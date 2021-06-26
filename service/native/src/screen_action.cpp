@@ -33,7 +33,7 @@ void ScreenAction::Init()
     DISPLAY_HILOGI(MODULE_SERVICE, "Succeed to init");
 }
 
-bool ScreenAction::SetPowerState(ScreenState state __unused)
+bool ScreenAction::SetPowerState(ScreenState state __attribute__((__unused__)))
 {
     return true;
 }
