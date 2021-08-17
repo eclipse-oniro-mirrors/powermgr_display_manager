@@ -20,7 +20,7 @@ import { AsyncCallback } from './basic';
  *
  * @SysCap SystemCapability.PowerMgr.DisplayManager
  * @devices phone, tablet
- * @since 6
+ * @since 7
  */
 declare namespace brightness {
   /**
@@ -29,7 +29,8 @@ declare namespace brightness {
    * @param value Brightness value, ranging from 0 to 255.
    * @SysCap SystemCapability.PowerMgr.DisplayManager
    * @devices phone, tablet
-   * @since 6
+   * @systemapi
+   * @since 7
    */
   function setValue(value: number): void;
 }
