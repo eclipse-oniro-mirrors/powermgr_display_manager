@@ -19,7 +19,7 @@
 #include <errors.h>
 
 namespace OHOS {
-namespace DisplayMgr {
+namespace DisplayPowerMgr {
 enum {
     /**
      *  Module type: Display Manager Service
@@ -42,7 +42,7 @@ enum {
     E_ADD_DEATH_RECIPIENT_FAILED,
     E_INNER_ERR
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 
 #endif // DISPLAYMGR_DISPLAY_MGR_ERRORS_H

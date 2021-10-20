@@ -13,21 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_INFO_H
-#define DISPLAYMGR_DISPLAY_INFO_H
+#include "display_system_ability.h"
+#include "display_common.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-/**
- * Display State
- */
-enum class DisplayState : uint32_t {
-    DISPLAY_OFF = 0,
-    DISPLAY_DIM = 1,
-    DISPLAY_ON = 2,
-    DISPLAY_SUSPEND = 3,
-    DISPLAY_UNKNOWN = 4,
-};
-} // namespace DisplayPowerMgr
-} // namespace OHOS
-#endif // DISPLAYMGR_DISPLAY_INFO_H
+namespace {
+REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, true);
+}
+void DisplaySystemAbility::OnStart()
+{
+        DISPLAY_HILOGI(MODULE_SERVICE, "Start service");
+        service_ = new DisplayPowerMgrService();
+        if (!Publish(service_)) {
+            DISPLAY_HILOGE(MODULE_SERVICE, "Failed to publish service");
+        }
+}
+
+void DisplaySystemAbility::OnStop()
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "Stop service");
+}
+}
+}

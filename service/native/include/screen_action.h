@@ -18,18 +18,23 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include <display_device.h>
 
 #include "display_info.h"
 
 namespace OHOS {
-namespace DisplayMgr {
+namespace DisplayPowerMgr {
 class ScreenAction {
 public:
-    void Init();
-    bool SetPowerState(ScreenState state);
-    bool SetBrightness(int32_t value);
+    ScreenAction();
+    ~ScreenAction() = default;
+    std::vector<uint32_t> GetDisplayIds();
+    DisplayState GetPowerState(uint32_t devId);
+    bool SetPowerState(uint32_t devId, DisplayState state);
+    uint32_t GetBrightness(uint32_t devId);
+    bool SetBrightness(uint32_t devId, uint32_t value);
 
 private:
     struct DeviceFuncCloser {
@@ -48,8 +53,9 @@ private:
     static constexpr int32_t MAX_BRIGHTNESS = 255;
     static constexpr int32_t MIN_BRIGHTNESS = 6;
 
+    std::vector<uint32_t> devIds_;
     DeviceFuncPtr hdiFuncs_;
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_SCREEN_ACTION_H

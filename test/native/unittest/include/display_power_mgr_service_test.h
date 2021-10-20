@@ -13,21 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_INFO_H
-#define DISPLAYMGR_DISPLAY_INFO_H
+#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
 
-namespace OHOS {
-namespace DisplayPowerMgr {
-/**
- * Display State
- */
-enum class DisplayState : uint32_t {
-    DISPLAY_OFF = 0,
-    DISPLAY_DIM = 1,
-    DISPLAY_ON = 2,
-    DISPLAY_SUSPEND = 3,
-    DISPLAY_UNKNOWN = 4,
+#include <gtest/gtest.h>
+
+class DisplayPowerMgrServiceTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDown() {}
 };
-} // namespace DisplayPowerMgr
-} // namespace OHOS
-#endif // DISPLAYMGR_DISPLAY_INFO_H
+#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H

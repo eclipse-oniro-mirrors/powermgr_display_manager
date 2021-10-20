@@ -23,6 +23,7 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//utils/system/safwk/native/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
   ]
 }
 
@@ -30,7 +31,7 @@ config("module_private_config") {
 ohos_unittest("unittest_display_mgr_service") {
   module_out_path = module_output_path
 
-  sources = [ "src/display_mgr_service_test.cpp" ]
+  sources = [ "src/display_power_mgr_service_test.cpp" ]
 
   configs = [
     "${displaymgr_utils_path}:utils_config",

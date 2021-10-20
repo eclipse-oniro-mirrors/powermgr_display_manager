@@ -14,7 +14,7 @@
           "header": {
             "header_files": [
                 "display_info.h",
-                "display_manager.h"
+                "display_power_mgr_client.h"
             ],
             "header_base": "//base/powermgr/display_manager/interfaces/innerkits/native/include"
           }
