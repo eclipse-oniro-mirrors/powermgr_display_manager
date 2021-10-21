@@ -26,6 +26,7 @@ using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
 namespace {
+#ifdef IPC_AVAILABLE
 /**
  * @tc.name: DisplayPowerMgrService01
  * @tc.desc: Test DisplayPowerMgrService service ready.
@@ -89,6 +90,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleep(5);
     EXPECT_TRUE(ret);
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
 }
 
 /**
@@ -101,6 +104,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     sleep(5);
     EXPECT_TRUE(ret);
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_DIM);
 }
 
 /**
@@ -113,6 +118,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     sleep(5);
     EXPECT_TRUE(ret);
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_OFF);
 }
 
 /**
@@ -125,5 +132,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     sleep(5);
     EXPECT_TRUE(ret);
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_SUSPEND);
 }
+#endif // IPC_AVAILABLE
 }

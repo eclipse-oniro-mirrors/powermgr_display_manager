@@ -76,7 +76,7 @@ bool DisplayPowerMgrClient::SetDisplayState(DisplayState state, uint32_t id)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return true;
+        return false;
     }
     return proxy->SetDisplayState(id, state);
 }
@@ -94,7 +94,7 @@ bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t id)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return true;
+        return false;
     }
     return proxy->SetBrightness(id, value);
 }
@@ -103,7 +103,7 @@ bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, 
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return true;
+        return false;
     }
     return proxy->AdjustBrightness(id, value, duration);
 }
@@ -112,7 +112,7 @@ bool DisplayPowerMgrClient::SetStateConfig(DisplayState state, uint32_t value, u
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return true;
+        return false;
     }
     return proxy->SetStateConfig(id, state, value);
 }
