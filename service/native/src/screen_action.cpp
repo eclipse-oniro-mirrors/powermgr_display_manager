@@ -16,11 +16,13 @@
 #include "screen_action.h"
 
 #include "display_common.h"
+#include "display_type.h"
 #include "hilog_wrapper.h"
+#include "window_manager_service_client.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-void ScreenAction::Init()
+namespace DisplayPowerMgr {
+ScreenAction::ScreenAction()
 {
     DeviceFuncs *f = NULL;
 
@@ -29,22 +31,114 @@ void ScreenAction::Init()
         DISPLAY_HILOGE(MODULE_SERVICE, "Failed to init device");
         return;
     }
+    devIds_.push_back(0);
     hdiFuncs_ = DeviceFuncPtr(f);
     DISPLAY_HILOGI(MODULE_SERVICE, "Succeed to init");
 }
 
-bool ScreenAction::SetPowerState(ScreenState state __attribute__((__unused__)))
+std::vector<uint32_t> ScreenAction::GetDisplayIds()
 {
+    return devIds_;
+}
+
+DisplayState ScreenAction::GetPowerState(uint32_t devId)
+{
+    DisplayState ret = DisplayState::DISPLAY_UNKNOWN;
+
+    auto wmsc = WindowManagerServiceClient::GetInstance();
+    wmsc->Init();
+    sptr<IWindowManagerService> wms = wmsc->GetService();
+    if (wms == nullptr) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
+        return DisplayState::DISPLAY_UNKNOWN;
+    }
+    auto promise = wms->GetDisplayPower(devId)->Await();
+    if (promise.wret != WM_OK) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "GetPowerState failed: %{public}d", promise.wret);
+        return ret;
+    }
+
+    switch (promise.status) {
+        case POWER_STATUS_ON:
+            ret = DisplayState::DISPLAY_ON;
+            break;
+        case POWER_STATUS_STANDBY:
+            ret = DisplayState::DISPLAY_DIM;
+            break;
+        case POWER_STATUS_SUSPEND:
+            ret = DisplayState::DISPLAY_SUSPEND;
+            break;
+        case POWER_STATUS_OFF:
+            ret = DisplayState::DISPLAY_OFF;
+            break;
+        default:
+            break;
+    }
+
+    return ret;
+}
+
+bool ScreenAction::SetPowerState(uint32_t devId, DisplayState state)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayPower: devId=%{public}d, state=%{public}d",
+        devId, static_cast<uint32_t>(state));
+    auto wmsc = WindowManagerServiceClient::GetInstance();
+    wmsc->Init();
+    sptr<IWindowManagerService> wms = wmsc->GetService();
+    if (wms == nullptr) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
+        return false;
+    }
+
+    DispPowerStatus status = POWER_STATUS_BUTT;
+    switch (state) {
+        case DisplayState::DISPLAY_ON:
+            status = POWER_STATUS_ON;
+            break;
+        case DisplayState::DISPLAY_DIM:
+            status = POWER_STATUS_STANDBY;
+            break;
+        case DisplayState::DISPLAY_SUSPEND:
+            status = POWER_STATUS_SUSPEND;
+            break;
+        case DisplayState::DISPLAY_OFF:
+            status = POWER_STATUS_OFF;
+            break;
+        default:
+            break;
+    }
+
+    auto wret = wms->SetDisplayPower(devId, status)->Await();
+    if (wret != WM_OK) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayPower failed: %{public}d", wret);
+        return false;
+    }
+
     return true;
 }
 
-bool ScreenAction::SetBrightness(int32_t value)
+uint32_t ScreenAction::GetBrightness(uint32_t devId)
+{
+    uint32_t level = 0;
+    if (!hdiFuncs_) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness:Invalid device functions");
+        return 0;
+    }
+    int32_t hdiRet = hdiFuncs_->GetDisplayBacklight(devId, &level);
+    if (hdiRet != DISPLAY_SUCCESS) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed:%d", level);
+        return 0;
+    }
+    return level;
+}
+
+bool ScreenAction::SetBrightness(uint32_t devId, uint32_t value)
 {
     if (!hdiFuncs_) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Invalid device functions");
+        DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness: Invalid device functions");
         return false;
     }
-    return hdiFuncs_->SetDisplayBacklight(0, GetValidBrightness(value)) == DISPLAY_SUCCESS;
+    return hdiFuncs_->SetDisplayBacklight(devId, GetValidBrightness(value)) == DISPLAY_SUCCESS;
 }
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS

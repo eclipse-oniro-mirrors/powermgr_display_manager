@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_HILOG_WRAPPER_H
-#define DISPLAYMGR_HILOG_WRAPPER_H
+#ifndef DISPLAY_POWER_MGR_HILOG_WRAPPER_H
+#define DISPLAY_POWER_MGR_HILOG_WRAPPER_H
 
 #define CONFIG_HILOG
 #ifdef CONFIG_HILOG
 #include "hilog/log.h"
 namespace OHOS {
-namespace DisplayMgr {
+namespace DisplayPowerMgr {
 #define __FILENAME__            (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 #define __FORMATED(fmt, ...)    "[%{public}s] %{public}s# " fmt, __FILENAME__, __FUNCTION__, ##__VA_ARGS__
 
@@ -45,45 +45,45 @@ namespace DisplayMgr {
 #endif
 
 // param of log interface, such as DISPLAY_HILOGF.
-enum DisplayMgrSubModule {
+enum DisplayPowerMgrSubModule {
     MODULE_INNERKIT = 0,
     MODULE_SERVICE,
     MODULE_JAVAKIT, // java kit, defined to avoid repeated use of domain.
     MODULE_JNI,
     MODULE_COMMON,
     MODULE_JS_NAPI,
-    DISPLAYMGR_MODULE_BUTT,
+    DISPLAY_POWER_MGR_MODULE_BUTT,
 };
 
-// 0xD002900: subsystem:PowerMgr module:DisplayMgr, 8 bits reserved.
-static constexpr unsigned int BASE_DISPLAYMGR_DOMAIN_ID = 0xD002910;
+// 0xD002900: subsystem:PowerMgr module:DisplayPowerMgr, 8 bits reserved.
+static constexpr unsigned int BASE_DisplayPowerMgr_DOMAIN_ID = 0xD002910;
 
-enum DisplayMgrDomainId {
-    DISPLAYMGR_INNERKIT_DOMAIN = BASE_DISPLAYMGR_DOMAIN_ID + MODULE_INNERKIT,
-    DISPLAYMGR_SERVICE_DOMAIN,
-    DISPLAYMGR_JAVAKIT_DOMAIN,
+enum DisplayPowerMgrDomainId {
+    DISPLAY_POWER_MGR_INNERKIT_DOMAIN = BASE_DisplayPowerMgr_DOMAIN_ID + MODULE_INNERKIT,
+    DISPLAY_POWER_MGR_SERVICE_DOMAIN,
+    DISPLAY_POWER_MGR_JAVAKIT_DOMAIN,
     COMMON_DOMAIN,
-    DISPLAYMGR_JS_NAPI,
-    DISPLAYMGR_BUTT,
+    DISPLAY_POWER_MGR_JS_NAPI,
+    DISPLAY_POWER_MGR_BUTT,
 };
 
-static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_MGR_LABEL[DISPLAYMGR_MODULE_BUTT] = {
-    {LOG_CORE, DISPLAYMGR_INNERKIT_DOMAIN, "DisplayMgrClient"},
-    {LOG_CORE, DISPLAYMGR_SERVICE_DOMAIN, "DisplayMgrService"},
-    {LOG_CORE, DISPLAYMGR_JAVAKIT_DOMAIN, "DisplayMgrJavaService"},
-    {LOG_CORE, DISPLAYMGR_INNERKIT_DOMAIN, "DisplayMgrJni"},
-    {LOG_CORE, COMMON_DOMAIN, "DisplayMgrCommon"},
-    {LOG_CORE, DISPLAYMGR_JS_NAPI, "DisplayMgrJSNAPI"},
+static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_MGR_LABEL[DISPLAY_POWER_MGR_MODULE_BUTT] = {
+    {LOG_CORE, DISPLAY_POWER_MGR_INNERKIT_DOMAIN, "DisplayPowerMgrClient"},
+    {LOG_CORE, DISPLAY_POWER_MGR_SERVICE_DOMAIN, "DisplayPowerMgrService"},
+    {LOG_CORE, DISPLAY_POWER_MGR_JAVAKIT_DOMAIN, "DisplayPowerMgrJavaService"},
+    {LOG_CORE, DISPLAY_POWER_MGR_INNERKIT_DOMAIN, "DisplayPowerMgrJni"},
+    {LOG_CORE, COMMON_DOMAIN, "DisplayPowerMgrCommon"},
+    {LOG_CORE, DISPLAY_POWER_MGR_JS_NAPI, "DisplayPowerMgrJSNAPI"},
 };
 
 // In order to improve performance, do not check the module range.
-// Besides, make sure module is less than DISPLAYMGR_MODULE_BUTT.
+// Besides, make sure module is less than DisplayPowerMgr_MODULE_BUTT.
 #define DISPLAY_HILOGF(m, ...) (void)OHOS::HiviewDFX::HiLog::Fatal(DISPLAY_MGR_LABEL[m], __FORMATED(__VA_ARGS__))
 #define DISPLAY_HILOGE(m, ...) (void)OHOS::HiviewDFX::HiLog::Error(DISPLAY_MGR_LABEL[m], __FORMATED(__VA_ARGS__))
 #define DISPLAY_HILOGW(m, ...) (void)OHOS::HiviewDFX::HiLog::Warn(DISPLAY_MGR_LABEL[m], __FORMATED(__VA_ARGS__))
 #define DISPLAY_HILOGI(m, ...) (void)OHOS::HiviewDFX::HiLog::Info(DISPLAY_MGR_LABEL[m], __FORMATED(__VA_ARGS__))
 #define DISPLAY_HILOGD(m, ...) (void)OHOS::HiviewDFX::HiLog::Debug(DISPLAY_MGR_LABEL[m], __FORMATED(__VA_ARGS__))
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 
 #else
@@ -96,4 +96,4 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_MGR_LABEL[DISPLAYMGR_MODULE
 
 #endif // CONFIG_HILOG
 
-#endif // DISPLAYMGR_HILOG_WRAPPER_H
+#endif // DISPLAY_POWER_MGR_HILOG_WRAPPER_H

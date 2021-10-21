@@ -14,7 +14,7 @@
 import("//base/powermgr/display_manager/displaymgr.gni")
 
 ohos_shared_library("brightness") {
-  sources = [ "brightness.cpp" ]
+  sources = [ "${displaymgr_framework_path}/napi/brightness.cpp" ]
 
   include_dirs = [
     "//foundation/ace/napi/native_engine",
@@ -29,7 +29,10 @@ ohos_shared_library("brightness") {
     "//foundation/ace/napi:ace_napi",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
 
   relative_install_dir = "module"
 

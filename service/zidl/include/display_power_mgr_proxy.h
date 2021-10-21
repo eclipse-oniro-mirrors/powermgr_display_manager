@@ -18,22 +18,25 @@
 
 #include <iremote_proxy.h>
 
-#include "idisplay_mgr.h"
+#include "idisplay_power_mgr.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-class DisplayMgrProxy : public IRemoteProxy<IDisplayMgr> {
+namespace DisplayPowerMgr {
+class DisplayPowerMgrProxy : public IRemoteProxy<IDisplayPowerMgr> {
 public:
-    explicit DisplayMgrProxy(const sptr<IRemoteObject>& impl)
-        : IRemoteProxy<IDisplayMgr>(impl) {}
-    ~DisplayMgrProxy() override = default;
+    explicit DisplayPowerMgrProxy(const sptr<IRemoteObject>& impl)
+        : IRemoteProxy<IDisplayPowerMgr>(impl) {}
+    ~DisplayPowerMgrProxy() override = default;
 
-    bool SetScreenState(ScreenState state) override;
-    bool SetBrightness(int32_t value) override;
+    virtual bool SetDisplayState(uint32_t id, DisplayState state) override;
+    virtual DisplayState GetDisplayState(uint32_t id) override;
+    virtual bool SetBrightness(uint32_t id, int32_t value) override;
+    virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
+    virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
 
 private:
-    static inline BrokerDelegator<DisplayMgrProxy> delegator_;
+    static inline BrokerDelegator<DisplayPowerMgrProxy> delegator_;
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_DISPLAY_MGR_PROXY_H

@@ -13,20 +13,16 @@
  * limitations under the License.
  */
 
-#include "display_manager.h"
+#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
 
-#include "display_mgr_client.h"
+#include <gtest/gtest.h>
 
-namespace OHOS {
-namespace DisplayMgr {
-bool DisplayManager::SetScreenState(ScreenState state)
-{
-    return DisplayMgrClient::GetInstance().SetScreenState(state);
-}
-
-bool DisplayManager::SetBrightness(int32_t value)
-{
-    return DisplayMgrClient::GetInstance().SetBrightness(value);
-}
-}  // namespace DisplayMgr
-}  // namespace OHOS
+class DisplayPowerMgrServiceTest : public testing::Test {
+public:
+    static void SetUpTestCase(void) {}
+    static void TearDownTestCase(void) {}
+    void SetUp() {}
+    void TearDown() {}
+};
+#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H

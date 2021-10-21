@@ -13,16 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
-#define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#include "display_system_ability.h"
+#include "display_common.h"
 
-#include <gtest/gtest.h>
+namespace OHOS {
+namespace DisplayPowerMgr {
+namespace {
+REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, true);
+}
+void DisplaySystemAbility::OnStart()
+{
+        DISPLAY_HILOGI(MODULE_SERVICE, "Start service");
+        service_ = new DisplayPowerMgrService();
+        if (!Publish(service_)) {
+            DISPLAY_HILOGE(MODULE_SERVICE, "Failed to publish service");
+        }
+}
 
-class DisplayMgrServiceTest : public testing::Test {
-public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
-    void SetUp() {}
-    void TearDown() {}
-};
-#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+void DisplaySystemAbility::OnStop()
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "Stop service");
+}
+}
+}

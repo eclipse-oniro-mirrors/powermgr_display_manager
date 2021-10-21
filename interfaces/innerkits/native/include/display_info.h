@@ -17,11 +17,17 @@
 #define DISPLAYMGR_DISPLAY_INFO_H
 
 namespace OHOS {
-namespace DisplayMgr {
-enum class ScreenState : uint32_t {
-    SCREEN_STATE_OFF = 0,
-    SCREEN_STATE_ON = 1,
+namespace DisplayPowerMgr {
+/**
+ * Display State
+ */
+enum class DisplayState : uint32_t {
+    DISPLAY_OFF = 0,
+    DISPLAY_DIM = 1,
+    DISPLAY_ON = 2,
+    DISPLAY_SUSPEND = 3,
+    DISPLAY_UNKNOWN = 4,
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_DISPLAY_INFO_H

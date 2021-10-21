@@ -20,10 +20,10 @@
 #include <napi/native_api.h>
 #include <napi/native_node_api.h>
 
-#include "display_manager.h"
+#include "display_power_mgr_client.h"
 #include "hilog_wrapper.h"
 
-using namespace OHOS::DisplayMgr;
+using namespace OHOS::DisplayPowerMgr;
 
 struct BrightnessAsyncCallbackInfo {
     napi_env env;
@@ -66,7 +66,7 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
         resourceName,
         [](napi_env env, void *data) {
             BrightnessAsyncCallbackInfo* asyncCallbackInfo = (BrightnessAsyncCallbackInfo *)data;
-            if (!DisplayManager::SetBrightness(asyncCallbackInfo->value)) {
+            if (!DisplayPowerMgrClient::GetInstance().SetBrightness(asyncCallbackInfo->value)) {
                 DISPLAY_HILOGE(MODULE_JS_NAPI, "Failed to set brightness");
             } else {
                 DISPLAY_HILOGD(MODULE_JS_NAPI, "Succeed to set brightness");

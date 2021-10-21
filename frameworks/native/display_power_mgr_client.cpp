@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "display_mgr_client.h"
+#include "display_power_mgr_client.h"
 
 #include <if_system_ability_manager.h>
 #include <iservice_registry.h>
@@ -22,11 +22,11 @@
 #include "display_common.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-DisplayMgrClient::DisplayMgrClient() = default;
-DisplayMgrClient::~DisplayMgrClient() = default;
+namespace DisplayPowerMgr {
+DisplayPowerMgrClient::DisplayPowerMgrClient() = default;
+DisplayPowerMgrClient::~DisplayPowerMgrClient() = default;
 
-sptr<IDisplayMgr> DisplayMgrClient::GetProxy()
+sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
 {
     std::lock_guard lock(mutex_);
     if (proxy_ != nullptr) {
@@ -49,13 +49,13 @@ sptr<IDisplayMgr> DisplayMgrClient::GetProxy()
         return nullptr;
     }
 
-    proxy_ = iface_cast<IDisplayMgr>(obj);
+    proxy_ = iface_cast<IDisplayPowerMgr>(obj);
     deathRecipient_ = dr;
     DISPLAY_HILOGI(MODULE_INNERKIT, "Succeed to connect display manager service");
     return proxy_;
 }
 
-void DisplayMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+void DisplayPowerMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
         DISPLAY_HILOGE(MODULE_INNERKIT, "OnRemoteDied failed, remote is nullptr");
@@ -72,22 +72,49 @@ void DisplayMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
     }
 }
 
-bool DisplayMgrClient::SetScreenState(ScreenState state)
+bool DisplayPowerMgrClient::SetDisplayState(DisplayState state, uint32_t id)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         return false;
     }
-    return proxy->SetScreenState(state);
+    return proxy->SetDisplayState(id, state);
 }
 
-bool DisplayMgrClient::SetBrightness(int32_t value)
+DisplayState DisplayPowerMgrClient::GetDisplayState(uint32_t id)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return DisplayState::DISPLAY_UNKNOWN;
+    }
+    return proxy->GetDisplayState(id);
+}
+
+bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t id)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         return false;
     }
-    return proxy->SetBrightness(value);
+    return proxy->SetBrightness(id, value);
 }
-}  // namespace DisplayMgr
+
+bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->AdjustBrightness(id, value, duration);
+}
+
+bool DisplayPowerMgrClient::SetStateConfig(DisplayState state, uint32_t value, uint32_t id)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->SetStateConfig(id, state, value);
+}
+}  // namespace DisplayPowerMgr
 }  // namespace OHOS

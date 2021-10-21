@@ -18,18 +18,21 @@
 
 #include <iremote_stub.h>
 
-#include "idisplay_mgr.h"
+#include "idisplay_power_mgr.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-class DisplayMgrStub : public IRemoteStub<IDisplayMgr> {
+namespace DisplayPowerMgr {
+class DisplayPowerMgrStub : public IRemoteStub<IDisplayPowerMgr> {
 public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    int32_t SetScreenStateStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetDisplayStateStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetDisplayStateStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t AdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetStateConfigStub(MessageParcel& data, MessageParcel& reply);
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_DISPLAY_MGR_STUB_H

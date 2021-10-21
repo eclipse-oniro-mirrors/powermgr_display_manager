@@ -26,10 +26,12 @@ config("displaymgr_public_config") {
 
 ohos_shared_library("displaymgrservice") {
   sources = [
-    "native/src/display_mgr_service.cpp",
+    "native/src/display_power_mgr_service.cpp",
+    "native/src/display_system_ability.cpp",
+    "native/src/gradual_animator.cpp",
     "native/src/screen_action.cpp",
     "native/src/screen_controller.cpp",
-    "zidl/src/display_mgr_stub.cpp",
+    "zidl/src/display_power_mgr_stub.cpp",
   ]
 
   configs = [
@@ -42,10 +44,13 @@ ohos_shared_library("displaymgrservice") {
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
     "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/standard:libwmservice",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

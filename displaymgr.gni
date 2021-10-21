@@ -17,6 +17,8 @@ displaymgr_native_part_name = "display_manager_native"
 
 displaymgr_root_path = "//base/powermgr/display_manager"
 
+displaymgr_framework_path = "${displaymgr_root_path}/frameworks"
+
 displaymgr_service_path = "${displaymgr_root_path}/service"
 
 displaymgr_interfaces_path = "${displaymgr_root_path}/interfaces"

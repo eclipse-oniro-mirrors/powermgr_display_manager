@@ -13,25 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_H
-#define DISPLAYMGR_DISPLAY_MGR_SERVICE_H
+#ifndef DISPLAY_SYSTEM_ABILITY_H
+#define DISPLAY_SYSTEM_ABILITY_H
 
-#include <mutex>
-
-#include "display_mgr_stub.h"
-#include "screen_controller.h"
+#include <system_ability.h>
+#include <system_ability_definition.h>
+#include "display_power_mgr_service.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-class DisplayMgrService : public DisplayMgrStub {
+namespace DisplayPowerMgr {
+class DisplaySystemAbility : public SystemAbility {
+    DECLARE_SYSTEM_ABILITY(DisplaySystemAbility);
+
 public:
-    bool SetScreenState(ScreenState state) override;
-    bool SetBrightness(int32_t value) override;
-    int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    DisplaySystemAbility(int32_t id, bool runOnCreate) : SystemAbility(id, runOnCreate) {}
+    ~DisplaySystemAbility() override = default;
+
+    void OnStart() override;
+    void OnStop() override;
 
 private:
-    ScreenController screenController_;
+    sptr<DisplayPowerMgrService> service_;
 };
-} // namespace DisplayMgr
-} // namespace OHOS
-#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_H
+}
+}
+#endif

@@ -20,21 +20,24 @@
 #include <singleton.h>
 
 #include "display_info.h"
-#include "idisplay_mgr.h"
+#include "idisplay_power_mgr.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-class DisplayMgrClient : public DelayedRefSingleton<DisplayMgrClient> {
-    DECLARE_DELAYED_REF_SINGLETON(DisplayMgrClient);
+namespace DisplayPowerMgr {
+class DisplayPowerMgrClient : public DelayedRefSingleton<DisplayPowerMgrClient> {
+    DECLARE_DELAYED_REF_SINGLETON(DisplayPowerMgrClient);
 
 public:
-    bool SetScreenState(ScreenState state);
-    bool SetBrightness(int32_t value);
+    bool SetDisplayState(DisplayState state, uint32_t id = 0);
+    DisplayState GetDisplayState(uint32_t id = 0);
+    bool SetBrightness(uint32_t value, uint32_t id = 0);
+    bool AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id = 0);
+    bool SetStateConfig(DisplayState state, uint32_t value, uint32_t id = 0);
 
 private:
     class DisplayDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit DisplayDeathRecipient(DisplayMgrClient& client) : client_(client) {}
+        explicit DisplayDeathRecipient(DisplayPowerMgrClient& client) : client_(client) {}
         ~DisplayDeathRecipient() override = default;
         void OnRemoteDied(const wptr<IRemoteObject>& remote) override
         {
@@ -42,16 +45,16 @@ private:
         }
 
     private:
-        DisplayMgrClient& client_;
+        DisplayPowerMgrClient& client_;
     };
 
-    sptr<IDisplayMgr> GetProxy();
+    sptr<IDisplayPowerMgr> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
 
     std::mutex mutex_;
-    sptr<IDisplayMgr> proxy_{nullptr};
-    sptr<IRemoteObject::DeathRecipient> deathRecipient_{nullptr};
+    sptr<IDisplayPowerMgr> proxy_ {nullptr};
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
-#endif // DISPLAYMGR_DISPLAY_MGR_CLIENT_H
+#endif // DISPLAYMGR_GRADUAL_ANIMATOR_H

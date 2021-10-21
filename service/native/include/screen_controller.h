@@ -16,33 +16,44 @@
 #ifndef DISPLAYMGR_SCREEN_CONTROLLER_H
 #define DISPLAYMGR_SCREEN_CONTROLLER_H
 
+#include <map>
 #include <mutex>
 
 #include "display_info.h"
+#include "gradual_animator.h"
 #include "screen_action.h"
 
 namespace OHOS {
-namespace DisplayMgr {
-class ScreenController {
+namespace DisplayPowerMgr {
+class ScreenController :
+    public AnimateCallback,
+    public std::enable_shared_from_this<ScreenController> {
 public:
-    ScreenController();
-    ~ScreenController() = default;
+    ScreenController(uint32_t devId, std::shared_ptr<ScreenAction> action);
+    virtual ~ScreenController() = default;
 
-    bool UpdateState(ScreenState state);
-    bool UpdateBrightness(int32_t value);
-    bool IsScreenOn();
-
-private:
-    inline bool IsScreenStateLocked(ScreenState state)
+    DisplayState GetState()
     {
-        return state_ == state;
-    }
-
+        return state_;
+    };
+    bool UpdateState(DisplayState state);
+    bool UpdateStateConfig(DisplayState state, uint32_t value);
+    bool UpdateBrightness(uint32_t value, uint32_t duration = 0);
+    bool IsScreenOn();
+    virtual void onStart() override;
+    virtual void onChanged(int32_t currentValue) override;
+    virtual void onEnd() override;
+private:
+    static const uint32_t SCREEN_BRIGHTNESS_UPDATE_DURATION = 200;
     std::mutex mutex_;
-    ScreenState state_{ScreenState::SCREEN_STATE_ON};
-    int32_t brightness_{0};
-    ScreenAction action_;
+    const uint32_t devId_;
+    DisplayState state_;
+    std::map<DisplayState, uint32_t> stateValues_;
+
+    uint32_t brightness_ {0};
+    std::shared_ptr<ScreenAction> action_;
+    std::shared_ptr<GradualAnimator> animator_;
 };
-} // namespace DisplayMgr
+} // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_SCREEN_CONTROLLER_H
