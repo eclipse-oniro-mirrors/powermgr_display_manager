@@ -26,7 +26,6 @@ using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
 namespace {
-
 /**
  * @tc.name: DisplayPowerMgrService01
  * @tc.desc: Test DisplayPowerMgrService service ready.
