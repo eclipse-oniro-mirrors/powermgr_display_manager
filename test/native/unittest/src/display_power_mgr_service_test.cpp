@@ -40,7 +40,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
     sptr<IRemoteObject> remoteObject_ = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     EXPECT_TRUE(remoteObject_ != nullptr) << "GetSystemAbility failed.";
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -55,7 +55,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
     sleep(5);
     EXPECT_TRUE(ret);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -70,7 +70,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
     sleep(5);
     EXPECT_TRUE(ret);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -88,7 +88,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
     sleep(5);
     EXPECT_TRUE(ret);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 
@@ -106,7 +106,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -123,7 +123,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_DIM);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -140,7 +140,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_OFF);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 
 /**
@@ -157,6 +157,6 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_SUSPEND);
     #endif // IPC_AVAILABLE
-	EXPECT_TRUE(true);
+    EXPECT_TRUE(true);
 }
 }
