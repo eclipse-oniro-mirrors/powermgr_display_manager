@@ -33,13 +33,10 @@ namespace {
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     EXPECT_TRUE(sam != nullptr) << "DisplayPowerMgrService01 fail to get GetSystemAbilityManager";
     sptr<IRemoteObject> remoteObject_ = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     EXPECT_TRUE(remoteObject_ != nullptr) << "GetSystemAbility failed.";
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
@@ -49,12 +46,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     sleep(5);
     EXPECT_TRUE(ret);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
@@ -64,98 +58,146 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleep(5);
     EXPECT_TRUE(ret);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
  * @tc.name: DisplayPowerMgrService004
- * @tc.desc: Test set brightness
+ * @tc.desc: Test set screen state dim
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
-    auto ret = DisplayPowerMgrClient::GetInstance().SetBrightness(5);
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     sleep(5);
     EXPECT_TRUE(ret);
-    ret = DisplayPowerMgrClient::GetInstance().SetBrightness(255);
-    sleep(5);
-    EXPECT_TRUE(ret);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
-
 
 /**
  * @tc.name: DisplayPowerMgrService005
- * @tc.desc: Test set screen state on
+ * @tc.desc: Test set screen state suspend
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
+    sleep(5);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService006
+ * @tc.desc: Test set screen state unknown
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
+{
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
+    sleep(5);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService007
+ * @tc.desc: Test set brightness
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: fun is start");
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 5");
+    auto ret = DisplayPowerMgrClient::GetInstance().SetBrightness(5);
+    sleep(5);
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 155");
+    ret = DisplayPowerMgrClient::GetInstance().SetBrightness(155);
+    sleep(5);
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 255");
+    ret = DisplayPowerMgrClient::GetInstance().SetBrightness(255);
+    sleep(5);
+    EXPECT_TRUE(ret);
+}
+
+
+/**
+ * @tc.name: DisplayPowerMgrService008
+ * @tc.desc: Test set screen state on
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService008: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleep(5);
     EXPECT_TRUE(ret);
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
- * @tc.name: DisplayPowerMgrService006
+ * @tc.name: DisplayPowerMgrService009
  * @tc.desc: Test set screen state dim
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService009: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     sleep(5);
     EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService009: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_DIM);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
- * @tc.name: DisplayPowerMgrService007
+ * @tc.name: DisplayPowerMgrService0010
  * @tc.desc: Test set screen state off
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService010: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     sleep(5);
     EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService010: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_OFF);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
 }
 
 /**
- * @tc.name: DisplayPowerMgrService008
+ * @tc.name: DisplayPowerMgrService011
  * @tc.desc: Test set screen state suspend
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
 {
-#ifdef IPC_AVAILABLE
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService011: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     sleep(5);
     EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService011: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_SUSPEND);
-#endif // IPC_AVAILABLE
-    EXPECT_TRUE(true);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService012
+ * @tc.desc: Test set screen state unknow
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService012: fun is start");
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
+    sleep(5);
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService012: GetDisplayState");
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_UNKNOWN);
 }
 }

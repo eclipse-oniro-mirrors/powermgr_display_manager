@@ -119,26 +119,38 @@ bool ScreenAction::SetPowerState(uint32_t devId, DisplayState state)
 
 uint32_t ScreenAction::GetBrightness(uint32_t devId)
 {
-    uint32_t level = 0;
-    if (!hdiFuncs_) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness:Invalid device functions");
+    auto wmsc = WindowManagerServiceClient::GetInstance();
+    wmsc->Init();
+    sptr<IWindowManagerService> wms = wmsc->GetService();
+    if (wms == nullptr) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
         return 0;
     }
-    int32_t hdiRet = hdiFuncs_->GetDisplayBacklight(devId, &level);
-    if (hdiRet != DISPLAY_SUCCESS) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed:%d", level);
+    auto promise = wms->GetDisplayBacklight(devId)->Await();
+    if (promise.wret != WM_OK) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed: %{public}d", promise.wret);
         return 0;
     }
-    return level;
+
+    return promise.level;
 }
 
 bool ScreenAction::SetBrightness(uint32_t devId, uint32_t value)
 {
-    if (!hdiFuncs_) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness: Invalid device functions");
+    auto wmsc = WindowManagerServiceClient::GetInstance();
+    wmsc->Init();
+    sptr<IWindowManagerService> wms = wmsc->GetService();
+    if (wms == nullptr) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
         return false;
     }
-    return hdiFuncs_->SetDisplayBacklight(devId, GetValidBrightness(value)) == DISPLAY_SUCCESS;
+    auto wret = wms->SetDisplayBacklight(devId, value)->Await();
+    if (wret != WM_OK) {
+        DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness failed: %{public}d", wret);
+        return false;
+    }
+
+    return true;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
