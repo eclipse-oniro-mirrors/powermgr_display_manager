@@ -1,0 +1,60 @@
+{
+    "name": "@ohos/powermgr_display_manager",
+    "version": "",
+    "description": "显示管理服务",
+    "homePage": "https://gitee.com/openharmony",
+    "license": "Apache V2",
+    "repository": "https://gitee.com/openharmony/powermgr_display_manager",
+    "domain": "os",
+    "language": "",
+    "publishAs": "code-segment",
+    "private": false,
+    "scripts": {},
+    "tags": [
+        "base"
+    ],
+    "keywords": [
+        "powermgr",
+        "display",
+        "manager"
+    ],
+    "envs": [],
+    "dirs": [],
+    "author": {
+        "name": "",
+        "email": "",
+        "url": ""
+    },
+    "contributors": [
+        {
+            "name": "",
+            "email": "",
+            "url": ""
+        }
+    ],
+    "segment": {
+        "destPath": "base/powermgr/display_manager"
+    },
+    "component": {
+        "name": "display_manger",
+        "subsystem": "powermgr",
+        "syscap": [
+            "SystemPart.PowerMgr.DisplayManager"
+        ],
+        "features": [],
+        "adated_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [],
+            "third_party": []
+        },
+        "build": {
+            "sub_component": [],
+            "inner_kits": [],
+            "test": []
+        }
+    }
+}
