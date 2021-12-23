@@ -52,28 +52,28 @@ DisplayState ScreenAction::GetPowerState(uint32_t devId)
         DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
         return DisplayState::DISPLAY_UNKNOWN;
     }
-    auto promise = wms->GetDisplayPower(devId)->Await();
-    if (promise.wret != WM_OK) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "GetPowerState failed: %{public}d", promise.wret);
-        return ret;
-    }
+    // auto promise = wms->GetDisplayPower(devId)->Await();
+    // if (promise.wret != WM_OK) {
+    //     DISPLAY_HILOGE(MODULE_SERVICE, "GetPowerState failed: %{public}d", promise.wret);
+    //     return ret;
+    // }
 
-    switch (promise.status) {
-        case POWER_STATUS_ON:
-            ret = DisplayState::DISPLAY_ON;
-            break;
-        case POWER_STATUS_STANDBY:
-            ret = DisplayState::DISPLAY_DIM;
-            break;
-        case POWER_STATUS_SUSPEND:
-            ret = DisplayState::DISPLAY_SUSPEND;
-            break;
-        case POWER_STATUS_OFF:
-            ret = DisplayState::DISPLAY_OFF;
-            break;
-        default:
-            break;
-    }
+    // switch (promise.status) {
+    //     case POWER_STATUS_ON:
+    //         ret = DisplayState::DISPLAY_ON;
+    //         break;
+    //     case POWER_STATUS_STANDBY:
+    //         ret = DisplayState::DISPLAY_DIM;
+    //         break;
+    //     case POWER_STATUS_SUSPEND:
+    //         ret = DisplayState::DISPLAY_SUSPEND;
+    //         break;
+    //     case POWER_STATUS_OFF:
+    //         ret = DisplayState::DISPLAY_OFF;
+    //         break;
+    //     default:
+    //         break;
+    // }
 
     return ret;
 }
@@ -108,11 +108,11 @@ bool ScreenAction::SetPowerState(uint32_t devId, DisplayState state)
             break;
     }
 
-    auto wret = wms->SetDisplayPower(devId, status)->Await();
-    if (wret != WM_OK) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayPower failed: %{public}d", wret);
-        return false;
-    }
+    // auto wret = wms->SetDisplayPower(devId, status)->Await();
+    // if (wret != WM_OK) {
+    //     DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayPower failed: %{public}d", wret);
+    //     return false;
+    // }
 
     return true;
 }
@@ -126,13 +126,14 @@ uint32_t ScreenAction::GetBrightness(uint32_t devId)
         DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
         return 0;
     }
-    auto promise = wms->GetDisplayBacklight(devId)->Await();
-    if (promise.wret != WM_OK) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed: %{public}d", promise.wret);
-        return 0;
-    }
+    // auto promise = wms->GetDisplayBacklight(devId)->Await();
+    // if (promise.wret != WM_OK) {
+    //     DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed: %{public}d", promise.wret);
+    //     return 0;
+    // }
 
-    return promise.level;
+    // return promise.level;
+    return 0;
 }
 
 bool ScreenAction::SetBrightness(uint32_t devId, uint32_t value)
@@ -144,11 +145,11 @@ bool ScreenAction::SetBrightness(uint32_t devId, uint32_t value)
         DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
         return false;
     }
-    auto wret = wms->SetDisplayBacklight(devId, value)->Await();
-    if (wret != WM_OK) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness failed: %{public}d", wret);
-        return false;
-    }
+    // auto wret = wms->SetDisplayBacklight(devId, value)->Await();
+    // if (wret != WM_OK) {
+    //     DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness failed: %{public}d", wret);
+    //     return false;
+    // }
 
     return true;
 }
