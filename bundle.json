@@ -1,7 +1,7 @@
 {
     "name": "@ohos/powermgr_display_manager",
     "version": "",
-    "description": "显示管理服务",
+    "description": "显示能耗管理服务",
     "homePage": "https://gitee.com/openharmony",
     "license": "Apache V2",
     "repository": "https://gitee.com/openharmony/powermgr_display_manager",
@@ -42,7 +42,7 @@
             "SystemPart.PowerMgr.DisplayManager"
         ],
         "features": [],
-        "adated_system_type": [
+        "adapted_system_type": [
             "standard"
         ],
         "rom": "",
