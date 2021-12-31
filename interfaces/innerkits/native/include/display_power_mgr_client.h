@@ -18,8 +18,10 @@
 
 #include <iremote_object.h>
 #include <singleton.h>
+#include <vector>
 
 #include "display_info.h"
+#include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
 
 namespace OHOS {
@@ -30,9 +32,13 @@ class DisplayPowerMgrClient : public DelayedRefSingleton<DisplayPowerMgrClient> 
 public:
     bool SetDisplayState(DisplayState state, uint32_t id = 0);
     DisplayState GetDisplayState(uint32_t id = 0);
+    std::vector<uint32_t> GetDisplayIds();
+    int32_t GetMainDisplayId();
     bool SetBrightness(uint32_t value, uint32_t id = 0);
     bool AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id = 0);
     bool SetStateConfig(DisplayState state, uint32_t value, uint32_t id = 0);
+    bool AutoAdjustBrightness(bool enable);
+    bool RegisterCallback(sptr<IDisplayPowerCallback> callback);
 
 private:
     class DisplayDeathRecipient : public IRemoteObject::DeathRecipient {

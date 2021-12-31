@@ -22,6 +22,7 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
+    "//base/sensors/sensor/interfaces/native/include",
     "//utils/system/safwk/native/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
   ]
@@ -51,5 +52,6 @@ ohos_unittest("unittest_display_mgr_service") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "sensor:sensor_interface_native",
   ]
 }

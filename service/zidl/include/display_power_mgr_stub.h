@@ -29,9 +29,13 @@ public:
 private:
     int32_t SetDisplayStateStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDisplayStateStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetDisplayIdsStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetMainDisplayIdStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t AdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t AutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetStateConfigStub(MessageParcel& data, MessageParcel& reply);
+    int32_t RegisterCallbackStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -25,10 +25,6 @@ GradualAnimator::GradualAnimator(const std::string& name,
     DISPLAY_HILOGD(MODULE_SERVICE, "GradualAnimator construct start");
     name_ = name;
     callback_ = callback;
-    eventRunner_ = AppExecFwk::EventRunner::Create(name_);
-    if (eventRunner_ == nullptr) {
-        DISPLAY_HILOGW(MODULE_SERVICE, "GradualAnimator failed due to create EventRunner");
-    }
     from_ = 0;
     to_ = 0;
     current_ = 0;
@@ -45,7 +41,7 @@ void GradualAnimator::StartAnimation(int32_t from, int32_t to, uint32_t duration
     DISPLAY_HILOGD(MODULE_SERVICE,
         "StartAnimation from=%{public}d, to=%{public}d, duration=%{public}d",
         from, to, duration);
-    if (callback_ == nullptr) {
+    if (callback_.lock() == nullptr) {
         DISPLAY_HILOGW(MODULE_SERVICE, "Callback is NULL");
         return;
     }
@@ -57,9 +53,14 @@ void GradualAnimator::StartAnimation(int32_t from, int32_t to, uint32_t duration
     if (steps_ < 1) {
         steps_ = 1;
     }
-    stride_ = (to_ - from_) / steps_;
+    stride_ = (to_ - from_) / static_cast<int32_t>(steps_);
     currentStep_ = 0;
     if (handler_ == nullptr) {
+        eventRunner_ = AppExecFwk::EventRunner::Create(name_);
+        if (eventRunner_ == nullptr) {
+            DISPLAY_HILOGW(MODULE_SERVICE, "GradualAnimator failed due to create EventRunner");
+            return;
+        }
         handler_ = std::make_shared<AnimatorHandler>(eventRunner_, shared_from_this());
     }
     animating_ = true;
@@ -72,11 +73,12 @@ void GradualAnimator::StopAnimation()
     DISPLAY_HILOGD(MODULE_SERVICE, "GradualAnimator StopAnimation start");
     animating_ = false;
     handler_->RemoveEvent(EVENT_STEP);
-    if (callback_ == nullptr) {
+    if (callback_.lock() == nullptr) {
         DISPLAY_HILOGW(MODULE_SERVICE, "Callback is NULL");
         return;
     }
-    callback_->onEnd();
+    std::shared_ptr<AnimateCallback> callback = callback_.lock();
+    callback->OnEnd();
     DISPLAY_HILOGD(MODULE_SERVICE, "GradualAnimator StopAnimation end");
 }
 
@@ -91,24 +93,27 @@ void GradualAnimator::NextStep()
         DISPLAY_HILOGW(MODULE_SERVICE, "NextStep, not animating");
         return;
     }
-    if (callback_ == nullptr) {
+    if (callback_.lock() == nullptr) {
         DISPLAY_HILOGW(MODULE_SERVICE, "Callback is NULL");
         return;
     }
+    std::shared_ptr<AnimateCallback> callback = callback_.lock();
     currentStep_++;
     if (currentStep_ == 1) {
-        callback_->onStart();
+        callback->OnStart();
     }
     if (currentStep_ < steps_) {
         current_ = current_ + stride_;
-        callback_->onChanged(current_);
+        callback->OnChanged(current_);
         handler_->SendEvent(EVENT_STEP, 0, updateTime_);
     } else {
         current_ = to_;
-        callback_->onChanged(current_);
-        callback_->onEnd();
+        callback->OnChanged(current_);
+        callback->OnEnd();
         animating_ = false;
     }
+    DISPLAY_HILOGD(MODULE_SERVICE, "NextStep: Step=%{public}d, current=%{public}d, stride=%{public}d",
+        currentStep_, current_, stride_);
 }
 
 GradualAnimator::AnimatorHandler::AnimatorHandler(
@@ -124,6 +129,10 @@ void GradualAnimator::AnimatorHandler::ProcessEvent(const AppExecFwk::InnerEvent
     DISPLAY_HILOGD(MODULE_SERVICE, "AnimatorHandler::%{public}s ,eventid = %d", __func__,
         event->GetInnerEventId());
     std::shared_ptr<GradualAnimator> animator = owner_.lock();
+    if (animator == nullptr) {
+        DISPLAY_HILOGD(MODULE_SERVICE, "AnimatorHandler no object");
+        return;
+    }
     switch (event->GetInnerEventId()) {
         case EVENT_STEP: {
             animator->NextStep();

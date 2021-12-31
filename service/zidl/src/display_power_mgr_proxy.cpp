@@ -85,6 +85,78 @@ DisplayState DisplayPowerMgrProxy::GetDisplayState(uint32_t id)
     return static_cast<DisplayState>(result);
 }
 
+std::vector<uint32_t> DisplayPowerMgrProxy::GetDisplayIds()
+{
+    sptr<IRemoteObject> remote = Remote();
+    std::vector<uint32_t> result;
+
+    RETURN_IF_WITH_RET(remote == nullptr, result);
+
+    uint32_t count = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DISPLAY_IDS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        return result;
+    }
+
+    if (!reply.ReadUint32(count)) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "Readback fail!");
+        return result;
+    }
+
+    for (uint32_t i = 0; i < count; i++) {
+        uint32_t value;
+        if (reply.ReadUint32(value)) {
+            result.push_back(value);
+        } else {
+            DISPLAY_HILOGE(MODULE_INNERKIT, "read value fail: %{public}d", i);
+        }
+    }
+
+    return result;
+}
+
+uint32_t DisplayPowerMgrProxy::GetMainDisplayId()
+{
+    sptr<IRemoteObject> remote = Remote();
+    uint32_t result = 0;
+
+    RETURN_IF_WITH_RET(remote == nullptr, result);
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MAIN_DISPLAY_ID),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        return result;
+    }
+
+    if (!reply.ReadUint32(result)) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
 bool DisplayPowerMgrProxy::SetBrightness(uint32_t id, int32_t value)
 {
     sptr<IRemoteObject> remote = Remote();
@@ -152,6 +224,38 @@ bool DisplayPowerMgrProxy::AdjustBrightness(uint32_t id, int32_t value, uint32_t
     return result;
 }
 
+bool DisplayPowerMgrProxy::AutoAdjustBrightness(bool enable)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Bool, enable, false);
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %d", __func__, ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
 bool DisplayPowerMgrProxy::SetStateConfig(uint32_t id, DisplayState state, int32_t value)
 {
     sptr<IRemoteObject> remote = Remote();
@@ -176,6 +280,38 @@ bool DisplayPowerMgrProxy::SetStateConfig(uint32_t id, DisplayState state, int32
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(MODULE_INNERKIT, "PowerMgrProxy::%{public}s SendRequest is failed, error code: %d",
             __func__, ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
+bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, RemoteObject, callback->AsObject(), false);
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::REGISTER_CALLBACK),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %d", __func__, ret);
         return result;
     }
 

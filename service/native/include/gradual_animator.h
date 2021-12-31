@@ -25,9 +25,9 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class AnimateCallback {
 public:
-    virtual void onStart() = 0;
-    virtual void onChanged(int32_t currentValue) = 0;
-    virtual void onEnd() = 0;
+    virtual void OnStart() = 0;
+    virtual void OnChanged(int32_t currentValue) = 0;
+    virtual void OnEnd() = 0;
 };
 
 class GradualAnimator : public std::enable_shared_from_this<GradualAnimator> {
@@ -51,7 +51,7 @@ private:
     };
     void NextStep();
     std::string name_;
-    std::shared_ptr<AnimateCallback> callback_;
+    std::weak_ptr<AnimateCallback> callback_;
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
     std::shared_ptr<AnimatorHandler> handler_;
     bool animating_ = false;

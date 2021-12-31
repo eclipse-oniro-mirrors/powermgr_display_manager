@@ -13,25 +13,22 @@
  * limitations under the License.
  */
 
-#include "display_system_ability.h"
-#include "display_common.h"
+#ifndef POWERMGR_IDISPLAY_POWER_CALLBACK_H
+#define POWERMGR_IDISPLAY_POWER_CALLBACK_H
+
+#include <iremote_broker.h>
+#include <iremote_object.h>
+
+#include "display_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-namespace {
-REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, true);
-}
-void DisplaySystemAbility::OnStart()
-{
-    DISPLAY_HILOGI(MODULE_SERVICE, "Start service");
-    if (!Publish(DelayedSpSingleton<DisplayPowerMgrService>::GetInstance())) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to publish service");
-    }
-}
+class IDisplayPowerCallback : public IRemoteBroker {
+public:
+    virtual void OnDisplayStateChanged(DisplayState state) = 0;
 
-void DisplaySystemAbility::OnStop()
-{
-    DISPLAY_HILOGI(MODULE_SERVICE, "Stop service");
-}
-}
-}
+    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.powermgr.IDisplayPowerCallback");
+};
+} // namespace DisplayPowerMgr
+} // namespace OHOS
+#endif // POWERMGR_IDISPLAY_POWER_CALLBACK_H

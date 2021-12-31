@@ -17,8 +17,10 @@
 #define DISPLAYMGR_IDISPLAY_MGR_H
 
 #include <iremote_broker.h>
+#include <vector>
 
 #include "display_info.h"
+#include "idisplay_power_callback.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -27,16 +29,24 @@ public:
     enum {
         SET_DISPLAY_STATE = 0,
         GET_DISPLAY_STATE,
+        GET_DISPLAY_IDS,
+        GET_MAIN_DISPLAY_ID,
         SET_BRIGHTNESS,
         ADJUST_BRIGHTNESS,
+        AUTO_ADJUST_BRIGHTNESS,
         SET_STATE_CONFIG,
+        REGISTER_CALLBACK,
     };
 
     virtual bool SetDisplayState(uint32_t id, DisplayState state) = 0;
     virtual DisplayState GetDisplayState(uint32_t id) = 0;
+    virtual std::vector<uint32_t> GetDisplayIds() = 0;
+    virtual uint32_t GetMainDisplayId() = 0;
     virtual bool SetBrightness(uint32_t id, int32_t value) = 0;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) = 0;
+    virtual bool AutoAdjustBrightness(bool enable) = 0;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) = 0;
+    virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");
 };

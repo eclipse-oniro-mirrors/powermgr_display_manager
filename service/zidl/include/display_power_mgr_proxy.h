@@ -30,9 +30,14 @@ public:
 
     virtual bool SetDisplayState(uint32_t id, DisplayState state) override;
     virtual DisplayState GetDisplayState(uint32_t id) override;
+    virtual std::vector<uint32_t> GetDisplayIds() override;
+    virtual uint32_t GetMainDisplayId() override;
+
     virtual bool SetBrightness(uint32_t id, int32_t value) override;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
+    virtual bool AutoAdjustBrightness(bool enable) override;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
+    virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
 
 private:
     static inline BrokerDelegator<DisplayPowerMgrProxy> delegator_;
