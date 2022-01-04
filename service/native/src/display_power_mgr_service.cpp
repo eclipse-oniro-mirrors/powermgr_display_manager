@@ -114,8 +114,8 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
         strcpy_s(user_.name, sizeof(user_.name), "DisplayPowerMgrService");
         user_.userData = nullptr;
         user_.callback = &AmbientLightCallback;
-        SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SAMPLING_RATE, SAMPLING_RATE);
         SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
+        SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SAMPLING_RATE, SAMPLING_RATE);
         ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
         SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SENSOR_ON_CHANGE);
     } else {
@@ -253,8 +253,6 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
             return false;
         } else {
             DISPLAY_HILOGI(MODULE_SERVICE, "IsChangedLux: First time to change, wait for stable");
-            lastLuxTime_ = time(0);
-            lastLux_ = scalar;
             luxChanged_ = true;
             return false;
         }
@@ -263,9 +261,11 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
         if (luxChangeMin < LUX_CHANGE_STABLE_MIN) {
             luxChangeMin = LUX_CHANGE_STABLE_MIN;
         }
-        if (abs(scalar - lastLux_) <= luxChangeMin) {
+        if (abs(scalar - lastLux_) >= luxChangeMin) {
+            time_t currentTime = time(0);
+            time_t sub = currentTime - lastLuxTime_;
             DISPLAY_HILOGI(MODULE_SERVICE, "IsChangedLux: stable lux");
-            if (time(0) - lastLuxTime_ >= LUX_STABLE_TIME) {
+            if (sub >= LUX_STABLE_TIME) {
                 DISPLAY_HILOGI(MODULE_SERVICE, "IsChangedLux: stable enought to change");
                 lastLuxTime_ = time(0);
                 lastLux_ = scalar;
@@ -274,13 +274,10 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
             }
         } else {
             DISPLAY_HILOGI(MODULE_SERVICE, "IsChangedLux: unstable lux, wait for stable");
-            lastLuxTime_ = time(0);
-            lastLux_ = scalar;
             luxChanged_ = true;
             return false;
         }
     }
-
     return false;
 }
 

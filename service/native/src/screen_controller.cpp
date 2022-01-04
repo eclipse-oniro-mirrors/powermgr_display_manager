@@ -88,7 +88,6 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
     } else {
         DISPLAY_HILOGI(MODULE_SERVICE, "Update brightness falied! %{public}d", value);
     }
-
     return ret;
 }
 

@@ -38,6 +38,10 @@ GradualAnimator::GradualAnimator(const std::string& name,
 
 void GradualAnimator::StartAnimation(int32_t from, int32_t to, uint32_t duration)
 {
+    if (animating_) {
+        DISPLAY_HILOGD(MODULE_SERVICE, "StartAnimation is running...");
+        return;
+    }
     DISPLAY_HILOGD(MODULE_SERVICE,
         "StartAnimation from=%{public}d, to=%{public}d, duration=%{public}d",
         from, to, duration);
