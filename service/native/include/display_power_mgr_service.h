@@ -20,51 +20,59 @@
 #include <system_ability.h>
 #include <system_ability_definition.h>
 
+#include "delayed_sp_singleton.h"
+#include "display_common.h"
 #include "display_power_mgr_stub.h"
 #include "screen_controller.h"
-#include "display_common.h"
+#include "sensor_agent.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 class DisplayPowerMgrService : public DisplayPowerMgrStub {
 public:
-    DisplayPowerMgrService();
-    ~DisplayPowerMgrService() = default;
+    virtual ~DisplayPowerMgrService();
     virtual bool SetDisplayState(uint32_t id, DisplayState state) override;
     virtual DisplayState GetDisplayState(uint32_t id) override;
+    virtual std::vector<uint32_t> GetDisplayIds() override;
+    virtual uint32_t GetMainDisplayId() override;
     virtual bool SetBrightness(uint32_t id, int32_t value) override;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
+    virtual bool AutoAdjustBrightness(bool enable) override;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
+    virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
 
-    class DisplaySystemAbility : public SystemAbility {
-    DECLARE_SYSTEM_ABILITY(DisplaySystemAbility);
-
-    public:
-        DisplaySystemAbility(int32_t id, bool runOnCreate) : SystemAbility(id, runOnCreate) {}
-        ~DisplaySystemAbility() override = default;
-
-        void OnStart() override
-        {
-            DISPLAY_HILOGI(MODULE_SERVICE, "Start service");
-            service_ = new DisplayPowerMgrService();
-            if (!Publish(service_)) {
-                DISPLAY_HILOGE(MODULE_SERVICE, "Failed to publish service");
-            }
-        }
-
-        void OnStop() override
-        {
-            DISPLAY_HILOGI(MODULE_SERVICE, "Stop service");
-        }
-
-    private:
-        sptr<DisplayPowerMgrService> service_;
-    };
-    REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, true);
-
 private:
+    static const uint32_t AUTO_ADJUST_BRIGHTNESS_DURATION = 1000;
+    static const uint32_t SAMPLING_RATE = 100000000;
+    static const int32_t BRIGHTNESS_CHANGE_MIN = 5;
+    static const int32_t LUX_TO_NIT_SQRT_RADIO = 5;
+    static const time_t LUX_STABLE_TIME = 1;
+    static constexpr float LUX_CHANGE_RATE_THRESHOLD = 10;
+    static constexpr float LUX_CHANGE_STABLE_MIN = 100.0;
+    static const int32_t NIT_MIN = 2;
+    static const int32_t NIT_MAX = 450;
+    static const int32_t BRIGHTNESS_MIN = 1;
+    static const int32_t BRIGHTNESS_MAX = 255;
+    static void AmbientLightCallback(SensorEvent *event);
+
+    friend DelayedSpSingleton<DisplayPowerMgrService>;
+
+    DisplayPowerMgrService();
+    void InitSensors();
+    bool IsChangedLux(float scalar);
+    bool CalculateBrightness(float scalar, int32_t& brightness);
+    int32_t GetBrightnessFromLightScalar(float scalar);
+
     std::map<uint32_t, std::shared_ptr<ScreenController>> controllerMap_;
+    bool supportLightSensor_ {false};
+    bool autoBrightness_ {false};
+    SensorUser user_;
+    sptr<IDisplayPowerCallback> callback_;
+
+    time_t lastLuxTime_ {0};
+    float lastLux_ {0};
+    bool luxChanged_ {false};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

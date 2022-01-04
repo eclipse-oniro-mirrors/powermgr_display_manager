@@ -66,8 +66,8 @@ bool ScreenController::UpdateState(DisplayState state)
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
 {
     std::lock_guard lock(mutex_);
-    DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController UpdateState: %{public}d, %{public}d",
-        devId_, value);
+    DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController UpdateBrightness: %{public}d, %{public}d, %{public}d",
+        devId_, value, duraion);
     if (animator_ == nullptr) {
         std::string name = "ScreenController_" + std::to_string(devId_);
         std::shared_ptr<AnimateCallback> callback = shared_from_this();
@@ -78,7 +78,7 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
     }
     if (duraion > 0) {
         DISPLAY_HILOGI(MODULE_SERVICE, "UpdateState gradually");
-        animator_->StartAnimation(brightness_, value, SCREEN_BRIGHTNESS_UPDATE_DURATION);
+        animator_->StartAnimation(brightness_, value, duraion);
         return true;
     }
     bool ret = action_->SetBrightness(devId_, value);
@@ -88,7 +88,6 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
     } else {
         DISPLAY_HILOGI(MODULE_SERVICE, "Update brightness falied! %{public}d", value);
     }
-    
     return ret;
 }
 
@@ -113,23 +112,32 @@ bool ScreenController::IsScreenOn()
     return (state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM);
 }
 
-void ScreenController::onStart()
+uint32_t ScreenController::GetBrightness()
+{
+    std::lock_guard lock(mutex_);
+    if (brightness_ == 0) {
+        brightness_ = action_->GetBrightness(devId_);
+    }
+    return brightness_;
+}
+
+void ScreenController::OnStart()
 {
     DISPLAY_HILOGD(MODULE_SERVICE, "ScreenAnimatorCallback onStart");
 }
 
-void ScreenController::onChanged(int32_t currentValue)
+void ScreenController::OnChanged(int32_t currentValue)
 {
-    brightness_ = currentValue;
-    bool ret = action_->SetBrightness(devId_, currentValue);
+    brightness_ = static_cast<uint32_t>(currentValue);
+    bool ret = action_->SetBrightness(devId_, brightness_);
     if (ret) {
-        DISPLAY_HILOGD(MODULE_SERVICE, "Update brightness to %{public}d", currentValue);
+        DISPLAY_HILOGD(MODULE_SERVICE, "Update brightness to %{public}d", brightness_);
     } else {
-        DISPLAY_HILOGD(MODULE_SERVICE, "Update brightness falied! %{public}d", currentValue);
+        DISPLAY_HILOGD(MODULE_SERVICE, "Update brightness falied! %{public}d", brightness_);
     }
 }
 
-void ScreenController::onEnd()
+void ScreenController::OnEnd()
 {
     DISPLAY_HILOGD(MODULE_SERVICE, "ScreenAnimatorCallback OnEnd");
 }

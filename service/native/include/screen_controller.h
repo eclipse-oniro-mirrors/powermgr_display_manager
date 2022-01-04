@@ -40,9 +40,10 @@ public:
     bool UpdateStateConfig(DisplayState state, uint32_t value);
     bool UpdateBrightness(uint32_t value, uint32_t duration = 0);
     bool IsScreenOn();
-    virtual void onStart() override;
-    virtual void onChanged(int32_t currentValue) override;
-    virtual void onEnd() override;
+    uint32_t GetBrightness();
+    virtual void OnStart() override;
+    virtual void OnChanged(int32_t currentValue) override;
+    virtual void OnEnd() override;
 private:
     static const uint32_t SCREEN_BRIGHTNESS_UPDATE_DURATION = 200;
     std::mutex mutex_;

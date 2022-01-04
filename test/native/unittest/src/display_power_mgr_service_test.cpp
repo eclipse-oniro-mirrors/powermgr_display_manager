@@ -17,6 +17,7 @@
 
 #include <iservice_registry.h>
 #include <system_ability_definition.h>
+#include <vector>
 
 #include "display_power_mgr_client.h"
 #include "display_power_mgr_service.h"
@@ -104,6 +105,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
  * @tc.desc: Test set brightness
  * @tc.type: FUNC
  */
+#ifdef SHIELDING
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: fun is start");
@@ -120,6 +122,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     sleep(5);
     EXPECT_TRUE(ret);
 }
+#endif
 
 
 /**
@@ -199,5 +202,65 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
     DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService012: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_UNKNOWN);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService013
+ * @tc.desc: Test GetDisplayIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService013: fun is start");
+    std::vector<uint32_t> ret = DisplayPowerMgrClient::GetInstance().GetDisplayIds();
+    sleep(5);
+    EXPECT_TRUE(ret.size() != 0);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService014
+ * @tc.desc: Test GetDisplayIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService014: fun is start");
+    int32_t ret = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
+    sleep(5);
+    EXPECT_TRUE(ret == 0);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService015
+ * @tc.desc: Test GetDisplayIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService015: fun is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
+    sleep(5);
+    if (ret) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "AutoAdjustBrightness: is supported");
+        ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
+        EXPECT_TRUE(ret);
+    } else {
+        DISPLAY_HILOGI(MODULE_SERVICE, "AutoAdjustBrightness: is not supported");
+        EXPECT_FALSE(ret);
+    }
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService016
+ * @tc.desc: Test GetDisplayIds
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService016: fun is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 3000);
+    sleep(5);
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService016: fun is end");
 }
 }

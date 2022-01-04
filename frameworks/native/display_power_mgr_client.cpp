@@ -90,6 +90,24 @@ DisplayState DisplayPowerMgrClient::GetDisplayState(uint32_t id)
     return proxy->GetDisplayState(id);
 }
 
+std::vector<uint32_t> DisplayPowerMgrClient::GetDisplayIds()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return std::vector<uint32_t>();
+    }
+    return proxy->GetDisplayIds();
+}
+
+int32_t DisplayPowerMgrClient::GetMainDisplayId()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return -1;
+    }
+    return proxy->GetMainDisplayId();
+}
+
 bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t id)
 {
     auto proxy = GetProxy();
@@ -108,6 +126,15 @@ bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, 
     return proxy->AdjustBrightness(id, value, duration);
 }
 
+bool DisplayPowerMgrClient::AutoAdjustBrightness(bool enable)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->AutoAdjustBrightness(enable);
+}
+
 bool DisplayPowerMgrClient::SetStateConfig(DisplayState state, uint32_t value, uint32_t id)
 {
     auto proxy = GetProxy();
@@ -115,6 +142,15 @@ bool DisplayPowerMgrClient::SetStateConfig(DisplayState state, uint32_t value, u
         return false;
     }
     return proxy->SetStateConfig(id, state, value);
+}
+
+bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callback)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->RegisterCallback(callback);
 }
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS
