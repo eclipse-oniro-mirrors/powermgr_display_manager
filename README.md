@@ -6,7 +6,7 @@
 
 ## Introduction<a name="section11660541593"></a>
 
-The Display Manager module of this repository provides the following capabilities:
+The Display power manager module of this repository provides the following capabilities:
 
 1.  Turning on/off the display
 2.  Adjusting the brightness of the display screen
@@ -30,11 +30,11 @@ base/powermgr/display_manager$
 
 ## Repositories Involved<a name="section63151229062"></a>
 
-Power management subsystem
+[Power management subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/power-management.md)
 
 [powermgr_power_manager](https://gitee.com/openharmony/powermgr_power_manager)
 
-[**powermgr_display_manager**](https://gitee.com/openharmony/powermgr_display_manager)
+**powermgr_display_manager**
 
 [powermgr_battery_manager](https://gitee.com/openharmony/powermgr_battery_manager)
 

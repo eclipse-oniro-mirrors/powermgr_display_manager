@@ -1,4 +1,4 @@
-# 显示管理组件<a name="ZH-CN_TOPIC_0000001152026155"></a>
+# 显示能效管理组件<a name="ZH-CN_TOPIC_0000001152026155"></a>
 
 -   [简介](#section11660541593)
 -   [目录](#section19472752217)
@@ -6,7 +6,7 @@
 
 ## 简介<a name="section11660541593"></a>
 
-显示管理组件主要负责显示屏的亮/灭、亮度调节等功能，如下：
+显示能效管理组件主要负责显示屏的亮/灭、亮度调节等功能，如下：
 
 1.  显示屏的亮/灭。
 2.  显示屏亮度调节。
@@ -30,11 +30,11 @@ base/powermgr/display_manager$
 
 ## 相关仓<a name="section63151229062"></a>
 
-电源管理子系统
+[电源管理子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
 [powermgr_power_manager](https://gitee.com/openharmony/powermgr_power_manager)
 
-[**powermgr_display_manager**](https://gitee.com/openharmony/powermgr_display_manager)
+**powermgr_display_manager**
 
 [powermgr_battery_manager](https://gitee.com/openharmony/powermgr_battery_manager)
 
