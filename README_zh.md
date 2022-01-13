@@ -11,8 +11,8 @@
 1.  显示屏的亮/灭。
 2.  显示屏亮度调节。
 
-**图 1**  电源管理子系统架构图<a name="fig106301571239"></a>  
-![](figures/power-management-subsystem-architecture.png "电源管理子系统架构图")
+**图 1**  显示能效管理组件架构图<a name="fig106301571239"></a> 
+![](figures/power-management-subsystem-architecture.png "显示能效管理组件架构图")
 
 ## 目录<a name="section19472752217"></a>
 
@@ -32,8 +32,16 @@ base/powermgr/display_manager$
 
 电源管理子系统
 
-powermgr_battery_manager
+[powermgr_power_manager](https://gitee.com/openharmony/powermgr_power_manager)
 
-powermgr_power_manager
+[**powermgr_display_manager**](https://gitee.com/openharmony/powermgr_display_manager)
 
-**powermgr_display_manager**
+[powermgr_battery_manager](https://gitee.com/openharmony/powermgr_battery_manager)
+
+[powermgr_thermal_manager](https://gitee.com/openharmony/powermgr_thermal_manager)
+
+[powermgr_battery_statistics](https://gitee.com/openharmony/powermgr_battery_statistics)
+
+[powermgr_battery_lite](https://gitee.com/openharmony/powermgr_battery_lite)
+
+[powermgr_powermgr_lite](https://gitee.com/openharmony/powermgr_powermgr_lite)
