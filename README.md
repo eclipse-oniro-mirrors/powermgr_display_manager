@@ -6,7 +6,7 @@
 
 ## Introduction<a name="section11660541593"></a>
 
-The Display Manager module of this repository provides the following capabilities:
+The Display power manager module of this repository provides the following capabilities:
 
 1.  Turning on/off the display
 2.  Adjusting the brightness of the display screen
