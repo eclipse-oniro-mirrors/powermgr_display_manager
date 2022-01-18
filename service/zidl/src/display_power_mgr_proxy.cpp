@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state)
+bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
     sptr<IRemoteObject> remote = Remote();
     RETURN_IF_WITH_RET(remote == nullptr, false);
@@ -36,6 +36,7 @@ bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, id, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, static_cast<uint32_t>(state), false);
+    WRITE_PARCEL_WITH_RET(data, Uint32, reason, false);
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::SET_DISPLAY_STATE),
         data, reply, option);

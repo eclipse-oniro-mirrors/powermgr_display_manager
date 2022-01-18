@@ -28,7 +28,7 @@ public:
         : IRemoteProxy<IDisplayPowerMgr>(impl) {}
     ~DisplayPowerMgrProxy() override = default;
 
-    virtual bool SetDisplayState(uint32_t id, DisplayState state) override;
+    virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) override;
     virtual DisplayState GetDisplayState(uint32_t id) override;
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;

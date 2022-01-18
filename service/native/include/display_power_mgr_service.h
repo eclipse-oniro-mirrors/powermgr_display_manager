@@ -31,7 +31,7 @@ namespace DisplayPowerMgr {
 class DisplayPowerMgrService : public DisplayPowerMgrStub {
 public:
     virtual ~DisplayPowerMgrService();
-    virtual bool SetDisplayState(uint32_t id, DisplayState state) override;
+    virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) override;
     virtual DisplayState GetDisplayState(uint32_t id) override;
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;
@@ -41,8 +41,15 @@ public:
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
 
 private:
+    class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        CallbackDeathRecipient() = default;
+        virtual ~CallbackDeathRecipient() = default;
+        virtual void OnRemoteDied(const wptr<IRemoteObject>& remote);
+    };
     static const uint32_t AUTO_ADJUST_BRIGHTNESS_DURATION = 1000;
     static const uint32_t SAMPLING_RATE = 100000000;
     static const int32_t BRIGHTNESS_CHANGE_MIN = 5;
@@ -64,11 +71,14 @@ private:
     bool CalculateBrightness(float scalar, int32_t& brightness);
     int32_t GetBrightnessFromLightScalar(float scalar);
 
-    std::map<uint32_t, std::shared_ptr<ScreenController>> controllerMap_;
+    std::shared_ptr<ScreenAction> action_;
+
+    std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
     SensorUser user_;
     sptr<IDisplayPowerCallback> callback_;
+    sptr<CallbackDeathRecipient> cbDeathRecipient_;
 
     time_t lastLuxTime_ {0};
     float lastLux_ {0};

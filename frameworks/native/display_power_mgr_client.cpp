@@ -72,13 +72,14 @@ void DisplayPowerMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
     }
 }
 
-bool DisplayPowerMgrClient::SetDisplayState(DisplayState state, uint32_t id)
+bool DisplayPowerMgrClient::SetDisplayState(DisplayState state,
+    PowerMgr::StateChangeReason reason, uint32_t id)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         return false;
     }
-    return proxy->SetDisplayState(id, state);
+    return proxy->SetDisplayState(id, state, static_cast<uint32_t>(reason));
 }
 
 DisplayState DisplayPowerMgrClient::GetDisplayState(uint32_t id)

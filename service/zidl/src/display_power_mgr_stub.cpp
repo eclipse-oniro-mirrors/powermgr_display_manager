@@ -59,11 +59,13 @@ int32_t DisplayPowerMgrStub::SetDisplayStateStub(MessageParcel& data, MessagePar
 {
     uint32_t id = 0;
     uint32_t state = 0;
+    uint32_t reason = 0;
 
     READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
     READ_PARCEL_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
+    READ_PARCEL_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
 
-    bool ret = SetDisplayState(id, static_cast<DisplayState>(state));
+    bool ret = SetDisplayState(id, static_cast<DisplayState>(state), reason);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write SetDisplayStateStub return value");
         return E_WRITE_PARCEL_ERROR;

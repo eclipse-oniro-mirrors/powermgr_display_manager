@@ -20,9 +20,10 @@
 #include <singleton.h>
 #include <vector>
 
-#include "display_info.h"
+#include "display_power_info.h"
 #include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
+#include "power_state_machine_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -30,7 +31,9 @@ class DisplayPowerMgrClient : public DelayedRefSingleton<DisplayPowerMgrClient> 
     DECLARE_DELAYED_REF_SINGLETON(DisplayPowerMgrClient);
 
 public:
-    bool SetDisplayState(DisplayState state, uint32_t id = 0);
+    bool SetDisplayState(DisplayState state,
+        PowerMgr::StateChangeReason reason = PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN,
+        uint32_t id = 0);
     DisplayState GetDisplayState(uint32_t id = 0);
     std::vector<uint32_t> GetDisplayIds();
     int32_t GetMainDisplayId();

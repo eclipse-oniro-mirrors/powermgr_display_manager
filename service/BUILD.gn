@@ -16,7 +16,9 @@ import("//base/powermgr/display_manager/displaymgr.gni")
 config("displaymgr_private_config") {
   include_dirs = [
     "//utils/system/safwk/native/include",
+    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
     "//base/sensors/sensor/interfaces/native/include",
+    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
   ]
 }
 
@@ -34,6 +36,7 @@ ohos_shared_library("displaymgrservice") {
     "native/src/gradual_animator.cpp",
     "native/src/screen_action.cpp",
     "native/src/screen_controller.cpp",
+    "zidl/src/display_power_callback_proxy.cpp",
     "zidl/src/display_power_mgr_stub.cpp",
   ]
 
@@ -47,7 +50,10 @@ ohos_shared_library("displaymgrservice") {
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
     "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/standard:libsurface",
     "//foundation/graphic/standard:libwmservice",
+    "//foundation/windowmanager/utils:libwmutil",
+    "//foundation/windowmanager/wm:libwm",
     "//utils/native/base:utils",
   ]
 

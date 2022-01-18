@@ -22,7 +22,7 @@
 
 #include <display_device.h>
 
-#include "display_info.h"
+#include "display_power_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -30,11 +30,14 @@ class ScreenAction {
 public:
     ScreenAction();
     ~ScreenAction() = default;
-    std::vector<uint32_t> GetDisplayIds();
-    DisplayState GetPowerState(uint32_t devId);
-    bool SetPowerState(uint32_t devId, DisplayState state);
-    uint32_t GetBrightness(uint32_t devId);
-    bool SetBrightness(uint32_t devId, uint32_t value);
+    uint64_t GetDefaultDisplayId();
+    std::vector<uint64_t> GetDisplayIds();
+    DisplayState GetPowerState(uint64_t devId);
+    bool SetDisplayState(uint64_t devId, DisplayState state,
+        std::function<void(DisplayState)> callback);
+    bool SetDisplayPower(uint64_t devId, DisplayState state, uint32_t reason);
+    uint32_t GetBrightness(uint64_t devId);
+    bool SetBrightness(uint64_t devId, uint32_t value);
 
 private:
     struct DeviceFuncCloser {
@@ -53,7 +56,7 @@ private:
     static constexpr int32_t MAX_BRIGHTNESS = 255;
     static constexpr int32_t MIN_BRIGHTNESS = 6;
 
-    std::vector<uint32_t> devIds_;
+    std::vector<uint64_t> devIds_;
     DeviceFuncPtr hdiFuncs_;
 };
 } // namespace DisplayPowerMgr

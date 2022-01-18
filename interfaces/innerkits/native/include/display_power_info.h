@@ -13,25 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef POWERMGR_IDISPLAY_POWER_CALLBACK_H
-#define POWERMGR_IDISPLAY_POWER_CALLBACK_H
-
-#include <iremote_broker.h>
-#include <iremote_object.h>
-
-#include "display_power_info.h"
+#ifndef DISPLAYMGR_DISPLAY_POWER_INFO_H
+#define DISPLAYMGR_DISPLAY_POWER_INFO_H
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-class IDisplayPowerCallback : public IRemoteBroker {
-public:
-    enum {
-        ON_DISPLAY_STATE_CHANGED = 0,
-    };
-    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state) = 0;
-
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.powermgr.IDisplayPowerCallback");
+/**
+ * Display State
+ */
+enum class DisplayState : uint32_t {
+    DISPLAY_OFF = 0,
+    DISPLAY_DIM = 1,
+    DISPLAY_ON = 2,
+    DISPLAY_SUSPEND = 3,
+    DISPLAY_UNKNOWN = 4,
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
-#endif // POWERMGR_IDISPLAY_POWER_CALLBACK_H
+#endif // DISPLAYMGR_DISPLAY_POWER_INFO_H
