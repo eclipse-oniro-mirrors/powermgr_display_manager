@@ -22,6 +22,7 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
+    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
     "//base/sensors/sensor/interfaces/native/include",
     "//utils/system/safwk/native/include",
     "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",

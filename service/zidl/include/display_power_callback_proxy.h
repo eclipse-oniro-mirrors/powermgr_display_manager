@@ -13,21 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_INFO_H
-#define DISPLAYMGR_DISPLAY_INFO_H
+#ifndef DISPLAYMGR_DISPLAY_POWER_CALLBACK_PROXY_H
+#define DISPLAYMGR_DISPLAY_POWER_CALLBACK_PROXY_H
+
+#include <iremote_proxy.h>
+
+#include "idisplay_power_callback.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-/**
- * Display State
- */
-enum class DisplayState : uint32_t {
-    DISPLAY_OFF = 0,
-    DISPLAY_DIM = 1,
-    DISPLAY_ON = 2,
-    DISPLAY_SUSPEND = 3,
-    DISPLAY_UNKNOWN = 4,
+class DisplayPowerCallbackProxy : public IRemoteProxy<IDisplayPowerCallback> {
+public:
+    explicit DisplayPowerCallbackProxy(const sptr<IRemoteObject>& impl)
+        : IRemoteProxy<IDisplayPowerCallback>(impl) {}
+    ~DisplayPowerCallbackProxy() override = default;
+    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state) override;
+
+private:
+    static inline BrokerDelegator<DisplayPowerCallbackProxy> delegator_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
-#endif // DISPLAYMGR_DISPLAY_INFO_H
+
+#endif // DISPLAYMGR_DISPLAY_POWER_CALLBACK_PROXY_H

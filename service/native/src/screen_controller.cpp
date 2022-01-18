@@ -16,6 +16,7 @@
 #include "screen_controller.h"
 
 #include "display_common.h"
+#include "display_power_mgr_service.h"
 #include "hilog_wrapper.h"
 
 namespace OHOS {
@@ -25,10 +26,10 @@ const int DISPLAY_DIM_BRIGHTNESS = 50;
 const int DISPLAY_OFF_BRIGHTNESS = 0;
 const int DISPLAY_SUSPEND_BRIGHTNESS = 50;
 
-ScreenController::ScreenController(uint32_t devId, std::shared_ptr<ScreenAction> action)
+ScreenController::ScreenController(uint64_t devId, std::shared_ptr<ScreenAction> action)
     : devId_(devId), state_(DisplayState::DISPLAY_UNKNOWN), action_(action)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController created: %{public}d", devId_);
+    DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController created: %{public}d", static_cast<uint32_t>(devId_));
     stateValues_.emplace(DisplayState::DISPLAY_ON, DISPLAY_FULL_BRIGHTNESS);
     stateValues_.emplace(DisplayState::DISPLAY_DIM, DISPLAY_DIM_BRIGHTNESS);
     stateValues_.emplace(DisplayState::DISPLAY_OFF, DISPLAY_OFF_BRIGHTNESS);
@@ -36,29 +37,43 @@ ScreenController::ScreenController(uint32_t devId, std::shared_ptr<ScreenAction>
     animator_ = nullptr;
 }
 
-bool ScreenController::UpdateState(DisplayState state)
+bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
     std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController UpdateState: %{public}d, %{public}d",
-        devId_, static_cast<uint32_t>(state));
+        static_cast<uint32_t>(devId_), static_cast<uint32_t>(state));
     if (state == state_) {
         return true;
     }
 
-    bool ret = action_->SetPowerState(devId_, state);
-    if (!ret) {
-        DISPLAY_HILOGW(MODULE_SERVICE, "SetPowerState failed state=%{public}d", state);
-    }
-    state_ = state;
-    auto iterator = stateValues_.find(state);
-    if (iterator != stateValues_.end()) {
-        ret = action_->SetBrightness(devId_, iterator->second);
-        if (ret) {
-            brightness_ = iterator->second;
-        } else {
-            DISPLAY_HILOGI(MODULE_SERVICE, "set brightness falied! %{public}d", iterator->second);
+    switch (state) {
+        case DisplayState::DISPLAY_ON: // fall through
+        case DisplayState::DISPLAY_OFF: {
+            std::function<void(DisplayState)> callback =
+                std::bind(&ScreenController::OnStateChanged, this, std::placeholders::_1);
+            bool ret = action_->SetDisplayState(devId_, state, callback);
+            if (!ret) {
+                DISPLAY_HILOGW(MODULE_SERVICE, "SetDisplayState failed state=%{public}d", state);
+                return ret;
+            }
+            break;
         }
+        case DisplayState::DISPLAY_DIM: // fall through
+        case DisplayState::DISPLAY_SUSPEND: {
+            bool ret = action_->SetDisplayPower(devId_, state, stateChangeReason_);
+            if (!ret) {
+                DISPLAY_HILOGW(MODULE_SERVICE, "SetDisplayPower failed state=%{public}d", state);
+                return ret;
+            }
+            break;
+        }
+        default:
+            break;
     }
+
+    state_ = state;
+    stateChangeReason_ = reason;
+
     DISPLAY_HILOGI(MODULE_SERVICE, "Update screen state to %{public}u", state);
     return true;
 }
@@ -67,7 +82,7 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
 {
     std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(MODULE_SERVICE, "ScreenController UpdateBrightness: %{public}d, %{public}d, %{public}d",
-        devId_, value, duraion);
+        static_cast<uint32_t>(devId_), value, duraion);
     if (animator_ == nullptr) {
         std::string name = "ScreenController_" + std::to_string(devId_);
         std::shared_ptr<AnimateCallback> callback = shared_from_this();
@@ -96,7 +111,7 @@ bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
     std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(MODULE_SERVICE,
         "ScreenController UpdateStateConfig: Id=%{public}d, State=%{public}d, Value=%{public}d",
-        devId_, static_cast<uint32_t>(state), value);
+        static_cast<uint32_t>(devId_), static_cast<uint32_t>(state), value);
     auto iterator = stateValues_.find(state);
     if (iterator == stateValues_.end()) {
         DISPLAY_HILOGI(MODULE_SERVICE, "UpdateStateConfig No such state");
@@ -140,6 +155,21 @@ void ScreenController::OnChanged(int32_t currentValue)
 void ScreenController::OnEnd()
 {
     DISPLAY_HILOGD(MODULE_SERVICE, "ScreenAnimatorCallback OnEnd");
+}
+
+void ScreenController::OnStateChanged(DisplayState state)
+{
+    DISPLAY_HILOGD(MODULE_SERVICE, "OnStateChanged %{public}d", state);
+    auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    if (pms == nullptr) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "OnRemoteDied no service");
+        return;
+    }
+
+    bool ret = action_->SetDisplayPower(devId_, state, stateChangeReason_);
+    if (ret) {
+        pms->NotifyStateChangeCallback(devId_, state);
+    }
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

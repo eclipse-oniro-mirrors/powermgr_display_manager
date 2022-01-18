@@ -16,142 +16,141 @@
 #include "screen_action.h"
 
 #include "display_common.h"
+#include "display_manager.h"
 #include "display_type.h"
 #include "hilog_wrapper.h"
 #include "window_manager_service_client.h"
+#include "display_power_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 ScreenAction::ScreenAction()
 {
-    DeviceFuncs *f = NULL;
-
-    int32_t ret = DeviceInitialize(&f);
-    if (ret != DISPLAY_SUCCESS) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to init device");
-        return;
-    }
-    devIds_.push_back(0);
-    hdiFuncs_ = DeviceFuncPtr(f);
     DISPLAY_HILOGI(MODULE_SERVICE, "Succeed to init");
 }
 
-std::vector<uint32_t> ScreenAction::GetDisplayIds()
+uint64_t ScreenAction::GetDefaultDisplayId()
 {
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetDefaultDisplayId");
+    return Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
+}
+
+std::vector<uint64_t> ScreenAction::GetDisplayIds()
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetDisplayIds");
+    devIds_ = Rosen::DisplayManager::GetInstance().GetAllDisplayIds();
+    if (devIds_.empty()) {
+        devIds_.push_back(0);
+    }
     return devIds_;
 }
 
-DisplayState ScreenAction::GetPowerState(uint32_t devId)
+DisplayState ScreenAction::GetPowerState(uint64_t devId)
 {
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetPowerState: %{public}d", static_cast<int>(devId));
+
     DisplayState ret = DisplayState::DISPLAY_UNKNOWN;
-
-    auto wmsc = WindowManagerServiceClient::GetInstance();
-    wmsc->Init();
-    sptr<IWindowManagerService> wms = wmsc->GetService();
-    if (wms == nullptr) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
-        return DisplayState::DISPLAY_UNKNOWN;
-    }
-    // auto promise = wms->GetDisplayPower(devId)->Await();
-    // if (promise.wret != WM_OK) {
-    //     DISPLAY_HILOGE(MODULE_SERVICE, "GetPowerState failed: %{public}d", promise.wret);
-    //     return ret;
-    // }
-
-    // switch (promise.status) {
-    //     case POWER_STATUS_ON:
-    //         ret = DisplayState::DISPLAY_ON;
-    //         break;
-    //     case POWER_STATUS_STANDBY:
-    //         ret = DisplayState::DISPLAY_DIM;
-    //         break;
-    //     case POWER_STATUS_SUSPEND:
-    //         ret = DisplayState::DISPLAY_SUSPEND;
-    //         break;
-    //     case POWER_STATUS_OFF:
-    //         ret = DisplayState::DISPLAY_OFF;
-    //         break;
-    //     default:
-    //         break;
-    // }
-
-    return ret;
-}
-
-bool ScreenAction::SetPowerState(uint32_t devId, DisplayState state)
-{
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayPower: devId=%{public}d, state=%{public}d",
-        devId, static_cast<uint32_t>(state));
-    auto wmsc = WindowManagerServiceClient::GetInstance();
-    wmsc->Init();
-    sptr<IWindowManagerService> wms = wmsc->GetService();
-    if (wms == nullptr) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
-        return false;
-    }
-
-    DispPowerStatus status = POWER_STATUS_BUTT;
+    Rosen::DisplayPowerState state = Rosen::DisplayManager::GetInstance()
+        .GetScreenPower(devId);
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetPowerState: %{public}d", static_cast<uint32_t>(state));
     switch (state) {
-        case DisplayState::DISPLAY_ON:
-            status = POWER_STATUS_ON;
+        case Rosen::DisplayPowerState::POWER_ON:
+            ret = DisplayState::DISPLAY_ON;
             break;
-        case DisplayState::DISPLAY_DIM:
-            status = POWER_STATUS_STANDBY;
+        case Rosen::DisplayPowerState::POWER_STAND_BY:
+            ret = DisplayState::DISPLAY_DIM;
             break;
-        case DisplayState::DISPLAY_SUSPEND:
-            status = POWER_STATUS_SUSPEND;
+        case Rosen::DisplayPowerState::POWER_SUSPEND:
+            ret = DisplayState::DISPLAY_SUSPEND;
             break;
-        case DisplayState::DISPLAY_OFF:
-            status = POWER_STATUS_OFF;
+        case Rosen::DisplayPowerState::POWER_OFF:
+            ret = DisplayState::DISPLAY_OFF;
             break;
         default:
             break;
     }
 
-    // auto wret = wms->SetDisplayPower(devId, status)->Await();
-    // if (wret != WM_OK) {
-    //     DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayPower failed: %{public}d", wret);
-    //     return false;
-    // }
+    return ret;
+}
 
+bool ScreenAction::SetDisplayState(uint64_t devId, DisplayState state,
+    std::function<void(DisplayState)> callback)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayState: devId=%{public}d, state=%{public}d",
+        static_cast<int>(devId), static_cast<uint32_t>(state));
+
+    Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
+    switch (state) {
+        case DisplayState::DISPLAY_ON:
+            rds = Rosen::DisplayState::ON;
+            break;
+        case DisplayState::DISPLAY_OFF:
+            rds = Rosen::DisplayState::OFF;
+            break;
+        default:
+            break;
+    }
+    bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds,
+        [callback](Rosen::DisplayState rosenState) {
+            DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayState Callback:%{public}d",
+                static_cast<uint32_t>(rosenState));
+            DisplayState state = DisplayState::DISPLAY_UNKNOWN;
+            switch (rosenState) {
+                case Rosen::DisplayState::ON:
+                    state = DisplayState::DISPLAY_ON;
+                    break;
+                case Rosen::DisplayState::OFF:
+                    state = DisplayState::DISPLAY_OFF;
+                    break;
+                default:
+                    return;
+            }
+            callback(state);
+    });
+    DISPLAY_HILOGE(MODULE_SERVICE, "SetDisplayState:%{public}d", ret);
+    return ret;
+}
+
+bool ScreenAction::SetDisplayPower(uint64_t devId, DisplayState state, uint32_t reason)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayPower: devId=%{public}d, state=%{public}d, state=%{public}d",
+        static_cast<int>(devId), static_cast<uint32_t>(state), reason);
+    Rosen::DisplayPowerState status = Rosen::DisplayPowerState::INVALID_STATE;
+    switch (state) {
+        case DisplayState::DISPLAY_ON:
+            status = Rosen::DisplayPowerState::POWER_ON;
+            break;
+        case DisplayState::DISPLAY_DIM:
+            status = Rosen::DisplayPowerState::POWER_STAND_BY;
+            break;
+        case DisplayState::DISPLAY_SUSPEND:
+            status = Rosen::DisplayPowerState::POWER_SUSPEND;
+            break;
+        case DisplayState::DISPLAY_OFF:
+            status = Rosen::DisplayPowerState::POWER_OFF;
+            break;
+        default:
+            break;
+    }
+    bool ret = Rosen::DisplayManager::GetInstance().SetScreenPowerForAll(status,
+        Rosen::PowerStateChangeReason::POWER_BUTTON);
+    DISPLAY_HILOGE(MODULE_SERVICE, "SetScreenPowerForAll:%{public}d", ret);
     return true;
 }
 
-uint32_t ScreenAction::GetBrightness(uint32_t devId)
+uint32_t ScreenAction::GetBrightness(uint64_t devId)
 {
-    auto wmsc = WindowManagerServiceClient::GetInstance();
-    wmsc->Init();
-    sptr<IWindowManagerService> wms = wmsc->GetService();
-    if (wms == nullptr) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
-        return 0;
-    }
-    // auto promise = wms->GetDisplayBacklight(devId)->Await();
-    // if (promise.wret != WM_OK) {
-    //     DISPLAY_HILOGE(MODULE_SERVICE, "GetBrightness failed: %{public}d", promise.wret);
-    //     return 0;
-    // }
-
-    // return promise.level;
-    return 0;
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetBrightness: %{public}d", static_cast<int>(devId));
+    return Rosen::DisplayManager::GetInstance()
+        .GetScreenBrightness(static_cast<uint64_t>(devId));
 }
 
-bool ScreenAction::SetBrightness(uint32_t devId, uint32_t value)
+bool ScreenAction::SetBrightness(uint64_t devId, uint32_t value)
 {
-    auto wmsc = WindowManagerServiceClient::GetInstance();
-    wmsc->Init();
-    sptr<IWindowManagerService> wms = wmsc->GetService();
-    if (wms == nullptr) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "FAILED to get service from WindowManager Client");
-        return false;
-    }
-    // auto wret = wms->SetDisplayBacklight(devId, value)->Await();
-    // if (wret != WM_OK) {
-    //     DISPLAY_HILOGE(MODULE_SERVICE, "SetBrightness failed: %{public}d", wret);
-    //     return false;
-    // }
-
-    return true;
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: %{public}d, %{public}d",
+        static_cast<int>(devId), value);
+    return Rosen::DisplayManager::GetInstance()
+        .SetScreenBrightness(static_cast<uint64_t>(devId), value);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

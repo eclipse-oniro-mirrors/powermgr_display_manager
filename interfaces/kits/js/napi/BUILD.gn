@@ -17,6 +17,7 @@ ohos_shared_library("brightness") {
   sources = [ "${displaymgr_framework_path}/napi/brightness.cpp" ]
 
   include_dirs = [
+    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
     "//foundation/ace/napi/native_engine",
     "//foundation/ace/napi/interfaces/kits",
     "//third_party/node/src",

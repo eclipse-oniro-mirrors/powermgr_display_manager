@@ -19,7 +19,7 @@
 #include <iremote_broker.h>
 #include <vector>
 
-#include "display_info.h"
+#include "display_power_info.h"
 #include "idisplay_power_callback.h"
 
 namespace OHOS {
@@ -38,7 +38,7 @@ public:
         REGISTER_CALLBACK,
     };
 
-    virtual bool SetDisplayState(uint32_t id, DisplayState state) = 0;
+    virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) = 0;
     virtual DisplayState GetDisplayState(uint32_t id) = 0;
     virtual std::vector<uint32_t> GetDisplayIds() = 0;
     virtual uint32_t GetMainDisplayId() = 0;

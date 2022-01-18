@@ -26,13 +26,15 @@ namespace DisplayPowerMgr {
 DisplayPowerMgrService::DisplayPowerMgrService()
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService Create");
-    std::shared_ptr<ScreenAction> screenAction = std::make_shared<ScreenAction>();
-    std::vector<uint32_t> devIds = screenAction->GetDisplayIds();
+    action_ = std::make_shared<ScreenAction>();
+    std::vector<uint64_t> devIds = action_->GetDisplayIds();
     int count = devIds.size();
     for (int i = 0; i < count; i++) {
-        DISPLAY_HILOGI(MODULE_SERVICE, "find display: %{public}d", devIds[i]);
-        controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], screenAction));
+        DISPLAY_HILOGI(MODULE_SERVICE, "find display: %{public}d", static_cast<uint32_t>(devIds[i]));
+        controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], action_));
     }
+    callback_ = nullptr;
+    cbDeathRecipient_ = nullptr;
     InitSensors();
 }
 
@@ -40,14 +42,14 @@ DisplayPowerMgrService::~DisplayPowerMgrService()
 {
 }
 
-bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state)
+bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayState %{public}d, %{public}d", id, state);
     auto iterater = controllerMap_.find(id);
     if (iterater == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->UpdateState(state);
+    return iterater->second->UpdateState(state, reason);
 }
 
 DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
@@ -73,8 +75,8 @@ std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
 uint32_t DisplayPowerMgrService::GetMainDisplayId()
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "GetMainDisplayId");
-    // To add modified when window manager can tell us which is the main display
-    return 0;
+    uint64_t id = action_->GetDefaultDisplayId();
+    return static_cast<uint32_t>(id);
 }
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t id, int32_t value)
@@ -144,8 +146,26 @@ bool DisplayPowerMgrService::SetStateConfig(uint32_t id, DisplayState state, int
 bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "RegisterCallback");
+    if (callback_ != nullptr) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "Callback function exist");
+        return false;
+    }
     callback_ = callback;
+    sptr<IRemoteObject> remote = callback_->AsObject();
+    if (!remote->IsProxyObject()) {
+        DISPLAY_HILOGE(MODULE_INNERKIT, "Callback is not proxy");
+        return false;
+    }
+    if (cbDeathRecipient_ == nullptr) {
+        cbDeathRecipient_ = new CallbackDeathRecipient();
+    }
+    remote->AddDeathRecipient(cbDeathRecipient_);
     return true;
+}
+
+void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
+{
+    callback_->OnDisplayStateChanged(displayId, state);
 }
 
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
@@ -313,6 +333,18 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     DISPLAY_HILOGI(MODULE_SERVICE, "brightness: %{public}d", brightness);
 
     return brightness;
+}
+
+void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "CallbackDeathRecipient OnRemoteDied");
+    auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    if (pms == nullptr) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "OnRemoteDied no service");
+        return;
+    }
+
+    pms->callback_ = nullptr;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
