@@ -165,7 +165,9 @@ bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callba
 
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
 {
-    callback_->OnDisplayStateChanged(displayId, state);
+    if (callback_ != nullptr) {
+        callback_->OnDisplayStateChanged(displayId, state);
+    }
 }
 
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
