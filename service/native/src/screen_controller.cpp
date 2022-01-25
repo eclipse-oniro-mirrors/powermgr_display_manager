@@ -56,6 +56,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                 DISPLAY_HILOGW(MODULE_SERVICE, "SetDisplayState failed state=%{public}d", state);
                 return ret;
             }
+            ScreenOnReset(state);
             break;
         }
         case DisplayState::DISPLAY_DIM: // fall through
@@ -76,6 +77,15 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 
     DISPLAY_HILOGI(MODULE_SERVICE, "Update screen state to %{public}u", state);
     return true;
+}
+
+void ScreenController::ScreenOnReset(DisplayState state)
+{
+    if (state == DisplayState::DISPLAY_ON) {
+        bool ret = action_->SetBrightness(devId_, DISPLAY_FULL_BRIGHTNESS);
+        DISPLAY_HILOGI(MODULE_SERVICE, "Is SetBrightness %{public}d, \
+            Update brightness to %{public}d", ret, DISPLAY_FULL_BRIGHTNESS);
+    }
 }
 
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t duraion)
