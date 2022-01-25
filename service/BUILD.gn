@@ -57,8 +57,8 @@ ohos_shared_library("displaymgrservice") {
   ]
 
   external_deps = [
-    "bundle_framework:appexecfwk_base",
     "appexecfwk_standard:libeventhandler",
+    "bundle_framework:appexecfwk_base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
