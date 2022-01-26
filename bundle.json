@@ -1,0 +1,65 @@
+{
+  "name": "@ohos/display_power_manager",
+  "version": "3.1",
+  "description": "显示能效管理，包括屏幕亮灭、亮度调节等。",
+  "homePage": "https://gitee.com/openharmony",
+  "license": " Apache License 2.0",
+  "repository": "https://gitee.com/openharmony/powermgr_display_manager",
+  "domain": "os",
+  "publishAs": "code-segment",
+  "scripts": {},
+  "dirs": [],
+  "segment": {
+    "destPath": "base/powermgr/display_manager"
+  },
+  "component": {
+    "name": "display_manager_native",
+    "subsystem": "powermgr",
+    "syscap": [
+      "SystemCapability.PowerMgr.DisplayManager"
+    ],
+    "features": [],
+    "adapted_system_type": [ "standard" ],
+    "rom": "1024KB",
+    "ram": "2048KB",
+    "deps": {
+      "components": [
+        "appexecfwk_standard",
+        "hiviewdfx_hilog_native",
+        "ipc",
+        "multimedia_image_standard",
+        "safwk",
+        "samgr_standard",
+        "sensor",
+        "window_manager"
+      ],
+      "third_party": [
+        "googletest",
+        "node"
+      ]
+    },
+    "build": {
+      "sub_component": [
+        "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
+        "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
+        "//base/powermgr/display_manager/service:displaymgrservice",
+        "//base/powermgr/display_manager/interfaces/kits/js/napi:brightness"
+      ],
+      "inner_kits": [
+        {
+          "name": "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
+          "header": {
+            "header_files": [
+              "display_power_info.h",
+              "display_power_mgr_client.h"
+            ],
+            "header_base": "//base/powermgr/display_manager/interfaces/innerkits/native/include"
+          }
+        }
+      ],
+      "test": [
+        "//base/powermgr/display_manager/test/native:displaymgr_native_test"
+      ]
+    }
+  }
+}
