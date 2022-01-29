@@ -17,15 +17,20 @@ The Display power manager module of this repository provides the following capab
 ## Directory Structure<a name="section19472752217"></a>
 
 ```
-base/powermgr/display_manager$
-├── interfaces        # APIs
-│   ├── innerkits     # Internal APIs
-│   └── kits          # External APIs
-├── sa_profile        # SA profile
-├── services          # Services
-│   ├── native        # Native services
-│   └── zidl          # zidl APIs
-└── utils             # Utilities and common code
+base/powermgr/display_manager
+├── figures                  	# Architecture figures
+├── frameworks                  # FrameWork Layer
+│   ├── napi                  	# NAPI code
+│   └── native                  # Native code
+├── interfaces                  # APIs
+│   ├── innerkits               # Internal APIs
+│   └── kits                    # External APIs
+├── sa_profile                  # SA profile
+├── service                    	# Services
+│   ├── native                  # Native services
+│   └── zidl                    # zidl APIs
+├── test                        # Test code
+└── utils                       # Utilities and common code
 ```
 
 ## Repositories Involved<a name="section63151229062"></a>
