@@ -28,7 +28,6 @@ declare namespace brightness {
    *
    * @param value Brightness value, ranging from 0 to 255.
    * @SysCap SystemCapability.PowerMgr.DisplayManager
-   * @devices phone, tablet
    * @systemapi
    * @since 7
    */
