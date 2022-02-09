@@ -16,5 +16,5 @@ import("//build/test.gni")
 
 group("displaymgr_native_test") {
   testonly = true
-  #deps = [ "unittest:unittest_display_mgr_service" ]
+  deps = [ "unittest:unittest_display_mgr_service" ]
 }
