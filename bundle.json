@@ -16,7 +16,7 @@
     "name": "display_manager_native",
     "subsystem": "powermgr",
     "syscap": [
-      "SystemCapability.PowerMgr.DisplayManager"
+      "SystemCapability.PowerManager.DisplayPowerManager"
     ],
     "features": [],
     "adapted_system_type": [ "standard" ],
