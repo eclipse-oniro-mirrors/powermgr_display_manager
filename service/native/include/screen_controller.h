@@ -47,13 +47,15 @@ public:
 private:
     static const uint32_t SCREEN_BRIGHTNESS_UPDATE_DURATION = 200;
     void OnStateChanged(DisplayState state);
-    void ScreenOnReset(DisplayState state);
+    void BeforeUpdateState(DisplayState state);
+    void AfterUpdateState(DisplayState state);
     std::mutex mutex_;
     const uint64_t devId_;
     DisplayState state_;
     std::map<DisplayState, uint32_t> stateValues_;
 
     uint32_t brightness_ {0};
+    uint32_t beforeOffBrightness_ {0};
     uint32_t stateChangeReason_ {0};
     std::shared_ptr<ScreenAction> action_;
     std::shared_ptr<GradualAnimator> animator_;

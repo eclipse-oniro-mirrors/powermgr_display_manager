@@ -49,6 +49,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     switch (state) {
         case DisplayState::DISPLAY_ON: // fall through
         case DisplayState::DISPLAY_OFF: {
+            BeforeUpdateState(state);
             std::function<void(DisplayState)> callback =
                 std::bind(&ScreenController::OnStateChanged, this, std::placeholders::_1);
             bool ret = action_->SetDisplayState(devId_, state, callback);
@@ -56,7 +57,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                 DISPLAY_HILOGW(MODULE_SERVICE, "SetDisplayState failed state=%{public}d", state);
                 return ret;
             }
-            ScreenOnReset(state);
+            AfterUpdateState(state);
             break;
         }
         case DisplayState::DISPLAY_DIM: // fall through
@@ -79,12 +80,21 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     return true;
 }
 
-void ScreenController::ScreenOnReset(DisplayState state)
+void ScreenController::BeforeUpdateState(DisplayState state)
+{
+    if (state == DisplayState::DISPLAY_OFF) {
+        beforeOffBrightness_ = action_->GetBrightness(devId_);
+        DISPLAY_HILOGI(MODULE_SERVICE, "Screen brightness before screen off %{public}d",
+            beforeOffBrightness_);
+    }
+}
+
+void ScreenController::AfterUpdateState(DisplayState state)
 {
     if (state == DisplayState::DISPLAY_ON) {
-        bool ret = action_->SetBrightness(devId_, DISPLAY_FULL_BRIGHTNESS);
+        bool ret = action_->SetBrightness(devId_, beforeOffBrightness_);
         DISPLAY_HILOGI(MODULE_SERVICE, "Is SetBrightness %{public}d, \
-            Update brightness to %{public}d", ret, DISPLAY_FULL_BRIGHTNESS);
+            Update brightness to %{public}d", ret, beforeOffBrightness_);
     }
 }
 
