@@ -28,7 +28,7 @@ DisplayPowerMgrService::DisplayPowerMgrService()
     DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService Create");
     action_ = std::make_shared<ScreenAction>();
     std::vector<uint64_t> devIds = action_->GetDisplayIds();
-    int count = devIds.size();
+    uint32_t count = devIds.size();
     for (int i = 0; i < count; i++) {
         DISPLAY_HILOGI(MODULE_SERVICE, "find display: %{public}d", static_cast<uint32_t>(devIds[i]));
         controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], action_));
@@ -249,7 +249,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     }
     AmbientLightData* data = (AmbientLightData*)event->data;
     DISPLAY_HILOGI(MODULE_SERVICE, "AmbientLightCallback: %{public}f", data->intensity);
-    int32_t brightness = mainDisp->second->GetBrightness();
+    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetBrightness());
     if (pms->CalculateBrightness(data->intensity, brightness)) {
         pms->AdjustBrightness(mainDispId, brightness, AUTO_ADJUST_BRIGHTNESS_DURATION);
     }
