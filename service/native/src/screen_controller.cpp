@@ -84,6 +84,9 @@ void ScreenController::BeforeUpdateState(DisplayState state)
 {
     if (state == DisplayState::DISPLAY_OFF) {
         beforeOffBrightness_ = action_->GetBrightness(devId_);
+        beforeOffBrightness_ = (beforeOffBrightness_ <= DISPLAY_OFF_BRIGHTNESS ||
+            beforeOffBrightness_ > DISPLAY_FULL_BRIGHTNESS) ?
+            DISPLAY_FULL_BRIGHTNESS : beforeOffBrightness_;
         DISPLAY_HILOGI(MODULE_SERVICE, "Screen brightness before screen off %{public}d",
             beforeOffBrightness_);
     }
