@@ -18,7 +18,7 @@ import { AsyncCallback } from './basic';
 /**
  * Provides interfaces to control the power of display.
  *
- * @sysCap SystemCapability.PowerManager.DisplayPowerManager
+ * @syscap SystemCapability.PowerManager.DisplayPowerManager
  * @since 7
  */
 declare namespace brightness {
@@ -26,7 +26,6 @@ declare namespace brightness {
    * Sets the screen brightness.
    *
    * @param value Brightness value, ranging from 0 to 255.
-   * @sysCap SystemCapability.PowerManager.DisplayPowerManager
    * @systemapi
    * @since 7
    */
