@@ -52,6 +52,7 @@ ohos_shared_library("displaymgrservice") {
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//foundation/graphic/standard:libsurface",
     "//foundation/graphic/standard:libwmservice",
+    "//foundation/graphic/standard/rosen/modules/render_service_client:librender_service_client",
     "//foundation/windowmanager/utils:libwmutil",
     "//utils/native/base:utils",
   ]
