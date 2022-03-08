@@ -18,6 +18,7 @@
 #include <message_parcel.h>
 
 #include "display_common.h"
+#include "xcollie.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -33,26 +34,42 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         return E_GET_POWER_SERVICE_FAILED;
     }
 
+    const int DFX_DELAY_MS = 10000;
+    int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerMgrStub", DFX_DELAY_MS, nullptr, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_NOOP);
+    int32_t ret = ERR_OK;
     switch (code) {
         case static_cast<int32_t>(IDisplayPowerMgr::SET_DISPLAY_STATE):
-            return SetDisplayStateStub(data, reply);
+            ret = SetDisplayStateStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::GET_DISPLAY_STATE):
-            return GetDisplayStateStub(data, reply);
+            ret = GetDisplayStateStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::GET_DISPLAY_IDS):
-            return GetDisplayIdsStub(data, reply);
+            ret = GetDisplayIdsStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::GET_MAIN_DISPLAY_ID):
-            return GetMainDisplayIdStub(data, reply);
+            ret = GetMainDisplayIdStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::SET_BRIGHTNESS):
-            return SetBrightnessStub(data, reply);
+            ret = SetBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::ADJUST_BRIGHTNESS):
-            return AdjustBrightnessStub(data, reply);
+            ret = AdjustBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS):
-            return AutoAdjustBrightnessStub(data, reply);
+            ret = AutoAdjustBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::SET_STATE_CONFIG):
-            return SetStateConfigStub(data, reply);
+            ret = SetStateConfigStub(data, reply);
+            break;
         default:
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            break;
     }
+
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    return ret;
 }
 
 int32_t DisplayPowerMgrStub::SetDisplayStateStub(MessageParcel& data, MessageParcel& reply)

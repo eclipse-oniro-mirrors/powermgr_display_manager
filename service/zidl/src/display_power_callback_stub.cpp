@@ -18,6 +18,7 @@
 #include <message_parcel.h>
 
 #include "display_common.h"
+#include "xcollie.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -34,12 +35,20 @@ int32_t DisplayPowerCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
         return E_GET_POWER_SERVICE_FAILED;
     }
 
+    const int DFX_DELAY_MS = 10000;
+    int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerCallbackStub", DFX_DELAY_MS, nullptr, nullptr,
+        HiviewDFX::XCOLLIE_FLAG_NOOP);
+    int32_t ret = ERR_OK;
     switch (code) {
         case static_cast<int32_t>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED):
-            return OnDisplayStateChangedStub(data, reply);
+            ret = OnDisplayStateChangedStub(data, reply);
+            break;
         default:
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+            break;
     }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    return ret;
 }
 
 int32_t DisplayPowerCallbackStub::OnDisplayStateChangedStub(MessageParcel& data, MessageParcel& reply)
