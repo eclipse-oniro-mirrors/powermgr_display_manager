@@ -19,6 +19,7 @@
 #include "display_manager.h"
 #include "display_type.h"
 #include "hilog_wrapper.h"
+#include "screen_manager.h"
 #include "window_manager_service_client.h"
 #include "display_power_info.h"
 
@@ -50,20 +51,20 @@ DisplayState ScreenAction::GetPowerState(uint64_t devId)
     DISPLAY_HILOGI(MODULE_SERVICE, "GetPowerState: %{public}d", static_cast<int>(devId));
 
     DisplayState ret = DisplayState::DISPLAY_UNKNOWN;
-    Rosen::DisplayPowerState state = Rosen::DisplayManager::GetInstance()
+    Rosen::ScreenPowerState state = Rosen::ScreenManager::GetInstance()
         .GetScreenPower(devId);
     DISPLAY_HILOGI(MODULE_SERVICE, "GetPowerState: %{public}d", static_cast<uint32_t>(state));
     switch (state) {
-        case Rosen::DisplayPowerState::POWER_ON:
+        case Rosen::ScreenPowerState::POWER_ON:
             ret = DisplayState::DISPLAY_ON;
             break;
-        case Rosen::DisplayPowerState::POWER_STAND_BY:
+        case Rosen::ScreenPowerState::POWER_STAND_BY:
             ret = DisplayState::DISPLAY_DIM;
             break;
-        case Rosen::DisplayPowerState::POWER_SUSPEND:
+        case Rosen::ScreenPowerState::POWER_SUSPEND:
             ret = DisplayState::DISPLAY_SUSPEND;
             break;
-        case Rosen::DisplayPowerState::POWER_OFF:
+        case Rosen::ScreenPowerState::POWER_OFF:
             ret = DisplayState::DISPLAY_OFF;
             break;
         default:
@@ -115,24 +116,24 @@ bool ScreenAction::SetDisplayPower(uint64_t devId, DisplayState state, uint32_t 
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayPower: devId=%{public}d, state=%{public}d, state=%{public}d",
         static_cast<int>(devId), static_cast<uint32_t>(state), reason);
-    Rosen::DisplayPowerState status = Rosen::DisplayPowerState::INVALID_STATE;
+    Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
         case DisplayState::DISPLAY_ON:
-            status = Rosen::DisplayPowerState::POWER_ON;
+            status = Rosen::ScreenPowerState::POWER_ON;
             break;
         case DisplayState::DISPLAY_DIM:
-            status = Rosen::DisplayPowerState::POWER_STAND_BY;
+            status = Rosen::ScreenPowerState::POWER_STAND_BY;
             break;
         case DisplayState::DISPLAY_SUSPEND:
-            status = Rosen::DisplayPowerState::POWER_SUSPEND;
+            status = Rosen::ScreenPowerState::POWER_SUSPEND;
             break;
         case DisplayState::DISPLAY_OFF:
-            status = Rosen::DisplayPowerState::POWER_OFF;
+            status = Rosen::ScreenPowerState::POWER_OFF;
             break;
         default:
             break;
     }
-    bool ret = Rosen::DisplayManager::GetInstance().SetScreenPowerForAll(status,
+    bool ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status,
         Rosen::PowerStateChangeReason::POWER_BUTTON);
     DISPLAY_HILOGE(MODULE_SERVICE, "SetScreenPowerForAll:%{public}d", ret);
     return true;
