@@ -78,6 +78,7 @@ private:
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
+    bool ambientSensorEnabled_ {false};
     SensorUser user_;
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;

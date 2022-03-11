@@ -49,7 +49,8 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
     if (iterater == controllerMap_.end()) {
         return false;
     }
-    if (autoBrightness_ && id == GetMainDisplayId()) {
+    if (id == GetMainDisplayId()) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "change ambient sensor status");
         if (state == DisplayState::DISPLAY_ON) {
             ActivateAmbientSensor();
         } else if (state == DisplayState::DISPLAY_OFF) {
@@ -81,14 +82,14 @@ std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
 
 uint32_t DisplayPowerMgrService::GetMainDisplayId()
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "GetMainDisplayId");
     uint64_t id = action_->GetDefaultDisplayId();
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetMainDisplayId %{public}d", static_cast<uint32_t>(id));
     return static_cast<uint32_t>(id);
 }
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t id, int32_t value)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayState %{public}d, %{public}d", id, value);
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness %{public}d, %{public}d", id, value);
     auto iterater = controllerMap_.find(id);
     if (iterater == controllerMap_.end()) {
         return false;
@@ -120,10 +121,10 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
             DISPLAY_HILOGW(MODULE_SERVICE, "AutoAdjustBrightness is already enabled");
             return true;
         }
+        autoBrightness_ = true;
         if (GetDisplayState(GetMainDisplayId()) == DisplayState::DISPLAY_ON) {
             ActivateAmbientSensor();
         }
-        autoBrightness_ = true;
     } else {
         DISPLAY_HILOGI(MODULE_SERVICE, "AutoAdjustBrightness disable");
         if (!autoBrightness_) {
@@ -138,7 +139,15 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "Activate Sensor");
+    DISPLAY_HILOGI(MODULE_SERVICE, "ActivateAmbientSensor");
+    if (!autoBrightness_) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "auto brightness is not enabled");
+        return;
+    }
+    if (ambientSensorEnabled_) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "Ambient Sensor is already on");
+        return;
+    }
     strcpy_s(user_.name, sizeof(user_.name), "DisplayPowerMgrService");
     user_.userData = nullptr;
     user_.callback = &AmbientLightCallback;
@@ -146,13 +155,23 @@ void DisplayPowerMgrService::ActivateAmbientSensor()
     SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SAMPLING_RATE, SAMPLING_RATE);
     ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
     SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SENSOR_ON_CHANGE);
+    ambientSensorEnabled_ = true;
 }
 
 void DisplayPowerMgrService::DeactivateAmbientSensor()
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "Deactivate Sensor");
+    DISPLAY_HILOGI(MODULE_SERVICE, "ActivateAmbientSensor");
+    if (!autoBrightness_) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "auto brightness is not enabled");
+        return;
+    }
+    if (!ambientSensorEnabled_) {
+        DISPLAY_HILOGI(MODULE_SERVICE, "Ambient Sensor is already off");
+        return;
+    }
     DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
     UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
+    ambientSensorEnabled_ = false;
 }
 
 bool DisplayPowerMgrService::SetStateConfig(uint32_t id, DisplayState state, int32_t value)
