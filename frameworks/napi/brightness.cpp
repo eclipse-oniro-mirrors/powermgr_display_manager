@@ -26,7 +26,6 @@
 using namespace OHOS::DisplayPowerMgr;
 
 struct BrightnessAsyncCallbackInfo {
-    napi_env env;
     napi_async_work asyncWork;
     int32_t value;
 };
@@ -51,7 +50,6 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &value));
 
     BrightnessAsyncCallbackInfo* asyncCallbackInfo = new BrightnessAsyncCallbackInfo {
-        .env = env,
         .asyncWork = nullptr,
     };
 
