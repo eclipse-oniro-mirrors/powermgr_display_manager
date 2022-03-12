@@ -16,6 +16,7 @@ import("//base/powermgr/display_manager/displaymgr.gni")
 config("displaymgr_private_config") {
   include_dirs = [
     "${displaymgr_service_path}/zidl/include",
+    "//base/hiviewdfx/hicollie/interfaces/native/innerkits/include/xcollie",
     "//base/powermgr/power_manager/interfaces/innerkits/native/include",
     "//utils/system/safwk/native/include",
   ]
@@ -42,6 +43,7 @@ ohos_shared_library("displaymgr") {
   deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
+    "hicollie_native:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

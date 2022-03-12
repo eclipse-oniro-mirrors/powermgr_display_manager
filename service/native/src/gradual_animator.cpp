@@ -16,6 +16,7 @@
 #include "gradual_animator.h"
 
 #include "display_common.h"
+#include "watchdog.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -66,6 +67,8 @@ void GradualAnimator::StartAnimation(int32_t from, int32_t to, uint32_t duration
             return;
         }
         handler_ = std::make_shared<AnimatorHandler>(eventRunner_, shared_from_this());
+        const int32_t WATCH_DOG_DELAY_MS = 10000;
+        HiviewDFX::Watchdog::GetInstance().AddThread(name_, handler_, WATCH_DOG_DELAY_MS);
     }
     animating_ = true;
     handler_->SendEvent(EVENT_STEP, 0, updateTime_);
