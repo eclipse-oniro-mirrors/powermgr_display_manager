@@ -70,12 +70,15 @@ private:
     bool IsChangedLux(float scalar);
     bool CalculateBrightness(float scalar, int32_t& brightness);
     int32_t GetBrightnessFromLightScalar(float scalar);
+    void ActivateAmbientSensor();
+    void DeactivateAmbientSensor();
 
     std::shared_ptr<ScreenAction> action_;
 
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
+    bool ambientSensorEnabled_ {false};
     SensorUser user_;
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
