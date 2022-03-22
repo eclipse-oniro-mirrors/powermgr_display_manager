@@ -29,7 +29,7 @@ DisplayPowerMgrService::DisplayPowerMgrService()
     action_ = std::make_shared<ScreenAction>();
     std::vector<uint64_t> devIds = action_->GetDisplayIds();
     uint32_t count = devIds.size();
-    for (int i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < count; i++) {
         DISPLAY_HILOGI(MODULE_SERVICE, "find display: %{public}d", static_cast<uint32_t>(devIds[i]));
         controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], action_));
     }
