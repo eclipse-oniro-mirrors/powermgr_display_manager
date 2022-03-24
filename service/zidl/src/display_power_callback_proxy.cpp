@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerCallbackProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(MODULE_INNERKIT,
+        DISPLAY_HILOGE(COMP_FWK,
             "DisplayPowerCallbackProxy::%{public}s write descriptor failed!", __func__);
         return;
     }
@@ -40,7 +40,7 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(MODULE_INNERKIT,
+        DISPLAY_HILOGE(COMP_FWK,
             "PowerMgrProxy::%{public}s SendRequest is failed, error code: %d", __func__, ret);
         return;
     }

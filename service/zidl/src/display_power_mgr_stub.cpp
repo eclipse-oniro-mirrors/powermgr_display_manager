@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,12 +25,12 @@ namespace DisplayPowerMgr {
 int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    DISPLAY_HILOGD(MODULE_SERVICE, "DisplayPowerMgrStub::OnRemoteRequest, cmd = %d, flags= %d",
+    DISPLAY_HILOGD(COMP_SVC, "DisplayPowerMgrStub::OnRemoteRequest, cmd = %d, flags= %d",
         code, option.GetFlags());
     std::u16string descripter = DisplayPowerMgrStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "DisplayPowerMgrStub::OnRemoteRequest failed, descriptor is not matched!");
+        DISPLAY_HILOGE(COMP_SVC, "DisplayPowerMgrStub::OnRemoteRequest failed, descriptor is not matched!");
         return E_GET_POWER_SERVICE_FAILED;
     }
 
@@ -84,7 +84,7 @@ int32_t DisplayPowerMgrStub::SetDisplayStateStub(MessageParcel& data, MessagePar
 
     bool ret = SetDisplayState(id, static_cast<DisplayState>(state), reason);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write SetDisplayStateStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetDisplayStateStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -98,7 +98,7 @@ int32_t DisplayPowerMgrStub::GetDisplayStateStub(MessageParcel& data, MessagePar
 
     DisplayState ret = GetDisplayState(id);
     if (!reply.WriteUint32(static_cast<uint32_t>(ret))) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write GetDisplayStateStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDisplayStateStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -108,12 +108,12 @@ int32_t DisplayPowerMgrStub::GetDisplayIdsStub(MessageParcel& data, MessageParce
 {
     std::vector<uint32_t> result = GetDisplayIds();
     if (!reply.WriteUint32(static_cast<uint32_t>(result.size()))) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write GetDisplayIdsStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDisplayIdsStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     for (uint32_t i = 0; i < result.size(); i++) {
         if (!reply.WriteUint32(static_cast<uint32_t>(result[i]))) {
-            DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write GetDisplayIdsStub");
+            DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDisplayIdsStub");
         }
     }
     return ERR_OK;
@@ -123,7 +123,7 @@ int32_t DisplayPowerMgrStub::GetMainDisplayIdStub(MessageParcel& data, MessagePa
 {
     uint32_t result = GetMainDisplayId();
     if (!reply.WriteUint32(result)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write GetMainDisplayIdStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetMainDisplayIdStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -139,7 +139,7 @@ int32_t DisplayPowerMgrStub::SetBrightnessStub(MessageParcel& data, MessageParce
 
     bool ret = SetBrightness(id, value);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write SetBrightness return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -157,7 +157,7 @@ int32_t DisplayPowerMgrStub::AdjustBrightnessStub(MessageParcel& data, MessagePa
 
     bool ret = AdjustBrightness(id, value, duration);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write AdjustBrightnessStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write AdjustBrightnessStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -171,7 +171,7 @@ int32_t DisplayPowerMgrStub::AutoAdjustBrightnessStub(MessageParcel& data, Messa
 
     bool ret = AutoAdjustBrightness(enable);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write AutoAdjustBrightnessStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write AutoAdjustBrightnessStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -189,7 +189,7 @@ int32_t DisplayPowerMgrStub::SetStateConfigStub(MessageParcel& data, MessageParc
 
     bool ret = SetStateConfig(id, static_cast<DisplayState>(state), value);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write SetStateConfigStub return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetStateConfigStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
