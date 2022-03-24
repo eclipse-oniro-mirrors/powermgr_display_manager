@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@
 #include <napi/native_node_api.h>
 
 #include "display_power_mgr_client.h"
-#include "hilog_wrapper.h"
+#include "display_log.h"
 
 using namespace OHOS::DisplayPowerMgr;
 
@@ -32,7 +32,7 @@ struct BrightnessAsyncCallbackInfo {
 
 static napi_value SetValue(napi_env env, napi_callback_info info)
 {
-    DISPLAY_HILOGD(MODULE_JS_NAPI, "enter");
+    DISPLAY_HILOGD(COMP_FWK, "enter");
     size_t argc = 1;
     napi_value args[1] = { 0 };
     napi_value jsthis;
@@ -65,9 +65,9 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
         [](napi_env env, void *data) {
             BrightnessAsyncCallbackInfo* asyncCallbackInfo = (BrightnessAsyncCallbackInfo *)data;
             if (!DisplayPowerMgrClient::GetInstance().SetBrightness(asyncCallbackInfo->value)) {
-                DISPLAY_HILOGE(MODULE_JS_NAPI, "Failed to set brightness");
+                DISPLAY_HILOGE(COMP_FWK, "Failed to set brightness: %{public}d", asyncCallbackInfo->value);
             } else {
-                DISPLAY_HILOGD(MODULE_JS_NAPI, "Succeed to set brightness");
+                DISPLAY_HILOGD(COMP_FWK, "Succeed to set brightness: %{public}d", asyncCallbackInfo->value);
             }
         },
         [](napi_env env, napi_status status, void *data) {
@@ -80,7 +80,7 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_queue_async_work(env, asyncCallbackInfo->asyncWork));
 
-    DISPLAY_HILOGD(MODULE_JS_NAPI, "return");
+    DISPLAY_HILOGD(COMP_FWK, "return");
     return nullptr;
 }
 
@@ -92,7 +92,7 @@ static napi_value Init(napi_env env, napi_value exports)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
 
-    DISPLAY_HILOGD(MODULE_JS_NAPI, "return");
+    DISPLAY_HILOGD(COMP_FWK, "return");
 
     return exports;
 }

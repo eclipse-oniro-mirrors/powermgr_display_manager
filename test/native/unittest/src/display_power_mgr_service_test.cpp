@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,16 +108,16 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
 #ifdef SHIELDING
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: fun is start");
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 5");
+    DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 5");
     auto ret = DisplayPowerMgrClient::GetInstance().SetBrightness(5);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 155");
+    DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 155");
     ret = DisplayPowerMgrClient::GetInstance().SetBrightness(155);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness: set 255");
+    DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 255");
     ret = DisplayPowerMgrClient::GetInstance().SetBrightness(255);
     sleep(5);
     EXPECT_TRUE(ret);
@@ -132,7 +132,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService008: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleep(5);
     if (false) {
@@ -149,11 +149,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService009: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService009: GetDisplayState");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_DIM);
 }
@@ -165,11 +165,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService010: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService010: GetDisplayState");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_OFF);
 }
@@ -181,11 +181,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService011: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService011: GetDisplayState");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_SUSPEND);
 }
@@ -197,11 +197,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService012: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService012: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService012: GetDisplayState");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService012: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(state == DisplayState::DISPLAY_UNKNOWN);
 }
@@ -213,7 +213,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService013: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService013: fun is start");
     std::vector<uint32_t> ret = DisplayPowerMgrClient::GetInstance().GetDisplayIds();
     sleep(5);
     EXPECT_TRUE(ret.size() != 0);
@@ -226,7 +226,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService014: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService014: fun is start");
     int32_t ret = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
     sleep(5);
     EXPECT_TRUE(ret == 0);
@@ -239,15 +239,15 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService015: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService015: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
     sleep(5);
     if (ret) {
-        DISPLAY_HILOGI(MODULE_SERVICE, "AutoAdjustBrightness: is supported");
+        DISPLAY_HILOGI(LABEL_TEST, "AutoAdjustBrightness: is supported");
         ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
         EXPECT_TRUE(ret);
     } else {
-        DISPLAY_HILOGI(MODULE_SERVICE, "AutoAdjustBrightness: is not supported");
+        DISPLAY_HILOGI(LABEL_TEST, "AutoAdjustBrightness: is not supported");
         EXPECT_FALSE(ret);
     }
 }
@@ -259,10 +259,10 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService016: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService016: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 3000);
     sleep(5);
     EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService016: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService016: fun is end");
 }
 }

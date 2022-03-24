@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,30 +35,30 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
 
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
-        DISPLAY_HILOGE(MODULE_INNERKIT, "Failed to get system ability manager");
+        DISPLAY_HILOGE(COMP_FWK, "Failed to get system ability manager");
         return nullptr;
     }
     sptr<IRemoteObject> obj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     if (obj == nullptr) {
-        DISPLAY_HILOGE(MODULE_INNERKIT, "Failed to get display manager service");
+        DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service");
         return nullptr;
     }
     sptr<IRemoteObject::DeathRecipient> dr = new DisplayDeathRecipient(*this);
     if ((obj->IsProxyObject()) && (!obj->AddDeathRecipient(dr))) {
-        DISPLAY_HILOGE(MODULE_INNERKIT, "Failed to add death recipient");
+        DISPLAY_HILOGE(COMP_FWK, "Failed to add death recipient");
         return nullptr;
     }
 
     proxy_ = iface_cast<IDisplayPowerMgr>(obj);
     deathRecipient_ = dr;
-    DISPLAY_HILOGI(MODULE_INNERKIT, "Succeed to connect display manager service");
+    DISPLAY_HILOGI(COMP_FWK, "Succeed to connect display manager service");
     return proxy_;
 }
 
 void DisplayPowerMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
-        DISPLAY_HILOGE(MODULE_INNERKIT, "OnRemoteDied failed, remote is nullptr");
+        DISPLAY_HILOGE(COMP_FWK, "OnRemoteDied failed, remote is nullptr");
         return;
     }
 
