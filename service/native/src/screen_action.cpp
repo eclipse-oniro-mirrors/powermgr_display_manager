@@ -93,7 +93,7 @@ bool ScreenAction::SetDisplayState(uint64_t devId, DisplayState state,
     }
     bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds,
         [callback](Rosen::DisplayState rosenState) {
-            DISPLAY_HILOGE(COMP_SVC, "SetDisplayState Callback:%{public}d",
+            DISPLAY_HILOGI(COMP_SVC, "SetDisplayState Callback:%{public}d",
                 static_cast<uint32_t>(rosenState));
             DisplayState state = DisplayState::DISPLAY_UNKNOWN;
             switch (rosenState) {
@@ -108,7 +108,7 @@ bool ScreenAction::SetDisplayState(uint64_t devId, DisplayState state,
             }
             callback(state);
     });
-    DISPLAY_HILOGE(COMP_SVC, "SetDisplayState:%{public}d", ret);
+    DISPLAY_HILOGI(COMP_SVC, "SetDisplayState:%{public}d", ret);
     return ret;
 }
 
@@ -135,7 +135,7 @@ bool ScreenAction::SetDisplayPower(uint64_t devId, DisplayState state, uint32_t 
     }
     bool ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status,
         Rosen::PowerStateChangeReason::POWER_BUTTON);
-    DISPLAY_HILOGE(COMP_SVC, "SetScreenPowerForAll:%{public}d", ret);
+    DISPLAY_HILOGI(COMP_SVC, "SetScreenPowerForAll:%{public}d", ret);
     return true;
 }
 
