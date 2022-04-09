@@ -38,9 +38,11 @@ public:
     };
     bool UpdateState(DisplayState state, uint32_t reason);
     bool UpdateStateConfig(DisplayState state, uint32_t value);
-    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
     bool IsScreenOn();
     uint32_t GetBrightness();
+    bool IsBrightnessOverride();
     virtual void OnStart() override;
     virtual void OnChanged(int32_t currentValue) override;
     virtual void OnEnd() override;
@@ -49,12 +51,15 @@ private:
     void OnStateChanged(DisplayState state);
     void BeforeUpdateState(DisplayState state);
     void AfterUpdateState(DisplayState state);
+    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration);
     std::mutex mutex_;
     const uint64_t displayId_;
     DisplayState state_;
     std::map<DisplayState, uint32_t> stateValues_;
 
     uint32_t brightness_ {0};
+    bool isBrightnessOverride_ {false};
+    uint32_t beforeOverrideBrightness_ {0};
     uint32_t beforeOffBrightness_ {0};
     uint32_t stateChangeReason_ {0};
     std::shared_ptr<ScreenAction> action_;

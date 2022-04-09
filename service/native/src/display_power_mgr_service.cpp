@@ -24,12 +24,6 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-namespace {
-constexpr uint32_t MIN_BRIGHTNESS_VALUE = 0;
-constexpr uint32_t DEFAULT_BRIGHTNESS_VALUE = 102; // 255 * 40%
-constexpr uint32_t MAX_BRIGHTNESS_VALUE  = 255;
-}
-
 DisplayPowerMgrService::DisplayPowerMgrService()
 {
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
@@ -95,21 +89,24 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
-    auto brightnessValue = value;
-    if (brightnessValue > MAX_BRIGHTNESS_VALUE) {
-        DISPLAY_HILOGW(COMP_SVC, "SetBrightness value is greater than max, value=%{public}u", value);
-        brightnessValue = MAX_BRIGHTNESS_VALUE;
-    }
-    if (brightnessValue < MIN_BRIGHTNESS_VALUE) {
-        DISPLAY_HILOGW(COMP_SVC, "SetBrightness value is less than min, value=%{public}u", value);
-        brightnessValue = MIN_BRIGHTNESS_VALUE;
-    }
-    DISPLAY_HILOGI(COMP_SVC, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightnessValue);
+    auto brightness = GetSafeBrightness(value);
+    DISPLAY_HILOGI(COMP_SVC, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return iter->second->UpdateBrightness(brightnessValue);
+    return iter->second->SetBrightness(brightness);
+}
+
+bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
+{
+    auto brightness = GetSafeBrightness(value);
+    DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->OverrideBrightness(brightness);
 }
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
@@ -120,7 +117,7 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
     if (iterater == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->UpdateBrightness(value, duration);
+    return iterater->second->SetBrightness(value, duration);
 }
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
@@ -230,13 +227,16 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
-    for (auto iter = controllerMap_.begin(); iter != controllerMap_.end(); iter++) {
+    for (auto& iter: controllerMap_) {
         result.append("Display Id=");
-        result.append(std::to_string(iter->first));
+        result.append(std::to_string(iter.first));
         result.append(" State=");
-        result.append(std::to_string(static_cast<uint32_t>(iter->second->GetState())));
+        result.append(std::to_string(static_cast<uint32_t>(iter.second->GetState())));
         result.append(" Brightness=");
-        result.append(std::to_string(iter->second->GetBrightness()));
+        result.append(std::to_string(iter.second->GetBrightness()));
+        if (iter.second->IsBrightnessOverride()) {
+            result.append("(Override)");
+        }
         result.append("\n");
     }
 
@@ -358,6 +358,20 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
         }
     }
     return false;
+}
+
+uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
+{
+    auto brightnessValue = value;
+    if (brightnessValue > BRIGHTNESS_MAX) {
+        DISPLAY_HILOGW(COMP_SVC, "brightness value is greater than max, value=%{public}u", value);
+        brightnessValue = BRIGHTNESS_MAX;
+    }
+    if (brightnessValue < BRIGHTNESS_MIN) {
+        DISPLAY_HILOGW(COMP_SVC, "brightness value is less than min, value=%{public}u", value);
+        brightnessValue = BRIGHTNESS_MIN;
+    }
+    return brightnessValue;
 }
 
 bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness)

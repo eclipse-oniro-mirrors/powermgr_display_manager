@@ -179,7 +179,40 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::SET_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(MODULE_INNERKIT, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
+        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
+                       ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
+bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
+    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+
+    int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_BRIGHTNESS), data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
                        ret);
         return result;
     }

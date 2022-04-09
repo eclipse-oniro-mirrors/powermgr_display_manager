@@ -107,7 +107,7 @@ void ScreenController::AfterUpdateState(DisplayState state)
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration)
 {
     std::lock_guard lock(mutex_);
-    DISPLAY_HILOGI(COMP_SVC, "ScreenController UpdateBrightness" \
+    DISPLAY_HILOGI(COMP_SVC, "UpdateBrightness" \
                    ", displayId=%{public}" PRIu64 ", value=%{public}u, duration=%{public}u",
                    displayId_, value, gradualDuration);
     if (animator_ == nullptr) {
@@ -119,7 +119,7 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
         animator_->StopAnimation();
     }
     if (gradualDuration > 0) {
-        DISPLAY_HILOGI(COMP_SVC, "UpdateState gradually");
+        DISPLAY_HILOGI(COMP_SVC, "UpdateBrightness gradually");
         animator_->StartAnimation(brightness_, value, gradualDuration);
         return true;
     }
@@ -131,6 +131,28 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
         DISPLAY_HILOGI(COMP_SVC, "Update brightness failed, value=%{public}u", value);
     }
     return ret;
+}
+
+bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
+{
+    DISPLAY_HILOGI(COMP_SVC, "Set brightness, value=%{public}u", value);
+    if (isBrightnessOverride_) {
+        DISPLAY_HILOGI(COMP_SVC, "brightness is override, ignore the change");
+        return false;
+    }
+    return UpdateBrightness(value, gradualDuration);
+}
+
+bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
+{
+    DISPLAY_HILOGI(COMP_SVC, "Override brightness, value=%{public}u", value);
+    if (!isBrightnessOverride_) {
+        isBrightnessOverride_ = true;
+        beforeOverrideBrightness_ = brightness_;
+    } else if (value == beforeOverrideBrightness_) {
+        isBrightnessOverride_ = false;
+    }
+    return UpdateBrightness(value, gradualDuration);
 }
 
 bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
@@ -162,6 +184,11 @@ uint32_t ScreenController::GetBrightness()
         brightness_ = action_->GetBrightness(displayId_);
     }
     return brightness_;
+}
+
+bool ScreenController::IsBrightnessOverride()
+{
+    return isBrightnessOverride_.load();
 }
 
 void ScreenController::OnStart()

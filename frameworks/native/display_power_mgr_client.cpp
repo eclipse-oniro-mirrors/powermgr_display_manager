@@ -118,6 +118,15 @@ bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId)
     return proxy->SetBrightness(value, displayId);
 }
 
+bool DisplayPowerMgrClient::OverrideBrightness(uint32_t value, uint32_t displayId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->OverrideBrightness(value, displayId);
+}
+
 bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id)
 {
     auto proxy = GetProxy();
