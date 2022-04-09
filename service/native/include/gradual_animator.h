@@ -34,7 +34,7 @@ class GradualAnimator : public std::enable_shared_from_this<GradualAnimator> {
 public:
     GradualAnimator(const std::string& name, std::shared_ptr<AnimateCallback> callback);
     ~GradualAnimator() = default;
-    void StartAnimation(int32_t from, int32_t to, uint32_t duration);
+    void StartAnimation(uint32_t from, uint32_t to, uint32_t duration);
     void StopAnimation();
     bool IsAnimating();
 private:

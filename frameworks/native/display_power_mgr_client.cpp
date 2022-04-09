@@ -109,13 +109,13 @@ int32_t DisplayPowerMgrClient::GetMainDisplayId()
     return proxy->GetMainDisplayId();
 }
 
-bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t id)
+bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
         return false;
     }
-    return proxy->SetBrightness(id, value);
+    return proxy->SetBrightness(value, displayId);
 }
 
 bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id)

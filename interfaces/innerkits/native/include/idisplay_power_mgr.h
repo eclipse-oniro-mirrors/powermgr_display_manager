@@ -42,7 +42,7 @@ public:
     virtual DisplayState GetDisplayState(uint32_t id) = 0;
     virtual std::vector<uint32_t> GetDisplayIds() = 0;
     virtual uint32_t GetMainDisplayId() = 0;
-    virtual bool SetBrightness(uint32_t id, int32_t value) = 0;
+    virtual bool SetBrightness(uint32_t value, uint32_t displayId) = 0;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) = 0;
     virtual bool AutoAdjustBrightness(bool enable) = 0;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) = 0;

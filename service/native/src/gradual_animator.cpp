@@ -37,14 +37,14 @@ GradualAnimator::GradualAnimator(const std::string& name,
     DISPLAY_HILOGD(COMP_SVC, "GradualAnimator construct end");
 }
 
-void GradualAnimator::StartAnimation(int32_t from, int32_t to, uint32_t duration)
+void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t duration)
 {
     if (animating_) {
         DISPLAY_HILOGD(COMP_SVC, "StartAnimation is running...");
         return;
     }
     DISPLAY_HILOGD(COMP_SVC,
-        "StartAnimation from=%{public}d, to=%{public}d, duration=%{public}d",
+        "StartAnimation from=%{public}u, to=%{public}u, duration=%{public}u",
         from, to, duration);
     if (callback_.lock() == nullptr) {
         DISPLAY_HILOGW(COMP_SVC, "Callback is NULL");

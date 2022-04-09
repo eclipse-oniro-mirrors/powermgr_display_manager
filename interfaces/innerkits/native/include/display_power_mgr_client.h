@@ -37,7 +37,7 @@ public:
     DisplayState GetDisplayState(uint32_t id = 0);
     std::vector<uint32_t> GetDisplayIds();
     int32_t GetMainDisplayId();
-    bool SetBrightness(uint32_t value, uint32_t id = 0);
+    bool SetBrightness(uint32_t value, uint32_t displayId = 0);
     bool AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id = 0);
     bool SetStateConfig(DisplayState state, uint32_t value, uint32_t id = 0);
     bool AutoAdjustBrightness(bool enable);

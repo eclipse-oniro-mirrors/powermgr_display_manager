@@ -15,6 +15,7 @@
 
 #include "display_power_mgr_service.h"
 
+#include <cinttypes>
 #include <file_ex.h>
 #include <securec.h>
 #include <string_ex.h>
@@ -23,15 +24,21 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
+namespace {
+constexpr uint32_t MIN_BRIGHTNESS_VALUE = 0;
+constexpr uint32_t DEFAULT_BRIGHTNESS_VALUE = 102; // 255 * 40%
+constexpr uint32_t MAX_BRIGHTNESS_VALUE  = 255;
+}
+
 DisplayPowerMgrService::DisplayPowerMgrService()
 {
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     action_ = std::make_shared<ScreenAction>();
-    std::vector<uint64_t> devIds = action_->GetDisplayIds();
-    uint32_t count = devIds.size();
+    std::vector<uint64_t> displayIds = action_->GetDisplayIds();
+    uint32_t count = displayIds.size();
     for (uint32_t i = 0; i < count; i++) {
-        DISPLAY_HILOGI(COMP_SVC, "find display: %{public}d", static_cast<uint32_t>(devIds[i]));
-        controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], action_));
+        DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}" PRIu64 "", displayIds[i]);
+        controllerMap_.emplace(displayIds[i], std::make_shared<ScreenController>(displayIds[i], action_));
     }
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
@@ -86,14 +93,23 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
     return static_cast<uint32_t>(id);
 }
 
-bool DisplayPowerMgrService::SetBrightness(uint32_t id, int32_t value)
+bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
-    DISPLAY_HILOGI(COMP_SVC, "SetBrightness %{public}d, %{public}d", id, value);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
+    auto brightnessValue = value;
+    if (brightnessValue > MAX_BRIGHTNESS_VALUE) {
+        DISPLAY_HILOGW(COMP_SVC, "SetBrightness value is greater than max, value=%{public}u", value);
+        brightnessValue = MAX_BRIGHTNESS_VALUE;
+    }
+    if (brightnessValue < MIN_BRIGHTNESS_VALUE) {
+        DISPLAY_HILOGW(COMP_SVC, "SetBrightness value is less than min, value=%{public}u", value);
+        brightnessValue = MIN_BRIGHTNESS_VALUE;
+    }
+    DISPLAY_HILOGI(COMP_SVC, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightnessValue);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->UpdateBrightness(value);
+    return iter->second->UpdateBrightness(brightnessValue);
 }
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
