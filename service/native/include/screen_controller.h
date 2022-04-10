@@ -29,7 +29,7 @@ class ScreenController :
     public AnimateCallback,
     public std::enable_shared_from_this<ScreenController> {
 public:
-    ScreenController(uint64_t displayId, std::shared_ptr<ScreenAction> action);
+    ScreenController(uint32_t displayId, std::shared_ptr<ScreenAction> action);
     virtual ~ScreenController() = default;
 
     DisplayState GetState()
@@ -42,9 +42,9 @@ public:
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
     bool IsScreenOn();
     uint32_t GetBrightness();
-    bool IsBrightnessOverride();
+    bool IsBrightnessOverride() const;
     virtual void OnStart() override;
-    virtual void OnChanged(int32_t currentValue) override;
+    virtual void OnChanged(uint32_t currentValue) override;
     virtual void OnEnd() override;
 private:
     static const uint32_t SCREEN_BRIGHTNESS_UPDATE_DURATION = 200;
@@ -53,7 +53,7 @@ private:
     void AfterUpdateState(DisplayState state);
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration);
     std::mutex mutex_;
-    const uint64_t displayId_;
+    const uint32_t displayId_;
     DisplayState state_;
     std::map<DisplayState, uint32_t> stateValues_;
 

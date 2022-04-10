@@ -30,34 +30,17 @@ class ScreenAction {
 public:
     ScreenAction();
     ~ScreenAction() = default;
-    uint64_t GetDefaultDisplayId();
-    std::vector<uint64_t> GetDisplayIds();
-    DisplayState GetPowerState(uint64_t devId);
-    bool SetDisplayState(uint64_t devId, DisplayState state,
-        std::function<void(DisplayState)> callback);
-    bool SetDisplayPower(uint64_t devId, DisplayState state, uint32_t reason);
-    uint32_t GetBrightness(uint64_t devId);
-    bool SetBrightness(uint64_t devId, uint32_t value);
+    uint32_t GetDefaultDisplayId();
+    std::vector<uint32_t> GetDisplayIds();
+    DisplayState GetPowerState(uint32_t displayId);
+    bool SetDisplayState(uint32_t displayId, DisplayState state, const std::function<void(DisplayState)> &callback);
+    bool SetDisplayPower(uint32_t displayId, DisplayState state, uint32_t reason);
+    uint32_t GetBrightness(uint32_t displayId);
+    bool SetBrightness(uint32_t displayId, uint32_t value);
 
 private:
-    struct DeviceFuncCloser {
-        void operator()(DeviceFuncs* f)
-        {
-            (void)DeviceUninitialize(f);
-        }
-    };
-    using DeviceFuncPtr = std::unique_ptr<DeviceFuncs, DeviceFuncCloser>;
-
-    static inline int32_t GetValidBrightness(int32_t value)
-    {
-        return (value < MIN_BRIGHTNESS) ? MIN_BRIGHTNESS : ((value > MAX_BRIGHTNESS) ? MAX_BRIGHTNESS : value);
-    }
-
-    static constexpr int32_t MAX_BRIGHTNESS = 255;
-    static constexpr int32_t MIN_BRIGHTNESS = 6;
-
-    std::vector<uint64_t> devIds_;
-    DeviceFuncPtr hdiFuncs_;
+    static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
+    std::vector<uint32_t> displayIds_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

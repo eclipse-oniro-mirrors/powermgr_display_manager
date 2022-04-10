@@ -95,7 +95,7 @@ std::vector<uint32_t> DisplayPowerMgrClient::GetDisplayIds()
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return std::vector<uint32_t>();
+        return {};
     }
     return proxy->GetDisplayIds();
 }
@@ -104,9 +104,9 @@ int32_t DisplayPowerMgrClient::GetMainDisplayId()
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
-        return -1;
+        return INVALID_DISPLAY_ID;
     }
-    return proxy->GetMainDisplayId();
+    return static_cast<int32_t>(proxy->GetMainDisplayId());
 }
 
 bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId)

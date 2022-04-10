@@ -60,6 +60,7 @@ private:
 
     sptr<IDisplayPowerMgr> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
+    static constexpr int32_t INVALID_DISPLAY_ID {-1};
 
     std::mutex mutex_;
     sptr<IDisplayPowerMgr> proxy_ {nullptr};

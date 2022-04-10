@@ -28,10 +28,10 @@ DisplayPowerMgrService::DisplayPowerMgrService()
 {
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     action_ = std::make_shared<ScreenAction>();
-    std::vector<uint64_t> displayIds = action_->GetDisplayIds();
+    std::vector<uint32_t> displayIds = action_->GetDisplayIds();
     uint32_t count = displayIds.size();
     for (uint32_t i = 0; i < count; i++) {
-        DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}" PRIu64 "", displayIds[i]);
+        DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", displayIds[i]);
         controllerMap_.emplace(displayIds[i], std::make_shared<ScreenController>(displayIds[i], action_));
     }
     callback_ = nullptr;
@@ -74,23 +74,23 @@ DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
 std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
 {
     std::vector<uint32_t> ids;
-    for (auto iter = controllerMap_.begin(); iter != controllerMap_.end(); iter++) {
-        ids.push_back(iter->first);
+    for (auto& iter: controllerMap_) {
+        ids.push_back(iter.first);
     }
     return ids;
 }
 
 uint32_t DisplayPowerMgrService::GetMainDisplayId()
 {
-    uint64_t id = action_->GetDefaultDisplayId();
-    DISPLAY_HILOGI(COMP_SVC, "GetMainDisplayId %{public}d", static_cast<uint32_t>(id));
-    return static_cast<uint32_t>(id);
+    uint32_t id = action_->GetDefaultDisplayId();
+    DISPLAY_HILOGI(COMP_SVC, "GetMainDisplayId %{public}d", id);
+    return id;
 }
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
     auto brightness = GetSafeBrightness(value);
-    DISPLAY_HILOGI(COMP_SVC, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;

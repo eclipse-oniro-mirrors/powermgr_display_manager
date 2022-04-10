@@ -28,10 +28,10 @@ const int DISPLAY_DIM_BRIGHTNESS = 50;
 const int DISPLAY_OFF_BRIGHTNESS = 0;
 const int DISPLAY_SUSPEND_BRIGHTNESS = 50;
 
-ScreenController::ScreenController(uint64_t displayId, std::shared_ptr<ScreenAction> action)
+ScreenController::ScreenController(uint32_t displayId, std::shared_ptr<ScreenAction> action)
     : displayId_(displayId), state_(DisplayState::DISPLAY_UNKNOWN), action_(std::move(action))
 {
-    DISPLAY_HILOGI(COMP_SVC, "ScreenController created for displayId=%{public}" PRIu64 "", displayId_);
+    DISPLAY_HILOGI(COMP_SVC, "ScreenController created for displayId=%{public}u", displayId_);
     stateValues_.emplace(DisplayState::DISPLAY_ON, DISPLAY_FULL_BRIGHTNESS);
     stateValues_.emplace(DisplayState::DISPLAY_DIM, DISPLAY_DIM_BRIGHTNESS);
     stateValues_.emplace(DisplayState::DISPLAY_OFF, DISPLAY_OFF_BRIGHTNESS);
@@ -43,7 +43,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
     std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(COMP_SVC,
-                   "ScreenController UpdateState, displayId=%{public}" PRIu64 ", state=%{public}u, state_=%{public}u",
+                   "ScreenController UpdateState, displayId=%{public}u, state=%{public}u, state_=%{public}u",
                    displayId_, static_cast<uint32_t>(state), static_cast<uint32_t>(state_));
     if (state == state_) {
         return true;
@@ -100,15 +100,15 @@ void ScreenController::AfterUpdateState(DisplayState state)
     if (state == DisplayState::DISPLAY_ON) {
         bool ret = action_->SetBrightness(displayId_, beforeOffBrightness_);
         DISPLAY_HILOGI(COMP_SVC, "Is SetBrightness %{public}d, \
-            Update brightness to %{public}d", ret, beforeOffBrightness_);
+            Update brightness to %{public}u", ret, beforeOffBrightness_);
     }
 }
 
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration)
 {
     std::lock_guard lock(mutex_);
-    DISPLAY_HILOGI(COMP_SVC, "UpdateBrightness" \
-                   ", displayId=%{public}" PRIu64 ", value=%{public}u, duration=%{public}u",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness" \
+                   ", displayId=%{public}u, value=%{public}u, duration=%{public}u",
                    displayId_, value, gradualDuration);
     if (animator_ == nullptr) {
         std::string name = "ScreenController_" + std::to_string(displayId_);
@@ -119,25 +119,25 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
         animator_->StopAnimation();
     }
     if (gradualDuration > 0) {
-        DISPLAY_HILOGI(COMP_SVC, "UpdateBrightness gradually");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness gradually");
         animator_->StartAnimation(brightness_, value, gradualDuration);
         return true;
     }
     bool ret = action_->SetBrightness(displayId_, value);
     if (ret) {
         brightness_ = value;
-        DISPLAY_HILOGI(COMP_SVC, "Update brightness, value=%{public}u", value);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Updated brightness, value=%{public}u", value);
     } else {
-        DISPLAY_HILOGI(COMP_SVC, "Update brightness failed, value=%{public}u", value);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Updated brightness failed, value=%{public}u", value);
     }
     return ret;
 }
 
 bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
 {
-    DISPLAY_HILOGI(COMP_SVC, "Set brightness, value=%{public}u", value);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness, value=%{public}u", value);
     if (isBrightnessOverride_) {
-        DISPLAY_HILOGI(COMP_SVC, "brightness is override, ignore the change");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness is override, ignore the change");
         return false;
     }
     return UpdateBrightness(value, gradualDuration);
@@ -145,12 +145,14 @@ bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
 
 bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
 {
-    DISPLAY_HILOGI(COMP_SVC, "Override brightness, value=%{public}u", value);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness, value=%{public}u", value);
     if (!isBrightnessOverride_) {
         isBrightnessOverride_ = true;
         beforeOverrideBrightness_ = brightness_;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Confirm override brightness, brightness_=%{public}u", brightness_);
     } else if (value == beforeOverrideBrightness_) {
         isBrightnessOverride_ = false;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness value is same as before, cancel override brightness");
     }
     return UpdateBrightness(value, gradualDuration);
 }
@@ -159,8 +161,7 @@ bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
 {
     std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(COMP_SVC,
-                   "ScreenController UpdateStateConfig" \
-                   ", displayId=%{public}" PRIu64 ", state=%{public}u, value=%{public}u",
+                   "ScreenController UpdateStateConfig, displayId=%{public}u, state=%{public}u, value=%{public}u",
                    displayId_, static_cast<uint32_t>(state), value);
     auto iterator = stateValues_.find(state);
     if (iterator == stateValues_.end()) {
@@ -186,9 +187,9 @@ uint32_t ScreenController::GetBrightness()
     return brightness_;
 }
 
-bool ScreenController::IsBrightnessOverride()
+bool ScreenController::IsBrightnessOverride() const
 {
-    return isBrightnessOverride_.load();
+    return isBrightnessOverride_;
 }
 
 void ScreenController::OnStart()
@@ -196,7 +197,7 @@ void ScreenController::OnStart()
     DISPLAY_HILOGD(COMP_SVC, "ScreenAnimatorCallback onStart");
 }
 
-void ScreenController::OnChanged(int32_t currentValue)
+void ScreenController::OnChanged(uint32_t currentValue)
 {
     brightness_ = static_cast<uint32_t>(currentValue);
     bool ret = action_->SetBrightness(displayId_, brightness_);
