@@ -109,6 +109,16 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
     return iter->second->OverrideBrightness(brightness);
 }
 
+uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGD(COMP_SVC, "GetBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->GetBrightness();
+}
+
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d, %{public}d",
