@@ -35,6 +35,7 @@ public:
 
     virtual bool SetBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool RestoreBrightness(uint32_t displayId) override;
     virtual uint32_t GetBrightness(uint32_t displayId) override;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
     virtual bool AutoAdjustBrightness(bool enable) override;
@@ -43,7 +44,6 @@ public:
 
 private:
     static inline BrokerDelegator<DisplayPowerMgrProxy> delegator_;
-
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

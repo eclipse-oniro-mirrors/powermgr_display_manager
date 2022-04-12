@@ -55,7 +55,8 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
     if (totalSteps_ < 1) {
         totalSteps_ = 1;
     }
-    stride_ = (static_cast<int32_t>(toBrightness_) - static_cast<int32_t>(fromBrightness_)) / static_cast<int32_t>(totalSteps_);
+    stride_ = (static_cast<int32_t>(toBrightness_) - static_cast<int32_t>(fromBrightness_)) /
+              static_cast<int32_t>(totalSteps_);
     currentStep_ = 0;
     if (handler_ == nullptr) {
         eventRunner_ = AppExecFwk::EventRunner::Create(name_);

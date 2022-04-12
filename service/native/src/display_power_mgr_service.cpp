@@ -15,7 +15,6 @@
 
 #include "display_power_mgr_service.h"
 
-#include <cinttypes>
 #include <file_ex.h>
 #include <securec.h>
 #include <string_ex.h>
@@ -109,12 +108,22 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
     return iter->second->OverrideBrightness(brightness);
 }
 
+bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->RestoreBrightness();
+}
+
 uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
 {
     DISPLAY_HILOGD(COMP_SVC, "GetBrightness displayId=%{public}u", displayId);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
-        return false;
+        return BRIGHTNESS_OFF;
     }
     return iter->second->GetBrightness();
 }
@@ -242,10 +251,14 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append(std::to_string(iter.first));
         result.append(" State=");
         result.append(std::to_string(static_cast<uint32_t>(iter.second->GetState())));
-        result.append(" Brightness=");
-        result.append(std::to_string(iter.second->GetBrightness()));
-        if (iter.second->IsBrightnessOverride()) {
-            result.append("(Override)");
+        if (!iter.second->IsBrightnessOverride()) {
+            result.append(" Brightness=");
+            result.append(std::to_string(iter.second->GetBrightness()));
+        } else {
+            result.append(" Brightness=");
+            result.append(std::to_string(iter.second->GetBeforeOverrideBrightness()));
+            result.append(" OverrideBrightness=");
+            result.append(std::to_string(iter.second->GetBrightness()));
         }
         result.append("\n");
     }
@@ -416,8 +429,8 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     }
     DISPLAY_HILOGI(COMP_SVC, "nit: %{public}d", nit);
 
-    int32_t brightness = BRIGHTNESS_MIN
-        + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN));
+    int32_t brightness = static_cast<int32_t>(BRIGHTNESS_MIN
+        + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN)));
     DISPLAY_HILOGI(COMP_SVC, "brightness: %{public}d", brightness);
 
     return brightness;

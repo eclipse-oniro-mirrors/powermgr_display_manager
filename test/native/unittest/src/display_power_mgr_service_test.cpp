@@ -48,7 +48,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 {
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 
@@ -60,7 +60,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 {
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 
@@ -72,7 +72,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 {
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 
@@ -84,7 +84,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 {
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 
@@ -96,7 +96,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
 {
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 
@@ -111,15 +111,15 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: fun is start");
     DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 5");
     auto ret = DisplayPowerMgrClient::GetInstance().SetBrightness(5);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 155");
     ret = DisplayPowerMgrClient::GetInstance().SetBrightness(155);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: set 255");
     ret = DisplayPowerMgrClient::GetInstance().SetBrightness(255);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
 }
 #endif
@@ -134,7 +134,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    sleep(5);
+    sleep(1);
     if (false) {
         EXPECT_TRUE(ret);
         DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -151,7 +151,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -167,7 +167,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -183,7 +183,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -199,7 +199,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService012: fun is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService012: GetDisplayState");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -215,7 +215,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService013: fun is start");
     std::vector<uint32_t> ret = DisplayPowerMgrClient::GetInstance().GetDisplayIds();
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret.size() != 0);
 }
 
@@ -228,7 +228,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService014: fun is start");
     int32_t ret = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret == 0);
 }
 
@@ -241,7 +241,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService015: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
-    sleep(5);
+    sleep(1);
     if (ret) {
         DISPLAY_HILOGI(LABEL_TEST, "AutoAdjustBrightness: is supported");
         ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
@@ -261,7 +261,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService016: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 3000);
-    sleep(5);
+    sleep(1);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService016: fun is end");
 }
@@ -274,8 +274,10 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService017, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService017: fun is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
     EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(value, 100);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService017: fun is end");
@@ -283,39 +285,89 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService017, TestSize.Level0)
 
 /**
  * @tc.name: DisplayPowerMgrService018
- * @tc.desc: Test OverrideBrightness after SetBrightness
+ * @tc.desc: Test OverrideBrightness
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService018, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019: fun is start");
-    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService018: fun is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(255);
     EXPECT_TRUE(ret);
-    ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(255);
-    EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(value, 255);
-    ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(100); // restore
+    ret = DisplayPowerMgrClient::GetInstance().RestoreBrightness(); // restore
     EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService018: fun is end");
 }
 
 /**
  * @tc.name: DisplayPowerMgrService019
- * @tc.desc: Test SetBrightness after OverrideBrightness
+ * @tc.desc: Test RestoreBrightness after OverrideBrightness
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019: fun is start");
-    bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(255);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
     EXPECT_TRUE(ret);
-    ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
-    EXPECT_FALSE(ret);
+    sleep(1); // wait for gradual animation
+    ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(255);
+    EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(value, 255);
-    ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(100); // restore
+    ret = DisplayPowerMgrClient::GetInstance().RestoreBrightness(); // restore
     EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
+    value = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(value, 100);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService020
+ * @tc.desc: Test SetBrightness after OverrideBrightness
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020: fun is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(255);
+    EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
+    ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
+    EXPECT_FALSE(ret);
+    sleep(1); // wait for gradual animation
+    uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(value, 255);
+    ret = DisplayPowerMgrClient::GetInstance().RestoreBrightness(); // restore
+    EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService021
+ * @tc.desc: Test RestoreBrightness after not override
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021: fun is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
+    EXPECT_TRUE(ret);
+    sleep(1); // wait for gradual animation
+    uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(value, 100);
+    ret = DisplayPowerMgrClient::GetInstance().RestoreBrightness(); // restore
+    EXPECT_FALSE(ret);
+    sleep(1); // wait for gradual animation
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021: fun is end");
 }
 }

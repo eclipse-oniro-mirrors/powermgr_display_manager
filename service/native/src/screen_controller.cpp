@@ -15,9 +15,6 @@
 
 #include "screen_controller.h"
 
-#include <utility>
-#include <cinttypes>
-
 #include "display_power_mgr_service.h"
 #include "display_log.h"
 
@@ -107,8 +104,7 @@ void ScreenController::AfterUpdateState(DisplayState state)
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration)
 {
     std::lock_guard lock(mutex_);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness" \
-                   ", displayId=%{public}u, value=%{public}u, duration=%{public}u",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness, displayId=%{public}u, value=%{public}u, duration=%{public}u",
                    displayId_, value, gradualDuration);
     if (animator_ == nullptr) {
         std::string name = "ScreenController_" + std::to_string(displayId_);
@@ -150,11 +146,28 @@ bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDurati
         isBrightnessOverride_ = true;
         beforeOverrideBrightness_ = brightness_;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Confirm override brightness, brightness_=%{public}u", brightness_);
-    } else if (value == beforeOverrideBrightness_) {
-        isBrightnessOverride_ = false;
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness value is same as before, cancel override brightness");
     }
     return UpdateBrightness(value, gradualDuration);
+}
+
+bool ScreenController::RestoreBrightness(uint32_t gradualDuration)
+{
+    if (!isBrightnessOverride_) {
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not override, no need to restore");
+        return false;
+    }
+    isBrightnessOverride_ = false;
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Restore brightness to value=%{public}u", beforeOverrideBrightness_);
+    return UpdateBrightness(beforeOverrideBrightness_, gradualDuration);
+}
+
+uint32_t ScreenController::GetBrightness()
+{
+    std::lock_guard lock(mutex_);
+    if (brightness_ == DISPLAY_OFF_BRIGHTNESS) {
+        brightness_ = action_->GetBrightness(displayId_);
+    }
+    return brightness_;
 }
 
 bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
@@ -178,18 +191,14 @@ bool ScreenController::IsScreenOn()
     return (state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM);
 }
 
-uint32_t ScreenController::GetBrightness()
-{
-    std::lock_guard lock(mutex_);
-    if (brightness_ == 0) {
-        brightness_ = action_->GetBrightness(displayId_);
-    }
-    return brightness_;
-}
-
 bool ScreenController::IsBrightnessOverride() const
 {
     return isBrightnessOverride_;
+}
+
+uint32_t ScreenController::GetBeforeOverrideBrightness() const
+{
+    return beforeOverrideBrightness_;
 }
 
 void ScreenController::OnStart()

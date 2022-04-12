@@ -57,6 +57,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_BRIGHTNESS):
             ret = OverrideBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::RESTORE_BRIGHTNESS):
+            ret = RestoreBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::GET_BRIGHTNESS):
             ret = GetBrightnessStub(data, reply);
             break;
@@ -161,7 +164,21 @@ int32_t DisplayPowerMgrStub::OverrideBrightnessStub(MessageParcel& data, Message
 
     bool ret = OverrideBrightness(value, displayId);
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetBrightness return value");
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write OverrideBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::RestoreBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t displayId = 0;
+
+    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+
+    bool ret = RestoreBrightness(displayId);
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write RestoreBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
@@ -173,9 +190,9 @@ int32_t DisplayPowerMgrStub::GetBrightnessStub(MessageParcel& data, MessageParce
 
     READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
-    bool ret = GetBrightness(displayId);
-    if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetBrightness return value");
+    uint32_t ret = GetBrightness(displayId);
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;

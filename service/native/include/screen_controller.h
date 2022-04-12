@@ -40,9 +40,11 @@ public:
     bool UpdateStateConfig(DisplayState state, uint32_t value);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
-    bool IsScreenOn();
+    bool RestoreBrightness(uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
     uint32_t GetBrightness();
+    bool IsScreenOn();
     bool IsBrightnessOverride() const;
+    uint32_t GetBeforeOverrideBrightness() const;
     virtual void OnStart() override;
     virtual void OnChanged(uint32_t currentValue) override;
     virtual void OnEnd() override;
