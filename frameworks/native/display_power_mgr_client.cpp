@@ -163,6 +163,15 @@ bool DisplayPowerMgrClient::AutoAdjustBrightness(bool enable)
     return proxy->AutoAdjustBrightness(enable);
 }
 
+bool DisplayPowerMgrClient::IsAutoAdjustBrightness()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->IsAutoAdjustBrightness();
+}
+
 bool DisplayPowerMgrClient::SetStateConfig(DisplayState state, uint32_t value, uint32_t id)
 {
     auto proxy = GetProxy();

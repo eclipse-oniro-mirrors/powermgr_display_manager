@@ -44,6 +44,7 @@ public:
     bool AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id = 0);
     bool SetStateConfig(DisplayState state, uint32_t value, uint32_t id = 0);
     bool AutoAdjustBrightness(bool enable);
+    bool IsAutoAdjustBrightness();
     bool RegisterCallback(sptr<IDisplayPowerCallback> callback);
 
 private:

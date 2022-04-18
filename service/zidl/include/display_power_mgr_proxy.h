@@ -39,6 +39,7 @@ public:
     virtual uint32_t GetBrightness(uint32_t displayId) override;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
     virtual bool AutoAdjustBrightness(bool enable) override;
+    virtual bool IsAutoAdjustBrightness() override;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
 

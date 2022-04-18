@@ -37,6 +37,7 @@ private:
     int32_t GetBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t AdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t AutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t IsAutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetStateConfigStub(MessageParcel& data, MessageParcel& reply);
     int32_t RegisterCallbackStub(MessageParcel& data, MessageParcel& reply);
 };
