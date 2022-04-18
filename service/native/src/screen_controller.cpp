@@ -144,8 +144,9 @@ bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDurati
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness, value=%{public}u", value);
     if (!isBrightnessOverride_) {
         isBrightnessOverride_ = true;
-        beforeOverrideBrightness_ = brightness_;
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Confirm override brightness, brightness_=%{public}u", brightness_);
+        beforeOverrideBrightness_ = GetBrightness();
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Confirm override brightness, beforeOverrideBrightness_=%{public}u",
+                       beforeOverrideBrightness_);
     }
     return UpdateBrightness(value, gradualDuration);
 }
@@ -203,7 +204,7 @@ uint32_t ScreenController::GetBeforeOverrideBrightness() const
 
 void ScreenController::OnStart()
 {
-    DISPLAY_HILOGD(COMP_SVC, "ScreenAnimatorCallback onStart");
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "ScreenAnimatorCallback onStart");
 }
 
 void ScreenController::OnChanged(uint32_t currentValue)
@@ -211,15 +212,15 @@ void ScreenController::OnChanged(uint32_t currentValue)
     brightness_ = static_cast<uint32_t>(currentValue);
     bool ret = action_->SetBrightness(displayId_, brightness_);
     if (ret) {
-        DISPLAY_HILOGD(COMP_SVC, "Update brightness, brightness_=%{public}u", brightness_);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Update brightness, brightness_=%{public}u", brightness_);
     } else {
-        DISPLAY_HILOGD(COMP_SVC, "Update brightness failed, brightness_=%{public}d", brightness_);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Update brightness failed, brightness_=%{public}d", brightness_);
     }
 }
 
 void ScreenController::OnEnd()
 {
-    DISPLAY_HILOGD(COMP_SVC, "ScreenAnimatorCallback OnEnd");
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "ScreenAnimatorCallback OnEnd");
 }
 
 void ScreenController::OnStateChanged(DisplayState state)
