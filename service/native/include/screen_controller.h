@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ class ScreenController :
     public AnimateCallback,
     public std::enable_shared_from_this<ScreenController> {
 public:
-    ScreenController(uint64_t devId, std::shared_ptr<ScreenAction> action);
+    ScreenController(uint32_t displayId, std::shared_ptr<ScreenAction> action);
     virtual ~ScreenController() = default;
 
     DisplayState GetState()
@@ -38,23 +38,30 @@ public:
     };
     bool UpdateState(DisplayState state, uint32_t reason);
     bool UpdateStateConfig(DisplayState state, uint32_t value);
-    bool UpdateBrightness(uint32_t value, uint32_t duration = 0);
-    bool IsScreenOn();
+    bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
+    bool RestoreBrightness(uint32_t gradualDuration = SCREEN_BRIGHTNESS_UPDATE_DURATION);
     uint32_t GetBrightness();
+    bool IsScreenOn();
+    bool IsBrightnessOverride() const;
+    uint32_t GetBeforeOverrideBrightness() const;
     virtual void OnStart() override;
-    virtual void OnChanged(int32_t currentValue) override;
+    virtual void OnChanged(uint32_t currentValue) override;
     virtual void OnEnd() override;
 private:
     static const uint32_t SCREEN_BRIGHTNESS_UPDATE_DURATION = 200;
     void OnStateChanged(DisplayState state);
     void BeforeUpdateState(DisplayState state);
     void AfterUpdateState(DisplayState state);
+    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration);
     std::mutex mutex_;
-    const uint64_t devId_;
+    const uint32_t displayId_;
     DisplayState state_;
     std::map<DisplayState, uint32_t> stateValues_;
 
     uint32_t brightness_ {0};
+    bool isBrightnessOverride_ {false};
+    uint32_t beforeOverrideBrightness_ {0};
     uint32_t beforeOffBrightness_ {0};
     uint32_t stateChangeReason_ {0};
     std::shared_ptr<ScreenAction> action_;
