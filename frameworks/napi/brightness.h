@@ -28,7 +28,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class Brightness {
 public:
-    Brightness(napi_env env);
+    explicit Brightness(napi_env env);
     void GetValue(napi_value options);
     void SetValue(napi_callback_info info);
     void GetMode(napi_value options);
