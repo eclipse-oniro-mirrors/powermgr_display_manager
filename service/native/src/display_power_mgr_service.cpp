@@ -169,6 +169,12 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
     return true;
 }
 
+bool DisplayPowerMgrService::IsAutoAdjustBrightness()
+{
+    DISPLAY_HILOGW(COMP_SVC, "Automatic brightness mode: %{public}d", autoBrightness_);
+    return autoBrightness_;
+}
+
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "ActivateAmbientSensor");

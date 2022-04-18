@@ -37,6 +37,7 @@ public:
         GET_BRIGHTNESS,
         ADJUST_BRIGHTNESS,
         AUTO_ADJUST_BRIGHTNESS,
+        IS_AUTO_ADJUST_BRIGHTNESS,
         SET_STATE_CONFIG,
         REGISTER_CALLBACK,
     };
@@ -51,6 +52,7 @@ public:
     virtual uint32_t GetBrightness(uint32_t displayId) = 0;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) = 0;
     virtual bool AutoAdjustBrightness(bool enable) = 0;
+    virtual bool IsAutoAdjustBrightness() = 0;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) = 0;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) = 0;
 

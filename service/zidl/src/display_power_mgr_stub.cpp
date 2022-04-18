@@ -69,6 +69,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS):
             ret = AutoAdjustBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS):
+            ret = IsAutoAdjustBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::SET_STATE_CONFIG):
             ret = SetStateConfigStub(data, reply);
             break;
@@ -225,6 +228,16 @@ int32_t DisplayPowerMgrStub::AutoAdjustBrightnessStub(MessageParcel& data, Messa
     bool ret = AutoAdjustBrightness(enable);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write AutoAdjustBrightnessStub return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::IsAutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    bool ret = IsAutoAdjustBrightness();
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write IsAutoAdjustBrightnessStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
