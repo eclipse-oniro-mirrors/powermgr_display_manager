@@ -15,6 +15,8 @@
 
 #include "screen_action.h"
 
+#include <hisysevent.h>
+
 #include "display_manager.h"
 #include "display_log.h"
 #include "screen_manager.h"
@@ -106,6 +108,9 @@ bool ScreenAction::SetDisplayState(uint32_t displayId, DisplayState state,
             }
             callback(state);
     });
+    // Notify screen state change event to battery statistics
+    HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::POWERMGR, "SCREEN_STATE",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "state", static_cast<int32_t>(state));
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState:%{public}d", ret);
     return ret;
 }
@@ -147,6 +152,9 @@ uint32_t ScreenAction::GetBrightness(uint32_t displayId)
 bool ScreenAction::SetBrightness(uint32_t displayId, uint32_t value)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId, value);
+    // Notify screen brightness change event to battery statistics
+    HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::POWERMGR, "BRIGHTNESS_NIT",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "brightness", value);
     return Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId, value);
 }
 } // namespace DisplayPowerMgr
