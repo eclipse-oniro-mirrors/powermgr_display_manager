@@ -16,5 +16,10 @@ import("//build/test.gni")
 
 group("displaymgr_native_test") {
   testonly = true
-  deps = [ "unittest:unittest_display_mgr_service" ]
+  deps = [ "unittest/common/native:unittest_display_mgr_service" ]
+}
+
+group("displaymgr_js_test") {
+  testonly = true
+  deps = [ "unittest/common/napi:PowerMgrDisplayJsTest" ]
 }
