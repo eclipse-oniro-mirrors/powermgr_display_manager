@@ -26,7 +26,7 @@ ohos_shared_library("brightness") {
 
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
-    "//foundation/ace/napi:ace_napi",
+    "//foundation/arkui/napi:ace_napi",
   ]
 
   external_deps = [
