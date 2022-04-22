@@ -25,7 +25,6 @@ config("module_private_config") {
     "//base/powermgr/power_manager/interfaces/innerkits/native/include",
     "//base/sensors/sensor/interfaces/native/include",
     "//utils/system/safwk/native/include",
-    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
   ]
 }
 
@@ -52,6 +51,7 @@ ohos_unittest("unittest_display_mgr_service") {
   ]
 
   external_deps = [
+    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
