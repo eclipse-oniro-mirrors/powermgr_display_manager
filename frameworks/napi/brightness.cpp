@@ -68,7 +68,7 @@ void Brightness::SetValue(napi_callback_info info)
 {
     napi_value options = GetCallbackInfo(info, napi_object);
     if (options != nullptr) {
-        DISPLAY_HILOGW(COMP_FWK, "System brightness interface");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "System brightness interface");
         napi_value value = GetOptions(options, BRIGHTNESS_VALUE, napi_number);
         if (value == nullptr) {
             result_.Error(INPUT_ERROR_CODE, SET_VALUE_ERROR_MGR);
@@ -83,7 +83,7 @@ void Brightness::SetValue(napi_callback_info info)
 
     napi_value number = GetCallbackInfo(info, napi_number);
     if (number != nullptr) {
-        DISPLAY_HILOGW(COMP_FWK, "Brightness interface");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
         int32_t value = MIN_BRIGHTNESS;
         if (napi_ok != napi_get_value_int32(env_, number, &value)) {
             DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
@@ -92,7 +92,7 @@ void Brightness::SetValue(napi_callback_info info)
         brightnessInfo_.SetBrightness(value);
         return;
     }
-    DISPLAY_HILOGE(COMP_FWK, "SetValue: No valid parameters");
+    DISPLAY_HILOGW(FEAT_BRIGHTNESS, "SetValue: No valid parameters");
 }
 
 void Brightness::GetMode(napi_value options)
@@ -139,7 +139,7 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info info, napi_valuetype c
     napi_value thisVar = nullptr;
     void *data = nullptr;
     if (napi_ok != napi_get_cb_info(env_, info, &argc, argv, &thisVar, &data)) {
-        DISPLAY_HILOGE(COMP_FWK, "Failed to get the input parameter");
+        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input parameter");
         return nullptr;
     }
 
@@ -191,18 +191,18 @@ napi_value Brightness::Result::GetResult(napi_env env)
 uint32_t Brightness::BrightnessInfo::GetBrightness()
 {
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
-    DISPLAY_HILOGI(COMP_FWK, "Get brightness: %{public}d", brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Get brightness: %{public}d", brightness);
     return brightness;
 }
 
 bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
 {
-    DISPLAY_HILOGI(COMP_FWK, "Set brightness: %{public}d", value);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d", value);
     value = value > MAX_BRIGHTNESS ? MAX_BRIGHTNESS : value;
     value = value < MIN_BRIGHTNESS ? MIN_BRIGHTNESS : value;
     bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value);
     if (!isSucc) {
-        DISPLAY_HILOGE(COMP_FWK, "Failed to set brightness: %{public}d", value);
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Failed to set brightness: %{public}d", value);
     }
     return isSucc;
 }
@@ -210,15 +210,15 @@ bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
 int32_t Brightness::BrightnessInfo::GetAutoMode()
 {
     bool isAuto = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
-    DISPLAY_HILOGD(COMP_FWK, "Automatic brightness adjustment: %{public}d", isAuto);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Automatic brightness adjustment: %{public}d", isAuto);
     return static_cast<int32_t>(isAuto);
 }
 
 bool Brightness::BrightnessInfo::SetAutoMode(bool mode)
 {
-    DISPLAY_HILOGD(COMP_FWK, "AutoAdjustBrightness begin");
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness begin");
     bool isSucc = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(mode);
-    DISPLAY_HILOGD(COMP_FWK, "set auto brightness mode: %{public}d, succ: %{public}d", mode, isSucc);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "set auto brightness mode: %{public}d, succ: %{public}d", mode, isSucc);
     return isSucc;
 }
 

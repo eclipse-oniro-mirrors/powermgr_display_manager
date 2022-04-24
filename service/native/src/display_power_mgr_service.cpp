@@ -129,6 +129,16 @@ uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
     return iter->second->GetBrightness();
 }
 
+uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGD(MODULE_SERVICE, "GetBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return BRIGHTNESS_OFF;
+    }
+    return iter->second->GetBrightness();
+}
+
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "SetDisplayState %{public}d, %{public}d, %{public}d",
@@ -171,7 +181,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 
 bool DisplayPowerMgrService::IsAutoAdjustBrightness()
 {
-    DISPLAY_HILOGW(COMP_SVC, "Automatic brightness mode: %{public}d", autoBrightness_);
+    DISPLAY_HILOGW(MODULE_SERVICE, "Automatic brightness mode: %{public}d", autoBrightness_);
     return autoBrightness_;
 }
 
