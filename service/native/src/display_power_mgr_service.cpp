@@ -120,7 +120,7 @@ bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
 
 uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
 {
-    DISPLAY_HILOGD(COMP_SVC, "GetBrightness displayId=%{public}u", displayId);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "GetBrightness displayId=%{public}u", displayId);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return BRIGHTNESS_OFF;
@@ -130,7 +130,7 @@ uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
-    DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d, %{public}d",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState %{public}d, %{public}d, %{public}d",
         id, value, duration);
     auto iterater = controllerMap_.find(id);
     if (iterater == controllerMap_.end()) {
@@ -141,15 +141,15 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 {
-    DISPLAY_HILOGI(COMP_SVC, "AutoAdjustBrightness start");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
     if (!supportLightSensor_) {
-        DISPLAY_HILOGI(COMP_SVC, "AutoAdjustBrightness not support");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
         return false;
     }
     if (enable) {
-        DISPLAY_HILOGI(COMP_SVC, "AutoAdjustBrightness enable");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness enable");
         if (autoBrightness_) {
-            DISPLAY_HILOGW(COMP_SVC, "AutoAdjustBrightness is already enabled");
+            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already enabled");
             return true;
         }
         autoBrightness_ = true;
@@ -157,9 +157,9 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
             ActivateAmbientSensor();
         }
     } else {
-        DISPLAY_HILOGI(COMP_SVC, "AutoAdjustBrightness disable");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness disable");
         if (!autoBrightness_) {
-            DISPLAY_HILOGW(COMP_SVC, "AutoAdjustBrightness is already disabled");
+            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already disabled");
             return true;
         }
         DeactivateAmbientSensor();
@@ -170,19 +170,19 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 
 bool DisplayPowerMgrService::IsAutoAdjustBrightness()
 {
-    DISPLAY_HILOGW(COMP_SVC, "Automatic brightness mode: %{public}d", autoBrightness_);
+    DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Automatic brightness mode: %{public}d", autoBrightness_);
     return autoBrightness_;
 }
 
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
-    DISPLAY_HILOGI(COMP_SVC, "ActivateAmbientSensor");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateAmbientSensor");
     if (!autoBrightness_) {
-        DISPLAY_HILOGI(COMP_SVC, "auto brightness is not enabled");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness is not enabled");
         return;
     }
     if (ambientSensorEnabled_) {
-        DISPLAY_HILOGI(COMP_SVC, "Ambient Sensor is already on");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
         return;
     }
     strcpy_s(user_.name, sizeof(user_.name), "DisplayPowerMgrService");
@@ -197,13 +197,13 @@ void DisplayPowerMgrService::ActivateAmbientSensor()
 
 void DisplayPowerMgrService::DeactivateAmbientSensor()
 {
-    DISPLAY_HILOGI(COMP_SVC, "ActivateAmbientSensor");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateAmbientSensor");
     if (!autoBrightness_) {
-        DISPLAY_HILOGI(COMP_SVC, "auto brightness is not enabled");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness is not enabled");
         return;
     }
     if (!ambientSensorEnabled_) {
-        DISPLAY_HILOGI(COMP_SVC, "Ambient Sensor is already off");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor is already off");
         return;
     }
     DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
@@ -293,39 +293,39 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
 
 void DisplayPowerMgrService::InitSensors()
 {
-    DISPLAY_HILOGI(COMP_SVC, "InitSensors start");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "InitSensors start");
     SensorInfo* sensorInfo = nullptr;
     int32_t count;
     int ret = GetAllSensors(&sensorInfo, &count);
     if (ret != 0 || sensorInfo == nullptr) {
-        DISPLAY_HILOGI(COMP_SVC, "Can't get sensors");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Can't get sensors");
         return;
     }
     supportLightSensor_ = false;
     for (int i = 0; i < count; i++) {
         if (sensorInfo[i].sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
-            DISPLAY_HILOGI(COMP_SVC, "AMBIENT_LIGHT Support");
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT Support");
             supportLightSensor_ = true;
             break;
         }
     }
 
     if (!supportLightSensor_) {
-        DISPLAY_HILOGI(COMP_SVC, "AMBIENT_LIGHT not support");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT not support");
     }
     free(sensorInfo);
 }
 
 void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
 {
-    DISPLAY_HILOGI(COMP_SVC, "AmbientSensorCallback");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientSensorCallback");
     if (event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT) {
-        DISPLAY_HILOGI(COMP_SVC, "Sensor Callback is not AMBIENT_LIGHT");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback is not AMBIENT_LIGHT");
         return;
     }
     auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     if (pms == nullptr) {
-        DISPLAY_HILOGI(COMP_SVC, "Sensor Callback no service");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback no service");
         return;
     }
     uint32_t mainDispId = pms->GetMainDisplayId();
@@ -334,7 +334,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
         return;
     }
     AmbientLightData* data = (AmbientLightData*)event->data;
-    DISPLAY_HILOGI(COMP_SVC, "AmbientLightCallback: %{public}f", data->intensity);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientLightCallback: %{public}f", data->intensity);
     int32_t brightness = static_cast<int32_t>(mainDisp->second->GetBrightness());
     if (pms->CalculateBrightness(data->intensity, brightness)) {
         pms->AdjustBrightness(mainDispId, brightness, AUTO_ADJUST_BRIGHTNESS_DURATION);
@@ -343,11 +343,11 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
 
 bool DisplayPowerMgrService::IsChangedLux(float scalar)
 {
-    DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: (%{public}d), %{public}f vs %{public}f",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: (%{public}d), %{public}f vs %{public}f",
         luxChanged_, lastLux_, scalar);
 
     if (lastLuxTime_ <= 0) {
-        DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: receive lux at first time");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: receive lux at first time");
         lastLuxTime_ = time(0);
         lastLux_ = scalar;
         luxChanged_ = true;
@@ -357,10 +357,10 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
     if (!luxChanged_) {
         float luxChangeMin = (lastLux_ / LUX_CHANGE_RATE_THRESHOLD) + 1;
         if (abs(scalar - lastLux_) < luxChangeMin) {
-            DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: Too little change");
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: Too little change");
             return false;
         } else {
-            DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: First time to change, wait for stable");
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: First time to change, wait for stable");
             luxChanged_ = true;
             return false;
         }
@@ -372,16 +372,16 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
         if (abs(scalar - lastLux_) >= luxChangeMin) {
             time_t currentTime = time(0);
             time_t sub = currentTime - lastLuxTime_;
-            DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: stable lux");
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: stable lux");
             if (sub >= LUX_STABLE_TIME) {
-                DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: stable enought to change");
+                DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: stable enought to change");
                 lastLuxTime_ = time(0);
                 lastLux_ = scalar;
                 luxChanged_ = false;
                 return true;
             }
         } else {
-            DISPLAY_HILOGI(COMP_SVC, "IsChangedLux: unstable lux, wait for stable");
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: unstable lux, wait for stable");
             luxChanged_ = true;
             return false;
         }
@@ -407,16 +407,16 @@ bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightne
 {
     const float lastLux = lastLux_;
     if (!IsChangedLux(scalar)) {
-        DISPLAY_HILOGI(COMP_SVC, "Lux is not change");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Lux is not change");
         return false;
     }
     int32_t change = GetBrightnessFromLightScalar(scalar);
-    DISPLAY_HILOGI(COMP_SVC, "lux: %{public}f -> %{public}f, screen: %{public}d -> %{public}d",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "lux: %{public}f -> %{public}f, screen: %{public}d -> %{public}d",
         lastLux, scalar, brightness, change);
     if (abs(change - brightness) < BRIGHTNESS_CHANGE_MIN
         || (scalar > lastLux && change < brightness)
         || (scalar < lastLux && change > brightness)) {
-        DISPLAY_HILOGI(COMP_SVC, "screen is too light/dark when calculated change");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "screen is too light/dark when calculated change");
         return false;
     }
     brightness = change;
@@ -433,11 +433,11 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     } else if (nit > NIT_MAX) {
         nit = NIT_MAX;
     }
-    DISPLAY_HILOGI(COMP_SVC, "nit: %{public}d", nit);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "nit: %{public}d", nit);
 
     int32_t brightness = static_cast<int32_t>(BRIGHTNESS_MIN
         + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN)));
-    DISPLAY_HILOGI(COMP_SVC, "brightness: %{public}d", brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness: %{public}d", brightness);
 
     return brightness;
 }
