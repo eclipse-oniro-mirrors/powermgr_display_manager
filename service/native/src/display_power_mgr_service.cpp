@@ -15,6 +15,7 @@
 
 #include "display_power_mgr_service.h"
 
+#include <hisysevent.h>
 #include <file_ex.h>
 #include <securec.h>
 #include <string_ex.h>
@@ -339,6 +340,9 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     if (pms->CalculateBrightness(data->intensity, brightness)) {
         pms->AdjustBrightness(mainDispId, brightness, AUTO_ADJUST_BRIGHTNESS_DURATION);
     }
+    // Notify ambient brightness change event to battery statistics
+    HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::POWERMGR, "AMBIENT_LIGHT",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "level", brightness);
 }
 
 bool DisplayPowerMgrService::IsChangedLux(float scalar)
