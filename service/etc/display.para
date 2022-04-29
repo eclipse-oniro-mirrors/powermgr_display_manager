@@ -1,0 +1,4 @@
+# Brightness
+const.display.brightness.min=1
+const.display.brightness.default=102
+const.display.brightness.max=255
