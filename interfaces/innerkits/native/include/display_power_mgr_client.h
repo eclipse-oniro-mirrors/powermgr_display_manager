@@ -41,6 +41,9 @@ public:
     bool OverrideBrightness(uint32_t value, uint32_t displayId = 0);
     bool RestoreBrightness(uint32_t displayId = 0);
     uint32_t GetBrightness(uint32_t displayId = 0);
+    uint32_t GetDefaultBrightness();
+    uint32_t GetMaxBrightness();
+    uint32_t GetMinBrightness();
     bool AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id = 0);
     bool SetStateConfig(DisplayState state, uint32_t value, uint32_t id = 0);
     bool AutoAdjustBrightness(bool enable);
@@ -65,6 +68,9 @@ private:
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
     static constexpr int32_t INVALID_DISPLAY_ID {-1};
     static constexpr uint32_t BRIGHTNESS_OFF {0};
+    static constexpr uint32_t BRIGHTNESS_DEFAULT {102};
+    static constexpr uint32_t BRIGHTNESS_MAX {255};
+    static constexpr uint32_t BRIGHTNESS_MIN {1};
 
     std::mutex mutex_;
     sptr<IDisplayPowerMgr> proxy_ {nullptr};

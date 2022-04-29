@@ -32,6 +32,7 @@ config("displaymgr_public_config") {
 
 ohos_shared_library("displaymgrservice") {
   sources = [
+    "native/src/display_param_helper.cpp",
     "native/src/display_power_mgr_service.cpp",
     "native/src/display_system_ability.cpp",
     "native/src/gradual_animator.cpp",
@@ -68,6 +69,7 @@ ohos_shared_library("displaymgrservice") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
     "sensor:sensor_interface_native",
+    "startup_l2:syspara",
     "window_manager:libdm",
   ]
 

@@ -35,6 +35,9 @@ public:
         OVERRIDE_BRIGHTNESS,
         RESTORE_BRIGHTNESS,
         GET_BRIGHTNESS,
+        GET_DEFAULT_BRIGHTNESS,
+        GET_MAX_BRIGHTNESS,
+        GET_MIN_BRIGHTNESS,
         ADJUST_BRIGHTNESS,
         AUTO_ADJUST_BRIGHTNESS,
         IS_AUTO_ADJUST_BRIGHTNESS,
@@ -50,6 +53,9 @@ public:
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) = 0;
     virtual bool RestoreBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetBrightness(uint32_t displayId) = 0;
+    virtual uint32_t GetDefaultBrightness() = 0;
+    virtual uint32_t GetMaxBrightness() = 0;
+    virtual uint32_t GetMinBrightness() = 0;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) = 0;
     virtual bool AutoAdjustBrightness(bool enable) = 0;
     virtual bool IsAutoAdjustBrightness() = 0;

@@ -43,6 +43,7 @@
         "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
         "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
         "//base/powermgr/display_manager/service:displaymgrservice",
+        "//base/powermgr/display_manager/service/etc:display.para",
         "//base/powermgr/display_manager/interfaces/kits/js/napi:brightness"
       ],
       "inner_kits": [

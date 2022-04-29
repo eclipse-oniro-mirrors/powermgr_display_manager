@@ -145,6 +145,34 @@ uint32_t DisplayPowerMgrClient::GetBrightness(uint32_t displayId)
     return proxy->GetBrightness(displayId);
 }
 
+uint32_t DisplayPowerMgrClient::GetDefaultBrightness()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return BRIGHTNESS_DEFAULT;
+    }
+    return proxy->GetDefaultBrightness();
+}
+
+uint32_t DisplayPowerMgrClient::GetMaxBrightness()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return BRIGHTNESS_MAX;
+    }
+    return proxy->GetMaxBrightness();
+}
+
+uint32_t DisplayPowerMgrClient::GetMinBrightness()
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return BRIGHTNESS_MIN;
+    }
+    return proxy->GetMinBrightness();
+}
+
+
 bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id)
 {
     auto proxy = GetProxy();
