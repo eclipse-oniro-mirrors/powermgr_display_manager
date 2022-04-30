@@ -127,4 +127,44 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBrightness005, TestSize.L
     EXPECT_EQ(value, 100);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBrightness005: fun is end");
 }
+
+/**
+ * @tc.name: DisplayPowerMgrMaxBrightness001
+ * @tc.desc: Test GetMaxBrightness less equals 255
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMaxBrightness001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMaxBrightness001: fun is start");
+    uint32_t value = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
+    EXPECT_LE(value, 255);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMaxBrightness001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrMinBrightness001
+ * @tc.desc: Test GetMinBrightness greater equals 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMinBrightness001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMinBrightness001: fun is start");
+    uint32_t value = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
+    EXPECT_GE(value, 0);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMinBrightness001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrDefaultBrightness001
+ * @tc.desc: Test GetDefaultnBrightness greater equals 0 and less equals 255
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDefaultBrightness001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001: fun is start");
+    uint32_t value = DisplayPowerMgrClient::GetInstance().GetDefaultBrightness();
+    EXPECT_GE(value, 0);
+    EXPECT_LE(value, 255);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001: fun is end");
+}
 }
