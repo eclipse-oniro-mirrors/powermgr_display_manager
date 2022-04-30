@@ -300,6 +300,12 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     }
     result.append("\n");
 
+    result.append("Brightness Limits: ");
+    result.append("Max=" + std::to_string(GetMaxBrightness()) + " ");
+    result.append("Min=" + std::to_string(GetMinBrightness()) + " ");
+    result.append("Default=" + std::to_string(GetDefaultBrightness()));
+    result.append("\n");
+
     if (!SaveStringToFd(fd, result)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to save dump info to fd");
     }

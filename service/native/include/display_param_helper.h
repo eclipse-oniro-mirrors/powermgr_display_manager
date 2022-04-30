@@ -41,4 +41,4 @@ private:
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 
-#endif //POWERMGR_DISPLAY_MANAGER_DISPLAY_PARAM_HELPER_H
+#endif // POWERMGR_DISPLAY_MANAGER_DISPLAY_PARAM_HELPER_H
