@@ -63,6 +63,15 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::GET_BRIGHTNESS):
             ret = GetBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::GET_DEFAULT_BRIGHTNESS):
+            ret = GetDefaultBrightnessStub(data, reply);
+            break;
+        case static_cast<int32_t>(IDisplayPowerMgr::GET_MAX_BRIGHTNESS):
+            ret = GetMaxBrightnessStub(data, reply);
+            break;
+        case static_cast<int32_t>(IDisplayPowerMgr::GET_MIN_BRIGHTNESS):
+            ret = GetMinBrightnessStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::ADJUST_BRIGHTNESS):
             ret = AdjustBrightnessStub(data, reply);
             break;
@@ -196,6 +205,36 @@ int32_t DisplayPowerMgrStub::GetBrightnessStub(MessageParcel& data, MessageParce
     uint32_t ret = GetBrightness(displayId);
     if (!reply.WriteUint32(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write GetBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::GetDefaultBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t ret = GetDefaultBrightness();
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDefaultBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::GetMaxBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t ret = GetMaxBrightness();
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetMaxBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::GetMinBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t ret = GetMinBrightness();
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetMinBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;

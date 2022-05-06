@@ -19,7 +19,7 @@
 #include <file_ex.h>
 #include <securec.h>
 #include <string_ex.h>
-
+#include "display_param_helper.h"
 #include "display_log.h"
 
 namespace OHOS {
@@ -127,6 +127,21 @@ uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
         return BRIGHTNESS_OFF;
     }
     return iter->second->GetBrightness();
+}
+
+uint32_t DisplayPowerMgrService::GetDefaultBrightness()
+{
+    return DisplayParamHelper::GetInstance().GetDefaultBrightness();
+}
+
+uint32_t DisplayPowerMgrService::GetMaxBrightness()
+{
+    return DisplayParamHelper::GetInstance().GetMaxBrightness();
+}
+
+uint32_t DisplayPowerMgrService::GetMinBrightness()
+{
+    return DisplayParamHelper::GetInstance().GetMinBrightness();
 }
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
@@ -284,6 +299,12 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     } else {
         result.append("OFF");
     }
+    result.append("\n");
+
+    result.append("Brightness Limits: ");
+    result.append("Max=" + std::to_string(GetMaxBrightness()) + " ");
+    result.append("Min=" + std::to_string(GetMinBrightness()) + " ");
+    result.append("Default=" + std::to_string(GetDefaultBrightness()));
     result.append("\n");
 
     if (!SaveStringToFd(fd, result)) {

@@ -35,6 +35,9 @@ private:
     int32_t OverrideBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t RestoreBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetDefaultBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetMaxBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetMinBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t AdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t AutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t IsAutoAdjustBrightnessStub(MessageParcel& data, MessageParcel& reply);
