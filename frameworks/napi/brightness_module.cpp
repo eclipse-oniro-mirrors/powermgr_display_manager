@@ -20,7 +20,7 @@
 
 #include "brightness.h"
 #include "display_common.h"
-#include "display_log.h"
+#include "hilog_wrapper.h"
 #include "power_mgr_client.h"
 #include "running_lock_info.h"
 
@@ -77,7 +77,7 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports)
 {
-    DISPLAY_HILOGI(COMP_FWK, "brightness init");
+    DISPLAY_HILOGI(MODULE_JNI, "brightness init");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getValue", GetValue),
         DECLARE_NAPI_FUNCTION("setValue", SetValue),
@@ -87,7 +87,7 @@ static napi_value Init(napi_env env, napi_value exports)
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    DISPLAY_HILOGI(COMP_FWK, "brightness init end");
+    DISPLAY_HILOGI(MODULE_JNI, "brightness init end");
     return exports;
 }
 EXTERN_C_END

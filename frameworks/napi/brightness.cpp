@@ -16,7 +16,7 @@
 #include "brightness.h"
 
 #include "display_common.h"
-#include "display_log.h"
+#include "hilog_wrapper.h"
 #include "display_power_mgr_client.h"
 
 using namespace OHOS::PowerMgr;
@@ -68,7 +68,7 @@ void Brightness::SetValue(napi_callback_info info)
 {
     napi_value options = GetCallbackInfo(info, napi_object);
     if (options != nullptr) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "System brightness interface");
+        DISPLAY_HILOGD(MODULE_JNI, "System brightness interface");
         napi_value value = GetOptions(options, BRIGHTNESS_VALUE, napi_number);
         if (value == nullptr) {
             result_.Error(INPUT_ERROR_CODE, SET_VALUE_ERROR_MGR);
@@ -83,16 +83,16 @@ void Brightness::SetValue(napi_callback_info info)
 
     napi_value number = GetCallbackInfo(info, napi_number);
     if (number != nullptr) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
+        DISPLAY_HILOGD(MODULE_JNI, "Brightness interface");
         int32_t value = MIN_BRIGHTNESS;
         if (napi_ok != napi_get_value_int32(env_, number, &value)) {
-            DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
+            DISPLAY_HILOGW(MODULE_JNI, "Failed to get the input number");
             return;
         }
         brightnessInfo_.SetBrightness(value);
         return;
     }
-    DISPLAY_HILOGW(FEAT_BRIGHTNESS, "SetValue: No valid parameters");
+    DISPLAY_HILOGW(MODULE_JNI, "SetValue: No valid parameters");
 }
 
 void Brightness::GetMode(napi_value options)
@@ -104,7 +104,7 @@ void Brightness::GetMode(napi_value options)
 
 void Brightness::SetMode(napi_value options)
 {
-    DISPLAY_HILOGD(COMP_FWK, "Set auto brightness");
+    DISPLAY_HILOGD(MODULE_JNI, "Set auto brightness");
     napi_value napiMode = GetOptions(options, BRIGHTNESS_MODE, napi_number);
     if (napiMode == nullptr) {
         result_.Error(INPUT_ERROR_CODE, SET_MODE_ERROR_MGR);
@@ -120,7 +120,7 @@ void Brightness::SetMode(napi_value options)
 
 void Brightness::SetKeepScreenOn(napi_value options, std::shared_ptr<RunningLock>& runningLock)
 {
-    DISPLAY_HILOGD(COMP_FWK, "Set keep screen on");
+    DISPLAY_HILOGD(MODULE_JNI, "Set keep screen on");
     napi_value napiKeep = GetOptions(options, KEEP_SCREENON, napi_boolean);
     if (napiKeep == nullptr) {
         result_.Error(INPUT_ERROR_CODE, SET_KEEP_SCREENON_ERROR_MGR);
@@ -139,12 +139,12 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info info, napi_valuetype c
     napi_value thisVar = nullptr;
     void *data = nullptr;
     if (napi_ok != napi_get_cb_info(env_, info, &argc, argv, &thisVar, &data)) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input parameter");
+        DISPLAY_HILOGW(MODULE_JNI, "Failed to get the input parameter");
         return nullptr;
     }
 
     if (argc != MAX_ARGC) {
-        DISPLAY_HILOGW(COMP_FWK, "Lack of parameter");
+        DISPLAY_HILOGW(MODULE_JNI, "Lack of parameter");
         return nullptr;
     }
     
@@ -157,14 +157,14 @@ void Brightness::Result::Error(int32_t code, const std::string& msg)
 {
     code_ = code;
     msg_ = msg;
-    DISPLAY_HILOGW(COMP_FWK, "Error message, code: %{public}d, msg: %{public}s",
+    DISPLAY_HILOGW(MODULE_JNI, "Error message, code: %{public}d, msg: %{public}s",
         code_, msg_.c_str());
 }
 
 void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size)
 {
     if (!error) {
-        DISPLAY_HILOGW(COMP_FWK, "error is null");
+        DISPLAY_HILOGW(MODULE_JNI, "error is null");
         return;
     }
     napi_value data = nullptr;
@@ -191,18 +191,18 @@ napi_value Brightness::Result::GetResult(napi_env env)
 uint32_t Brightness::BrightnessInfo::GetBrightness()
 {
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Get brightness: %{public}d", brightness);
+    DISPLAY_HILOGI(MODULE_JNI, "Get brightness: %{public}d", brightness);
     return brightness;
 }
 
 bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d", value);
+    DISPLAY_HILOGI(MODULE_JNI, "Set brightness: %{public}d", value);
     value = value > MAX_BRIGHTNESS ? MAX_BRIGHTNESS : value;
     value = value < MIN_BRIGHTNESS ? MIN_BRIGHTNESS : value;
     bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value);
     if (!isSucc) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Failed to set brightness: %{public}d", value);
+        DISPLAY_HILOGW(MODULE_JNI, "Failed to set brightness: %{public}d", value);
     }
     return isSucc;
 }
@@ -210,21 +210,21 @@ bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
 int32_t Brightness::BrightnessInfo::GetAutoMode()
 {
     bool isAuto = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Automatic brightness adjustment: %{public}d", isAuto);
+    DISPLAY_HILOGD(MODULE_JNI, "Automatic brightness adjustment: %{public}d", isAuto);
     return static_cast<int32_t>(isAuto);
 }
 
 bool Brightness::BrightnessInfo::SetAutoMode(bool mode)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness begin");
+    DISPLAY_HILOGD(MODULE_JNI, "AutoAdjustBrightness begin");
     bool isSucc = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(mode);
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "set auto brightness mode: %{public}d, succ: %{public}d", mode, isSucc);
+    DISPLAY_HILOGD(MODULE_JNI, "set auto brightness mode: %{public}d, succ: %{public}d", mode, isSucc);
     return isSucc;
 }
 
 void Brightness::BrightnessInfo::ScreenOn(bool keep, std::shared_ptr<RunningLock>& runningLock)
 {
-    DISPLAY_HILOGD(COMP_FWK, "Keep screen on, keep: %{public}d, isUsed: %{public}d", keep, runningLock->IsUsed());
+    DISPLAY_HILOGD(MODULE_JNI, "Keep screen on, keep: %{public}d, isUsed: %{public}d", keep, runningLock->IsUsed());
     keep ? runningLock->Lock() : runningLock->UnLock();
 }
 
@@ -232,20 +232,20 @@ void Brightness::ExecuteCallback(napi_value options)
 {
     bool error = result_.IsError();
     if (!error) {
-        DISPLAY_HILOGI(COMP_FWK, "Call the js success method");
+        DISPLAY_HILOGI(MODULE_JNI, "Call the js success method");
         napi_value result = result_.GetResult(env_);
         size_t argc = result ? MAX_ARGC : 0;
         CallFunction(options, FUNC_SUCEESS_NAME, argc, result ? &result : nullptr);
     }
 
     if (error) {
-        DISPLAY_HILOGI(COMP_FWK, "Call the js fail method");
+        DISPLAY_HILOGI(MODULE_JNI, "Call the js fail method");
         size_t argc = MAX_FAIL_ARGC;
         napi_value argv[argc];
         result_.GetError(env_, argv, argc);
         CallFunction(options, FUNC_FAIL_NAME, argc, argv);
     }
-    DISPLAY_HILOGI(COMP_FWK, "Call the js complete method");
+    DISPLAY_HILOGI(MODULE_JNI, "Call the js complete method");
     CallFunction(options, FUNC_COMPLETE_NAME, 0, nullptr);
 }
 
@@ -254,7 +254,7 @@ bool Brightness::CheckValueType(napi_value value, napi_valuetype checkType)
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env_, value, &valueType);
     if (valueType != checkType) {
-        DISPLAY_HILOGW(COMP_FWK, "Check input parameter error");
+        DISPLAY_HILOGW(MODULE_JNI, "Check input parameter error");
         return false;
     }
     return true;
@@ -265,11 +265,11 @@ napi_value Brightness::GetOptions(napi_value options, const std::string& name, n
     napi_value property = nullptr;
     napi_status status = napi_get_named_property(env_, options, name.c_str(), &property);
     if (status != napi_ok) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to get the %{public}s Options property", name.c_str());
+        DISPLAY_HILOGW(MODULE_JNI, "Failed to get the %{public}s Options property", name.c_str());
         return nullptr;
     }
     if (!CheckValueType(property, checkType)) {
-        DISPLAY_HILOGW(COMP_FWK, "Get %{public}s Options property type mismatch", name.c_str());
+        DISPLAY_HILOGW(MODULE_JNI, "Get %{public}s Options property type mismatch", name.c_str());
         return nullptr;
     }
     return property;
@@ -283,7 +283,7 @@ void Brightness::CallFunction(napi_value options, const std::string& name, size_
     napi_value callResult = 0;
     napi_status status = napi_call_function(env_, nullptr, optionsFunc, argc, response, &callResult);
     if (status != napi_ok) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to call the %{public}s callback function", name.c_str());
+        DISPLAY_HILOGW(MODULE_JNI, "Failed to call the %{public}s callback function", name.c_str());
     }
 }
 } // namespace DisplayPowerMgr

@@ -237,7 +237,7 @@ int32_t DisplayPowerMgrStub::IsAutoAdjustBrightnessStub(MessageParcel& data, Mes
 {
     bool ret = IsAutoAdjustBrightness();
     if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(COMP_SVC, "Failed to write IsAutoAdjustBrightnessStub return value");
+        DISPLAY_HILOGE(MODULE_SERVICE, "Failed to write IsAutoAdjustBrightnessStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
