@@ -27,11 +27,11 @@ DisplayPowerMgrService::DisplayPowerMgrService()
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "DisplayPowerMgrService Create");
     action_ = std::make_shared<ScreenAction>();
-    std::vector<uint64_t> devIds = action_->GetDisplayIds();
-    uint32_t count = devIds.size();
+    std::vector<uint32_t> displayIds = action_->GetDisplayIds();
+    uint32_t count = displayIds.size();
     for (uint32_t i = 0; i < count; i++) {
-        DISPLAY_HILOGI(MODULE_SERVICE, "find display: %{public}d", static_cast<uint32_t>(devIds[i]));
-        controllerMap_.emplace(devIds[i], std::make_shared<ScreenController>(devIds[i], action_));
+        DISPLAY_HILOGI(MODULE_SERVICE, "find display, id=%{public}u", displayIds[i]);
+        controllerMap_.emplace(displayIds[i], std::make_shared<ScreenController>(displayIds[i], action_));
     }
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
@@ -74,27 +74,59 @@ std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
 {
     DISPLAY_HILOGI(MODULE_SERVICE, "GetDisplayIds");
     std::vector<uint32_t> ids;
-    for (auto iter = controllerMap_.begin(); iter != controllerMap_.end(); iter++) {
-        ids.push_back(iter->first);
+    for (auto& iter: controllerMap_) {
+        ids.push_back(iter.first);
     }
     return ids;
 }
 
 uint32_t DisplayPowerMgrService::GetMainDisplayId()
 {
-    uint64_t id = action_->GetDefaultDisplayId();
-    DISPLAY_HILOGI(MODULE_SERVICE, "GetMainDisplayId %{public}d", static_cast<uint32_t>(id));
-    return static_cast<uint32_t>(id);
+    uint32_t id = action_->GetDefaultDisplayId();
+    DISPLAY_HILOGI(MODULE_SERVICE, "GetMainDisplayId %{public}d", id);
+    return id;
 }
 
-bool DisplayPowerMgrService::SetBrightness(uint32_t id, int32_t value)
+bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
-    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness %{public}d, %{public}d", id, value);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
+    auto brightness = GetSafeBrightness(value);
+    DISPLAY_HILOGI(MODULE_SERVICE, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->UpdateBrightness(value);
+    return iter->second->SetBrightness(brightness);
+}
+
+bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
+{
+    auto brightness = GetSafeBrightness(value);
+    DISPLAY_HILOGI(MODULE_SERVICE, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->OverrideBrightness(brightness);
+}
+
+bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGI(MODULE_SERVICE, "RestoreBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->RestoreBrightness();
+}
+
+uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGD(MODULE_SERVICE, "GetBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return BRIGHTNESS_OFF;
+    }
+    return iter->second->GetBrightness();
 }
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
@@ -105,7 +137,7 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
     if (iterater == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->UpdateBrightness(value, duration);
+    return iterater->second->SetBrightness(value, duration);
 }
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
@@ -215,13 +247,20 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
-    for (auto iter = controllerMap_.begin(); iter != controllerMap_.end(); iter++) {
+    for (auto& iter: controllerMap_) {
         result.append("Display Id=");
-        result.append(std::to_string(iter->first));
+        result.append(std::to_string(iter.first));
         result.append(" State=");
-        result.append(std::to_string(static_cast<uint32_t>(iter->second->GetState())));
-        result.append(" Brightness=");
-        result.append(std::to_string(iter->second->GetBrightness()));
+        result.append(std::to_string(static_cast<uint32_t>(iter.second->GetState())));
+        if (!iter.second->IsBrightnessOverride()) {
+            result.append(" Brightness=");
+            result.append(std::to_string(iter.second->GetBrightness()));
+        } else {
+            result.append(" Brightness=");
+            result.append(std::to_string(iter.second->GetBeforeOverrideBrightness()));
+            result.append(" OverrideBrightness=");
+            result.append(std::to_string(iter.second->GetBrightness()));
+        }
         result.append("\n");
     }
 
@@ -345,6 +384,20 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
     return false;
 }
 
+uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
+{
+    auto brightnessValue = value;
+    if (brightnessValue > BRIGHTNESS_MAX) {
+        DISPLAY_HILOGW(MODULE_SERVICE, "brightness value is greater than max, value=%{public}u", value);
+        brightnessValue = BRIGHTNESS_MAX;
+    }
+    if (brightnessValue < BRIGHTNESS_MIN) {
+        DISPLAY_HILOGW(MODULE_SERVICE, "brightness value is less than min, value=%{public}u", value);
+        brightnessValue = BRIGHTNESS_MIN;
+    }
+    return brightnessValue;
+}
+
 bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness)
 {
     const float lastLux = lastLux_;
@@ -377,8 +430,8 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     }
     DISPLAY_HILOGI(MODULE_SERVICE, "nit: %{public}d", nit);
 
-    int32_t brightness = BRIGHTNESS_MIN
-        + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN));
+    int32_t brightness = static_cast<int32_t>(BRIGHTNESS_MIN
+        + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN)));
     DISPLAY_HILOGI(MODULE_SERVICE, "brightness: %{public}d", brightness);
 
     return brightness;
