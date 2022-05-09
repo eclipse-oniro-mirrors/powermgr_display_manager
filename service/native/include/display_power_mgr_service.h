@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,10 @@ public:
     virtual DisplayState GetDisplayState(uint32_t id) override;
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;
-    virtual bool SetBrightness(uint32_t id, int32_t value) override;
+    virtual bool SetBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool RestoreBrightness(uint32_t displayId) override;
+    virtual uint32_t GetBrightness(uint32_t displayId) override;
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
     virtual bool AutoAdjustBrightness(bool enable) override;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
@@ -59,8 +62,9 @@ private:
     static constexpr float LUX_CHANGE_STABLE_MIN = 100.0;
     static const int32_t NIT_MIN = 2;
     static const int32_t NIT_MAX = 450;
-    static const int32_t BRIGHTNESS_MIN = 1;
-    static const int32_t BRIGHTNESS_MAX = 255;
+    static const uint32_t BRIGHTNESS_OFF = 0;
+    static const uint32_t BRIGHTNESS_MIN = 1;
+    static const uint32_t BRIGHTNESS_MAX = 255;
     static void AmbientLightCallback(SensorEvent *event);
 
     friend DelayedSpSingleton<DisplayPowerMgrService>;
@@ -68,6 +72,7 @@ private:
     DisplayPowerMgrService();
     void InitSensors();
     bool IsChangedLux(float scalar);
+    static uint32_t GetSafeBrightness(uint32_t value);
     bool CalculateBrightness(float scalar, int32_t& brightness);
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();
