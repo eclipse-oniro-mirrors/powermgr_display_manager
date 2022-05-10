@@ -217,5 +217,19 @@ bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callbac
     }
     return proxy->RegisterCallback(callback);
 }
+
+bool DisplayPowerMgrClient::BoostBrightness(int32_t timeoutMs, uint32_t displayId)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    return proxy->BoostBrightness(timeoutMs, displayId);
+}
+
+bool DisplayPowerMgrClient::CancelBoostBrightness(uint32_t displayId)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    return proxy->CancelBoostBrightness(displayId);
+}
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

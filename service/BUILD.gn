@@ -32,6 +32,7 @@ config("displaymgr_public_config") {
 
 ohos_shared_library("displaymgrservice") {
   sources = [
+    "native/src/display_event_handler.cpp",
     "native/src/display_param_helper.cpp",
     "native/src/display_power_mgr_service.cpp",
     "native/src/display_system_ability.cpp",

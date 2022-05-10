@@ -24,7 +24,9 @@ REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, 
 void DisplaySystemAbility::OnStart()
 {
     DISPLAY_HILOGI(COMP_SVC, "Start service");
-    if (!Publish(DelayedSpSingleton<DisplayPowerMgrService>::GetInstance())) {
+    auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    service->Init();
+    if (!Publish(service)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to publish service");
     }
 }
