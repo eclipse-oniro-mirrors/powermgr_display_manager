@@ -105,7 +105,6 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
  * @tc.desc: Test set brightness
  * @tc.type: FUNC
  */
-#ifdef SHIELDING
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "SetBrightness: fun is start");
@@ -122,8 +121,6 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     sleep(1);
     EXPECT_TRUE(ret);
 }
-#endif
-
 
 /**
  * @tc.name: DisplayPowerMgrService008

@@ -140,6 +140,46 @@ static void RegisterCallback(const uint8_t* data)
     g_displayMgrClient.RegisterCallback(callback);
 }
 
+static void OverrideBrightness(const uint8_t* data)
+{
+    uint32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.OverrideBrightness(type[0]);
+}
+
+static void RestoreBrightness(const uint8_t* data)
+{
+    uint32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.RestoreBrightness(type[0]);
+}
+
+static void BoostBrightness(const uint8_t* data)
+{
+    uint32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.BoostBrightness(type[0]);
+}
+
+static void CancelBoostBrightness(const uint8_t* data)
+{
+    uint32_t type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.CancelBoostBrightness(type[0]);
+}
+
 namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
@@ -182,11 +222,31 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
             case ApiNumber::NUM_EIGHT:
                 RegisterCallback(data);
                 break;
+            case ApiNumber::NUM_NINE:
+                OverrideBrightness(data);
+                break;
+            case ApiNumber::NUM_TEN:
+                RestoreBrightness(data);
+                break;
+            case ApiNumber::NUM_ELEVEN:
+                BoostBrightness(data);
+                break;
+            case ApiNumber::NUM_TWELVE:
+                CancelBoostBrightness(data);
+                break;
+            case ApiNumber::NUM_THIRTEEN:
+                g_displayMgrClient.GetDefaultBrightness();
+                break;
+            case ApiNumber::NUM_FOURTEEN:
+                g_displayMgrClient.GetMaxBrightness();
+                break;
+            case ApiNumber::NUM_FIFTEEN:
+                g_displayMgrClient.GetMinBrightness();
+                break;
             default:
                 break;
         }
     }
-
     return true;
 }
 }

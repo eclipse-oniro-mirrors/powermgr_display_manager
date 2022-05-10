@@ -84,6 +84,12 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::SET_STATE_CONFIG):
             ret = SetStateConfigStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::BOOST_BRIGHTNESS):
+            ret = BoostBrightnessStub(data, reply);
+            break;
+        case static_cast<int32_t>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS):
+            ret = CancelBoostBrightnessStub(data, reply);
+            break;
         default:
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -307,6 +313,35 @@ int32_t DisplayPowerMgrStub::RegisterCallbackStub(MessageParcel& data, MessagePa
     sptr<IDisplayPowerCallback> callback = iface_cast<IDisplayPowerCallback>(obj);
     RETURN_IF_WITH_RET((callback == nullptr), E_READ_PARCEL_ERROR);
     RegisterCallback(callback);
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::BoostBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t timeoutMs = -1;
+    uint32_t id = 0;
+    READ_PARCEL_WITH_RET(data, Int32, timeoutMs, E_READ_PARCEL_ERROR);
+    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+
+    bool isScuu = BoostBrightness(timeoutMs, id);
+    if (!reply.WriteBool(isScuu)) {
+        DISPLAY_HILOGW(COMP_SVC, "Failed to write BoostBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::CancelBoostBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t displayId = 0;
+
+    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+
+    bool isScuu = CancelBoostBrightness(displayId);
+    if (!reply.WriteBool(isScuu)) {
+        DISPLAY_HILOGW(COMP_SVC, "Failed to write CancelBoostBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
     return ERR_OK;
 }
 } // namespace DisplayPowerMgr

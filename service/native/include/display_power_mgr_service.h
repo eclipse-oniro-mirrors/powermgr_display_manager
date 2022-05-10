@@ -21,6 +21,7 @@
 #include <system_ability_definition.h>
 
 #include "delayed_sp_singleton.h"
+#include "display_event_handler.h"
 #include "display_common.h"
 #include "display_power_mgr_stub.h"
 #include "screen_controller.h"
@@ -30,7 +31,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class DisplayPowerMgrService : public DisplayPowerMgrStub {
 public:
-    virtual ~DisplayPowerMgrService();
+    virtual ~DisplayPowerMgrService() = default;
     virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) override;
     virtual DisplayState GetDisplayState(uint32_t id) override;
     virtual std::vector<uint32_t> GetDisplayIds() override;
@@ -47,8 +48,11 @@ public:
     virtual bool IsAutoAdjustBrightness() override;
     virtual bool SetStateConfig(uint32_t id, DisplayState state, int32_t value) override;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
+    virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) override;
+    virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
+    void Init();
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -82,8 +86,6 @@ private:
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
 
-    std::shared_ptr<ScreenAction> action_;
-
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
@@ -91,6 +93,8 @@ private:
     SensorUser user_;
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ { nullptr };
+    std::shared_ptr<DisplayEventHandler> handler_ { nullptr };
 
     time_t lastLuxTime_ {0};
     float lastLux_ {0};

@@ -49,6 +49,8 @@ public:
     bool AutoAdjustBrightness(bool enable);
     bool IsAutoAdjustBrightness();
     bool RegisterCallback(sptr<IDisplayPowerCallback> callback);
+    bool BoostBrightness(int32_t timeoutMs, uint32_t displayId = 0);
+    bool CancelBoostBrightness(uint32_t displayId = 0);
 
 private:
     class DisplayDeathRecipient : public IRemoteObject::DeathRecipient {

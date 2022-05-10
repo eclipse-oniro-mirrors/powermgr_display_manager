@@ -546,5 +546,69 @@ bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback
 
     return result;
 }
+
+bool DisplayPowerMgrProxy::BoostBrightness(int32_t timeoutMs, uint32_t displayId)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Int32, timeoutMs, false);
+    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::BOOST_BRIGHTNESS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed: %{public}d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
+bool DisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed: %{public}d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
