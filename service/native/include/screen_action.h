@@ -28,19 +28,23 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class ScreenAction {
 public:
-    ScreenAction();
+    ScreenAction(uint32_t displayId);
     ~ScreenAction() = default;
-    uint32_t GetDefaultDisplayId();
-    std::vector<uint32_t> GetDisplayIds();
-    DisplayState GetPowerState(uint32_t displayId);
-    bool SetDisplayState(uint32_t displayId, DisplayState state, const std::function<void(DisplayState)> &callback);
-    bool SetDisplayPower(uint32_t displayId, DisplayState state, uint32_t reason);
-    uint32_t GetBrightness(uint32_t displayId);
-    bool SetBrightness(uint32_t displayId, uint32_t value);
+
+    static uint32_t GetDefaultDisplayId();
+    static std::vector<uint32_t> GetAllDisplayId();
+
+    uint32_t GetDisplayId();
+    DisplayState GetPowerState();
+    bool SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback);
+    bool SetDisplayPower(DisplayState state, uint32_t reason);
+    uint32_t GetBrightness();
+    bool SetBrightness(uint32_t value);
 
 private:
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
-    std::vector<uint32_t> displayIds_;
+    uint32_t brightness_ { 0 };
+    uint32_t displayId_ { DEFAULT_DISPLAY_ID };
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -20,11 +20,9 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-GradualAnimator::GradualAnimator(const std::string& name,
-    const std::shared_ptr<AnimateCallback>& callback)
+GradualAnimator::GradualAnimator(const std::string& name, std::shared_ptr<AnimateCallback>& callback)
+    : name_(name), callback_(callback)
 {
-    name_ = name;
-    callback_ = callback;
     fromBrightness_ = 0;
     toBrightness_ = 0;
     currentBrightness_ = 0;
@@ -43,7 +41,7 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animation from=%{public}u, to=%{public}u, duration=%{public}u",
         from, to, duration);
-    if (callback_.lock() == nullptr) {
+    if (callback_ == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "callback_ is nullptr");
         return;
     }
@@ -77,12 +75,11 @@ void GradualAnimator::StopAnimation()
 {
     animating_ = false;
     handler_->RemoveEvent(EVENT_STEP);
-    if (callback_.lock() == nullptr) {
+    if (callback_ == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Callback is nullptr");
         return;
     }
-    std::shared_ptr<AnimateCallback> callback = callback_.lock();
-    callback->OnEnd();
+    callback_->OnEnd();
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animation stopped");
 }
 
@@ -97,23 +94,22 @@ void GradualAnimator::NextStep()
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "is not animating, return");
         return;
     }
-    if (callback_.lock() == nullptr) {
+    if (callback_ == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Callback is nullptr");
         return;
     }
-    std::shared_ptr<AnimateCallback> callback = callback_.lock();
     currentStep_++;
     if (currentStep_ == 1) {
-        callback->OnStart();
+        callback_->OnStart();
     }
     if (currentStep_ < totalSteps_) {
         currentBrightness_ = currentBrightness_ + stride_;
-        callback->OnChanged(currentBrightness_);
+        callback_->OnChanged(currentBrightness_);
         handler_->SendEvent(EVENT_STEP, 0, updateTime_);
     } else {
         currentBrightness_ = toBrightness_;
-        callback->OnChanged(currentBrightness_);
-        callback->OnEnd();
+        callback_->OnChanged(currentBrightness_);
+        callback_->OnEnd();
         animating_ = false;
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animating next step, step=%{public}u, brightness=%{public}u, stride=%{public}d",

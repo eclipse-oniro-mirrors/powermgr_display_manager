@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-ScreenAction::ScreenAction()
+ScreenAction::ScreenAction(uint32_t displayId) : displayId_(displayId)
 {
     DISPLAY_HILOGI(COMP_SVC, "Succeed to init");
 }
@@ -35,24 +35,30 @@ uint32_t ScreenAction::GetDefaultDisplayId()
     return static_cast<uint32_t>(defaultId);
 }
 
-std::vector<uint32_t> ScreenAction::GetDisplayIds()
+std::vector<uint32_t> ScreenAction::GetAllDisplayId()
 {
     std::vector<uint64_t> allIds = Rosen::DisplayManager::GetInstance().GetAllDisplayIds();
+    std::vector<uint32_t> displayIds;
     if (allIds.empty()) {
-        displayIds_.push_back(DEFAULT_DISPLAY_ID);
-        return displayIds_;
+        displayIds.push_back(DEFAULT_DISPLAY_ID);
+        return displayIds;
     }
     for (const auto& id: allIds) {
-        displayIds_.push_back(static_cast<uint32_t>(id));
+        displayIds.push_back(static_cast<uint32_t>(id));
     }
-    return displayIds_;
+    return displayIds;
 }
 
-DisplayState ScreenAction::GetPowerState(uint32_t displayId)
+uint32_t ScreenAction::GetDisplayId()
 {
-    DISPLAY_HILOGI(COMP_SVC, "GetPowerState of displayId=%{public}u", displayId);
+    return displayId_;
+}
+
+DisplayState ScreenAction::GetPowerState()
+{
+    DISPLAY_HILOGI(COMP_SVC, "GetPowerState of displayId=%{public}u", displayId_);
     DisplayState ret = DisplayState::DISPLAY_UNKNOWN;
-    Rosen::ScreenPowerState state = Rosen::ScreenManager::GetInstance().GetScreenPower(displayId);
+    Rosen::ScreenPowerState state = Rosen::ScreenManager::GetInstance().GetScreenPower(displayId_);
     DISPLAY_HILOGI(COMP_SVC, "GetPowerState: %{public}d", static_cast<uint32_t>(state));
     switch (state) {
         case Rosen::ScreenPowerState::POWER_ON:
@@ -74,11 +80,10 @@ DisplayState ScreenAction::GetPowerState(uint32_t displayId)
     return ret;
 }
 
-bool ScreenAction::SetDisplayState(uint32_t displayId, DisplayState state,
-                                   const std::function<void(DisplayState)>& callback)
+bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState: displayId=%{public}u, state=%{public}u",
-                   displayId, static_cast<uint32_t>(state));
+                   displayId_, static_cast<uint32_t>(state));
 
     Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
     switch (state) {
@@ -115,10 +120,10 @@ bool ScreenAction::SetDisplayState(uint32_t displayId, DisplayState state,
     return ret;
 }
 
-bool ScreenAction::SetDisplayPower(uint32_t displayId, DisplayState state, uint32_t reason)
+bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayPower: displayId=%{public}u, state=%{public}u, state=%{public}u",
-                   displayId, static_cast<uint32_t>(state), reason);
+                   displayId_, static_cast<uint32_t>(state), reason);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -142,20 +147,24 @@ bool ScreenAction::SetDisplayPower(uint32_t displayId, DisplayState state, uint3
     return true;
 }
 
-uint32_t ScreenAction::GetBrightness(uint32_t displayId)
+uint32_t ScreenAction::GetBrightness()
 {
-    auto brightness = Rosen::DisplayManager::GetInstance().GetScreenBrightness(displayId);
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId, brightness);
-    return brightness;
+    if (brightness_ == 0) {
+        brightness_ = Rosen::DisplayManager::GetInstance().GetScreenBrightness(displayId_);
+    }
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, brightness_);
+    return brightness_;
 }
 
-bool ScreenAction::SetBrightness(uint32_t displayId, uint32_t value)
+bool ScreenAction::SetBrightness(uint32_t value)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId, value);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, value);
     // Notify screen brightness change event to battery statistics
     HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::POWERMGR, "BRIGHTNESS_NIT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "brightness", value);
-    return Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId, value);
+    bool isSucc = Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId_, value);
+    brightness_ = isSucc ? value : brightness_;
+    return isSucc;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
