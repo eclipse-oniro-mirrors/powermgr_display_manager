@@ -58,7 +58,8 @@
         }
       ],
       "test": [
-        "//base/powermgr/display_manager/test/native:displaymgr_native_test"
+        "//base/powermgr/display_manager/test:displaymgr_js_test",
+        "//base/powermgr/display_manager/test:displaymgr_native_test"
       ]
     }
   }
