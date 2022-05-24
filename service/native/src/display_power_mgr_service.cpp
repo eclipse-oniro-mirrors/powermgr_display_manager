@@ -407,7 +407,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     }
     // Notify ambient brightness change event to battery statistics
     HiviewDFX::HiSysEvent::Write(HiviewDFX::HiSysEvent::Domain::POWERMGR, "AMBIENT_LIGHT",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "level", brightness);
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", brightness);
 }
 
 bool DisplayPowerMgrService::IsChangedLux(float scalar)
