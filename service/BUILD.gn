@@ -53,9 +53,9 @@ ohos_shared_library("displaymgrservice") {
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
     "//drivers/peripheral/display/hal:hdi_display_device",
-    "//foundation/graphic/graphic:libsurface",
-    "//foundation/graphic/graphic:libwmservice",
-    "//foundation/graphic/graphic/rosen/modules/render_service_client:librender_service_client",
+    "//foundation/graphic/graphic_2d:libsurface",
+    "//foundation/graphic/graphic_2d:libwmservice",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/windowmanager/utils:libwmutil",
     "//utils/native/base:utils",
   ]
