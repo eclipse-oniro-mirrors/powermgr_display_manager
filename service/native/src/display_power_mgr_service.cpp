@@ -379,7 +379,6 @@ void DisplayPowerMgrService::InitSensors()
     if (!supportLightSensor_) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT not support");
     }
-    free(sensorInfo);
 }
 
 void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
