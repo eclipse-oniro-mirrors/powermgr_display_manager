@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-const int DISPLAY_FULL_BRIGHTNESS = 100;
+const int DISPLAY_FULL_BRIGHTNESS = 255;
 const int DISPLAY_DIM_BRIGHTNESS = 50;
 const int DISPLAY_OFF_BRIGHTNESS = 0;
 const int DISPLAY_SUSPEND_BRIGHTNESS = 50;
