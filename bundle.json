@@ -22,6 +22,9 @@
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
     "ram": "2048KB",
+    "hisysevent_config": [
+        "//base/powermgr/display_manager/displaymanager.yaml"
+    ],
     "deps": {
       "components": [
         "appexecfwk_standard",

@@ -1,0 +1,33 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+domain: DISPLAY
+
+SCREEN_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: screen state}
+  STATE: {type: INT32, desc: screen_state}
+
+BRIGHTNESS_NIT:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: lcd brightness }
+  BRIGHTNESS: {type: INT32, desc: brightness}
+  REASON: {type: STRING, desc: brightness reason}
+  NIT: {type: INT32, desc: brightness nit}
+
+BACKLIGHT_DISCOUNT:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: backlight discount}
+  RATIO: {type: INT32, desc: ratio}
+
+AMBIENT_LIGHT:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: ambient light}
+  TYPE: {type: INT32, desc: type}
+  LEVEL: {type: INT32, desc: level}
