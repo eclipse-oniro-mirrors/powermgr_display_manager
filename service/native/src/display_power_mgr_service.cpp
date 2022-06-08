@@ -79,7 +79,7 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             DeactivateAmbientSensor();
         }
     }
-    return iterater->second->DisplayStateControl()->UpdateState(state, reason);
+    return iterater->second->UpdateState(state, reason);
 }
 
 DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
@@ -89,7 +89,7 @@ DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
     if (iterater == controllerMap_.end()) {
         return DisplayState::DISPLAY_UNKNOWN;
     }
-    return iterater->second->DisplayStateControl()->GetState();
+    return iterater->second->GetState();
 }
 
 std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
@@ -116,7 +116,7 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return iter->second->SharedControl()->SetBrightness(brightness);
+    return iter->second->SetBrightness(brightness);
 }
 
 bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
@@ -127,7 +127,7 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return iter->second->OverrideControl()->OverrideBrightness(brightness);
+    return iter->second->OverrideBrightness(brightness);
 }
 
 bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
@@ -137,7 +137,7 @@ bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return iter->second->OverrideControl()->RestoreBrightness();
+    return iter->second->RestoreBrightness();
 }
 
 uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
@@ -147,7 +147,7 @@ uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
     if (iter == controllerMap_.end()) {
         return BRIGHTNESS_OFF;
     }
-    return iter->second->SharedControl()->GetBrightness();
+    return iter->second->GetBrightness();
 }
 
 uint32_t DisplayPowerMgrService::GetDefaultBrightness()
@@ -173,7 +173,7 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
     if (iterater == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->SharedControl()->SetBrightness(value, duration);
+    return iterater->second->SetBrightness(value, duration);
 }
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
@@ -274,7 +274,7 @@ bool DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t display
     RETURN_IF_WITH_RET(timeoutMs <= 0, false);
     auto iter = controllerMap_.find(displayId);
     RETURN_IF_WITH_RET(iter == controllerMap_.end(), false);
-    return iter->second->OverrideControl()->BoostBrightness(timeoutMs);
+    return iter->second->BoostBrightness(timeoutMs);
 }
 
 bool DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId)
@@ -282,7 +282,7 @@ bool DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId)
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Cancel boost brightness, id: %{public}d", displayId);
     auto iter = controllerMap_.find(displayId);
     RETURN_IF_WITH_RET(iter == controllerMap_.end(), false);
-    return iter->second->OverrideControl()->CancelBoostBrightness();
+    return iter->second->CancelBoostBrightness();
 }
 
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
@@ -300,20 +300,20 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append("Display Id=");
         result.append(std::to_string(iter.first));
         result.append(" State=");
-        result.append(std::to_string(static_cast<uint32_t>(control->DisplayStateControl()->GetState())));
-        bool isOverride = control->OverrideControl()->IsBrightnessOverride();
-        bool isBoots = control->OverrideControl()->IsBoostBrightness();
+        result.append(std::to_string(static_cast<uint32_t>(control->GetState())));
+        bool isOverride = control->IsBrightnessOverride();
+        bool isBoots = control->IsBoostBrightness();
         result.append(" Brightness=");
         if (isOverride) {
-            result.append(std::to_string(control->OverrideControl()->GetBeforeBrightness()));
+            result.append(std::to_string(control->GetBeforeBrightness()));
             result.append(" OverrideBrightness=");
-            result.append(std::to_string(control->SharedControl()->GetBrightness()));
+            result.append(std::to_string(control->GetBrightness()));
         } else if (isBoots) {
-            result.append(std::to_string(control->OverrideControl()->GetBeforeBrightness()));
+            result.append(std::to_string(control->GetBeforeBrightness()));
             result.append(" BoostBrightness=");
-            result.append(std::to_string(control->SharedControl()->GetBrightness()));
+            result.append(std::to_string(control->GetBrightness()));
         } else {
-            result.append(std::to_string(control->SharedControl()->GetBrightness()));
+            result.append(std::to_string(control->GetBrightness()));
         }
         result.append("\n");
     }
@@ -389,7 +389,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     }
     AmbientLightData* data = (AmbientLightData*)event->data;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientLightCallback: %{public}f", data->intensity);
-    int32_t brightness = static_cast<int32_t>(mainDisp->second->SharedControl()->GetBrightness());
+    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetBrightness());
     if (pms->CalculateBrightness(data->intensity, brightness)) {
         pms->AdjustBrightness(mainDispId, brightness, AUTO_ADJUST_BRIGHTNESS_DURATION);
     }
