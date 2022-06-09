@@ -54,35 +54,37 @@ public:
 
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = 0);
     bool RestoreBrightness(uint32_t gradualDuration = 0);
-    bool IsBrightnessOverride() const;
+    bool IsBrightnessOverridden() const;
 
     bool BoostBrightness(uint32_t timeoutMs, uint32_t gradualDuration = 0);
     bool CancelBoostBrightness();
-    bool IsBoostBrightness() const;
+    bool IsBrightnessBoosted() const;
 
     uint32_t GetBeforeBrightness() const;
 
 private:
-    std::shared_ptr<ScreenAction>& GetAction();
-    void AllowAdjustBrightness(bool allow);
-    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
-    void UpdateBeforeOffBrightness(uint32_t brightness);
-    void SaveBeforeBrightness();
-    bool RestoreBeforeBrightness(std::atomic<bool>& isOverride, uint32_t gradualDuration = 0);
-    uint32_t beforeBrightness_ {0};
-    std::mutex mutexOverride_;
-    std::atomic<bool> isBrightnessOverride_ {false};
-    std::atomic<bool> isBoostBrightness_ {false};
     void BeforeScreenOff(DisplayState state);
     void AfterScreenOn(DisplayState state);
     void OnStateChanged(DisplayState state);
+
+    bool CanSetBrightness();
+    bool CanOverrideBrightness();
+    bool CanBoostBrightness();
+    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    void UpdateBeforeOffBrightness(uint32_t brightness);
+    void SaveBeforeBrightness();
+    bool RestoreBeforeBrightness(uint32_t gradualDuration = 0);
+
+    uint32_t beforeBrightness_ {0};
+    std::mutex mutexOverride_;
+    std::atomic<bool> isBrightnessOverridden_ {false};
+    std::atomic<bool> isBrightnessBoosted_ {false};
     uint32_t beforeOffBrightness_ {0};
     DisplayState state_;
     uint32_t stateChangeReason_ {0};
     std::mutex mutexState_;
     std::map<DisplayState, uint32_t> stateValues_;
     std::mutex mutex_;
-    std::atomic<bool> isAllow_ {true};
     std::shared_ptr<ScreenAction> action_ {nullptr};
     std::shared_ptr<GradualAnimator> animator_;
     const std::shared_ptr<DisplayEventHandler>& handler_;

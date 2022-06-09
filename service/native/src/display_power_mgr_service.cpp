@@ -301,8 +301,8 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append(std::to_string(iter.first));
         result.append(" State=");
         result.append(std::to_string(static_cast<uint32_t>(control->GetState())));
-        bool isOverride = control->IsBrightnessOverride();
-        bool isBoots = control->IsBoostBrightness();
+        bool isOverride = control->IsBrightnessOverridden();
+        bool isBoots = control->IsBrightnessBoosted();
         result.append(" Brightness=");
         if (isOverride) {
             result.append(std::to_string(control->GetBeforeBrightness()));
