@@ -32,7 +32,8 @@ class DisplayEventHandler : public AppExecFwk::EventHandler {
 public:
     typedef std::function<void()> EventCallback;
     enum Event {
-        EVENT_CANCEL_BOOST_BRIGHTNESS
+        EVENT_CANCEL_BOOST_BRIGHTNESS,
+        EVENT_SET_SETTING_BRIGHTNESS,
     };
     DisplayEventHandler(const std::shared_ptr<AppExecFwk::EventRunner>& runner, 
         const wptr<DisplayPowerMgrService>& parent);

@@ -65,6 +65,22 @@ void DisplayPowerMgrService::Init()
     InitSensors();
 }
 
+[[maybe_unused]] void DisplayPowerMgrService::RegisterSettings()
+{
+    for (const auto& iter: controllerMap_) {
+        auto controller = iter.second;
+        controller->RegisterSettingBrightnessObserver();
+    }
+}
+
+[[maybe_unused]] void DisplayPowerMgrService::UnregisterSettings()
+{
+    for (const auto& iter: controllerMap_) {
+        auto controller = iter.second;
+        controller->UnregisterSettingBrightnessObserver();
+    }
+}
+
 bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d", id, state);
@@ -449,11 +465,11 @@ uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
 {
     auto brightnessValue = value;
     if (brightnessValue > BRIGHTNESS_MAX) {
-        DISPLAY_HILOGW(COMP_SVC, "brightness value is greater than max, value=%{public}u", value);
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "brightness value is greater than max, value=%{public}u", value);
         brightnessValue = BRIGHTNESS_MAX;
     }
     if (brightnessValue < BRIGHTNESS_MIN) {
-        DISPLAY_HILOGW(COMP_SVC, "brightness value is less than min, value=%{public}u", value);
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "brightness value is less than min, value=%{public}u", value);
         brightnessValue = BRIGHTNESS_MIN;
     }
     return brightnessValue;

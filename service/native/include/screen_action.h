@@ -35,7 +35,7 @@ public:
     static std::vector<uint32_t> GetAllDisplayId();
 
     uint32_t GetDisplayId();
-    DisplayState GetPowerState();
+    DisplayState GetDisplayState();
     bool SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback);
     bool SetDisplayPower(DisplayState state, uint32_t reason);
     uint32_t GetBrightness();

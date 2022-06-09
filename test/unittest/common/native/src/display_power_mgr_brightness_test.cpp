@@ -225,7 +225,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMinBrightness001, TestSiz
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMinBrightness001: fun is start");
     uint32_t min = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_GE(min, 0);
-    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(min - 100);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(0);
     EXPECT_TRUE(ret);
     sleep(1); // wait for gradual animation
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetBrightness();

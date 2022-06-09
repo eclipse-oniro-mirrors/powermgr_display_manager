@@ -60,6 +60,8 @@ public:
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
     void Init();
+    [[maybe_unused]] void RegisterSettings();
+    [[maybe_unused]] void UnregisterSettings();
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {

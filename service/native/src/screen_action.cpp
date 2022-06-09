@@ -57,30 +57,29 @@ uint32_t ScreenAction::GetDisplayId()
     return displayId_;
 }
 
-DisplayState ScreenAction::GetPowerState()
+DisplayState ScreenAction::GetDisplayState()
 {
-    DISPLAY_HILOGI(FEAT_STATE, "GetPowerState of displayId=%{public}u", displayId_);
-    DisplayState ret = DisplayState::DISPLAY_UNKNOWN;
-    Rosen::ScreenPowerState state = Rosen::ScreenManager::GetInstance().GetScreenPower(displayId_);
-    DISPLAY_HILOGI(FEAT_STATE, "GetPowerState: %{public}d", static_cast<uint32_t>(state));
-    switch (state) {
+    DisplayState state = DisplayState::DISPLAY_UNKNOWN;
+    Rosen::ScreenPowerState powerState = Rosen::ScreenManager::GetInstance().GetScreenPower(displayId_);
+    DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
+    switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
-            ret = DisplayState::DISPLAY_ON;
+            state = DisplayState::DISPLAY_ON;
             break;
         case Rosen::ScreenPowerState::POWER_STAND_BY:
-            ret = DisplayState::DISPLAY_DIM;
+            state = DisplayState::DISPLAY_DIM;
             break;
         case Rosen::ScreenPowerState::POWER_SUSPEND:
-            ret = DisplayState::DISPLAY_SUSPEND;
+            state = DisplayState::DISPLAY_SUSPEND;
             break;
         case Rosen::ScreenPowerState::POWER_OFF:
-            ret = DisplayState::DISPLAY_OFF;
+            state = DisplayState::DISPLAY_OFF;
             break;
         default:
             break;
     }
-
-    return ret;
+    DISPLAY_HILOGI(FEAT_STATE, "state=%{public}u displayId=%{public}u", static_cast<uint32_t>(state), displayId_);
+    return state;
 }
 
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)

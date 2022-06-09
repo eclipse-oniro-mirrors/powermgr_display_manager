@@ -37,7 +37,7 @@ void DisplaySystemAbility::OnStart()
 
 void DisplaySystemAbility::OnStop()
 {
-    DISPLAY_HILOGI(COMP_SVC, "Stop service");
+    DISPLAY_HILOGW(COMP_SVC, "Stop service");
 }
-}
-}
+} // OHOS
+} // DisplayPowerMgr
