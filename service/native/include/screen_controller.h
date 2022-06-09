@@ -57,29 +57,27 @@ public:
     bool IsBrightnessOverridden() const;
 
     bool BoostBrightness(uint32_t timeoutMs, uint32_t gradualDuration = 0);
-    bool CancelBoostBrightness();
+    bool CancelBoostBrightness(uint32_t gradualDuration = 0);
     bool IsBrightnessBoosted() const;
 
-    uint32_t GetBeforeBrightness() const;
+    uint32_t GetSettingBrightness() const;
 
 private:
-    void BeforeScreenOff(DisplayState state);
-    void AfterScreenOn(DisplayState state);
     void OnStateChanged(DisplayState state);
 
     bool CanSetBrightness();
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
-    void UpdateBeforeOffBrightness(uint32_t brightness);
-    void SaveBeforeBrightness();
-    bool RestoreBeforeBrightness(uint32_t gradualDuration = 0);
+    void SetSettingBrightness(uint32_t brightness);
+    uint32_t GetScreenOnBrightness() const;
 
-    uint32_t beforeBrightness_ {0};
+    const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
+    uint32_t cachedBrightness_ {102};
     std::mutex mutexOverride_;
     std::atomic<bool> isBrightnessOverridden_ {false};
     std::atomic<bool> isBrightnessBoosted_ {false};
-    uint32_t beforeOffBrightness_ {0};
+    uint32_t overriddenBrightness_ {102};
     DisplayState state_;
     uint32_t stateChangeReason_ {0};
     std::mutex mutexState_;
