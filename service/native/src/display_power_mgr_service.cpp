@@ -31,9 +31,11 @@ namespace DisplayPowerMgr {
 namespace {
 constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
 }
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetInstance().GetMinBrightness();
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetInstance().GetDefaultBrightness();
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetInstance().GetMaxBrightness();
 DisplayPowerMgrService::DisplayPowerMgrService()
-{
-}
+{}
 
 void DisplayPowerMgrService::Init()
 {
@@ -152,17 +154,17 @@ uint32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId)
 
 uint32_t DisplayPowerMgrService::GetDefaultBrightness()
 {
-    return DisplayParamHelper::GetInstance().GetDefaultBrightness();
+    return BRIGHTNESS_DEFAULT;
 }
 
 uint32_t DisplayPowerMgrService::GetMaxBrightness()
 {
-    return DisplayParamHelper::GetInstance().GetMaxBrightness();
+    return BRIGHTNESS_MAX;
 }
 
 uint32_t DisplayPowerMgrService::GetMinBrightness()
 {
-    return DisplayParamHelper::GetInstance().GetMinBrightness();
+    return BRIGHTNESS_MIN;
 }
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)

@@ -78,8 +78,9 @@ private:
     static const int32_t NIT_MIN = 2;
     static const int32_t NIT_MAX = 450;
     static const uint32_t BRIGHTNESS_OFF = 0;
-    static const uint32_t BRIGHTNESS_MIN = 1;
-    static const uint32_t BRIGHTNESS_MAX = 255;
+    static const uint32_t BRIGHTNESS_MIN;
+    static const uint32_t BRIGHTNESS_DEFAULT;
+    static const uint32_t BRIGHTNESS_MAX;
     static void AmbientLightCallback(SensorEvent *event);
 
     friend DelayedSpSingleton<DisplayPowerMgrService>;
