@@ -203,7 +203,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Boost brightness, maxBrightness: %{public}d", maxBrightness);
         isBrightnessBoosted_ = true;
         cachedBrightness_ = action_->GetBrightness();
-        ret = UpdateBrightness(maxBrightness, gradualDuration);
+        return UpdateBrightness(maxBrightness, gradualDuration);
     }
 
     // If boost multi-times, we will resend the cancel boost event.

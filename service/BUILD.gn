@@ -55,6 +55,7 @@ ohos_shared_library("displaymgrservice") {
     "${powermgr_utils_path}/setting:power_setting",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager:dataobs_manager",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
   ]
 
@@ -62,7 +63,6 @@ ohos_shared_library("displaymgrservice") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
-    "dataability:native_dataability",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "eventhandler:libeventhandler",
