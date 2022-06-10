@@ -18,6 +18,8 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory>
+#include <mutex>
 #include <vector>
 
 #include "display_power_info.h"
@@ -41,8 +43,9 @@ public:
 
 private:
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
-    uint32_t brightness_ { 0 };
-    uint32_t displayId_ { DEFAULT_DISPLAY_ID };
+    std::mutex mutexBrightness_;
+    uint32_t brightness_ {0};
+    uint32_t displayId_ {DEFAULT_DISPLAY_ID};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

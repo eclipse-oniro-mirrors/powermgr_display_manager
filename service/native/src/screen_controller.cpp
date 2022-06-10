@@ -76,7 +76,6 @@ void ScreenController::AnimateCallbackImpl::OnEnd()
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "ScreenAnimatorCallback OnEnd");
 }
 
-
 DisplayState ScreenController::GetState()
 {
     return state_;
@@ -84,7 +83,6 @@ DisplayState ScreenController::GetState()
 
 bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
-    lock_guard lock(mutexState_);
     DISPLAY_HILOGI(FEAT_STATE, "UpdateState, state=%{public}u, current state=%{public}u",
                    static_cast<uint32_t>(state), static_cast<uint32_t>(state_));
     RETURN_IF_WITH_RET(state == state_, true);
@@ -113,6 +111,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
             break;
     }
 
+    lock_guard lock(mutexState_);
     state_ = state;
     stateChangeReason_ = reason;
 
@@ -122,9 +121,9 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 
 bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
 {
-    lock_guard lock(mutexState_);
     DISPLAY_HILOGI(FEAT_STATE, "UpdateStateConfig, state=%{public}u, value=%{public}u",
                    static_cast<uint32_t>(state), value);
+    lock_guard lock(mutexState_);
     auto iterator = stateValues_.find(state);
     if (iterator == stateValues_.end()) {
         DISPLAY_HILOGI(FEAT_STATE, "UpdateStateConfig no such state");
@@ -153,13 +152,11 @@ bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
 
 uint32_t ScreenController::GetBrightness()
 {
-    lock_guard lock(mutex_);
     return action_->GetBrightness();
 }
 
 bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
 {
-    lock_guard lock(mutexOverride_);
     if (!CanOverrideBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot override brightness, ignore the change");
         return false;
@@ -175,7 +172,6 @@ bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDurati
 
 bool ScreenController::RestoreBrightness(uint32_t gradualDuration)
 {
-    lock_guard lock(mutexOverride_);
     if (!IsBrightnessOverridden()) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not override, no need to restore");
         return false;
@@ -192,7 +188,6 @@ bool ScreenController::IsBrightnessOverridden() const
 
 bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDuration)
 {
-    lock_guard lock(mutexOverride_);
     if (!CanBoostBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot boost brightness, ignore the change");
         return false;
@@ -215,7 +210,6 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
 
 bool ScreenController::CancelBoostBrightness(uint32_t gradualDuration)
 {
-    lock_guard lock(mutexOverride_);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Cancel boost brightness");
     if (!IsBrightnessBoosted()) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not boost, no need to restore");
@@ -269,7 +263,6 @@ bool ScreenController::CanBoostBrightness()
 
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration)
 {
-    lock_guard lock(mutex_);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness, value=%{public}u, duration=%{public}u",
                    value, gradualDuration);
 

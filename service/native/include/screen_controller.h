@@ -73,16 +73,15 @@ private:
     uint32_t GetScreenOnBrightness() const;
 
     const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
-    uint32_t cachedBrightness_ {102};
-    std::mutex mutexOverride_;
-    std::atomic<bool> isBrightnessOverridden_ {false};
-    std::atomic<bool> isBrightnessBoosted_ {false};
-    uint32_t overriddenBrightness_ {102};
     DisplayState state_;
-    uint32_t stateChangeReason_ {0};
     std::mutex mutexState_;
     std::map<DisplayState, uint32_t> stateValues_;
-    std::mutex mutex_;
+    uint32_t stateChangeReason_ {0};
+
+    std::atomic<bool> isBrightnessOverridden_ {false};
+    std::atomic<bool> isBrightnessBoosted_ {false};
+    uint32_t cachedBrightness_ {102};
+    uint32_t overriddenBrightness_ {102};
     std::shared_ptr<ScreenAction> action_ {nullptr};
     std::shared_ptr<GradualAnimator> animator_;
     const std::shared_ptr<DisplayEventHandler>& handler_;
