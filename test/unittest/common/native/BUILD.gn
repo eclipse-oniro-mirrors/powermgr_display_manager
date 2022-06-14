@@ -45,7 +45,6 @@ ohos_unittest("unittest_display_mgr_service") {
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
     "${displaymgr_service_path}:displaymgrservice",
-    "//drivers/peripheral/display/hal:hdi_display_device",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

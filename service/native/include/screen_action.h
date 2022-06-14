@@ -20,8 +20,6 @@
 #include <memory>
 #include <vector>
 
-#include <display_device.h>
-
 #include "display_power_info.h"
 
 namespace OHOS {
