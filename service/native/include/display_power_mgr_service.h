@@ -98,7 +98,7 @@ private:
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
     bool ambientSensorEnabled_ {false};
-    SensorUser user_;
+    SensorUser sensorUser_ {};
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ { nullptr };

@@ -34,8 +34,7 @@ constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetInstance().GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetInstance().GetDefaultBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetInstance().GetMaxBrightness();
-DisplayPowerMgrService::DisplayPowerMgrService()
-{}
+DisplayPowerMgrService::DisplayPowerMgrService() = default;
 
 void DisplayPowerMgrService::Init()
 {
@@ -69,8 +68,8 @@ void DisplayPowerMgrService::Init()
 bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d", id, state);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
+    auto iterator = controllerMap_.find(id);
+    if (iterator == controllerMap_.end()) {
         return false;
     }
     if (id == GetMainDisplayId()) {
@@ -81,17 +80,17 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             DeactivateAmbientSensor();
         }
     }
-    return iterater->second->UpdateState(state, reason);
+    return iterator->second->UpdateState(state, reason);
 }
 
 DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
 {
-    DISPLAY_HILOGI(COMP_SVC, "GetDisplayState %{public}d", id);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
+    DISPLAY_HILOGD(COMP_SVC, "GetDisplayState %{public}d", id);
+    auto iterator = controllerMap_.find(id);
+    if (iterator == controllerMap_.end()) {
         return DisplayState::DISPLAY_UNKNOWN;
     }
-    return iterater->second->GetState();
+    return iterator->second->GetState();
 }
 
 std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
@@ -171,24 +170,24 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState %{public}d, %{public}d, %{public}d",
         id, value, duration);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
+    auto iterator = controllerMap_.find(id);
+    if (iterator == controllerMap_.end()) {
         return false;
     }
-    return iterater->second->SetBrightness(value, duration);
+    return iterator->second->SetBrightness(value, duration);
 }
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
     if (!supportLightSensor_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
         return false;
     }
     if (enable) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness enable");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness enable");
         if (autoBrightness_) {
-            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already enabled");
+            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already enabled");
             return true;
         }
         autoBrightness_ = true;
@@ -196,9 +195,9 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
             ActivateAmbientSensor();
         }
     } else {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness disable");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness disable");
         if (!autoBrightness_) {
-            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already disabled");
+            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already disabled");
             return true;
         }
         DeactivateAmbientSensor();
@@ -215,38 +214,36 @@ bool DisplayPowerMgrService::IsAutoAdjustBrightness()
 
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateAmbientSensor");
     if (!autoBrightness_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness is not enabled");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "auto brightness is not enabled");
         return;
     }
     if (ambientSensorEnabled_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
         return;
     }
-    strcpy_s(user_.name, sizeof(user_.name), "DisplayPowerMgrService");
-    user_.userData = nullptr;
-    user_.callback = &AmbientLightCallback;
-    SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
-    SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SAMPLING_RATE, SAMPLING_RATE);
-    ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
-    SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_, SENSOR_ON_CHANGE);
+    strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
+    sensorUser_.userData = nullptr;
+    sensorUser_.callback = &AmbientLightCallback;
+    SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
+    SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_, SAMPLING_RATE, SAMPLING_RATE);
+    ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
+    SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_, SENSOR_ON_CHANGE);
     ambientSensorEnabled_ = true;
 }
 
 void DisplayPowerMgrService::DeactivateAmbientSensor()
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateAmbientSensor");
     if (!autoBrightness_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness is not enabled");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "auto brightness is not enabled");
         return;
     }
     if (!ambientSensorEnabled_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor is already off");
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already off");
         return;
     }
-    DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
-    UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &user_);
+    DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
+    UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
     ambientSensorEnabled_ = false;
 }
 
