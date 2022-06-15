@@ -155,11 +155,9 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 uint32_t ScreenAction::GetBrightness()
 {
     std::lock_guard lock(mutexBrightness_);
-    if (brightness_ == 0) {
-        std::string identity = IPCSkeleton::ResetCallingIdentity();
-        brightness_ = Rosen::DisplayManager::GetInstance().GetScreenBrightness(displayId_);
-        IPCSkeleton::SetCallingIdentity(identity);
-    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    brightness_ = Rosen::DisplayManager::GetInstance().GetScreenBrightness(displayId_);
+    IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, brightness_);
     return brightness_;
 }

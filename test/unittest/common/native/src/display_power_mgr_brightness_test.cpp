@@ -23,7 +23,6 @@ using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
-using namespace OHOS::PowerMgr;
 
 static const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
 
@@ -73,7 +72,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
     sleep(1); // wait for gradual animation
 
     // Query setting brightness
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    PowerMgr::PowerSettingHelper& helper = PowerMgr::PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
     int32_t value;
     ErrCode code = helper.GetIntValue(SETTING_BRIGHTNESS_KEY, value);
     if (code != ERR_OK) {
@@ -92,7 +91,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness002, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: fun is start");
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    PowerMgr::PowerSettingHelper& helper = PowerMgr::PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
     ErrCode code = helper.PutIntValue(SETTING_BRIGHTNESS_KEY, 233);
     if (code != ERR_OK) {
         DISPLAY_HILOGW(LABEL_TEST, "put setting brightness failed, ret=%{public}d", code);

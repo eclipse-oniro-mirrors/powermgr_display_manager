@@ -75,7 +75,6 @@ private:
     const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
     DisplayState state_;
     std::mutex mutexState_;
-    std::map<DisplayState, uint32_t> stateValues_;
     uint32_t stateChangeReason_ {0};
 
     std::atomic<bool> isBrightnessOverridden_ {false};

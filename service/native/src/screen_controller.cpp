@@ -15,24 +15,18 @@
 
 #include "screen_controller.h"
 
-#include <string>
-#include <functional>
-#include <iosfwd>
 #include "delayed_sp_singleton.h"
-#include "new"
 #include "refbase.h"
-#include "display_common.h"
-#include "display_log.h"
+#include "display_power_mgr_service.h"
 #include "display_param_helper.h"
 #include "power_setting_helper.h"
+#include "system_ability_definition.h"
+#include "display_common.h"
 #include "display_log.h"
 
 using namespace std;
 namespace OHOS {
 namespace DisplayPowerMgr {
-constexpr uint32_t DISPLAY_FULL_BRIGHTNESS = 255;
-constexpr uint32_t DISPLAY_OFF_BRIGHTNESS = 0;
-
 ScreenController::ScreenController(uint32_t displayId, const shared_ptr <DisplayEventHandler>& handler) : state_(
     DisplayState::DISPLAY_UNKNOWN), handler_(handler)
 {
@@ -45,11 +39,6 @@ ScreenController::ScreenController(uint32_t displayId, const shared_ptr <Display
 
     DisplayEventHandler::EventCallback cancelBoostCallback = bind([&]() { CancelBoostBrightness(); });
     handler_->EmplaceCallBack(DisplayEventHandler::Event::EVENT_CANCEL_BOOST_BRIGHTNESS, cancelBoostCallback);
-
-    stateValues_.emplace(DisplayState::DISPLAY_ON, DISPLAY_FULL_BRIGHTNESS);
-    stateValues_.emplace(DisplayState::DISPLAY_DIM, DISPLAY_DIM_BRIGHTNESS);
-    stateValues_.emplace(DisplayState::DISPLAY_OFF, DISPLAY_OFF_BRIGHTNESS);
-    stateValues_.emplace(DisplayState::DISPLAY_SUSPEND, DISPLAY_SUSPEND_BRIGHTNESS);
 }
 
 ScreenController::AnimateCallbackImpl::AnimateCallbackImpl(const shared_ptr <ScreenAction>& action)
@@ -119,20 +108,6 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     return true;
 }
 
-bool ScreenController::UpdateStateConfig(DisplayState state, uint32_t value)
-{
-    DISPLAY_HILOGI(FEAT_STATE, "UpdateStateConfig, state=%{public}u, value=%{public}u",
-                   static_cast<uint32_t>(state), value);
-    lock_guard lock(mutexState_);
-    auto iterator = stateValues_.find(state);
-    if (iterator == stateValues_.end()) {
-        DISPLAY_HILOGI(FEAT_STATE, "UpdateStateConfig no such state");
-        return false;
-    }
-    iterator->second = value;
-    return true;
-}
-
 bool ScreenController::IsScreenOn()
 {
     lock_guard lock(mutexState_);
@@ -192,7 +167,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot boost brightness, ignore the change");
         return false;
     }
-    bool ret = false;
+    bool ret = true;
     if (!isBrightnessBoosted_) {
         uint32_t maxBrightness = DisplayParamHelper::GetInstance().GetMaxBrightness();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Boost brightness, maxBrightness: %{public}d", maxBrightness);
@@ -204,7 +179,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
     // If boost multi-times, we will resend the cancel boost event.
     handler_->RemoveEvent(DisplayEventHandler::Event::EVENT_CANCEL_BOOST_BRIGHTNESS);
     handler_->SendEvent(DisplayEventHandler::Event::EVENT_CANCEL_BOOST_BRIGHTNESS, timeoutMs);
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BoostBrightness update timeout");
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BoostBrightness update timeout=%{public}u, ret=%{public}d", timeoutMs, ret);
     return ret;
 }
 
@@ -302,6 +277,7 @@ void ScreenController::SetSettingBrightness(uint32_t brightness)
     ErrCode ret = helper.PutIntValue(SETTING_BRIGHTNESS_KEY, static_cast<int32_t>(brightness));
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "set setting brightness failed, ret=%{public}d", ret);
+        cachedBrightness_ = action_->GetBrightness();
     }
 }
 

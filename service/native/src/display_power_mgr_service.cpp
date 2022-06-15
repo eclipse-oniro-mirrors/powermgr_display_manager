@@ -222,7 +222,7 @@ void DisplayPowerMgrService::ActivateAmbientSensor()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
         return;
     }
-    strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
+    (void)strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
     sensorUser_.userData = nullptr;
     sensorUser_.callback = &AmbientLightCallback;
     SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
@@ -269,7 +269,7 @@ bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callba
 
 bool DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t displayId)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Timing max brightness: %{public}d, id: %{public}d", timeoutMs, displayId);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Timing boost brightness: %{public}d, id: %{public}d", timeoutMs, displayId);
     RETURN_IF_WITH_RET(timeoutMs <= 0, false);
     auto iter = controllerMap_.find(displayId);
     RETURN_IF_WITH_RET(iter == controllerMap_.end(), false);
