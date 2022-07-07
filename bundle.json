@@ -27,13 +27,21 @@
     ],
     "deps": {
       "components": [
-        "appexecfwk_standard",
+        "bundle_framework",
+        "eventhandler",
+        "graphic_graphic_2d",
+        "hicollie_native",
+        "hisysevent_native",
         "hiviewdfx_hilog_native",
+        "init",
         "ipc",
         "multimedia_image_standard",
+        "napi",
+        "power_manager_native",
         "safwk",
         "samgr_standard",
         "sensor",
+        "utils_base",
         "window_manager"
       ],
       "third_party": [
