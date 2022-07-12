@@ -54,7 +54,7 @@ ohos_shared_library("displaymgrservice") {
     "${displaymgr_native_innerkits_path}:displaymgr",
     "//foundation/graphic/graphic_2d:libsurface",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/windowmanager/utils:libwmutil",
+    "//foundation/window/window_manager/utils:libwmutil",
     "//utils/native/base:utils",
   ]
 
