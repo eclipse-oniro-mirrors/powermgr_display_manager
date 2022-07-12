@@ -13,18 +13,16 @@
 
 import("//build/ohos.gni")
 
-displaymgr_native_part_name = "display_manager"
+displaymgr_part_name = "display_manager"
 
 displaymgr_root_path = "//base/powermgr/display_manager"
 
 displaymgr_framework_path = "${displaymgr_root_path}/frameworks"
 
-displaymgr_service_path = "${displaymgr_root_path}/service"
+displaymgr_service_zidl = "${displaymgr_root_path}/service/zidl"
 
-displaymgr_interfaces_path = "${displaymgr_root_path}/interfaces"
+displaymgr_innerkits = "${displaymgr_root_path}/interfaces/innerkits"
 
-displaymgr_native_innerkits_path = "${displaymgr_interfaces_path}/innerkits"
-
-displaymgr_kits_path = "${displaymgr_interfaces_path}/kits"
+displaymgr_kits = "${displaymgr_root_path}/interfaces/kits"
 
 displaymgr_utils_path = "${displaymgr_root_path}/utils"

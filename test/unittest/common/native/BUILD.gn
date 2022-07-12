@@ -14,18 +14,13 @@
 import("//base/powermgr/display_manager/displaymgr.gni")
 import("//build/test.gni")
 
-module_output_path = "${displaymgr_native_part_name}/displaymgr_native"
+module_output_path = "${displaymgr_part_name}/displaymgr"
 
 ###############################################################################
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "include",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
-    "//base/sensors/sensor/interfaces/native/include",
-    "//utils/system/safwk/native/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 ##############################unittest##########################################
@@ -43,18 +38,16 @@ ohos_unittest("unittest_display_mgr_service") {
   ]
 
   deps = [
-    "${displaymgr_native_innerkits_path}:displaymgr",
-    "${displaymgr_service_path}:displaymgrservice",
+    "${displaymgr_innerkits}:displaymgr",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "sensor:sensor_interface_native",
   ]
 }

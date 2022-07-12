@@ -50,13 +50,19 @@
       ]
     },
     "build": {
-      "sub_component": [
-        "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
-        "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
-        "//base/powermgr/display_manager/service:displaymgrservice",
-        "//base/powermgr/display_manager/service/etc:display.para",
-        "//base/powermgr/display_manager/interfaces/kits/js/napi:brightness"
-      ],
+      "group_type": {
+        "base_group": [],
+        "fwk_group": [
+          "//base/powermgr/display_manager/interfaces/kits/js/napi:brightness",
+          "//base/powermgr/display_manager/interfaces/innerkits:displaymgr"
+        ],
+        "service_group": [
+          "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
+          "//base/powermgr/display_manager/service:displaymgrservice",
+          "//base/powermgr/display_manager/service:displaymgr_stub",
+          "//base/powermgr/display_manager/service/etc:display.para"
+        ]
+      },
       "inner_kits": [
         {
           "name": "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
