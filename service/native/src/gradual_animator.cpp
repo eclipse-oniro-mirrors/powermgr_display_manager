@@ -15,7 +15,9 @@
 
 #include "gradual_animator.h"
 
-#include "display_common.h"
+#include "display_log.h"
+#include "event_handler.h"
+#include "event_runner.h"
 #include "watchdog.h"
 
 namespace OHOS {

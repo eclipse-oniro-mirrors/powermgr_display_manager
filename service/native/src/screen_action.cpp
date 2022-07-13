@@ -17,6 +17,7 @@
 
 #include <hisysevent.h>
 
+#include "dm_common.h"
 #include "display_manager.h"
 #include "display_log.h"
 #include "screen_manager.h"
