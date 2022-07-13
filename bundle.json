@@ -13,7 +13,7 @@
     "destPath": "base/powermgr/display_manager"
   },
   "component": {
-    "name": "display_manager_native",
+    "name": "display_manager",
     "subsystem": "powermgr",
     "syscap": [
       "SystemCapability.PowerManager.DisplayPowerManager"
