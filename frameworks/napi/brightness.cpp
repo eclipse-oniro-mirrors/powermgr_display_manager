@@ -31,10 +31,6 @@ const int32_t MAX_BRIGHTNESS = 255;
 const int32_t MIN_BRIGHTNESS = 1;
 const int32_t BRIGHTNESS_OFF = 0;
 
-const std::string BRIGHTNESS_VALUE = "value";
-const std::string BRIGHTNESS_MODE = "mode";
-const std::string KEEP_SCREENON = "keepScreenOn";
-
 const std::string FUNC_SUCEESS_NAME = "success";
 const std::string FUNC_FAIL_NAME = "fail";
 const std::string FUNC_COMPLETE_NAME = "complete";
@@ -42,18 +38,22 @@ const std::string FUNC_COMPLETE_NAME = "complete";
 const int32_t COMMON_ERROR_COED = 200;
 const int32_t INPUT_ERROR_CODE = 202;
 
-const std::string SET_VALUE_ERROR_MGR = "setValue: value is not an available number";
+const std::string SET_VALUE_ERROR_MGR = "value is not an available number";
 const std::string GET_VALUE_ERROR_MGR = "get system screen brightness fail";
-const std::string SET_MODE_ERROR_MGR = "setMode: value is not an available number";
-const std::string SET_MODE_NOT_SUPPORTED_ERROR_MGR = "setMode: Auto adjusting brightness is not supported";
+const std::string SET_MODE_ERROR_MGR = "value is not an available number";
+const std::string SET_MODE_NOT_SUPPORTED_ERROR_MGR = "Auto adjusting brightness is not supported";
 const std::string SET_KEEP_SCREENON_ERROR_MGR = "value is not an available boolean";
 }
+const std::string Brightness::BRIGHTNESS_VALUE = "value";
+const std::string Brightness::BRIGHTNESS_MODE = "mode";
+const std::string Brightness::KEEP_SCREENON = "keepScreenOn";
 
-Brightness::Brightness(napi_env env) : env_(env)
+Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock)
+    : env_(env), runningLock_(runningLock)
 {
 }
 
-void Brightness::GetValue(napi_value options)
+void Brightness::GetValue()
 {
     uint32_t brightness = brightnessInfo_.GetBrightness();
     if (BRIGHTNESS_OFF >= brightness || brightness > MAX_BRIGHTNESS) {
@@ -61,78 +61,78 @@ void Brightness::GetValue(napi_value options)
     } else {
         result_.SetResult(BRIGHTNESS_VALUE, brightness);
     }
-    ExecuteCallback(options);
+    ExecuteCallback();
 }
 
-void Brightness::SetValue(napi_callback_info info)
+void Brightness::SetValue(napi_value& number)
 {
-    napi_value options = GetCallbackInfo(info, napi_object);
-    if (options != nullptr) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "System brightness interface");
-        napi_value value = GetOptions(options, BRIGHTNESS_VALUE, napi_number);
-        if (value == nullptr) {
-            result_.Error(INPUT_ERROR_CODE, SET_VALUE_ERROR_MGR);
-        } else {
-            int32_t brightness = MIN_BRIGHTNESS;
-            napi_get_value_int32(env_, value, &brightness);
-            brightnessInfo_.SetBrightness(brightness);
-        }
-        ExecuteCallback(options);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
+    int32_t value = MIN_BRIGHTNESS;
+    if (napi_ok != napi_get_value_int32(env_, number, &value)) {
+        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
         return;
     }
-
-    napi_value number = GetCallbackInfo(info, napi_number);
-    if (number != nullptr) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
-        int32_t value = MIN_BRIGHTNESS;
-        if (napi_ok != napi_get_value_int32(env_, number, &value)) {
-            DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
-            return;
-        }
-        brightnessInfo_.SetBrightness(value);
-        return;
-    }
-    DISPLAY_HILOGW(FEAT_BRIGHTNESS, "SetValue: No valid parameters");
+    brightnessInfo_.SetBrightness(value);
 }
 
-void Brightness::GetMode(napi_value options)
+void Brightness::SystemSetValue()
+{
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "System brightness interface");
+    if (napiValRef_ == nullptr) {
+        result_.Error(INPUT_ERROR_CODE, SET_VALUE_ERROR_MGR);
+    } else {
+        int32_t brightness = MIN_BRIGHTNESS;
+        napi_value napiVal = nullptr;
+        napi_get_reference_value(env_, napiValRef_, &napiVal);
+        napi_get_value_int32(env_, napiVal, &brightness);
+        brightnessInfo_.SetBrightness(brightness);
+        napi_delete_reference(env_, napiValRef_);
+    }
+    ExecuteCallback();
+}
+
+void Brightness::GetMode()
 {
     int32_t isAuto = brightnessInfo_.GetAutoMode();
     result_.SetResult(BRIGHTNESS_MODE, isAuto);
-    ExecuteCallback(options);
+    ExecuteCallback();
 }
 
-void Brightness::SetMode(napi_value options)
+void Brightness::SetMode()
 {
     DISPLAY_HILOGD(COMP_FWK, "Set auto brightness");
-    napi_value napiMode = GetOptions(options, BRIGHTNESS_MODE, napi_number);
-    if (napiMode == nullptr) {
+    if (napiValRef_ == nullptr) {
         result_.Error(INPUT_ERROR_CODE, SET_MODE_ERROR_MGR);
     } else {
         int32_t mode = 0;
+        napi_value napiMode = nullptr;
+        napi_get_reference_value(env_, napiValRef_, &napiMode);
         napi_get_value_int32(env_, napiMode, &mode);
         if (!brightnessInfo_.SetAutoMode(static_cast<bool>(mode))) {
             result_.Error(COMMON_ERROR_COED, SET_MODE_NOT_SUPPORTED_ERROR_MGR);
         }
+        napi_delete_reference(env_, napiValRef_);
     }
-    ExecuteCallback(options);
+    ExecuteCallback();
 }
 
-void Brightness::SetKeepScreenOn(napi_value options, std::shared_ptr<RunningLock>& runningLock)
+void Brightness::SetKeepScreenOn()
 {
     DISPLAY_HILOGD(COMP_FWK, "Set keep screen on");
-    napi_value napiKeep = GetOptions(options, KEEP_SCREENON, napi_boolean);
-    if (napiKeep == nullptr) {
+    if (napiValRef_ == nullptr) {
         result_.Error(INPUT_ERROR_CODE, SET_KEEP_SCREENON_ERROR_MGR);
     } else {
+        napi_value napiKeep = nullptr;
+        napi_get_reference_value(env_, napiValRef_, &napiKeep);
         bool screenOn = false;
         napi_get_value_bool(env_, napiKeep, &screenOn);
-        brightnessInfo_.ScreenOn(screenOn, runningLock);
+        brightnessInfo_.ScreenOn(screenOn, runningLock_);
+        napi_delete_reference(env_, napiValRef_);
     }
-    ExecuteCallback(options);
+    ExecuteCallback();
 }
 
-napi_value Brightness::GetCallbackInfo(napi_callback_info info, napi_valuetype checkType)
+napi_value Brightness::GetCallbackInfo(napi_callback_info& info, napi_valuetype checkType)
 {
     size_t argc = MAX_ARGC;
     napi_value argv[argc];
@@ -151,6 +151,35 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info info, napi_valuetype c
     napi_value options = argv[ARGV_ONE];
     RETURN_IF_WITH_RET(!CheckValueType(options, checkType), nullptr);
     return options;
+}
+
+bool Brightness::CreateCallbackRef(napi_value& options)
+{
+    RETURN_IF_WITH_RET(!CheckValueType(options, napi_object), false);
+
+    napi_value succCallBack = GetOptions(options, FUNC_SUCEESS_NAME, napi_function);
+    if (succCallBack != nullptr) {
+        napi_create_reference(env_, succCallBack, 1, &successRef_);
+    }
+
+    napi_value failCallBack = GetOptions(options, FUNC_FAIL_NAME, napi_function);
+    if (failCallBack != nullptr) {
+        napi_create_reference(env_, failCallBack, 1, &failRef_);
+    }
+
+    napi_value completeCallBack = GetOptions(options, FUNC_COMPLETE_NAME, napi_function);
+    if (completeCallBack != nullptr) {
+        napi_create_reference(env_, completeCallBack, 1, &completeRef_);
+    }
+    return true;
+}
+
+void Brightness::CreateValueRef(napi_value& options, const std::string& valName, napi_valuetype checkType)
+{
+    napi_value value = GetOptions(options, valName, checkType);
+    if (value != nullptr) {
+        napi_create_reference(env_, value, 1, &napiValRef_);
+    }
 }
 
 void Brightness::Result::Error(int32_t code, const std::string& msg)
@@ -224,18 +253,20 @@ bool Brightness::BrightnessInfo::SetAutoMode(bool mode)
 
 void Brightness::BrightnessInfo::ScreenOn(bool keep, std::shared_ptr<RunningLock>& runningLock)
 {
-    DISPLAY_HILOGD(COMP_FWK, "Keep screen on, keep: %{public}d, isUsed: %{public}d", keep, runningLock->IsUsed());
-    keep ? runningLock->Lock() : runningLock->UnLock();
+    if (runningLock != nullptr) {
+        DISPLAY_HILOGD(COMP_FWK, "Keep screen on, keep: %{public}d, isUsed: %{public}d", keep, runningLock->IsUsed());
+        keep ? runningLock->Lock() : runningLock->UnLock();
+    }
 }
 
-void Brightness::ExecuteCallback(napi_value options)
+void Brightness::ExecuteCallback()
 {
     bool error = result_.IsError();
     if (!error) {
         DISPLAY_HILOGI(COMP_FWK, "Call the js success method");
         napi_value result = result_.GetResult(env_);
         size_t argc = result ? MAX_ARGC : 0;
-        CallFunction(options, FUNC_SUCEESS_NAME, argc, result ? &result : nullptr);
+        CallFunction(successRef_, argc, result ? &result : nullptr);
     }
 
     if (error) {
@@ -243,13 +274,13 @@ void Brightness::ExecuteCallback(napi_value options)
         size_t argc = MAX_FAIL_ARGC;
         napi_value argv[argc];
         result_.GetError(env_, argv, argc);
-        CallFunction(options, FUNC_FAIL_NAME, argc, argv);
+        CallFunction(failRef_, argc, argv);
     }
     DISPLAY_HILOGI(COMP_FWK, "Call the js complete method");
-    CallFunction(options, FUNC_COMPLETE_NAME, 0, nullptr);
+    CallFunction(completeRef_, 0, nullptr);
 }
 
-bool Brightness::CheckValueType(napi_value value, napi_valuetype checkType)
+bool Brightness::CheckValueType(napi_value& value, napi_valuetype checkType)
 {
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env_, value, &valueType);
@@ -260,7 +291,7 @@ bool Brightness::CheckValueType(napi_value value, napi_valuetype checkType)
     return true;
 }
 
-napi_value Brightness::GetOptions(napi_value options, const std::string& name, napi_valuetype checkType)
+napi_value Brightness::GetOptions(napi_value& options, const std::string& name, napi_valuetype checkType)
 {
     napi_value property = nullptr;
     napi_status status = napi_get_named_property(env_, options, name.c_str(), &property);
@@ -275,16 +306,18 @@ napi_value Brightness::GetOptions(napi_value options, const std::string& name, n
     return property;
 }
 
-void Brightness::CallFunction(napi_value options, const std::string& name, size_t argc, napi_value* response)
+void Brightness::CallFunction(napi_ref& callbackRef, size_t argc, napi_value* response)
 {
-    napi_value optionsFunc = GetOptions(options, name, napi_function);
-    RETURN_IF(optionsFunc == nullptr);
+    RETURN_IF(callbackRef == nullptr);
 
     napi_value callResult = 0;
-    napi_status status = napi_call_function(env_, nullptr, optionsFunc, argc, response, &callResult);
+    napi_value callback = nullptr;
+    napi_get_reference_value(env_, callbackRef, &callback);
+    napi_status status = napi_call_function(env_, nullptr, callback, argc, response, &callResult);
     if (status != napi_ok) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to call the %{public}s callback function", name.c_str());
+        DISPLAY_HILOGW(COMP_FWK, "Failed to call the callback function");
     }
+    napi_delete_reference(env_, callbackRef);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
