@@ -14,10 +14,16 @@
  */
 
 #include <string>
+#include <iosfwd>
+#include <memory>
 
 #include <napi/native_api.h>
-#include <napi/native_node_api.h>
+#include <napi/native_common.h>
 
+#include "js_native_api.h"
+#include "js_native_api_types.h"
+
+#include "power_state_machine_info.h"
 #include "brightness.h"
 #include "display_common.h"
 #include "display_log.h"
