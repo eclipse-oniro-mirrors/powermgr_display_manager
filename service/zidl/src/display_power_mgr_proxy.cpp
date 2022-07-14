@@ -480,41 +480,6 @@ bool DisplayPowerMgrProxy::IsAutoAdjustBrightness()
     return result;
 }
 
-bool DisplayPowerMgrProxy::SetStateConfig(uint32_t id, DisplayState state, int32_t value)
-{
-    sptr<IRemoteObject> remote = Remote();
-    RETURN_IF_WITH_RET(remote == nullptr, false);
-
-    bool result = false;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-
-    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
-        return result;
-    }
-
-    WRITE_PARCEL_WITH_RET(data, Uint32, id, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, static_cast<uint32_t>(state), false);
-    WRITE_PARCEL_WITH_RET(data, Int32, value, false);
-
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::SET_STATE_CONFIG),
-        data, reply, option);
-    if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "PowerMgrProxy::%{public}s SendRequest is failed, error code: %d",
-            __func__, ret);
-        return result;
-    }
-
-    if (!reply.ReadBool(result)) {
-        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
-        return result;
-    }
-
-    return result;
-}
-
 bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     sptr<IRemoteObject> remote = Remote();
