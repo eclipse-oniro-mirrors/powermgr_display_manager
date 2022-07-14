@@ -23,9 +23,7 @@ using namespace std;
 namespace OHOS {
 namespace DisplayPowerMgr {
 constexpr uint32_t DISPLAY_FULL_BRIGHTNESS = 255;
-constexpr uint32_t DISPLAY_DIM_BRIGHTNESS = 50;
 constexpr uint32_t DISPLAY_OFF_BRIGHTNESS = 0;
-constexpr uint32_t DISPLAY_SUSPEND_BRIGHTNESS = 50;
 
 ScreenController::ScreenController(uint32_t displayId, const shared_ptr<DisplayEventHandler>& handler)
 {
@@ -223,15 +221,6 @@ bool ScreenController::OverrideController::BrightnessBeforeRestore(atomic<bool>&
     return sharedControl_->UpdateBrightness(beforeBrightness_, gradualDuration);
 }
 
-ScreenController::DisplayStateController::DisplayStateController(const shared_ptr<SharedController>& sharedControl)
-    : state_(DisplayState::DISPLAY_UNKNOWN), sharedControl_(sharedControl)
-{
-    stateValues_.emplace(DisplayState::DISPLAY_ON, DisplayParamHelper::GetInstance().GetMaxBrightness());
-    stateValues_.emplace(DisplayState::DISPLAY_DIM, DISPLAY_DIM_BRIGHTNESS);
-    stateValues_.emplace(DisplayState::DISPLAY_OFF, DisplayParamHelper::GetInstance().GetMinBrightness());
-    stateValues_.emplace(DisplayState::DISPLAY_SUSPEND, DISPLAY_SUSPEND_BRIGHTNESS);
-}
-
 bool ScreenController::DisplayStateController::UpdateState(DisplayState state, uint32_t reason)
 {
     lock_guard lock(mutexState_);
@@ -270,20 +259,6 @@ bool ScreenController::DisplayStateController::UpdateState(DisplayState state, u
     stateChangeReason_ = reason;
 
     DISPLAY_HILOGI(COMP_SVC, "Update screen state to %{public}u", state);
-    return true;
-}
-
-bool ScreenController::DisplayStateController::UpdateStateConfig(DisplayState state, uint32_t value)
-{
-    lock_guard lock(mutexState_);
-    DISPLAY_HILOGI(COMP_SVC, "UpdateStateConfig, state=%{public}u, value=%{public}u",
-                   static_cast<uint32_t>(state), value);
-    auto iterator = stateValues_.find(state);
-    if (iterator == stateValues_.end()) {
-        DISPLAY_HILOGI(COMP_SVC, "UpdateStateConfig no such state");
-        return false;
-    }
-    iterator->second = value;
     return true;
 }
 

@@ -81,9 +81,6 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS):
             ret = IsAutoAdjustBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::SET_STATE_CONFIG):
-            ret = SetStateConfigStub(data, reply);
-            break;
         case static_cast<int32_t>(IDisplayPowerMgr::BOOST_BRIGHTNESS):
             ret = BoostBrightnessStub(data, reply);
             break;
@@ -283,24 +280,6 @@ int32_t DisplayPowerMgrStub::IsAutoAdjustBrightnessStub(MessageParcel& data, Mes
     bool ret = IsAutoAdjustBrightness();
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write IsAutoAdjustBrightnessStub return value");
-        return E_WRITE_PARCEL_ERROR;
-    }
-    return ERR_OK;
-}
-
-int32_t DisplayPowerMgrStub::SetStateConfigStub(MessageParcel& data, MessageParcel& reply)
-{
-    uint32_t id = 0;
-    uint32_t state = 0;
-    int32_t value = 0;
-
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Int32, value, E_READ_PARCEL_ERROR);
-
-    bool ret = SetStateConfig(id, static_cast<DisplayState>(state), value);
-    if (!reply.WriteBool(ret)) {
-        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetStateConfigStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;

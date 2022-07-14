@@ -248,17 +248,6 @@ void DisplayPowerMgrService::DeactivateAmbientSensor()
     ambientSensorEnabled_ = false;
 }
 
-bool DisplayPowerMgrService::SetStateConfig(uint32_t id, DisplayState state, int32_t value)
-{
-    DISPLAY_HILOGI(COMP_SVC, "SetStateConfig %{public}d, %{public}d, %{public}d",
-        id, state, value);
-    auto iterater = controllerMap_.find(id);
-    if (iterater == controllerMap_.end()) {
-        return false;
-    }
-    return iterater->second->DisplayStateControl()->UpdateStateConfig(state, value);
-}
-
 bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     DISPLAY_HILOGI(COMP_SVC, "RegisterCallback");

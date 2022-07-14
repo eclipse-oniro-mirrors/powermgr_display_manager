@@ -103,21 +103,6 @@ static void AdjustBrightness(const uint8_t* data)
     g_displayMgrClient.AdjustBrightness(type[0], duration[0]);
 }
 
-static void SetStateConfig(const uint8_t* data)
-{
-    int32_t state[1];
-    int32_t value[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(state, sizeof(state), data, idSize)) != EOK) {
-        return;
-    }
-    if ((memcpy_s(value, sizeof(value), (data+DATANUM), idSize)) != EOK) {
-        return;
-    }
-
-    g_displayMgrClient.SetStateConfig(static_cast<DisplayState>(state[0]), value[0]);
-}
-
 static void AutoAdjustBrightness(const uint8_t* data)
 {
     int32_t type[1];
@@ -214,33 +199,30 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
                 AdjustBrightness(data);
                 break;
             case ApiNumber::NUM_SIX:
-                SetStateConfig(data);
-                break;
-            case ApiNumber::NUM_SEVEN:
                 AutoAdjustBrightness(data);
                 break;
-            case ApiNumber::NUM_EIGHT:
+            case ApiNumber::NUM_SEVEN:
                 RegisterCallback(data);
                 break;
-            case ApiNumber::NUM_NINE:
+            case ApiNumber::NUM_EIGHT:
                 OverrideBrightness(data);
                 break;
-            case ApiNumber::NUM_TEN:
+            case ApiNumber::NUM_NINE:
                 RestoreBrightness(data);
                 break;
-            case ApiNumber::NUM_ELEVEN:
+            case ApiNumber::NUM_TEN:
                 BoostBrightness(data);
                 break;
-            case ApiNumber::NUM_TWELVE:
+            case ApiNumber::NUM_ELEVEN:
                 CancelBoostBrightness(data);
                 break;
-            case ApiNumber::NUM_THIRTEEN:
+            case ApiNumber::NUM_TWELVE:
                 g_displayMgrClient.GetDefaultBrightness();
                 break;
-            case ApiNumber::NUM_FOURTEEN:
+            case ApiNumber::NUM_THIRTEEN:
                 g_displayMgrClient.GetMaxBrightness();
                 break;
-            case ApiNumber::NUM_FIFTEEN:
+            case ApiNumber::NUM_FOURTEEN:
                 g_displayMgrClient.GetMinBrightness();
                 break;
             default:

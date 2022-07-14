@@ -62,13 +62,13 @@ public:
 
     class DisplayStateController {
     public:
-        DisplayStateController(const std::shared_ptr<SharedController>& sharedControl);
+        DisplayStateController(const std::shared_ptr<SharedController>& sharedControl)
+            : state_(DisplayState::DISPLAY_UNKNOWN), sharedControl_(sharedControl) {};
         DisplayState GetState()
         {
             return state_;
         }
         bool UpdateState(DisplayState state, uint32_t reason);
-        bool UpdateStateConfig(DisplayState state, uint32_t value);
         bool IsScreenOn();
         void UpdateBeforeOffBrightness(uint32_t brightness);
 
@@ -80,7 +80,6 @@ public:
         DisplayState state_;
         uint32_t stateChangeReason_ { 0 };
         std::mutex mutexState_;
-        std::map<DisplayState, uint32_t> stateValues_;
         const std::shared_ptr<SharedController>& sharedControl_;
     };
 
