@@ -23,6 +23,6 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp() {}
-    void TearDown() {}
+    void TearDown();
 };
 #endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
