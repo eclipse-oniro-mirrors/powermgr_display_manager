@@ -26,6 +26,17 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
+void DisplayPowerMgrServiceTest::TearDown()
+{
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    if (state != DisplayState::DISPLAY_ON) {
+        DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+        sleep(1);
+        return;
+    }
+    return;
+}
+
 namespace {
 /**
  * @tc.name: DisplayPowerMgrService01
@@ -130,13 +141,13 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008: fun is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    sleep(1);
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleep(1);
-    if (false) {
-        EXPECT_TRUE(ret);
-        DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-        EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
-    }
+    EXPECT_TRUE(ret);
+    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
 }
 
 /**
