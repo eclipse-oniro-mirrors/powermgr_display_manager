@@ -66,10 +66,10 @@ void Brightness::GetValue()
 
 void Brightness::SetValue(napi_value& number)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
+    DISPLAY_HILOGD(MODULE_JNI, "Brightness interface");
     int32_t value = MIN_BRIGHTNESS;
     if (napi_ok != napi_get_value_int32(env_, number, &value)) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
+        DISPLAY_HILOGW(MODULE_JNI, "Failed to get the input number");
         return;
     }
     brightnessInfo_.SetBrightness(value);
@@ -77,7 +77,7 @@ void Brightness::SetValue(napi_value& number)
 
 void Brightness::SystemSetValue()
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "System brightness interface");
+    DISPLAY_HILOGD(MODULE_JNI, "System brightness interface");
     if (napiValRef_ == nullptr) {
         result_.Error(INPUT_ERROR_CODE, SET_VALUE_ERROR_MGR);
     } else {
@@ -89,7 +89,6 @@ void Brightness::SystemSetValue()
         napi_delete_reference(env_, napiValRef_);
     }
     ExecuteCallback();
->>>>>>> b7af760... fix: Example Change the synchronous case to asynchronous
 }
 
 void Brightness::GetMode()
