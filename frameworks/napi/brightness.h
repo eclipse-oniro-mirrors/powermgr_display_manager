@@ -17,11 +17,15 @@
 #define POWERMGR_BRIGHTNESS_H
 
 #include <map>
-
+#include <string>
+#include <cstdint>
+#include <iosfwd>
+#include <memory>
+#include <cstddef>
+#include <functional>
 #include "errors.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
 #include "running_lock.h"
 
 namespace OHOS {

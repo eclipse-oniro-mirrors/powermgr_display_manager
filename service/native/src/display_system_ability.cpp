@@ -14,7 +14,11 @@
  */
 
 #include "display_system_ability.h"
-#include "display_common.h"
+#include "delayed_sp_singleton.h"
+#include "iremote_object.h"
+#include "new"
+#include "system_ability_definition.h"
+#include "display_log.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

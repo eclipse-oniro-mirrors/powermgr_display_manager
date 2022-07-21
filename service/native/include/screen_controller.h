@@ -17,9 +17,9 @@
 #define DISPLAYMGR_SCREEN_CONTROLLER_H
 
 #include <atomic>
-#include <map>
 #include <memory>
 #include <mutex>
+#include <cstdint>
 
 #include "display_event_handler.h"
 #include "display_power_info.h"

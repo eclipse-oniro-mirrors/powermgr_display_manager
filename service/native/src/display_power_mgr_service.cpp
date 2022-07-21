@@ -15,13 +15,19 @@
 
 #include "display_power_mgr_service.h"
 
+#include <cstdlib>
+#include <ctime>
+#include <iosfwd>
+#include <cmath>
+#include <utility>
 #include <hisysevent.h>
 #include <file_ex.h>
 #include <securec.h>
-#include <string_ex.h>
-
+#include "errors.h"
+#include "new"
+#include "screen_action.h"
+#include "sensor_agent.h"
 #include "watchdog.h"
-
 #include "display_log.h"
 #include "display_param_helper.h"
 

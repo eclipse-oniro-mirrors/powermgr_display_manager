@@ -16,10 +16,14 @@
 #ifndef DISPLAYMGR_DISPLAY_EVENT_HANDLER_H
 #define DISPLAYMGR_DISPLAY_EVENT_HANDLER_H
 
+#include <cstdint>
+#include <functional>
 #include <map>
+#include <memory>
 #include <event_handler.h>
 #include <event_runner.h>
 #include <refbase.h>
+#include "inner_event.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
