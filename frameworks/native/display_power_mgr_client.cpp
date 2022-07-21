@@ -18,8 +18,16 @@
 #include <if_system_ability_manager.h>
 #include <iservice_registry.h>
 #include <system_ability_definition.h>
-
+#include "new"
+#include "refbase.h"
+#include "iremote_broker.h"
+#include "iremote_object.h"
+#include "display_log.h"
 #include "display_common.h"
+#include "display_power_info.h"
+#include "idisplay_power_callback.h"
+#include "idisplay_power_mgr.h"
+#include "power_state_machine_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

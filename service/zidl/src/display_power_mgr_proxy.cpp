@@ -15,6 +15,10 @@
 
 #include "display_power_mgr_proxy.h"
 
+#include "errors.h"
+#include "message_option.h"
+#include "message_parcel.h"
+#include "display_log.h"
 #include "display_common.h"
 
 namespace OHOS {

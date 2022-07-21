@@ -16,8 +16,8 @@
 #ifndef DISPLAYMGR_SCREEN_ACTION_H
 #define DISPLAYMGR_SCREEN_ACTION_H
 
+#include <cstdint>
 #include <functional>
-#include <memory>
 #include <vector>
 
 #include "display_power_info.h"

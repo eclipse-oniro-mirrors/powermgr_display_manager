@@ -20,6 +20,8 @@
 #include <napi/native_api.h>
 #include <napi/native_common.h>
 
+#include "new"
+#include "node_api_types.h"
 #include "js_native_api.h"
 #include "js_native_api_types.h"
 
@@ -29,6 +31,7 @@
 #include "display_log.h"
 #include "power_mgr_client.h"
 #include "running_lock_info.h"
+#include "running_lock.h"
 
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS::PowerMgr;

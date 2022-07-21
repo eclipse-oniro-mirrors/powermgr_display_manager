@@ -18,8 +18,11 @@
 
 #include <memory>
 #include <string>
+#include <cstdint>
+#include <iosfwd>
 #include <event_handler.h>
 #include <event_runner.h>
+#include "inner_event.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

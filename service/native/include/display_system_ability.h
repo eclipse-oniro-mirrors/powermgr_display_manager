@@ -16,8 +16,11 @@
 #ifndef DISPLAY_SYSTEM_ABILITY_H
 #define DISPLAY_SYSTEM_ABILITY_H
 
+#include <cstdint>
+#include <iosfwd>
+#include <string>
 #include <system_ability.h>
-#include <system_ability_definition.h>
+#include "refbase.h"
 #include "display_power_mgr_service.h"
 
 namespace OHOS {

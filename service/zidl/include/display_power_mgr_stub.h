@@ -16,7 +16,10 @@
 #ifndef DISPLAYMGR_DISPLAY_MGR_STUB_H
 #define DISPLAYMGR_DISPLAY_MGR_STUB_H
 
+#include <cstdint>
 #include <iremote_stub.h>
+#include "refbase.h"
+#include "message_option.h"
 
 #include "idisplay_power_mgr.h"
 

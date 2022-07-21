@@ -15,6 +15,9 @@
 
 #include "brightness.h"
 
+#include <utility>
+#include "napi/native_common.h"
+#include "power_state_machine_info.h"
 #include "display_common.h"
 #include "display_log.h"
 #include "display_power_mgr_client.h"

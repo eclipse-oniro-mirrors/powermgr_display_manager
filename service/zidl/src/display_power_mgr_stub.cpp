@@ -16,9 +16,17 @@
 #include "display_power_mgr_stub.h"
 
 #include <message_parcel.h>
-
+#include "errors.h"
+#include "ipc_object_stub.h"
+#include "iremote_broker.h"
+#include "iremote_object.h"
+#include "idisplay_power_callback.h"
+#include "display_log.h"
 #include "display_common.h"
+#include "display_mgr_errors.h"
+#include "display_power_info.h"
 #include "xcollie.h"
+#include "xcollie_define.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

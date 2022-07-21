@@ -16,8 +16,15 @@
 #ifndef DISPLAYMGR_DISPLAY_MGR_PROXY_H
 #define DISPLAYMGR_DISPLAY_MGR_PROXY_H
 
+#include <cstdint>
+#include <vector>
+#include <functional>
 #include <iremote_proxy.h>
-
+#include "iremote_broker.h"
+#include "iremote_object.h"
+#include "refbase.h"
+#include "display_power_info.h"
+#include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
 
 namespace OHOS {

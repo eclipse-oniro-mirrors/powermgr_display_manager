@@ -17,6 +17,9 @@
 #define POWERMGR_DISPLAY_MANAGER_DISPLAY_PARAM_HELPER_H
 
 #include <singleton.h>
+#include <cstdint>
+#include <iosfwd>
+#include <string>
 
 namespace OHOS {
 namespace DisplayPowerMgr {

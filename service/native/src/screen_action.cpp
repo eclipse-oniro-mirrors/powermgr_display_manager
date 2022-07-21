@@ -21,7 +21,6 @@
 #include "display_manager.h"
 #include "display_log.h"
 #include "screen_manager.h"
-#include "display_power_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

@@ -15,6 +15,13 @@
 
 #include "screen_controller.h"
 
+#include <string>
+#include <functional>
+#include <iosfwd>
+#include "delayed_sp_singleton.h"
+#include "new"
+#include "refbase.h"
+#include "display_common.h"
 #include "display_log.h"
 #include "display_param_helper.h"
 #include "display_power_mgr_service.h"

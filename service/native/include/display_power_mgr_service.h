@@ -16,16 +16,24 @@
 #ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 #define DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 
-#include <mutex>
-#include <system_ability.h>
-#include <system_ability_definition.h>
-
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
+#include <functional>
+#include <sys/types.h>
 #include "delayed_sp_singleton.h"
+#include "refbase.h"
+#include "event_runner.h"
+#include "iremote_object.h"
+#include "sensor_agent_type.h"
+#include "idisplay_power_callback.h"
+#include "display_power_info.h"
 #include "display_event_handler.h"
 #include "display_common.h"
 #include "display_power_mgr_stub.h"
 #include "screen_controller.h"
-#include "sensor_agent.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
