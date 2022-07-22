@@ -44,9 +44,6 @@ const std::string SET_MODE_ERROR_MGR = "value is not an available number";
 const std::string SET_MODE_NOT_SUPPORTED_ERROR_MGR = "Auto adjusting brightness is not supported";
 const std::string SET_KEEP_SCREENON_ERROR_MGR = "value is not an available boolean";
 }
-const std::string Brightness::BRIGHTNESS_VALUE = "value";
-const std::string Brightness::BRIGHTNESS_MODE = "mode";
-const std::string Brightness::KEEP_SCREENON = "keepScreenOn";
 
 Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock)
     : env_(env), runningLock_(runningLock)

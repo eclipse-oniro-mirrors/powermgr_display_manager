@@ -41,9 +41,9 @@ public:
 
     napi_async_work asyncWork = nullptr;
 
-    static const std::string BRIGHTNESS_VALUE;
-    static const std::string BRIGHTNESS_MODE;
-    static const std::string KEEP_SCREENON;
+    static constexpr const char* BRIGHTNESS_VALUE = "value";
+    static constexpr const char* BRIGHTNESS_MODE = "mode";
+    static constexpr const char* KEEP_SCREENON = "keepScreenOn";
 private:
     class Result {
     public:
