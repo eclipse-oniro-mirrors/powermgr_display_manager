@@ -34,7 +34,7 @@
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
-const std::string DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
+constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
 constexpr int32_t WATCH_DOG_DELAY_S = 60;
 }
 DisplayPowerMgrService::DisplayPowerMgrService()
