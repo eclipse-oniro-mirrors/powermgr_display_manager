@@ -63,8 +63,7 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
             return;
         }
         handler_ = std::make_shared<AnimatorHandler>(eventRunner_, shared_from_this());
-        const int32_t WATCH_DOG_DELAY_S = 60;
-        HiviewDFX::Watchdog::GetInstance().AddThread(name_, handler_, WATCH_DOG_DELAY_S);
+        HiviewDFX::Watchdog::GetInstance().AddThread(name_, handler_);
     }
     animating_ = true;
     handler_->SendEvent(EVENT_STEP, 0, updateTime_);
