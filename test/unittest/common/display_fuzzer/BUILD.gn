@@ -34,12 +34,12 @@ ohos_fuzztest("DisplayFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "./display_fuzzer.cpp" ]
-  deps = [
-    "${displaymgr_native_innerkits_path}:displaymgr",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "${displaymgr_native_innerkits_path}:displaymgr" ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_core",
+  ]
 }
 
 ###############################################################################

@@ -28,6 +28,7 @@
     "deps": {
       "components": [
         "bundle_framework",
+	"c_utils",
         "eventhandler",
         "graphic_graphic_2d",
         "hicollie_native",
@@ -41,7 +42,6 @@
         "safwk",
         "samgr_standard",
         "sensor",
-        "utils_base",
         "window_manager"
       ],
       "third_party": [
