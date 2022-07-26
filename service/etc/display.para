@@ -12,6 +12,6 @@
 # limitations under the License.
 
 # Brightness limits is 0-255.
-const.display.brightness.min=1
+const.display.brightness.min=5
 const.display.brightness.default=102
 const.display.brightness.max=255

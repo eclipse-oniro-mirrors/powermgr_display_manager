@@ -53,9 +53,6 @@ ohos_shared_library("displaymgrservice") {
     ":displaymgr_stub",
     "${displaymgr_innerkits}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager:dataobs_manager",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
   ]
 

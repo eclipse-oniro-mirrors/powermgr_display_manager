@@ -33,7 +33,8 @@ namespace {
 sptr<PowerSettingObserver> g_brightnessObserver;
 }
 
-ScreenController::ScreenController(uint32_t displayId, const shared_ptr <DisplayEventHandler>& handler) : handler_(handler)
+ScreenController::ScreenController(uint32_t displayId, const shared_ptr<DisplayEventHandler>& handler)
+    : handler_(handler)
 {
     DISPLAY_HILOGI(COMP_SVC, "ScreenController created for displayId=%{public}u", displayId);
     action_ = make_shared<ScreenAction>(displayId);
