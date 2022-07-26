@@ -28,7 +28,7 @@
     "deps": {
       "components": [
         "bundle_framework",
-	"c_utils",
+        "c_utils",
         "eventhandler",
         "graphic_graphic_2d",
         "hicollie_native",
