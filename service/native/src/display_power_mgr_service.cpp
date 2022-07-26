@@ -15,11 +15,6 @@
 
 #include "display_power_mgr_service.h"
 
-#include <cstdlib>
-#include <ctime>
-#include <iosfwd>
-#include <cmath>
-#include <utility>
 #include <hisysevent.h>
 #include <file_ex.h>
 #include <securec.h>
@@ -35,7 +30,6 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
 constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
-constexpr int32_t WATCH_DOG_DELAY_S = 60;
 }
 DisplayPowerMgrService::DisplayPowerMgrService()
 {
@@ -56,7 +50,7 @@ void DisplayPowerMgrService::Init()
         handler_ = std::make_shared<DisplayEventHandler>(eventRunner_,
             DelayedSpSingleton<DisplayPowerMgrService>::GetInstance());
         std::string handlerName("DisplayPowerEventHandler");
-        HiviewDFX::Watchdog::GetInstance().AddThread(handlerName, handler_, WATCH_DOG_DELAY_S);
+        HiviewDFX::Watchdog::GetInstance().AddThread(handlerName, handler_);
     }
 
     std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
