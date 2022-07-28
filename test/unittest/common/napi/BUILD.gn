@@ -14,7 +14,7 @@
 import("//base/powermgr/display_manager/displaymgr.gni")
 import("//build/test.gni")
 
-module_output_path = "${displaymgr_native_part_name}/displaymgr_native"
+module_output_path = "${displaymgr_part_name}/displaymgr"
 
 ohos_js_unittest("PowerMgrDisplayJsTest") {
   module_out_path = module_output_path

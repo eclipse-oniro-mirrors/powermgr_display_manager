@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "display_power_mgr_client.h"
-#include "display_power_mgr_service.h"
+#include "display_log.h"
 
 using namespace testing::ext;
 using namespace OHOS;

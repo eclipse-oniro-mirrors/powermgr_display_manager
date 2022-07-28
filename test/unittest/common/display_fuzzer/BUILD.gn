@@ -14,7 +14,7 @@
 import("//base/powermgr/display_manager/displaymgr.gni")
 import("//build/test.gni")
 
-module_output_path = "${displaymgr_native_part_name}/displaymgr_native"
+module_output_path = "${displaymgr_part_name}/displaymgr"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DisplayFuzzTest") {
@@ -25,7 +25,6 @@ ohos_fuzztest("DisplayFuzzTest") {
   include_dirs = [
     "./",
     "${displaymgr_utils_path}:utils_config",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
   ]
   cflags = [
     "-g",
@@ -34,11 +33,12 @@ ohos_fuzztest("DisplayFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "./display_fuzzer.cpp" ]
-  deps = [ "${displaymgr_native_innerkits_path}:displaymgr" ]
+  deps = [ "${displaymgr_innerkits}:displaymgr" ]
 
   external_deps = [
     "c_utils:utils",
     "ipc:ipc_core",
+    "power_manager:powermgr_client",
   ]
 }
 

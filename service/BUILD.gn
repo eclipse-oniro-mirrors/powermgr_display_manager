@@ -15,11 +15,7 @@ import("//base/powermgr/display_manager/displaymgr.gni")
 
 config("displaymgr_private_config") {
   include_dirs = [
-    "//utils/system/safwk/native/include",
     "//base/hiviewdfx/hicollie/interfaces/native/innerkits/include/xcollie",
-    "//base/powermgr/power_manager/interfaces/innerkits/native/include",
-    "//base/sensors/sensor/interfaces/native/include",
-    "//foundation/multimedia/image_standard/interfaces/innerkits/include",
   ]
 }
 
@@ -51,16 +47,16 @@ ohos_shared_library("displaymgrservice") {
   public_configs = [ ":displaymgr_public_config" ]
 
   deps = [
-    "${displaymgr_native_innerkits_path}:displaymgr",
-    "//foundation/graphic/graphic_2d:libsurface",
+    ":displaymgr_stub",
+    "${displaymgr_innerkits}:displaymgr",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/window/window_manager/utils:libwmutil",
   ]
 
   external_deps = [
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "graphic_standard:surface",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
@@ -73,5 +69,31 @@ ohos_shared_library("displaymgrservice") {
     "window_manager:libdm",
   ]
 
-  part_name = "${displaymgr_native_part_name}"
+  part_name = "${displaymgr_part_name}"
+}
+
+ohos_shared_library("displaymgr_stub") {
+  sources = [ "zidl/src/display_power_mgr_stub.cpp" ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":displaymgr_private_config",
+  ]
+
+  public_configs = [ ":displaymgr_public_config" ]
+
+  deps = [
+    "${displaymgr_innerkits}:displaymgr",
+    "//utils/native/base:utils",
+  ]
+
+  external_deps = [
+    "hicollie_native:libhicollie",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "safwk:system_ability_fwk",
+    "samgr_standard:samgr_proxy",
+  ]
+
+  part_name = "${displaymgr_part_name}"
 }

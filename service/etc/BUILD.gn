@@ -18,6 +18,6 @@ import("//build/ohos.gni")
 ohos_prebuilt_etc("display.para") {
   source = "display.para"
   relative_install_dir = "param"
-  part_name = "${displaymgr_native_part_name}"
+  part_name = "${displaymgr_part_name}"
   subsystem_name = "powermgr"
 }
