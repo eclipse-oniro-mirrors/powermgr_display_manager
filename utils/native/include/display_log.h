@@ -62,6 +62,7 @@ enum DisplayManagerLogLabel {
     COMP_DRV = 4,
     COMP_UTS = 5,
     FEAT_BRIGHTNESS,
+    FEAT_STATE,
     // Test label
     LABEL_TEST,
     // The end of labels, max to the domain id range length 32
@@ -76,6 +77,7 @@ enum DisplayManagerLogDomain {
     DOMAIN_DRIVER, // 0xD002984
     DOMAIN_UTILS, // 0xD002985
     DOMAIN_FEAT_BRIGHTNESS,
+    DOMAIN_FEAT_STATE,
     DOMAIN_TEST = TEST_DOMAIN_ID, // 0xD000F00
     DOMAIN_END = DISPLAY_DOMAIN_ID_END, // Max to 0xD00299F, keep the sequence and length same as DisplayManagerLogLabel
 };
@@ -89,6 +91,7 @@ static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_LABEL[LABEL_END] = {
     {LOG_CORE, DOMAIN_DRIVER,            "DisplayDrv"},
     {LOG_CORE, DOMAIN_UTILS,             "DisplayUts"},
     {LOG_CORE, DOMAIN_FEAT_BRIGHTNESS,   "DisplayBrightness"},
+    {LOG_CORE, DOMAIN_FEAT_STATE,        "DisplayState"},
     {LOG_CORE, DOMAIN_TEST,              "DisplayTest"},
 };
 

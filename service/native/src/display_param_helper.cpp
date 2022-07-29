@@ -15,7 +15,7 @@
 
 #include "display_param_helper.h"
 
-#include <parameter.h>
+#include "syspara/parameter.h"
 #include "display_log.h"
 
 namespace OHOS {

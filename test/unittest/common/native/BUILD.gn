@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//base/powermgr/display_manager/displaymgr.gni")
+import("//base/powermgr/power_manager/powermgr.gni")
 import("//build/test.gni")
 
 module_output_path = "${displaymgr_part_name}/displaymgr"
@@ -39,10 +40,14 @@ ohos_unittest("unittest_display_mgr_service") {
 
   deps = [
     "${displaymgr_innerkits}:displaymgr",
+    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 
   external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
