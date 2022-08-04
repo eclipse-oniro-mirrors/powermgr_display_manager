@@ -68,7 +68,7 @@ ohos_shared_library("displaymgrservice") {
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "multimedia_image_standard:image_native",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
@@ -98,7 +98,7 @@ ohos_shared_library("displaymgr_stub") {
   external_deps = [
     "hicollie_native:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
