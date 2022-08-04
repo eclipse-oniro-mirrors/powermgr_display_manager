@@ -130,7 +130,7 @@ bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
         return false;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness, value=%{public}u", value);
-    cachedBrightness_ = action_->GetBrightness();
+    cachedSettingBrightness_ = GetBrightness();
     bool ret = UpdateBrightness(value, gradualDuration);
     if (ret) {
         handler_->SendEvent(DisplayEventHandler::Event::EVENT_SET_SETTING_BRIGHTNESS);
@@ -140,7 +140,19 @@ bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
 
 uint32_t ScreenController::GetBrightness()
 {
-    return action_->GetBrightness();
+    return static_cast<uint32_t>(GetDeviceBrightness() / discount_);
+}
+
+bool ScreenController::DiscountBrightness(double discount, uint32_t gradualDuration)
+{
+    if (!CanDiscountBrightness()) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot discount brightness, ignore the change");
+        return false;
+    }
+    uint32_t origianlBrightness = GetBrightness();
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Discount brightness, discount=%{public}lf", discount);
+    discount_ = discount;
+    return UpdateBrightness(origianlBrightness, gradualDuration);
 }
 
 bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
@@ -152,7 +164,7 @@ bool ScreenController::OverrideBrightness(uint32_t value, uint32_t gradualDurati
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness, value=%{public}u", value);
     if (!isBrightnessOverridden_) {
         isBrightnessOverridden_ = true;
-        cachedBrightness_ = action_->GetBrightness();
+        cachedSettingBrightness_ = GetBrightness();
     }
     overriddenBrightness_ = value;
     return UpdateBrightness(value, gradualDuration);
@@ -185,7 +197,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
         uint32_t maxBrightness = DisplayParamHelper::GetInstance().GetMaxBrightness();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Boost brightness, maxBrightness: %{public}d", maxBrightness);
         isBrightnessBoosted_ = true;
-        cachedBrightness_ = action_->GetBrightness();
+        cachedSettingBrightness_ = GetBrightness();
         ret = UpdateBrightness(maxBrightness, gradualDuration);
     }
 
@@ -239,6 +251,11 @@ bool ScreenController::CanSetBrightness()
     return IsScreenOn() && !IsBrightnessOverridden() && !IsBrightnessBoosted();
 }
 
+bool ScreenController::CanDiscountBrightness()
+{
+    return IsScreenOn();
+}
+
 bool ScreenController::CanOverrideBrightness()
 {
     return IsScreenOn() && !IsBrightnessBoosted();
@@ -251,20 +268,21 @@ bool ScreenController::CanBoostBrightness()
 
 bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness, value=%{public}u, duration=%{public}u",
-                   value, gradualDuration);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness, value=%{public}u, discount=%{public}lf,"\
+                   " duration=%{public}u", value, discount_, gradualDuration);
+    auto brightness = DisplayPowerMgrService::GetSafeBrightness(static_cast<uint32_t>(value * discount_));
 
     if (animator_->IsAnimating()) {
         animator_->StopAnimation();
     }
     if (gradualDuration > 0) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update brightness gradually");
-        animator_->StartAnimation(action_->GetBrightness(), value, gradualDuration);
+        animator_->StartAnimation(GetDeviceBrightness(), brightness, gradualDuration);
         return true;
     }
-    bool isSucc = action_->SetBrightness(value);
+    bool isSucc = action_->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Updated brightness is %{public}s, brightness: %{public}u",
-                   isSucc ? "succ" : "failed", value);
+                   isSucc ? "succ" : "failed", brightness);
     return isSucc;
 }
 
@@ -275,15 +293,15 @@ uint32_t ScreenController::GetSettingBrightness(const std::string& key) const
     ErrCode ret = helper.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "get setting brightness failed, return cachedBrightness_=%{public}u,"\
-                       " key=%{public}s, ret=%{public}d", cachedBrightness_, key.c_str(), ret);
-        return cachedBrightness_;
+                       " key=%{public}s, ret=%{public}d", cachedSettingBrightness_, key.c_str(), ret);
+        return cachedSettingBrightness_;
     }
     return static_cast<uint32_t>(value);
 }
 
 void ScreenController::SetSettingBrightness()
 {
-    uint32_t brightness = action_->GetBrightness();
+    uint32_t brightness = GetBrightness();
     uint32_t settingBrightness = GetSettingBrightness();
     if (brightness == static_cast<uint32_t>(settingBrightness)) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "no need to set setting brightness");
@@ -329,7 +347,7 @@ void ScreenController::RegisterSettingBrightnessObserver()
 
 void ScreenController::BrightnessSettingUpdateFunc(const string& key)
 {
-    uint32_t brightness = action_->GetBrightness();
+    uint32_t brightness = GetBrightness();
     uint32_t settingBrightness = GetSettingBrightness(key);
     if (brightness == static_cast<uint32_t>(settingBrightness)) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "no need to set setting brightness");
@@ -352,6 +370,16 @@ void ScreenController::UnregisterSettingBrightnessObserver()
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "unregister setting brightness observer failed, ret=%{public}d", ret);
     }
     g_brightnessObserver = nullptr;
+}
+
+double ScreenController::GetDiscount() const
+{
+    return discount_;
+}
+
+uint32_t ScreenController::GetDeviceBrightness()
+{
+    return action_->GetBrightness();
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

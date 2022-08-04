@@ -17,6 +17,7 @@
 #define DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 
 #include <cstdint>
+#include <cmath>
 #include <string>
 #include <vector>
 #include <map>
@@ -45,6 +46,7 @@ public:
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;
     virtual bool SetBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool DiscountBrightness(double discount, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool RestoreBrightness(uint32_t displayId) override;
     virtual uint32_t GetBrightness(uint32_t displayId) override;
@@ -62,6 +64,8 @@ public:
     void Init();
     [[maybe_unused]] void RegisterSettings();
     [[maybe_unused]] void UnregisterSettings();
+    static uint32_t GetSafeBrightness(uint32_t value);
+    static double GetSafeDiscount(double discount);
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -83,6 +87,8 @@ private:
     static const uint32_t BRIGHTNESS_MIN;
     static const uint32_t BRIGHTNESS_DEFAULT;
     static const uint32_t BRIGHTNESS_MAX;
+    static constexpr const double DISCOUNT_MIN = 0.01;
+    static constexpr const double DISCOUNT_MAX = 1.00;
     static void AmbientLightCallback(SensorEvent *event);
 
     friend DelayedSpSingleton<DisplayPowerMgrService>;
@@ -90,7 +96,6 @@ private:
     DisplayPowerMgrService();
     void InitSensors();
     bool IsChangedLux(float scalar);
-    static uint32_t GetSafeBrightness(uint32_t value);
     bool CalculateBrightness(float scalar, int32_t& brightness);
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();

@@ -46,12 +46,12 @@ public:
 
     DisplayState GetState();
     bool UpdateState(DisplayState state, uint32_t reason);
-    bool UpdateStateConfig(DisplayState state, uint32_t value);
     bool IsScreenOn();
 
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
     uint32_t GetBrightness();
 
+    bool DiscountBrightness(double discount, uint32_t gradualDuration = 0);
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = 0);
     bool RestoreBrightness(uint32_t gradualDuration = 0);
     bool IsBrightnessOverridden() const;
@@ -63,14 +63,17 @@ public:
     uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;
     void RegisterSettingBrightnessObserver();
     void UnregisterSettingBrightnessObserver();
+    double GetDiscount() const;
 
 private:
     void OnStateChanged(DisplayState state);
 
     bool CanSetBrightness();
+    bool CanDiscountBrightness();
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    uint32_t GetDeviceBrightness();
     void SetSettingBrightness();
     uint32_t GetScreenOnBrightness() const;
     void BrightnessSettingUpdateFunc(const std::string& key);
@@ -79,10 +82,11 @@ private:
     DisplayState state_;
     std::mutex mutexState_;
     uint32_t stateChangeReason_ {0};
+    double discount_ {1.0};
 
     std::atomic<bool> isBrightnessOverridden_ {false};
     std::atomic<bool> isBrightnessBoosted_ {false};
-    uint32_t cachedBrightness_ {102};
+    uint32_t cachedSettingBrightness_ {102};
     uint32_t overriddenBrightness_ {102};
     std::shared_ptr<ScreenAction> action_ {nullptr};
     std::shared_ptr<GradualAnimator> animator_;

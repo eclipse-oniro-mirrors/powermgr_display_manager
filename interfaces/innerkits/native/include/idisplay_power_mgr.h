@@ -32,6 +32,7 @@ public:
         GET_DISPLAY_IDS,
         GET_MAIN_DISPLAY_ID,
         SET_BRIGHTNESS,
+        DISCOUNT_BRIGHTNESS,
         OVERRIDE_BRIGHTNESS,
         RESTORE_BRIGHTNESS,
         GET_BRIGHTNESS,
@@ -51,6 +52,7 @@ public:
     virtual std::vector<uint32_t> GetDisplayIds() = 0;
     virtual uint32_t GetMainDisplayId() = 0;
     virtual bool SetBrightness(uint32_t value, uint32_t displayId) = 0;
+    virtual bool DiscountBrightness(double discount, uint32_t displayId) = 0;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) = 0;
     virtual bool RestoreBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetBrightness(uint32_t displayId) = 0;

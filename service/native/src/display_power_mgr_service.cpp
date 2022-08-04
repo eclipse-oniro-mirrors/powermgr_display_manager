@@ -59,6 +59,7 @@ void DisplayPowerMgrService::Init()
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id, handler_));
     }
+
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
 
@@ -134,6 +135,18 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
         return false;
     }
     return iter->second->SetBrightness(brightness);
+}
+
+bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId)
+{
+    auto safeDiscount = GetSafeDiscount(discount);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
+                   displayId, safeDiscount);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return false;
+    }
+    return iter->second->DiscountBrightness(safeDiscount);
 }
 
 bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
@@ -316,6 +329,8 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append(std::to_string(iter.first));
         result.append(" State=");
         result.append(std::to_string(static_cast<uint32_t>(control->GetState())));
+        result.append(" Discount=");
+        result.append(std::to_string(control->GetDiscount()));
         bool isOverride = control->IsBrightnessOverridden();
         bool isBoots = control->IsBrightnessBoosted();
         result.append(" Brightness=");
@@ -465,14 +480,28 @@ uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
 {
     auto brightnessValue = value;
     if (brightnessValue > BRIGHTNESS_MAX) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "brightness value is greater than max, value=%{public}u", value);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "brightness value is greater than max, value=%{public}u", value);
         brightnessValue = BRIGHTNESS_MAX;
     }
     if (brightnessValue < BRIGHTNESS_MIN) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "brightness value is less than min, value=%{public}u", value);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "brightness value is less than min, value=%{public}u", value);
         brightnessValue = BRIGHTNESS_MIN;
     }
     return brightnessValue;
+}
+
+double DisplayPowerMgrService::GetSafeDiscount(double discount)
+{
+    auto safeDiscount = round(discount * 100) / 100;
+    if (safeDiscount > DISCOUNT_MAX) {
+        DISPLAY_HILOGD(COMP_SVC, "discount value is greater than max, discount=%{public}lf", discount);
+        safeDiscount = DISCOUNT_MAX;
+    }
+    if (safeDiscount < DISCOUNT_MIN) {
+        DISPLAY_HILOGD(COMP_SVC, "discount value is less than min, discount=%{public}lf", discount);
+        safeDiscount = DISCOUNT_MIN;
+    }
+    return safeDiscount;
 }
 
 bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness)
