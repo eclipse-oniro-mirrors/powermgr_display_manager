@@ -35,6 +35,7 @@ private:
     int32_t GetDisplayIdsStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetMainDisplayIdStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t DiscountBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t OverrideBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t RestoreBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetBrightnessStub(MessageParcel& data, MessageParcel& reply);
