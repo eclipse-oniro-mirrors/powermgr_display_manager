@@ -47,6 +47,8 @@ ohos_shared_library("displaymgr") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
 
   part_name = "${displaymgr_part_name}"
 }
