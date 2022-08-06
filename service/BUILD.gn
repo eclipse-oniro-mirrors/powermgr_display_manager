@@ -72,7 +72,7 @@ ohos_shared_library("displaymgrservice") {
     "multimedia_image_standard:image_native",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "sensor:sensor_interface_native",
     "window_manager:libdm",
   ]
@@ -100,7 +100,7 @@ ohos_shared_library("displaymgr_stub") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "${displaymgr_part_name}"

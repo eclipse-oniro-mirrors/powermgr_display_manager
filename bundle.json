@@ -40,7 +40,7 @@
         "napi",
         "power_manager",
         "safwk",
-        "samgr_standard",
+        "samgr",
         "sensor",
         "window_manager"
       ],
