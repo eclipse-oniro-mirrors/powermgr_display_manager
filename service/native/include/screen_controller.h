@@ -50,6 +50,7 @@ public:
 
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
     uint32_t GetBrightness();
+    uint32_t GetDeviceBrightness();
 
     bool DiscountBrightness(double discount, uint32_t gradualDuration = 0);
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = 0);
@@ -73,7 +74,6 @@ private:
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
-    uint32_t GetDeviceBrightness();
     void SetSettingBrightness();
     uint32_t GetScreenOnBrightness() const;
     void BrightnessSettingUpdateFunc(const std::string& key);

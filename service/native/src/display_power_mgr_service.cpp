@@ -139,13 +139,14 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 
 bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId)
 {
-    auto safeDiscount = GetSafeDiscount(discount);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
-                   displayId, safeDiscount);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
+    auto brightness = iter->second->GetBrightness();
+    auto safeDiscount = GetSafeDiscount(discount, brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
+                   displayId, safeDiscount);
     return iter->second->DiscountBrightness(safeDiscount);
 }
 
@@ -313,6 +314,16 @@ bool DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId)
     return iter->second->CancelBoostBrightness();
 }
 
+uint32_t DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId)
+{
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "GetDeviceBrightness displayId=%{public}u", displayId);
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        return BRIGHTNESS_OFF;
+    }
+    return iter->second->GetDeviceBrightness();
+}
+
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
 {
     if (callback_ != nullptr) {
@@ -419,7 +430,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     }
     AmbientLightData* data = (AmbientLightData*)event->data;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientLightCallback: %{public}f", data->intensity);
-    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetBrightness());
+    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetDeviceBrightness());
     if (pms->CalculateBrightness(data->intensity, brightness)) {
         pms->AdjustBrightness(mainDispId, brightness, AUTO_ADJUST_BRIGHTNESS_DURATION);
     }
@@ -490,9 +501,9 @@ uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
     return brightnessValue;
 }
 
-double DisplayPowerMgrService::GetSafeDiscount(double discount)
+double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightness)
 {
-    auto safeDiscount = round(discount * 100) / 100;
+    auto safeDiscount = discount;
     if (safeDiscount > DISCOUNT_MAX) {
         DISPLAY_HILOGD(COMP_SVC, "discount value is greater than max, discount=%{public}lf", discount);
         safeDiscount = DISCOUNT_MAX;
@@ -501,6 +512,12 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount)
         DISPLAY_HILOGD(COMP_SVC, "discount value is less than min, discount=%{public}lf", discount);
         safeDiscount = DISCOUNT_MIN;
     }
+    if (static_cast<uint32_t>(BRIGHTNESS_MIN / discount) > BRIGHTNESS_MAX) {
+        DISPLAY_HILOGD(COMP_SVC, "brightness than max, brightness=%{public}u, discount=%{public}lf",
+                       static_cast<uint32_t>(BRIGHTNESS_MIN / discount), discount);
+        safeDiscount = static_cast<double>(BRIGHTNESS_MIN / static_cast<double>(brightness));
+    }
+
     return safeDiscount;
 }
 

@@ -54,6 +54,7 @@ public:
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) override;
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
+    virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
 
 private:
     static inline BrokerDelegator<DisplayPowerMgrProxy> delegator_;

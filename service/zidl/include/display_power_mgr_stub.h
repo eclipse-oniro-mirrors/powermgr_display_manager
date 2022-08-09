@@ -48,6 +48,7 @@ private:
     int32_t RegisterCallbackStub(MessageParcel& data, MessageParcel& reply);
     int32_t BoostBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t CancelBoostBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t GetDeviceBrightnessStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

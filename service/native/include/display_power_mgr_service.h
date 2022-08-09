@@ -17,7 +17,6 @@
 #define DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 
 #include <cstdint>
-#include <cmath>
 #include <string>
 #include <vector>
 #include <map>
@@ -59,13 +58,14 @@ public:
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) override;
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
+    virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
     void Init();
     [[maybe_unused]] void RegisterSettings();
     [[maybe_unused]] void UnregisterSettings();
     static uint32_t GetSafeBrightness(uint32_t value);
-    static double GetSafeDiscount(double discount);
+    static double GetSafeDiscount(double discount, uint32_t brightness);
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {

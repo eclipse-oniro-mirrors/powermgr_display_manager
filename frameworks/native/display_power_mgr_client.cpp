@@ -238,5 +238,14 @@ bool DisplayPowerMgrClient::CancelBoostBrightness(uint32_t displayId)
     RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->CancelBoostBrightness(displayId);
 }
+
+uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
+{
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return false;
+    }
+    return proxy->GetDeviceBrightness(displayId);
+}
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

@@ -613,5 +613,38 @@ bool DisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId)
 
     return result;
 }
+
+uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
+{
+    sptr<IRemoteObject> remote = Remote();
+    uint32_t result = 0;
+
+    RETURN_IF_WITH_RET(remote == nullptr, result);
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+
+    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DEVICE_BRIGHTNESS),
+                                  data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        return result;
+    }
+
+    if (!reply.ReadUint32(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
