@@ -44,7 +44,8 @@ public:
         IS_AUTO_ADJUST_BRIGHTNESS,
         REGISTER_CALLBACK,
         BOOST_BRIGHTNESS,
-        CANCEL_BOOST_BRIGHTNESS
+        CANCEL_BOOST_BRIGHTNESS,
+        GET_DEVICE_BRIGHTNESS
     };
 
     virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) = 0;
@@ -65,6 +66,7 @@ public:
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) = 0;
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) = 0;
     virtual bool CancelBoostBrightness(uint32_t displayId) = 0;
+    virtual uint32_t GetDeviceBrightness(uint32_t displayId) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");
 };

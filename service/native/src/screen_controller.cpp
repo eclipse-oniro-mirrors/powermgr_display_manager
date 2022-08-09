@@ -143,6 +143,11 @@ uint32_t ScreenController::GetBrightness()
     return static_cast<uint32_t>(GetDeviceBrightness() / discount_);
 }
 
+uint32_t ScreenController::GetDeviceBrightness()
+{
+    return action_->GetBrightness();
+}
+
 bool ScreenController::DiscountBrightness(double discount, uint32_t gradualDuration)
 {
     if (!CanDiscountBrightness()) {
@@ -375,11 +380,6 @@ void ScreenController::UnregisterSettingBrightnessObserver()
 double ScreenController::GetDiscount() const
 {
     return discount_;
-}
-
-uint32_t ScreenController::GetDeviceBrightness()
-{
-    return action_->GetBrightness();
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

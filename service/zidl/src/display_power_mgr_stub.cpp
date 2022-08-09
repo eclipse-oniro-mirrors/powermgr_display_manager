@@ -98,6 +98,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS):
             ret = CancelBoostBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::GET_DEVICE_BRIGHTNESS):
+            ret = GetDeviceBrightnessStub(data, reply);
+            break;
         default:
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -346,6 +349,20 @@ int32_t DisplayPowerMgrStub::CancelBoostBrightnessStub(MessageParcel& data, Mess
     bool isScuu = CancelBoostBrightness(displayId);
     if (!reply.WriteBool(isScuu)) {
         DISPLAY_HILOGW(COMP_SVC, "Failed to write CancelBoostBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::GetDeviceBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t displayId = 0;
+
+    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+
+    uint32_t ret = GetDeviceBrightness(displayId);
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDeviceBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;
