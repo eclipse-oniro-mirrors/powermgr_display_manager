@@ -84,9 +84,7 @@ bool DisplayPowerMgrClient::SetDisplayState(DisplayState state,
     PowerMgr::StateChangeReason reason, uint32_t id)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->SetDisplayState(id, state, static_cast<uint32_t>(reason));
 }
 
@@ -111,117 +109,91 @@ std::vector<uint32_t> DisplayPowerMgrClient::GetDisplayIds()
 int32_t DisplayPowerMgrClient::GetMainDisplayId()
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return INVALID_DISPLAY_ID;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, INVALID_DISPLAY_ID);
     return static_cast<int32_t>(proxy->GetMainDisplayId());
 }
 
 bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->SetBrightness(value, displayId);
 }
 
 bool DisplayPowerMgrClient::DiscountBrightness(double discount, uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->DiscountBrightness(discount, displayId);
 }
 
 bool DisplayPowerMgrClient::OverrideBrightness(uint32_t value, uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->OverrideBrightness(value, displayId);
 }
 
 bool DisplayPowerMgrClient::RestoreBrightness(uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->RestoreBrightness(displayId);
 }
 
 uint32_t DisplayPowerMgrClient::GetBrightness(uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return BRIGHTNESS_OFF;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, BRIGHTNESS_OFF);
     return proxy->GetBrightness(displayId);
 }
 
 uint32_t DisplayPowerMgrClient::GetDefaultBrightness()
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return BRIGHTNESS_DEFAULT;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, BRIGHTNESS_DEFAULT);
     return proxy->GetDefaultBrightness();
 }
 
 uint32_t DisplayPowerMgrClient::GetMaxBrightness()
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return BRIGHTNESS_MAX;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, BRIGHTNESS_MAX);
     return proxy->GetMaxBrightness();
 }
 
 uint32_t DisplayPowerMgrClient::GetMinBrightness()
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return BRIGHTNESS_MIN;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, BRIGHTNESS_MIN);
     return proxy->GetMinBrightness();
 }
 
 bool DisplayPowerMgrClient::AdjustBrightness(uint32_t value, uint32_t duration, uint32_t id)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->AdjustBrightness(id, value, duration);
 }
 
 bool DisplayPowerMgrClient::AutoAdjustBrightness(bool enable)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->AutoAdjustBrightness(enable);
 }
 
 bool DisplayPowerMgrClient::IsAutoAdjustBrightness()
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->IsAutoAdjustBrightness();
 }
 
 bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->RegisterCallback(callback);
 }
 
@@ -242,9 +214,7 @@ bool DisplayPowerMgrClient::CancelBoostBrightness(uint32_t displayId)
 uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
 {
     auto proxy = GetProxy();
-    if (proxy == nullptr) {
-        return false;
-    }
+    RETURN_IF_WITH_RET(proxy == nullptr, 0);
     return proxy->GetDeviceBrightness(displayId);
 }
 }  // namespace DisplayPowerMgr
