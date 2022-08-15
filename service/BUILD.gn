@@ -90,12 +90,10 @@ ohos_shared_library("displaymgr_stub") {
 
   public_configs = [ ":displaymgr_public_config" ]
 
-  deps = [
-    "${displaymgr_innerkits}:displaymgr",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "${displaymgr_innerkits}:displaymgr" ]
 
   external_deps = [
+    "c_utils:utils",
     "hicollie_native:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
