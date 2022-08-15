@@ -50,7 +50,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
