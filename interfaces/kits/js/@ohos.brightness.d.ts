@@ -19,6 +19,7 @@ import { AsyncCallback } from './basic';
  * Provides interfaces to control the power of display.
  *
  * @syscap SystemCapability.PowerManager.DisplayPowerManager
+ * @systemapi
  * @since 7
  */
 declare namespace brightness {
