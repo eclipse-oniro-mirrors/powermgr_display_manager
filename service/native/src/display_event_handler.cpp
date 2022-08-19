@@ -28,10 +28,11 @@ DisplayEventHandler::DisplayEventHandler(const std::shared_ptr<AppExecFwk::Event
 void DisplayEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer& event)
 {
     uint32_t eventId = event->GetInnerEventId();
+    int64_t param = event->GetParam();
     auto callback = eventCallbackMap_.find(eventId);
     if (callback != eventCallbackMap_.end()) {
         DISPLAY_HILOGD(COMP_SVC, "Perform the display handler event callback, eventId: %{public}d", eventId);
-        callback->second();
+        callback->second(param);
         return;
     }
     DISPLAY_HILOGI(COMP_SVC, "Start to process, eventId: %{public}d", eventId);
