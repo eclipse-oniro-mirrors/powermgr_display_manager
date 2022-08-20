@@ -28,13 +28,22 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class Brightness {
 public:
-    explicit Brightness(napi_env env);
-    void GetValue(napi_value options);
-    void SetValue(napi_callback_info info);
-    void GetMode(napi_value options);
-    void SetMode(napi_value options);
-    void SetKeepScreenOn(napi_value options, std::shared_ptr<PowerMgr::RunningLock>& runningLock);
-    napi_value GetCallbackInfo(napi_callback_info info, napi_valuetype checkType);
+    explicit Brightness(napi_env env, std::shared_ptr<PowerMgr::RunningLock> runningLock = nullptr);
+    void GetValue();
+    void SetValue(napi_value& number);
+    void SystemSetValue();
+    void GetMode();
+    void SetMode();
+    void SetKeepScreenOn();
+    napi_value GetCallbackInfo(napi_callback_info& info, napi_valuetype checkType);
+    bool CreateCallbackRef(napi_value& options);
+    void CreateValueRef(napi_value& options, const std::string& valName, napi_valuetype checkType);
+
+    napi_async_work asyncWork = nullptr;
+
+    static const std::string BRIGHTNESS_VALUE;
+    static const std::string BRIGHTNESS_MODE;
+    static const std::string KEEP_SCREENON;
 private:
     class Result {
     public:
@@ -64,14 +73,20 @@ private:
         void ScreenOn(bool keep, std::shared_ptr<PowerMgr::RunningLock>& runningLock);
     };
 
-    void ExecuteCallback(napi_value options);
-    bool CheckValueType(napi_value value, napi_valuetype checkType);
-    napi_value GetOptions(napi_value options, const std::string& name, napi_valuetype checkType);
-    void CallFunction(napi_value options, const std::string& name, size_t argc, napi_value* response);
+    void ExecuteCallback();
+    bool CheckValueType(napi_value& value, napi_valuetype checkType);
+    napi_value GetOptions(napi_value& options, const std::string& name, napi_valuetype checkType);
+    void CallFunction(napi_ref& callbackRef, size_t argc, napi_value* response);
 
     napi_env env_;
     Result result_;
     BrightnessInfo brightnessInfo_;
+
+    napi_ref successRef_ = nullptr;
+    napi_ref failRef_ = nullptr;
+    napi_ref completeRef_ = nullptr;
+    napi_ref napiValRef_ = nullptr;
+    std::shared_ptr<PowerMgr::RunningLock> runningLock_ = nullptr;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
