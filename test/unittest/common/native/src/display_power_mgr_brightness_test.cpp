@@ -24,23 +24,23 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
-static const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
+namespace {
+const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
+const double NO_DISCOUNT = 1.00;
+}
 
 class DisplayPowerMgrBrightnessTest : public Test {
 public:
     void SetUp()
     {
         DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-        const double DISCOUNT = 1.00;
-        DisplayPowerMgrClient::GetInstance().DiscountBrightness(DISCOUNT);
+        DisplayPowerMgrClient::GetInstance().DiscountBrightness(NO_DISCOUNT);
     }
 
     void TearDown()
     {
         DisplayPowerMgrClient::GetInstance().RestoreBrightness();
-        sleep(1); // wait for gradual animation
         DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
-        sleep(1); // wait for gradual animation
     }
 };
 
@@ -55,9 +55,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetBrightness001, TestSiz
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBrightness001: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(100);
     EXPECT_TRUE(ret);
-    sleep(1); // wait for gradual animation
-    uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(value, 100);
+    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(deviceBrightness, 100);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBrightness001: fun is end");
 }
 
@@ -71,17 +70,9 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness001: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(223);
     EXPECT_TRUE(ret);
-    sleep(1); // wait for gradual animation
-
-    // Query setting brightness
-    PowerMgr::PowerSettingHelper& helper = PowerMgr::PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    int32_t value;
-    ErrCode code = helper.GetIntValue(SETTING_BRIGHTNESS_KEY, value);
-    if (code != ERR_OK) {
-        DISPLAY_HILOGW(LABEL_TEST, "get setting brightness failed, ret=%{public}d", code);
-        FAIL();
-    }
-    EXPECT_EQ(223, value);
+    sleep(1); // wait for setting update
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(brightness, 223);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness001: fun is end");
 }
 
@@ -99,10 +90,10 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness002, Tes
         DISPLAY_HILOGW(LABEL_TEST, "put setting brightness failed, ret=%{public}d", code);
         FAIL();
     }
-    sleep(1); // wait for gradual animation
+    sleep(1); // wait for setting update
 
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(value, 233);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: value is %{public}u", value);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: fun is end");
 }
 
@@ -324,7 +315,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, Te
 
 /**
  * @tc.name: DisplayPowerMgrDiscountBrightness004
- * @tc.desc: Test BoostBrightness after DisconutBrightness, then CancelBoostBrightness
+ * @tc.desc: Test BoostBrightness after DiscountBrightness, then CancelBoostBrightness
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, TestSize.Level0)

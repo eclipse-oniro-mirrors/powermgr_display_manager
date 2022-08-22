@@ -61,7 +61,8 @@ public:
     bool CancelBoostBrightness(uint32_t gradualDuration = 0);
     bool IsBrightnessBoosted() const;
 
-    uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;
+    uint32_t GetScreenOnBrightness() const;
+
     void RegisterSettingBrightnessObserver();
     void UnregisterSettingBrightnessObserver();
     double GetDiscount() const;
@@ -74,8 +75,8 @@ private:
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
-    void SetSettingBrightness();
-    uint32_t GetScreenOnBrightness() const;
+    void SetSettingBrightness(uint32_t value);
+    uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;
     void BrightnessSettingUpdateFunc(const std::string& key);
 
     static const constexpr char* SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
