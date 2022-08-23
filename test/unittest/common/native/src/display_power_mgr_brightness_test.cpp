@@ -101,6 +101,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness002, Tes
  * @tc.name: DisplayPowerMgrDiscountBrightnessNormal
  * @tc.desc: Test DiscountBrightness the normal test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessNormal, TestSize.Level0)
 {
@@ -120,6 +121,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessNormal,
  * @tc.name: DisplayPowerMgrDiscountBrightnessNormal
  * @tc.desc: Test DiscountBrightness when screen is off
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessScreenOff, TestSize.Level0)
 {
@@ -135,6 +137,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessScreenO
  * @tc.name: DisplayPowerMgrDiscountBrightnessBoundary001
  * @tc.desc: Test DiscountBrightness the boundary test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundary001, TestSize.Level0)
 {
@@ -155,6 +158,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
  * @tc.name: DisplayPowerMgrDiscountBrightnessBoundary002
  * @tc.desc: Test DiscountBrightness the boundary test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundary002, TestSize.Level0)
 {
@@ -174,6 +178,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
  * @tc.name: DisplayPowerMgrDiscountBrightnessAbnormal001
  * @tc.desc: Test DiscountBrightness the abnormal test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal001, TestSize.Level0)
 {
@@ -194,6 +199,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  * @tc.name: DisplayPowerMgrDiscountBrightnessAbnormal002
  * @tc.desc: Test DiscountBrightness the abnormal test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal002, TestSize.Level0)
 {
@@ -214,6 +220,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  * @tc.name: DisplayPowerMgrDiscountBrightnessAbnormal003
  * @tc.desc: Test DiscountBrightness the abnormal test
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal003, TestSize.Level0)
 {
@@ -234,6 +241,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  * @tc.name: DisplayPowerMgrDiscountBrightness001
  * @tc.desc: Test OverrideBrightness after DiscountBrightness, then RestoreBrightness
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, TestSize.Level0)
 {
@@ -262,6 +270,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, Te
  * @tc.name: DisplayPowerMgrDiscountBrightness002
  * @tc.desc: Test DiscountBrightness after OverrideBrightness, then RestoreBrightness
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, TestSize.Level0)
 {
@@ -289,6 +298,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
  * @tc.name: DisplayPowerMgrDiscountBrightness003
  * @tc.desc: Test DisconutBrightness after BoostBrightness and CancelBoostBrightness
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, TestSize.Level0)
 {
@@ -317,6 +327,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, Te
  * @tc.name: DisplayPowerMgrDiscountBrightness004
  * @tc.desc: Test BoostBrightness after DiscountBrightness, then CancelBoostBrightness
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, TestSize.Level0)
 {
@@ -344,6 +355,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, Te
  * @tc.name: DisplayPowerMgrDiscountBrightness005
  * @tc.desc: Test DisconutBrightness after SetBrightness, then GetBrightness
  * @tc.type: FUNC
+ * @tc.require: issueI5HWMN
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness005, TestSize.Level0)
 {
