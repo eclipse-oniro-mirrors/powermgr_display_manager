@@ -64,21 +64,28 @@ void DisplayPowerMgrService::Init()
     cbDeathRecipient_ = nullptr;
 
     InitSensors();
+    RegisterSettings();
 }
 
-[[maybe_unused]] void DisplayPowerMgrService::RegisterSettings()
+void DisplayPowerMgrService::Deinit()
 {
-    for (const auto& iter: controllerMap_) {
-        auto controller = iter.second;
-        controller->RegisterSettingBrightnessObserver();
-    }
+    UnregisterSettings();
 }
 
-[[maybe_unused]] void DisplayPowerMgrService::UnregisterSettings()
+void DisplayPowerMgrService::RegisterSettings()
+{
+    DisplayParamHelper::GetInstance().RegisterBootCompletedCallback([]() {
+        auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetControllerMap();
+        for (const auto& iter: controllerMap) {
+            iter.second->RegisterSettingBrightnessObserver();
+        }
+    });
+}
+
+void DisplayPowerMgrService::UnregisterSettings()
 {
     for (const auto& iter: controllerMap_) {
-        auto controller = iter.second;
-        controller->UnregisterSettingBrightnessObserver();
+        iter.second->UnregisterSettingBrightnessObserver();
     }
 }
 
@@ -557,6 +564,11 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness: %{public}d", brightness);
 
     return brightness;
+}
+
+std::map<uint64_t, std::shared_ptr<ScreenController>> DisplayPowerMgrService::GetControllerMap()
+{
+    return controllerMap_;
 }
 
 void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)

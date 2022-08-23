@@ -67,6 +67,7 @@ ohos_shared_library("displaymgrservice") {
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
+    "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
     "multimedia_image_standard:image_native",

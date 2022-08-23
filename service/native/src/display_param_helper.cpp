@@ -15,6 +15,7 @@
 
 #include "display_param_helper.h"
 
+#include <cstring>
 #include "syspara/parameter.h"
 #include "display_log.h"
 
@@ -39,6 +40,18 @@ uint32_t DisplayParamHelper::GetMinBrightness()
 {
     int32_t value = QueryIntValue(KEY_MIN_BRIGHTNESS, BRIGHTNESS_MIN);
     return static_cast<uint32_t>(value);
+}
+
+void DisplayParamHelper::RegisterBootCompletedCallback(BootCompletedCallback callback)
+{
+    int32_t ret = WatchParameter(KEY_BOOT_COMPLETED.c_str(), [](const char* key, const char* value, void* context) {
+        if (strcmp(value, "true") == 0) {
+            ((BootCompletedCallback) context)();
+        }
+    }, (void*) callback);
+    if (ret < 0) {
+        DISPLAY_HILOGW(COMP_SVC, "RegisterBootCompletedCallback failed, ret=%{public}d", ret);
+    }
 }
 
 int32_t DisplayParamHelper::QueryIntValue(const std::string& key, int32_t def)

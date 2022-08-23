@@ -62,8 +62,7 @@ public:
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
     void Init();
-    [[maybe_unused]] void RegisterSettings();
-    [[maybe_unused]] void UnregisterSettings();
+    void Deinit();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);
 
@@ -100,6 +99,9 @@ private:
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
+    void RegisterSettings();
+    void UnregisterSettings();
+    std::map<uint64_t, std::shared_ptr<ScreenController>> GetControllerMap();
 
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
