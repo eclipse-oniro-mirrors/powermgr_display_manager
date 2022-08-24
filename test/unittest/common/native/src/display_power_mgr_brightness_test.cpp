@@ -77,27 +77,6 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
 }
 
 /**
- * @tc.name: DisplayPowerMgrSettingBrightness002
- * @tc.desc: Test change setting brightness value then system brightness changed
- * @tc.type: FUNC
- */
-HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness002, TestSize.Level0)
-{
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: fun is start");
-    PowerMgr::PowerSettingHelper& helper = PowerMgr::PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    ErrCode code = helper.PutIntValue(SETTING_BRIGHTNESS_KEY, 233);
-    if (code != ERR_OK) {
-        DISPLAY_HILOGW(LABEL_TEST, "put setting brightness failed, ret=%{public}d", code);
-        FAIL();
-    }
-    sleep(1); // wait for setting update
-
-    uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: value is %{public}u", value);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness002: fun is end");
-}
-
-/**
  * @tc.name: DisplayPowerMgrDiscountBrightnessNormal
  * @tc.desc: Test DiscountBrightness the normal test
  * @tc.type: FUNC
