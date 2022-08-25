@@ -342,20 +342,19 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append(std::to_string(static_cast<uint32_t>(control->GetState())));
         result.append(" Discount=");
         result.append(std::to_string(control->GetDiscount()));
-        bool isOverride = control->IsBrightnessOverridden();
-        bool isBoots = control->IsBrightnessBoosted();
         result.append(" Brightness=");
-        if (isOverride) {
-            result.append(std::to_string(control->GetSettingBrightness()));
+        result.append(std::to_string(control->GetBrightness()));
+        if (control->IsBrightnessOverridden()) {
             result.append(" OverrideBrightness=");
-            result.append(std::to_string(control->GetBrightness()));
-        } else if (isBoots) {
-            result.append(std::to_string(control->GetSettingBrightness()));
-            result.append(" BoostBrightness=");
-            result.append(std::to_string(control->GetBrightness()));
-        } else {
-            result.append(std::to_string(control->GetBrightness()));
+            result.append(std::to_string(control->GetScreenOnBrightness()));
         }
+        if (control->IsBrightnessBoosted()) {
+            result.append(" BoostBrightness=");
+            result.append(std::to_string(control->GetScreenOnBrightness()));
+        }
+        result.append("\n");
+        result.append("DeviceBrightness=");
+        result.append(std::to_string(control->GetDeviceBrightness()));
         result.append("\n");
     }
 
@@ -512,9 +511,9 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightn
         DISPLAY_HILOGD(COMP_SVC, "discount value is less than min, discount=%{public}lf", discount);
         safeDiscount = DISCOUNT_MIN;
     }
-    if (static_cast<uint32_t>(BRIGHTNESS_MIN / discount) > BRIGHTNESS_MAX) {
+    if (static_cast<uint32_t>(BRIGHTNESS_MIN / safeDiscount) > BRIGHTNESS_MAX) {
         DISPLAY_HILOGD(COMP_SVC, "brightness than max, brightness=%{public}u, discount=%{public}lf",
-                       static_cast<uint32_t>(BRIGHTNESS_MIN / discount), discount);
+                       static_cast<uint32_t>(BRIGHTNESS_MIN / safeDiscount), discount);
         safeDiscount = static_cast<double>(BRIGHTNESS_MIN / static_cast<double>(brightness));
     }
 

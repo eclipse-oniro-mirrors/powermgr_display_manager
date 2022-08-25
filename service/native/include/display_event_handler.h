@@ -30,7 +30,7 @@ namespace DisplayPowerMgr {
 class DisplayPowerMgrService;
 class DisplayEventHandler : public AppExecFwk::EventHandler {
 public:
-    typedef std::function<void()> EventCallback;
+    typedef std::function<void(int64_t)> EventCallback;
     enum Event {
         EVENT_CANCEL_BOOST_BRIGHTNESS,
         EVENT_SET_SETTING_BRIGHTNESS,
