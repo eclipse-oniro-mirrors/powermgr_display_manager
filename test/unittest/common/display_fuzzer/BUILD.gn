@@ -37,7 +37,7 @@ ohos_fuzztest("DisplayFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "power_manager:powermgr_client",
   ]
 }
