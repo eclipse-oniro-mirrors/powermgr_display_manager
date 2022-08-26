@@ -18,6 +18,7 @@
 #include <hisysevent.h>
 #include <file_ex.h>
 #include <securec.h>
+#include <system_ability_definition.h>
 #include "errors.h"
 #include "new"
 #include "screen_action.h"
@@ -25,11 +26,14 @@
 #include "watchdog.h"
 #include "display_log.h"
 #include "display_param_helper.h"
+#include "power_setting_helper.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
+using namespace OHOS::PowerMgr;
 namespace {
 constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
+sptr<PowerSettingObserver> g_autoBrightnessObserver;
 }
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetInstance().GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetInstance().GetDefaultBrightness();
@@ -49,13 +53,13 @@ void DisplayPowerMgrService::Init()
 
     if (!handler_) {
         handler_ = std::make_shared<DisplayEventHandler>(eventRunner_,
-            DelayedSpSingleton<DisplayPowerMgrService>::GetInstance());
+                                                         DelayedSpSingleton<DisplayPowerMgrService>::GetInstance());
         std::string handlerName("DisplayPowerEventHandler");
         HiviewDFX::Watchdog::GetInstance().AddThread(handlerName, handler_);
     }
 
     std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
-    for (const auto& id : displayIds) {
+    for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id, handler_));
     }
@@ -64,29 +68,79 @@ void DisplayPowerMgrService::Init()
     cbDeathRecipient_ = nullptr;
 
     InitSensors();
-    RegisterSettings();
+    RegisterSettingObservers();
 }
 
 void DisplayPowerMgrService::Deinit()
 {
-    UnregisterSettings();
+    UnregisterSettingObservers();
 }
 
-void DisplayPowerMgrService::RegisterSettings()
+void DisplayPowerMgrService::RegisterSettingObservers()
 {
     DisplayParamHelper::GetInstance().RegisterBootCompletedCallback([]() {
-        auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetControllerMap();
-        for (const auto& iter: controllerMap) {
-            iter.second->RegisterSettingBrightnessObserver();
+        uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
+        auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->controllerMap_;
+        auto iter = controllerMap.find(mainDisplayId);
+        if (iter != controllerMap.end()) {
+            iter->second->RegisterSettingBrightnessObserver();
         }
+        RegisterSettingAutoBrightnessObserver();
     });
 }
 
-void DisplayPowerMgrService::UnregisterSettings()
+void DisplayPowerMgrService::UnregisterSettingObservers()
 {
-    for (const auto& iter: controllerMap_) {
-        iter.second->UnregisterSettingBrightnessObserver();
+    uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
+    auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->controllerMap_;
+    auto iter = controllerMap.find(mainDisplayId);
+    if (iter != controllerMap.end()) {
+        iter->second->UnregisterSettingBrightnessObserver();
     }
+    UnregisterSettingAutoBrightnessObserver();
+}
+
+void DisplayPowerMgrService::RegisterSettingAutoBrightnessObserver()
+{
+    if (g_autoBrightnessObserver) {
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "setting auto brightness observer is already registered");
+        return;
+    }
+    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    PowerSettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { AutoBrightnessSettingUpdateFunc(key); };
+    g_autoBrightnessObserver = helper.CreateObserver(SETTING_AUTO_ADJUST_BRIGHTNESS_KEY, updateFunc);
+    ErrCode ret = helper.RegisterObserver(g_autoBrightnessObserver);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "register setting brightness observer failed, ret=%{public}d", ret);
+        g_autoBrightnessObserver = nullptr;
+    }
+}
+
+void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& key)
+{
+    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    int32_t value;
+    ErrCode ret = helper.GetIntValue(key, value);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "get setting auto brightness failed key=%{public}s, ret=%{public}d",
+                       key.c_str(), ret);
+    }
+    const int32_t ENABLE = 1;
+    DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(value == ENABLE);
+}
+
+void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
+{
+    if (g_autoBrightnessObserver == nullptr) {
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "g_autoBrightnessObserver is nullptr, no need to unregister");
+        return;
+    }
+    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    ErrCode ret = helper.UnregisterObserver(g_autoBrightnessObserver);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "unregister setting auto brightness observer failed, ret=%{public}d", ret);
+    }
+    g_autoBrightnessObserver = nullptr;
 }
 
 bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
@@ -206,7 +260,7 @@ uint32_t DisplayPowerMgrService::GetMinBrightness()
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState %{public}d, %{public}d, %{public}d",
-        id, value, duration);
+                   id, value, duration);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
         return false;
@@ -259,7 +313,7 @@ void DisplayPowerMgrService::ActivateAmbientSensor()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
         return;
     }
-    (void)strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
+    (void) strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
     sensorUser_.userData = nullptr;
     sensorUser_.callback = &AmbientLightCallback;
     SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
@@ -417,7 +471,7 @@ void DisplayPowerMgrService::InitSensors()
     }
 }
 
-void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
+void DisplayPowerMgrService::AmbientLightCallback(SensorEvent* event)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientSensorCallback");
     if (event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT) {
@@ -434,7 +488,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     if (mainDisp == pms->controllerMap_.end()) {
         return;
     }
-    AmbientLightData* data = (AmbientLightData*)event->data;
+    AmbientLightData* data = (AmbientLightData*) event->data;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AmbientLightCallback: %{public}f", data->intensity);
     int32_t brightness = static_cast<int32_t>(mainDisp->second->GetDeviceBrightness());
     if (pms->CalculateBrightness(data->intensity, brightness)) {
@@ -442,13 +496,13 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent *event)
     }
     // Notify ambient brightness change event to battery statistics
     HiviewDFX::HiSysEvent::Write("DISPLAY", "AMBIENT_LIGHT",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", brightness);
+                                 HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", brightness);
 }
 
 bool DisplayPowerMgrService::IsChangedLux(float scalar)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: (%{public}d), %{public}f vs %{public}f",
-        luxChanged_, lastLux_, scalar);
+                   luxChanged_, lastLux_, scalar);
 
     if (lastLuxTime_ <= 0) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "IsChangedLux: receive lux at first time");
@@ -536,7 +590,7 @@ bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightne
     }
     int32_t change = GetBrightnessFromLightScalar(scalar);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "lux: %{public}f -> %{public}f, screen: %{public}d -> %{public}d",
-        lastLux, scalar, brightness, change);
+                   lastLux, scalar, brightness, change);
     if (abs(change - brightness) < BRIGHTNESS_CHANGE_MIN
         || (scalar > lastLux && change < brightness)
         || (scalar < lastLux && change > brightness)) {
@@ -560,15 +614,11 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "nit: %{public}d", nit);
 
     int32_t brightness = static_cast<int32_t>(BRIGHTNESS_MIN
-        + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) / (NIT_MAX - NIT_MIN)));
+                                              + ((BRIGHTNESS_MAX - BRIGHTNESS_MIN) * (nit - NIT_MIN) /
+                                                 (NIT_MAX - NIT_MIN)));
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness: %{public}d", brightness);
 
     return brightness;
-}
-
-std::map<uint64_t, std::shared_ptr<ScreenController>> DisplayPowerMgrService::GetControllerMap()
-{
-    return controllerMap_;
 }
 
 void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
