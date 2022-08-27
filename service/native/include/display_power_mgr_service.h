@@ -100,6 +100,7 @@ private:
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
+    static void SetBootCompletedBrightness();
     static void RegisterSettingObservers();
     static void UnregisterSettingObservers();
     static void RegisterSettingAutoBrightnessObserver();

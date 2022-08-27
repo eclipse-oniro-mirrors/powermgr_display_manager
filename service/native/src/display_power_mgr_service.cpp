@@ -68,7 +68,10 @@ void DisplayPowerMgrService::Init()
     cbDeathRecipient_ = nullptr;
 
     InitSensors();
-    RegisterSettingObservers();
+    DisplayParamHelper::GetInstance().RegisterBootCompletedCallback([]() {
+        SetBootCompletedBrightness();
+        RegisterSettingObservers();
+    });
 }
 
 void DisplayPowerMgrService::Deinit()
@@ -76,17 +79,22 @@ void DisplayPowerMgrService::Deinit()
     UnregisterSettingObservers();
 }
 
+void DisplayPowerMgrService::SetBootCompletedBrightness()
+{
+    uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
+    uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
+    DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->SetBrightness(brightness, mainDisplayId);
+}
+
 void DisplayPowerMgrService::RegisterSettingObservers()
 {
-    DisplayParamHelper::GetInstance().RegisterBootCompletedCallback([]() {
-        uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
-        auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->controllerMap_;
-        auto iter = controllerMap.find(mainDisplayId);
-        if (iter != controllerMap.end()) {
-            iter->second->RegisterSettingBrightnessObserver();
-        }
-        RegisterSettingAutoBrightnessObserver();
-    });
+    uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
+    auto controllerMap = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->controllerMap_;
+    auto iter = controllerMap.find(mainDisplayId);
+    if (iter != controllerMap.end()) {
+        iter->second->RegisterSettingBrightnessObserver();
+    }
+    RegisterSettingAutoBrightnessObserver();
 }
 
 void DisplayPowerMgrService::UnregisterSettingObservers()
