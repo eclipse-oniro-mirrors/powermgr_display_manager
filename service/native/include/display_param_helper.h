@@ -29,8 +29,11 @@ public:
     uint32_t GetDefaultBrightness();
     uint32_t GetMaxBrightness();
     uint32_t GetMinBrightness();
+    typedef void (*BootCompletedCallback)();
+    void RegisterBootCompletedCallback(BootCompletedCallback);
 
 private:
+    const std::string KEY_BOOT_COMPLETED = "bootevent.boot.completed";
     const std::string KEY_DEFAULT_BRIGHTNESS = "const.display.brightness.default";
     const std::string KEY_MAX_BRIGHTNESS = "const.display.brightness.max";
     const std::string KEY_MIN_BRIGHTNESS = "const.display.brightness.min";
@@ -39,7 +42,7 @@ private:
     static constexpr uint32_t BRIGHTNESS_MAX = 255;
     static constexpr int32_t VALUE_MAX_LEN = 32;
 
-    int32_t QueryIntValue(const std::string& key, int32_t def);
+    static int32_t QueryIntValue(const std::string& key, int32_t def);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

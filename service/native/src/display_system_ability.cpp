@@ -38,6 +38,8 @@ void DisplaySystemAbility::OnStart()
 void DisplaySystemAbility::OnStop()
 {
     DISPLAY_HILOGW(COMP_SVC, "Stop service");
+    auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    service->Deinit();
 }
 } // OHOS
 } // DisplayPowerMgr

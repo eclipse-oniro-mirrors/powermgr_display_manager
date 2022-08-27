@@ -62,8 +62,7 @@ public:
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
     void Init();
-    [[maybe_unused]] void RegisterSettings();
-    [[maybe_unused]] void UnregisterSettings();
+    void Deinit();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);
 
@@ -74,6 +73,7 @@ private:
         virtual ~CallbackDeathRecipient() = default;
         virtual void OnRemoteDied(const wptr<IRemoteObject>& remote);
     };
+
     static const uint32_t AUTO_ADJUST_BRIGHTNESS_DURATION = 1000;
     static const uint32_t SAMPLING_RATE = 100000000;
     static const int32_t BRIGHTNESS_CHANGE_MIN = 5;
@@ -89,7 +89,7 @@ private:
     static const uint32_t BRIGHTNESS_MAX;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
-    static void AmbientLightCallback(SensorEvent *event);
+    static void AmbientLightCallback(SensorEvent* event);
 
     friend DelayedSpSingleton<DisplayPowerMgrService>;
 
@@ -100,7 +100,14 @@ private:
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
+    static void SetBootCompletedBrightness();
+    static void RegisterSettingObservers();
+    static void UnregisterSettingObservers();
+    static void RegisterSettingAutoBrightnessObserver();
+    static void UnregisterSettingAutoBrightnessObserver();
+    static void AutoBrightnessSettingUpdateFunc(const std::string& key);
 
+    static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
@@ -108,8 +115,8 @@ private:
     SensorUser sensorUser_ {};
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ { nullptr };
-    std::shared_ptr<DisplayEventHandler> handler_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ {nullptr};
+    std::shared_ptr<DisplayEventHandler> handler_ {nullptr};
 
     time_t lastLuxTime_ {0};
     float lastLux_ {0};
