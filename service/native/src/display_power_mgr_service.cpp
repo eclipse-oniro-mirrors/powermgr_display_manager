@@ -26,14 +26,14 @@
 #include "watchdog.h"
 #include "display_log.h"
 #include "display_param_helper.h"
-#include "power_setting_helper.h"
+#include "setting_provider.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 using namespace OHOS::PowerMgr;
 namespace {
 constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
-sptr<PowerSettingObserver> g_autoBrightnessObserver;
+sptr<SettingObserver> g_autoBrightnessObserver;
 }
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetInstance().GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetInstance().GetDefaultBrightness();
@@ -114,10 +114,10 @@ void DisplayPowerMgrService::RegisterSettingAutoBrightnessObserver()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "setting auto brightness observer is already registered");
         return;
     }
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    PowerSettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { AutoBrightnessSettingUpdateFunc(key); };
-    g_autoBrightnessObserver = helper.CreateObserver(SETTING_AUTO_ADJUST_BRIGHTNESS_KEY, updateFunc);
-    ErrCode ret = helper.RegisterObserver(g_autoBrightnessObserver);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { AutoBrightnessSettingUpdateFunc(key); };
+    g_autoBrightnessObserver = provider.CreateObserver(SETTING_AUTO_ADJUST_BRIGHTNESS_KEY, updateFunc);
+    ErrCode ret = provider.RegisterObserver(g_autoBrightnessObserver);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "register setting brightness observer failed, ret=%{public}d", ret);
         g_autoBrightnessObserver = nullptr;
@@ -126,9 +126,9 @@ void DisplayPowerMgrService::RegisterSettingAutoBrightnessObserver()
 
 void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& key)
 {
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
     int32_t value;
-    ErrCode ret = helper.GetIntValue(key, value);
+    ErrCode ret = provider.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "get setting auto brightness failed key=%{public}s, ret=%{public}d",
                        key.c_str(), ret);
@@ -143,8 +143,8 @@ void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "g_autoBrightnessObserver is nullptr, no need to unregister");
         return;
     }
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    ErrCode ret = helper.UnregisterObserver(g_autoBrightnessObserver);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    ErrCode ret = provider.UnregisterObserver(g_autoBrightnessObserver);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "unregister setting auto brightness observer failed, ret=%{public}d", ret);
     }

@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "display_power_mgr_client.h"
-#include "power_setting_helper.h"
+#include "setting_provider.h"
 #include "system_ability_definition.h"
 #include "display_log.h"
 

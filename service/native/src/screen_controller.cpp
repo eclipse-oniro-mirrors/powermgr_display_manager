@@ -19,7 +19,7 @@
 #include "refbase.h"
 #include "display_power_mgr_service.h"
 #include "display_param_helper.h"
-#include "power_setting_helper.h"
+#include "setting_provider.h"
 #include "system_ability_definition.h"
 #include "display_common.h"
 #include "display_log.h"
@@ -30,7 +30,7 @@ using namespace OHOS::PowerMgr;
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
-sptr<PowerSettingObserver> g_brightnessObserver;
+sptr<SettingObserver> g_brightnessObserver;
 }
 
 ScreenController::ScreenController(uint32_t displayId, const shared_ptr<DisplayEventHandler>& handler)
@@ -292,9 +292,9 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
 
 uint32_t ScreenController::GetSettingBrightness(const std::string& key) const
 {
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
     int32_t value;
-    ErrCode ret = helper.GetIntValue(key, value);
+    ErrCode ret = provider.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "get setting brightness failed, return cachedBrightness_=%{public}u,"\
                        " key=%{public}s, ret=%{public}d", cachedSettingBrightness_, key.c_str(), ret);
@@ -311,8 +311,8 @@ void ScreenController::SetSettingBrightness(uint32_t value)
         return;
     }
     cachedSettingBrightness_ = settingBrightness;
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    ErrCode ret = helper.PutIntValue(SETTING_BRIGHTNESS_KEY, static_cast<int32_t>(value));
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    ErrCode ret = provider.PutIntValue(SETTING_BRIGHTNESS_KEY, static_cast<int32_t>(value));
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "set setting brightness failed, ret=%{public}d", ret);
     }
@@ -338,10 +338,10 @@ void ScreenController::RegisterSettingBrightnessObserver()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "setting brightness observer is already registered");
         return;
     }
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    PowerSettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { BrightnessSettingUpdateFunc(key); };
-    g_brightnessObserver = helper.CreateObserver(SETTING_BRIGHTNESS_KEY, updateFunc);
-    ErrCode ret = helper.RegisterObserver(g_brightnessObserver);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { BrightnessSettingUpdateFunc(key); };
+    g_brightnessObserver = provider.CreateObserver(SETTING_BRIGHTNESS_KEY, updateFunc);
+    ErrCode ret = provider.RegisterObserver(g_brightnessObserver);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "register setting brightness observer failed, ret=%{public}d", ret);
         g_brightnessObserver = nullptr;
@@ -363,8 +363,8 @@ void ScreenController::UnregisterSettingBrightnessObserver()
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "g_brightnessObserver is nullptr, no need to unregister");
         return;
     }
-    PowerSettingHelper& helper = PowerSettingHelper::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    ErrCode ret = helper.UnregisterObserver(g_brightnessObserver);
+    SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
+    ErrCode ret = provider.UnregisterObserver(g_brightnessObserver);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "unregister setting brightness observer failed, ret=%{public}d", ret);
     }
