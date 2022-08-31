@@ -34,7 +34,7 @@ bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state, uint
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -45,8 +45,7 @@ bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state, uint
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::SET_DISPLAY_STATE),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed, error code: %d",
-            __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -69,7 +68,7 @@ DisplayState DisplayPowerMgrProxy::GetDisplayState(uint32_t id)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return DisplayState::DISPLAY_UNKNOWN;
     }
 
@@ -78,7 +77,7 @@ DisplayState DisplayPowerMgrProxy::GetDisplayState(uint32_t id)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DISPLAY_STATE),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return DisplayState::DISPLAY_UNKNOWN;
     }
 
@@ -103,14 +102,14 @@ std::vector<uint32_t> DisplayPowerMgrProxy::GetDisplayIds()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DISPLAY_IDS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -143,14 +142,14 @@ uint32_t DisplayPowerMgrProxy::GetMainDisplayId()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MAIN_DISPLAY_ID),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -173,7 +172,7 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -183,8 +182,7 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::SET_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
-                       ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -207,7 +205,7 @@ bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayI
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -217,8 +215,7 @@ bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayI
     int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::DISCOUNT_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
-                       ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return false;
     }
 
@@ -241,7 +238,7 @@ bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -250,8 +247,7 @@ bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId
 
     int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_BRIGHTNESS), data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__,
-                       ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -275,7 +271,7 @@ bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -284,7 +280,7 @@ bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::RESTORE_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -308,7 +304,7 @@ uint32_t DisplayPowerMgrProxy::GetBrightness(uint32_t displayId)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -317,7 +313,7 @@ uint32_t DisplayPowerMgrProxy::GetBrightness(uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -341,14 +337,14 @@ uint32_t DisplayPowerMgrProxy::GetDefaultBrightness()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DEFAULT_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -372,14 +368,14 @@ uint32_t DisplayPowerMgrProxy::GetMaxBrightness()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MAX_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -403,14 +399,14 @@ uint32_t DisplayPowerMgrProxy::GetMinBrightness()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MIN_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -433,7 +429,7 @@ bool DisplayPowerMgrProxy::AdjustBrightness(uint32_t id, int32_t value, uint32_t
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -444,7 +440,7 @@ bool DisplayPowerMgrProxy::AdjustBrightness(uint32_t id, int32_t value, uint32_t
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -467,7 +463,7 @@ bool DisplayPowerMgrProxy::AutoAdjustBrightness(bool enable)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -476,7 +472,7 @@ bool DisplayPowerMgrProxy::AutoAdjustBrightness(bool enable)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -499,14 +495,14 @@ bool DisplayPowerMgrProxy::IsAutoAdjustBrightness()
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %{public}d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -529,7 +525,7 @@ bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -538,7 +534,7 @@ bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::REGISTER_CALLBACK),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed: %d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -571,7 +567,7 @@ bool DisplayPowerMgrProxy::BoostBrightness(int32_t timeoutMs, uint32_t displayId
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::BOOST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed: %{public}d", ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -602,7 +598,7 @@ bool DisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed: %{public}d", ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 
@@ -626,7 +622,7 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrClient::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
 
@@ -635,7 +631,7 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DEVICE_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK, "DisplayPowerMgrProxy::%{public}s SendRequest is failed,%d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
     }
 

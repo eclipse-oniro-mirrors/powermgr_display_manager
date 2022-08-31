@@ -33,8 +33,7 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DisplayPowerCallbackProxy::GetDescriptor())) {
-        DISPLAY_HILOGE(COMP_FWK,
-            "DisplayPowerCallbackProxy::%{public}s write descriptor failed!", __func__);
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return;
     }
 
@@ -44,8 +43,7 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
     int ret = remote->SendRequest(static_cast<int>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED),
         data, reply, option);
     if (ret != ERR_OK) {
-        DISPLAY_HILOGE(COMP_FWK,
-            "PowerMgrProxy::%{public}s SendRequest is failed, error code: %d", __func__, ret);
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return;
     }
 

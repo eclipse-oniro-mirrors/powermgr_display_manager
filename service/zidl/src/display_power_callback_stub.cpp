@@ -37,8 +37,7 @@ int32_t DisplayPowerCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     std::u16string descripter = DisplayPowerCallbackStub::GetDescriptor();
     std::u16string remoteDescripter = data.ReadInterfaceToken();
     if (descripter != remoteDescripter) {
-        DISPLAY_HILOGE(COMP_SVC,
-            "DisplayPowerCallbackStub::OnRemoteRequest failed, descriptor is not matched!");
+        DISPLAY_HILOGE(COMP_SVC, "descriptor is not matched!");
         return E_GET_POWER_SERVICE_FAILED;
     }
 
