@@ -33,11 +33,14 @@ namespace DisplayPowerMgr {
 using namespace OHOS::PowerMgr;
 namespace {
 constexpr const char* DISPLAY_SERVICE_NAME = "DisplayPowerManagerService";
+constexpr int32_t AUTO_BRIGHTNESS_DISABLE = 0;
+constexpr int32_t AUTO_BRIGHTNESS_ENABLE = 1;
 sptr<SettingObserver> g_autoBrightnessObserver;
+DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
 }
-const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetInstance().GetMinBrightness();
-const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetInstance().GetDefaultBrightness();
-const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetInstance().GetMaxBrightness();
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetDefaultBrightness();
+const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetMaxBrightness();
 DisplayPowerMgrService::DisplayPowerMgrService() = default;
 
 void DisplayPowerMgrService::Init()
@@ -68,11 +71,16 @@ void DisplayPowerMgrService::Init()
     cbDeathRecipient_ = nullptr;
 
     InitSensors();
-    DisplayParamHelper::GetInstance().RegisterBootCompletedCallback([]() {
+    RegisterBootCompletedCallback();
+}
+void DisplayPowerMgrService::RegisterBootCompletedCallback()
+{
+    g_bootCompletedCallback = []() {
         SetBootCompletedBrightness();
         SetBootCompletedAutoBrightness();
         RegisterSettingObservers();
-    });
+    };
+    DisplayParamHelper::RegisterBootCompletedCallback(g_bootCompletedCallback);
 }
 
 void DisplayPowerMgrService::Deinit()
@@ -89,7 +97,7 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
 
 void DisplayPowerMgrService::SetBootCompletedAutoBrightness()
 {
-    bool enable = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->IsAutoAdjustBrightness();
+    bool enable = GetSettingAutoBrightness();
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(enable);
 }
 
@@ -133,14 +141,19 @@ void DisplayPowerMgrService::RegisterSettingAutoBrightnessObserver()
 
 void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& key)
 {
-    bool enable = GetSettingAutoBrightness(key);
-    DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(enable);
+    bool isSettingEnable = GetSettingAutoBrightness(key);
+    bool isSystemEnable = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->IsAutoAdjustBrightness();
+    if (isSettingEnable == isSystemEnable) {
+        return;
+    }
+    DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(isSettingEnable);
 }
 
 void DisplayPowerMgrService::SetSettingAutoBrightness(bool enable)
 {
     SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    ErrCode ret = provider.PutBoolValue(SETTING_AUTO_ADJUST_BRIGHTNESS_KEY, enable);
+    int32_t value = enable ? AUTO_BRIGHTNESS_ENABLE : AUTO_BRIGHTNESS_DISABLE;
+    ErrCode ret = provider.PutIntValue(SETTING_AUTO_ADJUST_BRIGHTNESS_KEY, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "set setting auto brightness failed, ret=%{public}d", ret);
     }
@@ -149,13 +162,13 @@ void DisplayPowerMgrService::SetSettingAutoBrightness(bool enable)
 bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
 {
     SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    bool enable;
-    ErrCode ret = provider.GetBoolValue(key, enable);
+    int value;
+    ErrCode ret = provider.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(
             FEAT_BRIGHTNESS, "get setting auto brightness failed key=%{public}s, ret=%{public}d", key.c_str(), ret);
     }
-    return enable;
+    return (value == AUTO_BRIGHTNESS_ENABLE);
 }
 
 void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
@@ -304,6 +317,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
     if (!supportLightSensor_) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
+        SetSettingAutoBrightness(false);
         return false;
     }
     if (enable) {
@@ -331,7 +345,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 
 bool DisplayPowerMgrService::IsAutoAdjustBrightness()
 {
-    return GetSettingAutoBrightness();
+    return autoBrightness_;
 }
 
 void DisplayPowerMgrService::ActivateAmbientSensor()
