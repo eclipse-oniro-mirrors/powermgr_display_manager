@@ -101,11 +101,14 @@ private:
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
     static void SetBootCompletedBrightness();
+    static void SetBootCompletedAutoBrightness();
     static void RegisterSettingObservers();
     static void UnregisterSettingObservers();
     static void RegisterSettingAutoBrightnessObserver();
     static void UnregisterSettingAutoBrightnessObserver();
     static void AutoBrightnessSettingUpdateFunc(const std::string& key);
+    static void SetSettingAutoBrightness(bool enable);
+    static bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
