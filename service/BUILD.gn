@@ -52,6 +52,7 @@ ohos_shared_library("displaymgrservice") {
   deps = [
     ":displaymgr_stub",
     "${displaymgr_innerkits}:displaymgr",
+    "${powermgr_utils_path}/param:power_sysparam",
     "${powermgr_utils_path}/setting:power_setting",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
   ]
@@ -67,8 +68,6 @@ ohos_shared_library("displaymgrservice") {
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
-    "init:libbeget_proxy",
-    "init:libbegetutil",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "relational_store:native_rdb",

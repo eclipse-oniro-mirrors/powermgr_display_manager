@@ -199,7 +199,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
     }
     bool ret = true;
     if (!isBrightnessBoosted_) {
-        uint32_t maxBrightness = DisplayParamHelper::GetInstance().GetMaxBrightness();
+        uint32_t maxBrightness = DisplayParamHelper::GetMaxBrightness();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Boost brightness, maxBrightness: %{public}d", maxBrightness);
         isBrightnessBoosted_ = true;
         ret = UpdateBrightness(maxBrightness, gradualDuration);
@@ -322,7 +322,7 @@ uint32_t ScreenController::GetScreenOnBrightness() const
 {
     if (IsBrightnessBoosted()) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is boosted, return max brightness");
-        return DisplayParamHelper::GetInstance().GetMaxBrightness();
+        return DisplayParamHelper::GetMaxBrightness();
     } else if (IsBrightnessOverridden()) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is overridden, return overridden brightness=%{public}u",
                        overriddenBrightness_);

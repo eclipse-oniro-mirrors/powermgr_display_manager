@@ -16,33 +16,29 @@
 #ifndef POWERMGR_DISPLAY_MANAGER_DISPLAY_PARAM_HELPER_H
 #define POWERMGR_DISPLAY_MANAGER_DISPLAY_PARAM_HELPER_H
 
-#include <singleton.h>
 #include <cstdint>
+#include <functional>
 #include <iosfwd>
+#include <singleton.h>
 #include <string>
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-class DisplayParamHelper : public DelayedRefSingleton<DisplayParamHelper> {
-    DECLARE_DELAYED_REF_SINGLETON(DisplayParamHelper);
+class DisplayParamHelper {
 public:
-    uint32_t GetDefaultBrightness();
-    uint32_t GetMaxBrightness();
-    uint32_t GetMinBrightness();
-    typedef void (*BootCompletedCallback)();
-    void RegisterBootCompletedCallback(BootCompletedCallback);
+    static uint32_t GetDefaultBrightness();
+    static uint32_t GetMaxBrightness();
+    static uint32_t GetMinBrightness();
+    typedef void (* BootCompletedCallback)();
+    static void RegisterBootCompletedCallback(BootCompletedCallback&);
 
 private:
-    const std::string KEY_BOOT_COMPLETED = "bootevent.boot.completed";
-    const std::string KEY_DEFAULT_BRIGHTNESS = "const.display.brightness.default";
-    const std::string KEY_MAX_BRIGHTNESS = "const.display.brightness.max";
-    const std::string KEY_MIN_BRIGHTNESS = "const.display.brightness.min";
+    static constexpr const char* KEY_DEFAULT_BRIGHTNESS {"const.display.brightness.default"};
+    static constexpr const char* KEY_MAX_BRIGHTNESS {"const.display.brightness.max"};
+    static constexpr const char* KEY_MIN_BRIGHTNESS {"const.display.brightness.min"};
     static constexpr uint32_t BRIGHTNESS_MIN = 1;
     static constexpr uint32_t BRIGHTNESS_DEFAULT = 102;
     static constexpr uint32_t BRIGHTNESS_MAX = 255;
-    static constexpr int32_t VALUE_MAX_LEN = 32;
-
-    static int32_t QueryIntValue(const std::string& key, int32_t def);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
