@@ -162,7 +162,7 @@ void DisplayPowerMgrService::SetSettingAutoBrightness(bool enable)
 bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
 {
     SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    int value;
+    int32_t value;
     ErrCode ret = provider.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(
