@@ -165,6 +165,17 @@ static void CancelBoostBrightness(const uint8_t* data)
     g_displayMgrClient.CancelBoostBrightness(type[0]);
 }
 
+static void DiscountBrightness(const uint8_t* data)
+{
+    double type[1];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+
+    g_displayMgrClient.DiscountBrightness(type[0]);
+}
+
 namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
@@ -224,6 +235,9 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
                 break;
             case ApiNumber::NUM_FOURTEEN:
                 g_displayMgrClient.GetMinBrightness();
+                break;
+            case ApiNumber::NUM_FIFTEEN:
+                DiscountBrightness(data);
                 break;
             default:
                 break;
