@@ -66,7 +66,7 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
 void DisplayPowerMgrClient::OnRemoteDied(const wptr<IRemoteObject>& remote)
 {
     if (remote == nullptr) {
-        DISPLAY_HILOGE(COMP_FWK, "OnRemoteDied failed, remote is nullptr");
+        DISPLAY_HILOGE(COMP_FWK, "remote is nullptr");
         return;
     }
 
