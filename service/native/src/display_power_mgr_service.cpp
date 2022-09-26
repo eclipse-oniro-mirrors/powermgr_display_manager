@@ -26,6 +26,7 @@
 #include "watchdog.h"
 #include "display_log.h"
 #include "display_param_helper.h"
+#include "permission.h"
 #include "setting_provider.h"
 
 namespace OHOS {
@@ -231,6 +232,9 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
