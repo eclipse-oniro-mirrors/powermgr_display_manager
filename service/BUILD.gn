@@ -52,6 +52,7 @@ ohos_shared_library("displaymgrservice") {
 
   deps = [
     "${powermgr_utils_path}/param:power_sysparam",
+    "${powermgr_utils_path}/permission:power_permission",
     "${powermgr_utils_path}/setting:power_setting",
   ]
 
