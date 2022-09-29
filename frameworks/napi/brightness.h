@@ -52,13 +52,13 @@ private:
     class Result {
     public:
         void Error(int32_t code, const std::string& msg);
-        void GetError(napi_env env, napi_value* error, size_t& size);
-        napi_value GetResult(napi_env env);
+        void GetError(napi_env env, napi_value* error, size_t& size) const;
+        napi_value GetResult(napi_env env) const;
         inline void SetResult(const std::string& key, int32_t value)
         {
             mapResult_.emplace(key, value);
         }
-        inline bool IsError()
+        inline bool IsError() const
         {
             return !msg_.empty() && (code_ != ERR_OK);
         }
