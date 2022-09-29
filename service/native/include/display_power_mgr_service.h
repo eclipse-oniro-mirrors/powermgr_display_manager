@@ -74,13 +74,13 @@ private:
         virtual void OnRemoteDied(const wptr<IRemoteObject>& remote);
     };
 
-    static const uint32_t AUTO_ADJUST_BRIGHTNESS_DURATION = 1000;
+    static const uint32_t AUTO_ADJUST_BRIGHTNESS_STRIDE = 1;
     static const uint32_t SAMPLING_RATE = 100000000;
-    static const int32_t BRIGHTNESS_CHANGE_MIN = 5;
+    static const int32_t BRIGHTNESS_CHANGE_MIN = 2;
     static const int32_t LUX_TO_NIT_SQRT_RADIO = 5;
     static const time_t LUX_STABLE_TIME = 1;
     static constexpr float LUX_CHANGE_RATE_THRESHOLD = 10;
-    static constexpr float LUX_CHANGE_STABLE_MIN = 100.0;
+    static constexpr float LUX_CHANGE_STABLE_MIN = 10.0;
     static const int32_t NIT_MIN = 2;
     static const int32_t NIT_MAX = 450;
     static const uint32_t BRIGHTNESS_OFF = 0;
@@ -96,7 +96,7 @@ private:
     DisplayPowerMgrService();
     void InitSensors();
     bool IsChangedLux(float scalar);
-    bool CalculateBrightness(float scalar, int32_t& brightness);
+    bool CalculateBrightness(float scalar, int32_t& brightness, int32_t& change);
     int32_t GetBrightnessFromLightScalar(float scalar);
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();

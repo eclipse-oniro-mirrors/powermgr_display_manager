@@ -163,7 +163,7 @@ uint32_t ScreenAction::GetBrightness()
 
 bool ScreenAction::SetBrightness(uint32_t value)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, value);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, value);
     // Notify screen brightness change event to battery statistics
     HiviewDFX::HiSysEvent::Write("DISPLAY", "BRIGHTNESS_NIT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", value);
