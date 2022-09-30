@@ -190,7 +190,7 @@ void Brightness::Result::Error(int32_t code, const std::string& msg)
         code_, msg_.c_str());
 }
 
-void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size)
+void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size) const
 {
     if (!error) {
         DISPLAY_HILOGW(COMP_FWK, "error is null");
@@ -205,7 +205,7 @@ void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size)
     error[MAX_ARGC] = code;
 }
 
-napi_value Brightness::Result::GetResult(napi_env env)
+napi_value Brightness::Result::GetResult(napi_env env) const
 {
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_object(env, &result));

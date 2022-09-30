@@ -46,9 +46,9 @@ std::vector<uint32_t> ScreenAction::GetAllDisplayId()
         displayIds.push_back(DEFAULT_DISPLAY_ID);
         return displayIds;
     }
-    for (const auto& id: allIds) {
-        displayIds.push_back(static_cast<uint32_t>(id));
-    }
+    std::transform(allIds.begin(), allIds.end(), back_inserter(displayIds), [](uint64_t id) {
+        return static_cast<uint32_t>(id);
+    });
     return displayIds;
 }
 
