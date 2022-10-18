@@ -233,6 +233,7 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
     if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_PERMISSION_DENIED;
         return false;
     }
     auto brightness = GetSafeBrightness(value);
@@ -668,6 +669,13 @@ int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness: %{public}d", brightness);
 
     return brightness;
+}
+
+DisplayErrors DisplayPowerMgrService::GetError()
+{
+    DisplayErrors tmpError = lastError_;
+    lastError_ = DisplayErrors::ERR_OK;
+    return tmpError;
 }
 
 void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)

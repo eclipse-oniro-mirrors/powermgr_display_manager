@@ -190,6 +190,9 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
         DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
         return result;
     }
+    int32_t error;
+    READ_PARCEL_WITH_RET(reply, Int32, error, result);
+    lastError_ = static_cast<DisplayErrors>(error);
 
     return result;
 }
@@ -641,6 +644,11 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
     }
 
     return result;
+}
+
+DisplayErrors DisplayPowerMgrProxy::GetError()
+{
+    return lastError_;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

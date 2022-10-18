@@ -16,13 +16,15 @@
 #ifndef POWERMGR_BRIGHTNESS_H
 #define POWERMGR_BRIGHTNESS_H
 
-#include <map>
-#include <string>
-#include <cstdint>
-#include <iosfwd>
-#include <memory>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <iosfwd>
+#include <map>
+#include <memory>
+#include <string>
+
+#include "display_mgr_errors.h"
 #include "errors.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -34,7 +36,7 @@ class Brightness {
 public:
     explicit Brightness(napi_env env, std::shared_ptr<PowerMgr::RunningLock> runningLock = nullptr);
     void GetValue();
-    void SetValue(napi_value& number);
+    void SetValue(napi_callback_info& info);
     void SystemSetValue();
     void GetMode();
     void SetMode();
@@ -48,33 +50,39 @@ public:
     static constexpr const char* BRIGHTNESS_VALUE = "value";
     static constexpr const char* BRIGHTNESS_MODE = "mode";
     static constexpr const char* KEEP_SCREENON = "keepScreenOn";
+
 private:
     class Result {
     public:
-        void Error(int32_t code, const std::string& msg);
+        void Error(int32_t code, const std::string& msg = "");
         void GetError(napi_env env, napi_value* error, size_t& size) const;
-        napi_value GetResult(napi_env env) const;
+        napi_value GetError(napi_env& env);
+        napi_value ThrowError(napi_env& env, DisplayErrors code = DisplayErrors::ERR_OK);
+        napi_value GetResult(napi_env env);
         inline void SetResult(const std::string& key, int32_t value)
         {
             mapResult_.emplace(key, value);
         }
         inline bool IsError() const
         {
-            return !msg_.empty() && (code_ != ERR_OK);
+            return code_ != ERR_OK;
         }
+
     private:
-        int32_t code_ { ERR_OK };
+        int32_t code_ {ERR_OK};
         std::string msg_;
         std::map<std::string, int32_t> mapResult_;
+        static std::map<DisplayErrors, std::string> errorTable_;
     };
 
     class BrightnessInfo {
     public:
-        uint32_t GetBrightness();
+        uint32_t GetBrightness() const;
         bool SetBrightness(int32_t value);
-        int32_t GetAutoMode();
+        int32_t GetAutoMode() const;
         bool SetAutoMode(bool mode);
         void ScreenOn(bool keep, std::shared_ptr<PowerMgr::RunningLock>& runningLock);
+        DisplayErrors GetServiceError() const;
     };
 
     void ExecuteCallback();

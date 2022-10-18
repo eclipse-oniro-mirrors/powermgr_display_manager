@@ -19,6 +19,7 @@
 #include <iremote_broker.h>
 #include <vector>
 
+#include "display_mgr_errors.h"
 #include "display_power_info.h"
 #include "idisplay_power_callback.h"
 
@@ -67,6 +68,7 @@ public:
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) = 0;
     virtual bool CancelBoostBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) = 0;
+    virtual DisplayErrors GetError() = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");
 };
