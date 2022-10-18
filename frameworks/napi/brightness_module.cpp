@@ -104,7 +104,6 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
             }
         }
     );
-
     if (res != nullptr) {
         Brightness brightness(env);
         brightness.SetValue(info);
