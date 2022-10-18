@@ -35,13 +35,17 @@ public:
 
     class AnimateCallbackImpl : public AnimateCallback {
     public:
-        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action);
+        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
+            const std::shared_ptr<DisplayEventHandler>& handler);
         ~AnimateCallbackImpl() override = default;
         void OnStart() override;
         void OnChanged(uint32_t currentValue) override;
         void OnEnd() override;
+        void DiscountBrightness(double discount) override;
     private:
         const std::shared_ptr<ScreenAction>& action_;
+        const std::shared_ptr<DisplayEventHandler>& handler_;
+        double discount_ {1.0};
     };
 
     DisplayState GetState();
@@ -67,6 +71,7 @@ public:
     void UnregisterSettingBrightnessObserver();
     double GetDiscount() const;
 
+    uint32_t GetAnimationUpdateTime() const;
 private:
     void OnStateChanged(DisplayState state);
 
@@ -74,7 +79,7 @@ private:
     bool CanDiscountBrightness();
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
-    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0, bool updateSetting = false);
     void SetSettingBrightness(uint32_t value);
     uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;
     void BrightnessSettingUpdateFunc(const std::string& key);
@@ -90,6 +95,7 @@ private:
     uint32_t cachedSettingBrightness_ {102};
     uint32_t overriddenBrightness_ {102};
     std::shared_ptr<ScreenAction> action_ {nullptr};
+    std::shared_ptr<AnimateCallback> animateCallback_ {nullptr};
     std::shared_ptr<GradualAnimator> animator_;
     const std::shared_ptr<DisplayEventHandler>& handler_;
 };

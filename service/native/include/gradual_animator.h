@@ -32,6 +32,7 @@ public:
     virtual void OnStart() = 0;
     virtual void OnChanged(uint32_t currentValue) = 0;
     virtual void OnEnd() = 0;
+    virtual void DiscountBrightness(double discount) = 0;
 };
 
 class GradualAnimator : public std::enable_shared_from_this<GradualAnimator> {
@@ -41,9 +42,11 @@ public:
     void StartAnimation(uint32_t from, uint32_t to, uint32_t duration);
     void StopAnimation();
     bool IsAnimating() const;
+    uint32_t GetAnimationUpdateTime() const;
 private:
-    static const uint32_t DEFAULT_UPDATE_TIME = 200;
+    static const uint32_t DEFAULT_UPDATE_TIME = 30;
     static const uint32_t EVENT_STEP = 1;
+    static const int32_t STRIDE_ABSOLUTE_MIN = 1;
     class AnimatorHandler : public AppExecFwk::EventHandler {
     public:
         AnimatorHandler(const std::shared_ptr<AppExecFwk::EventRunner>& runner,

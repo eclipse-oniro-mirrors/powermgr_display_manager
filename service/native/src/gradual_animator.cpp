@@ -53,8 +53,11 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
     if (totalSteps_ < 1) {
         totalSteps_ = 1;
     }
-    stride_ = (static_cast<int32_t>(toBrightness_) - static_cast<int32_t>(fromBrightness_)) /
-              static_cast<int32_t>(totalSteps_);
+    int32_t changeBrightness = static_cast<int32_t>(toBrightness_) - static_cast<int32_t>(fromBrightness_);
+    stride_ = changeBrightness / static_cast<int32_t>(totalSteps_);
+    if (abs(stride_) < STRIDE_ABSOLUTE_MIN) {
+        stride_ = (changeBrightness / abs(changeBrightness)) * STRIDE_ABSOLUTE_MIN;
+    }
     currentStep_ = 0;
     if (handler_ == nullptr) {
         eventRunner_ = AppExecFwk::EventRunner::Create(name_);
@@ -87,6 +90,11 @@ bool GradualAnimator::IsAnimating() const
     return animating_;
 }
 
+uint32_t GradualAnimator::GetAnimationUpdateTime() const
+{
+    return updateTime_;
+}
+
 void GradualAnimator::NextStep()
 {
     if (!animating_) {
@@ -102,9 +110,19 @@ void GradualAnimator::NextStep()
         callback_->OnStart();
     }
     if (currentStep_ < totalSteps_) {
-        currentBrightness_ = currentBrightness_ + stride_;
-        callback_->OnChanged(currentBrightness_);
-        handler_->SendEvent(EVENT_STEP, 0, updateTime_);
+        uint32_t nextBrightness = currentBrightness_ + stride_;
+        bool isOutRange = stride_ > 0 ? (nextBrightness >= toBrightness_) : (nextBrightness <= toBrightness_);
+        if (isOutRange) {
+            currentBrightness_ = toBrightness_;
+            callback_->OnChanged(currentBrightness_);
+            callback_->OnEnd();
+            animating_ = false;
+            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "next step brightness is out range, brightness=%{public}u", nextBrightness);
+        } else {
+            currentBrightness_ = nextBrightness;
+            callback_->OnChanged(currentBrightness_);
+            handler_->SendEvent(EVENT_STEP, 0, updateTime_);
+        }
     } else {
         currentBrightness_ = toBrightness_;
         callback_->OnChanged(currentBrightness_);
