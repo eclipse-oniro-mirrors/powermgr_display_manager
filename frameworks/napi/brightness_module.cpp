@@ -43,11 +43,13 @@ std::shared_ptr<RunningLock> runningLock =
 static napi_value SyncWork(napi_env env, const std::string resName, const std::string valName,
     napi_callback_info& info, napi_async_complete_callback complete)
 {
+    napi_value undefined;
+    napi_get_undefined(env, &undefined);
     std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env);
-    RETURN_IF_WITH_RET(asyncBrightness == nullptr, nullptr);
+    RETURN_IF_WITH_RET(asyncBrightness == nullptr, undefined);
     napi_value options = asyncBrightness->GetCallbackInfo(info, napi_object);
-    RETURN_IF_WITH_RET(options == nullptr, nullptr);
-    RETURN_IF_WITH_RET(!asyncBrightness->CreateCallbackRef(options), nullptr);
+    RETURN_IF_WITH_RET(options == nullptr, undefined);
+    RETURN_IF_WITH_RET(!asyncBrightness->CreateCallbackRef(options), undefined);
     if (!valName.empty()) {
         asyncBrightness->CreateValueRef(options, valName, napi_number);
     }
@@ -88,7 +90,7 @@ static napi_value GetValue(napi_env env, napi_callback_info info)
 
 static napi_value SetValue(napi_env env, napi_callback_info info)
 {
-    SyncWork(
+    napi_value res = SyncWork(
         env,
         "SetValue",
         Brightness::BRIGHTNESS_VALUE,
@@ -103,11 +105,9 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
         }
     );
 
-    std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env);
-    napi_value number = asyncBrightness->GetCallbackInfo(info, napi_number);
-    if (number != nullptr) {
+    if (res != nullptr) {
         Brightness brightness(env);
-        brightness.SetValue(number);
+        brightness.SetValue(info);
     }
     return nullptr;
 }

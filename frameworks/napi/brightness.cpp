@@ -16,8 +16,10 @@
 #include "brightness.h"
 
 #include <utility>
+
 #include "napi/native_common.h"
 #include "power_state_machine_info.h"
+
 #include "display_common.h"
 #include "display_log.h"
 #include "display_power_mgr_client.h"
@@ -46,12 +48,15 @@ const std::string GET_VALUE_ERROR_MGR = "get system screen brightness fail";
 const std::string SET_MODE_ERROR_MGR = "value is not an available number";
 const std::string SET_MODE_NOT_SUPPORTED_ERROR_MGR = "Auto adjusting brightness is not supported";
 const std::string SET_KEEP_SCREENON_ERROR_MGR = "value is not an available boolean";
-}
+} // namespace
 
-Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock)
-    : env_(env), runningLock_(runningLock)
-{
-}
+std::map<DisplayErrors, std::string> Brightness::Result::errorTable_ = {
+    {DisplayErrors::ERR_CONNECTION_FAIL,   "Connecting to the service failed."},
+    {DisplayErrors::ERR_PERMISSION_DENIED, "Permission is denied"             },
+    {DisplayErrors::ERR_PARAM_INVALID,     "Invalid input parameter."         }
+};
+
+Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock) : env_(env), runningLock_(runningLock) {}
 
 void Brightness::GetValue()
 {
@@ -64,15 +69,27 @@ void Brightness::GetValue()
     ExecuteCallback();
 }
 
-void Brightness::SetValue(napi_value& number)
+void Brightness::SetValue(napi_callback_info& info)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
-    int32_t value = MIN_BRIGHTNESS;
-    if (napi_ok != napi_get_value_int32(env_, number, &value)) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
+    napi_value napiBrightness = GetCallbackInfo(info, napi_number);
+    if (napiBrightness == nullptr) {
+        result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
         return;
     }
-    brightnessInfo_.SetBrightness(value);
+
+    int32_t value = MIN_BRIGHTNESS;
+    if (napi_ok != napi_get_value_int32(env_, napiBrightness, &value)) {
+        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
+        result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
+        return;
+    }
+    if (!brightnessInfo_.SetBrightness(value)) {
+        DisplayErrors error = brightnessInfo_.GetServiceError();
+        if (error != DisplayErrors::ERR_OK) {
+            result_.ThrowError(env_, error);
+        }
+    }
 }
 
 void Brightness::SystemSetValue()
@@ -137,7 +154,7 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info& info, napi_valuetype 
     size_t argc = MAX_ARGC;
     napi_value argv[argc];
     napi_value thisVar = nullptr;
-    void *data = nullptr;
+    void* data = nullptr;
     if (napi_ok != napi_get_cb_info(env_, info, &argc, argv, &thisVar, &data)) {
         DISPLAY_HILOGW(COMP_FWK, "Failed to get the input parameter");
         return nullptr;
@@ -147,7 +164,7 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info& info, napi_valuetype 
         DISPLAY_HILOGW(COMP_FWK, "Lack of parameter");
         return nullptr;
     }
-    
+
     napi_value options = argv[ARGV_ONE];
     RETURN_IF_WITH_RET(!CheckValueType(options, checkType), nullptr);
     return options;
@@ -186,8 +203,7 @@ void Brightness::Result::Error(int32_t code, const std::string& msg)
 {
     code_ = code;
     msg_ = msg;
-    DISPLAY_HILOGW(COMP_FWK, "Error message, code: %{public}d, msg: %{public}s",
-        code_, msg_.c_str());
+    DISPLAY_HILOGW(COMP_FWK, "Error message, code: %{public}d, msg: %{public}s", code_, msg_.c_str());
 }
 
 void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size) const
@@ -205,7 +221,43 @@ void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size)
     error[MAX_ARGC] = code;
 }
 
-napi_value Brightness::Result::GetResult(napi_env env) const
+napi_value Brightness::Result::GetError(napi_env& env)
+{
+    napi_value napiError = nullptr;
+    if (!IsError()) {
+        napi_get_undefined(env, &napiError);
+        return napiError;
+    }
+
+    std::string msg;
+    auto item = errorTable_.find(static_cast<DisplayErrors>(code_));
+    if (item != errorTable_.end()) {
+        msg = item->second;
+    }
+    napi_value napiMsg;
+    NAPI_CALL(env, napi_create_string_utf8(env, msg.c_str(), msg.size(), &napiMsg));
+    NAPI_CALL(env, napi_create_error(env, nullptr, napiMsg, &napiError));
+
+    napi_value napiCode;
+    NAPI_CALL(env, napi_create_int32(env, code_, &napiCode));
+
+    napi_set_named_property(env, napiError, "code", napiCode);
+    napi_set_named_property(env, napiError, "message", napiMsg);
+
+    DISPLAY_HILOGW(COMP_FWK, "throw error code: %{public}d, msg: %{public}s,", code_, msg.c_str());
+    return napiError;
+}
+
+napi_value Brightness::Result::ThrowError(napi_env& env, DisplayErrors code)
+{
+    Error(static_cast<int32_t>(code));
+    napi_value error = GetError(env);
+    RETURN_IF_WITH_RET(error == nullptr, nullptr);
+    napi_throw(env, error);
+    return nullptr;
+}
+
+napi_value Brightness::Result::GetResult(napi_env env)
 {
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_object(env, &result));
@@ -217,7 +269,7 @@ napi_value Brightness::Result::GetResult(napi_env env) const
     return result;
 }
 
-uint32_t Brightness::BrightnessInfo::GetBrightness()
+uint32_t Brightness::BrightnessInfo::GetBrightness() const
 {
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Get brightness: %{public}d", brightness);
@@ -236,7 +288,7 @@ bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
     return isSucc;
 }
 
-int32_t Brightness::BrightnessInfo::GetAutoMode()
+int32_t Brightness::BrightnessInfo::GetAutoMode() const
 {
     bool isAuto = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Automatic brightness adjustment: %{public}d", isAuto);
@@ -257,6 +309,11 @@ void Brightness::BrightnessInfo::ScreenOn(bool keep, std::shared_ptr<RunningLock
         DISPLAY_HILOGD(COMP_FWK, "Keep screen on, keep: %{public}d, isUsed: %{public}d", keep, runningLock->IsUsed());
         keep ? runningLock->Lock() : runningLock->UnLock();
     }
+}
+
+DisplayErrors Brightness::BrightnessInfo::GetServiceError() const
+{
+    return DisplayPowerMgrClient::GetInstance().GetError();
 }
 
 void Brightness::ExecuteCallback()

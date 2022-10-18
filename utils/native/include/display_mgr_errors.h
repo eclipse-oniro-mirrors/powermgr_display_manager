@@ -42,6 +42,13 @@ enum {
     E_ADD_DEATH_RECIPIENT_FAILED,
     E_INNER_ERR
 };
+
+enum class DisplayErrors : int32_t {
+    ERR_OK = 0,
+    ERR_PERMISSION_DENIED = 201,
+    ERR_PARAM_INVALID = 401,
+    ERR_CONNECTION_FAIL = 4700101
+};
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 

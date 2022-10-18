@@ -44,16 +44,19 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
         DISPLAY_HILOGE(COMP_FWK, "Failed to get system ability manager");
+        lastError_ = DisplayErrors::ERR_CONNECTION_FAIL;
         return nullptr;
     }
     sptr<IRemoteObject> obj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     if (obj == nullptr) {
+        lastError_ = DisplayErrors::ERR_CONNECTION_FAIL;
         DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service");
         return nullptr;
     }
     sptr<IRemoteObject::DeathRecipient> dr = new DisplayDeathRecipient(*this);
     if ((obj->IsProxyObject()) && (!obj->AddDeathRecipient(dr))) {
         DISPLAY_HILOGE(COMP_FWK, "Failed to add death recipient");
+        lastError_ = DisplayErrors::ERR_CONNECTION_FAIL;
         return nullptr;
     }
 
@@ -216,6 +219,18 @@ uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, 0);
     return proxy->GetDeviceBrightness(displayId);
+}
+
+DisplayErrors DisplayPowerMgrClient::GetError()
+{
+    if (lastError_ != DisplayErrors::ERR_OK) {
+        DisplayErrors tmpError = lastError_;
+        lastError_ = DisplayErrors::ERR_OK;
+        return tmpError;
+    }
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
+    return proxy->GetError();
 }
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS
