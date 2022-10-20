@@ -20,6 +20,8 @@
 #include <string_ex.h>
 
 #include "hilog_wrapper.h"
+#include "ipc_skeleton.h"
+#include "permission.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -100,6 +102,10 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 
 bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
 {
+    auto uid = IPCSkeleton::GetCallingUid();
+    if (!PowerMgr::Permission::CheckIsSystemAppByUid(uid)) {
+        return false;
+    }
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(MODULE_SERVICE, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);

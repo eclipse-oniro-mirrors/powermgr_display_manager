@@ -50,6 +50,7 @@ ohos_shared_library("displaymgrservice") {
 
   deps = [
     "${displaymgr_native_innerkits_path}:displaymgr",
+    "//base/powermgr/power_manager/utils:powermgr_utils",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//foundation/graphic/standard:libsurface",
     "//foundation/graphic/standard:libwmservice",
