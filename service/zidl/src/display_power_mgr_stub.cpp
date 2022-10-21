@@ -180,6 +180,8 @@ int32_t DisplayPowerMgrStub::SetBrightnessStub(MessageParcel& data, MessageParce
         DISPLAY_HILOGE(COMP_SVC, "Failed to write SetBrightness return value");
         return E_WRITE_PARCEL_ERROR;
     }
+    int32_t error = static_cast<int32_t>(GetError());
+    WRITE_PARCEL_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
     return ERR_OK;
 }
 

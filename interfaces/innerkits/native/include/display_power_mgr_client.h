@@ -52,6 +52,7 @@ public:
     bool BoostBrightness(int32_t timeoutMs, uint32_t displayId = 0);
     bool CancelBoostBrightness(uint32_t displayId = 0);
     uint32_t GetDeviceBrightness(uint32_t displayId = 0);
+    DisplayErrors GetError();
 
 private:
     class DisplayDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -75,6 +76,7 @@ private:
     static constexpr uint32_t BRIGHTNESS_MAX {255};
     static constexpr uint32_t BRIGHTNESS_MIN {1};
 
+    DisplayErrors lastError_ {DisplayErrors::ERR_OK};
     std::mutex mutex_;
     sptr<IDisplayPowerMgr> proxy_ {nullptr};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};

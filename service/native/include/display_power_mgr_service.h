@@ -60,6 +60,7 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
+    virtual DisplayErrors GetError() override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
     void Init();
     void Deinit();
@@ -122,6 +123,7 @@ private:
     std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ {nullptr};
     std::shared_ptr<DisplayEventHandler> handler_ {nullptr};
 
+    DisplayErrors lastError_ {DisplayErrors::ERR_OK};
     time_t lastLuxTime_ {0};
     float lastLux_ {0};
     bool luxChanged_ {false};
