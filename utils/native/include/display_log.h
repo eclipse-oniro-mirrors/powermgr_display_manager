@@ -84,15 +84,15 @@ enum DisplayManagerLogDomain {
 
 // Keep the sequence and length same as DisplayManagerLogDomain
 static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_LABEL[LABEL_END] = {
-    {LOG_CORE, DOMAIN_APP,               "DisplayApp"},
-    {LOG_CORE, DOMAIN_FRAMEWORK,         "DisplayFwk"},
-    {LOG_CORE, DOMAIN_SERVICE,           "DisplaySvc"},
-    {LOG_CORE, DOMAIN_HDI,               "DisplayHdi"},
-    {LOG_CORE, DOMAIN_DRIVER,            "DisplayDrv"},
-    {LOG_CORE, DOMAIN_UTILS,             "DisplayUts"},
-    {LOG_CORE, DOMAIN_FEAT_BRIGHTNESS,   "DisplayBrightness"},
-    {LOG_CORE, DOMAIN_FEAT_STATE,        "DisplayState"},
-    {LOG_CORE, DOMAIN_TEST,              "DisplayTest"},
+    {LOG_CORE, DOMAIN_APP,               "DisplayPowerApp"},
+    {LOG_CORE, DOMAIN_FRAMEWORK,         "DisplayPowerFwk"},
+    {LOG_CORE, DOMAIN_SERVICE,           "DisplayPowerSvc"},
+    {LOG_CORE, DOMAIN_HDI,               "DisplayPowerHdi"},
+    {LOG_CORE, DOMAIN_DRIVER,            "DisplayPowerDrv"},
+    {LOG_CORE, DOMAIN_UTILS,             "DisplayPowerUts"},
+    {LOG_CORE, DOMAIN_FEAT_BRIGHTNESS,   "DisplayPowerBrightness"},
+    {LOG_CORE, DOMAIN_FEAT_STATE,        "DisplayPowerState"},
+    {LOG_CORE, DOMAIN_TEST,              "DisplayPowerTest"},
 };
 
 // In order to improve performance, do not check the module range.
