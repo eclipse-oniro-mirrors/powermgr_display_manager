@@ -233,4 +233,17 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
         EXPECT_FALSE(ret);
     }
 }
+
+/**
+ * @tc.name: DisplayPowerMgrService015
+ * @tc.desc: Test GetError
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DisplayErrors error = DisplayPowerMgrClient::GetInstance().GetError();
+    DISPLAY_HILOGI(LABEL_TEST, "get error %{public}d", static_cast<int32_t>(error));
+    EXPECT_TRUE(error == DisplayErrors::ERR_OK);
+}
 }
