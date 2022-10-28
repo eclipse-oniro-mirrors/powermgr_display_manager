@@ -26,9 +26,9 @@ const uint32_t DisplayAutoBrightness::BRIGHTNESS_MAX = DisplayParamHelper::GetMa
 const float DisplayAutoBrightness::TRANSFORM_NODE_LUX_START = 0.0;
 const float DisplayAutoBrightness::TRANSFORM_NODE_LUX_FIRST = 100.0;
 const float DisplayAutoBrightness::TRANSFORM_NODE_LUX_SECOND = 500.0;
-//0.47 is the ratio of brightness value 120 to 255
+// 0.47 is the ratio of brightness value 120 to 255
 const float DisplayAutoBrightness::TRANSFORM_NODE_BRIGHTNESS_FIRST_PER = 0.47;
-//0.86 is the ratio of brightness value 220 to 255
+// 0.86 is the ratio of brightness value 220 to 255
 const float DisplayAutoBrightness::TRANSFORM_NODE_BRIGHTNESS_SECOND_PER = 0.86;
 const uint32_t DisplayAutoBrightness::TRANSFORM_NODE_BRIGHTNESS_FIRST = static_cast<uint32_t>(BRIGHTNESS_MIN +
     TRANSFORM_NODE_BRIGHTNESS_FIRST_PER * (BRIGHTNESS_MAX - BRIGHTNESS_MIN));
@@ -48,7 +48,7 @@ uint32_t DisplayAutoBrightness::CalculateAutoBrightness(float scalar)
     if (scalar >= LUX_MAX) {
         return brightness;
     }
-    for(uint8_t count = 1; count < TRANSFORM_NODE_TYPE_END; count++) {
+    for (uint8_t count = 1; count < TRANSFORM_NODE_TYPE_END; count++) {
         auto lastNode = TRANSFORM_NODE_TABLE[count - 1];
         auto curNode = TRANSFORM_NODE_TABLE[count];
         if (lastNode.lux <= scalar && scalar < curNode.lux) {
