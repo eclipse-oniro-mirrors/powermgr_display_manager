@@ -62,7 +62,7 @@ static napi_value SyncWork(napi_env env, const std::string resName, const std::s
         resource,
         [](napi_env env, void *data) {},
         complete,
-        (void*)asyncBrightness.get(),
+        reinterpret_cast<void*>(asyncBrightness.get()),
         &asyncBrightness->asyncWork);
     NAPI_CALL(env, napi_queue_async_work(env, asyncBrightness->asyncWork));
     asyncBrightness.release();
@@ -78,7 +78,7 @@ static napi_value GetValue(napi_env env, napi_callback_info info)
         "",
         info,
         [](napi_env env, napi_status status, void *data) {
-            Brightness *asyncBrightness = (Brightness*)data;
+            Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
                 asyncBrightness->GetValue();
                 napi_delete_async_work(env, asyncBrightness->asyncWork);
@@ -96,7 +96,7 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
         Brightness::BRIGHTNESS_VALUE,
         info,
         [](napi_env env, napi_status status, void *data) {
-            Brightness *asyncBrightness = (Brightness*)data;
+            Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
                 asyncBrightness->SystemSetValue();
                 napi_delete_async_work(env, asyncBrightness->asyncWork);
@@ -119,7 +119,7 @@ static napi_value GetMode(napi_env env, napi_callback_info info)
         "",
         info,
         [](napi_env env, napi_status status, void *data) {
-            Brightness *asyncBrightness = (Brightness*)data;
+            Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
                 asyncBrightness->GetMode();
                 napi_delete_async_work(env, asyncBrightness->asyncWork);
@@ -137,7 +137,7 @@ static napi_value SetMode(napi_env env, napi_callback_info info)
         Brightness::BRIGHTNESS_MODE,
         info,
         [](napi_env env, napi_status status, void *data) {
-            Brightness *asyncBrightness = (Brightness*)data;
+            Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
                 asyncBrightness->SetMode();
                 napi_delete_async_work(env, asyncBrightness->asyncWork);
@@ -164,14 +164,14 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
         resource,
         [](napi_env env, void *data) {},
         [](napi_env env, napi_status status, void *data) {
-            Brightness *asyncBrightness = (Brightness*)data;
+            Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
                 asyncBrightness->SetKeepScreenOn();
                 napi_delete_async_work(env, asyncBrightness->asyncWork);
                 delete asyncBrightness;
             }
         },
-        (void*)asyncBrightness.get(),
+        reinterpret_cast<void*>(asyncBrightness.get()),
         &asyncBrightness->asyncWork);
     NAPI_CALL(env, napi_queue_async_work(env, asyncBrightness->asyncWork));
     asyncBrightness.release();

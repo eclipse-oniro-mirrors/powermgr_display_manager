@@ -61,7 +61,7 @@ Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock) :
 void Brightness::GetValue()
 {
     uint32_t brightness = brightnessInfo_.GetBrightness();
-    if (BRIGHTNESS_OFF >= brightness || brightness > MAX_BRIGHTNESS) {
+    if (brightness == BRIGHTNESS_OFF || brightness > MAX_BRIGHTNESS) {
         result_.Error(COMMON_ERROR_COED, GET_VALUE_ERROR_MGR);
     } else {
         result_.SetResult(BRIGHTNESS_VALUE, brightness);
