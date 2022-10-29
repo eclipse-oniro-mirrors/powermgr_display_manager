@@ -29,9 +29,9 @@ using namespace std;
 
 namespace {
 auto& g_displayMgrClient = OHOS::DisplayPowerMgr::DisplayPowerMgrClient::GetInstance();
-constexpr int32_t MIN = 0;
-constexpr int32_t MAX = 3;
 constexpr int32_t DATANUM = 4;
+constexpr int32_t SIZE = 1;
+constexpr int32_t INDEX_0 = 0;
 }
 
 static void SetDisplayState(const uint8_t* data)
@@ -176,10 +176,30 @@ static void DiscountBrightness(const uint8_t* data)
     g_displayMgrClient.DiscountBrightness(type[0]);
 }
 
+static void GetBrightness(const uint8_t* data)
+{
+    uint32_t type[SIZE];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.GetBrightness(type[INDEX_0]);
+}
+
+static void GetDeviceBrightness(const uint8_t* data)
+{
+    uint32_t type[SIZE];
+    int32_t idSize = 4;
+    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+        return;
+    }
+    g_displayMgrClient.GetDeviceBrightness(type[INDEX_0]);
+}
+
 namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    int32_t idSize = 8;
+    int32_t idSize = 4;
     int32_t cond[1];
     if (static_cast<int32_t>(size) > idSize) {
         if ((memcpy_s(cond, sizeof(cond), data, idSize)) != EOK) {
@@ -187,7 +207,8 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
         }
         std::random_device rd;
         std::default_random_engine engine(rd());
-        std::uniform_int_distribution<int32_t> randomNum(MIN, MAX);
+        std::uniform_int_distribution<int32_t> randomNum(static_cast<int32_t>(ApiNumber::NUM_ZERO),
+            static_cast<int32_t>(ApiNumber::NUM_END) - 1);
         int32_t number = randomNum(engine);
 
         switch (static_cast<ApiNumber>(number)) {
@@ -238,6 +259,18 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
                 break;
             case ApiNumber::NUM_FIFTEEN:
                 DiscountBrightness(data);
+                break;
+            case ApiNumber::NUM_SIXTEEN:
+                GetBrightness(data);
+                break;
+            case ApiNumber::NUM_SEVENTEEN:
+                GetDeviceBrightness(data);
+                break;
+            case ApiNumber::NUM_EIGHTEEN:
+                g_displayMgrClient.IsAutoAdjustBrightness();
+                break;
+            case ApiNumber::NUM_NINETEEN:
+                g_displayMgrClient.GetError();
                 break;
             default:
                 break;

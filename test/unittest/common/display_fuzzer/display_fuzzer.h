@@ -34,7 +34,12 @@ enum class ApiNumber {
     NUM_TWELVE,
     NUM_THIRTEEN,
     NUM_FOURTEEN,
-    NUM_FIFTEEN
+    NUM_FIFTEEN,
+    NUM_SIXTEEN,
+    NUM_SEVENTEEN,
+    NUM_EIGHTEEN,
+    NUM_NINETEEN,
+    NUM_END
 };
 
 #endif
