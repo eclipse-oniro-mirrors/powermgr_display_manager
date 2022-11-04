@@ -88,7 +88,7 @@ static void SetBrightness(const uint8_t* data)
     g_displayMgrClient.SetBrightness(type[0]);
 }
 
-static void AdjustBrightness(const uint8_t* data)
+static void AdjustBrightness(const uint8_t* data, size_t size)
 {
     int32_t type[1];
     int32_t duration[1];
@@ -96,8 +96,8 @@ static void AdjustBrightness(const uint8_t* data)
     if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
         return;
     }
-    if ((memcpy_s(duration, sizeof(duration), (data+DATANUM), idSize)) != EOK) {
-        return;
+    if (size <= (idSize + DATANUM) || (memcpy_s(duration, sizeof(duration), (data + DATANUM), idSize) != EOK)) {
+        duration[INDEX_0] = type[INDEX_0];
     }
 
     g_displayMgrClient.AdjustBrightness(type[0], duration[0]);
@@ -228,7 +228,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
                 SetBrightness(data);
                 break;
             case ApiNumber::NUM_FIVE:
-                AdjustBrightness(data);
+                AdjustBrightness(data, size);
                 break;
             case ApiNumber::NUM_SIX:
                 AutoAdjustBrightness(data);
