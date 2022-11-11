@@ -259,7 +259,12 @@ void ScreenController::OnStateChanged(DisplayState state)
 
 bool ScreenController::CanSetBrightness()
 {
-    return IsScreenOn() && !IsBrightnessOverridden() && !IsBrightnessBoosted();
+    bool isScreenOn = IsScreenOn();
+    bool isOverridden = IsBrightnessOverridden();
+    bool isBoosted = IsBrightnessBoosted();
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "isScreenOn: %{public}d, isOverridden: %{public}d, isBoosted: %{public}d",
+        isScreenOn, isOverridden, isBoosted);
+    return isScreenOn && !isOverridden && !isBoosted;
 }
 
 bool ScreenController::CanDiscountBrightness()
@@ -361,7 +366,7 @@ void ScreenController::RegisterSettingBrightnessObserver()
 
 void ScreenController::BrightnessSettingUpdateFunc(const string& key)
 {
-    if (animator_->IsAnimating()) {
+    if (animator_->IsAnimating() || !CanSetBrightness()) {
         return;
     }
     uint32_t settingBrightness = GetSettingBrightness(key);
