@@ -21,8 +21,27 @@ module_output_path = "${displaymgr_part_name}/displaymgr"
 config("module_private_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "include/mock",
+    "mock/include",
+    "${displaymgr_innerkits}/native/include",
+    "${displaymgr_service_zidl}/include",
+    "${displaymgr_utils_path}/native/include",
+  ]
 }
+
+deps_ex = [
+  "ability_base:want",
+  "ability_base:zuri",
+  "ability_runtime:ability_manager",
+  "c_utils:utils",
+  "hiviewdfx_hilog_native:libhilog",
+  "ipc:ipc_core",
+  "power_manager:powermgr_client",
+  "safwk:system_ability_fwk",
+  "samgr:samgr_proxy",
+]
 
 ##############################unittest##########################################
 ohos_unittest("unittest_display_mgr_service") {
@@ -54,5 +73,91 @@ ohos_unittest("unittest_display_mgr_service") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+  ]
+}
+
+############################display_mock_parcel_test#############################
+ohos_unittest("display_mock_parcel_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "mock/src/mock_message_parcel.cpp",
+    "mock/src/mock_parcel.cpp",
+    "src/mock/display_mock_parcel_test.cpp",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${displaymgr_innerkits}:displaymgr",
+    "${powermgr_utils_path}/setting:power_setting",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = deps_ex
+}
+
+############################display_mock_test#############################
+ohos_unittest("display_mock_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "mock/src/mock_display_remote_object.cpp",
+    "mock/src/mock_message_parcel.cpp",
+    "mock/src/mock_parcel.cpp",
+    "src/mock/display_mock_test.cpp",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":module_private_config",
+  ]
+
+  defines = [
+    "MOCK_READSTRING_DESCRIPTIR",
+    "MOCK_WRITE_INTERFACE_TOKEN_RETURN_TRUE",
+  ]
+
+  deps = [
+    "${displaymgr_innerkits}:displaymgr",
+    "${powermgr_utils_path}/setting:power_setting",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = deps_ex
+}
+
+############################display_mock_object_test#############################
+ohos_unittest("display_mock_object_test") {
+  module_out_path = module_output_path
+
+  sources = [
+    "mock/src/mock_display_remote_object.cpp",
+    "src/mock/display_mock_object_test.cpp",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":module_private_config",
+  ]
+
+  deps = [
+    "${displaymgr_innerkits}:displaymgr",
+    "${powermgr_utils_path}/setting:power_setting",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = deps_ex
+}
+
+group("unittest") {
+  testonly = true
+  deps = [
+    ":display_mock_object_test",
+    ":display_mock_parcel_test",
+    ":display_mock_test",
   ]
 }
