@@ -21,3 +21,17 @@ ohos_prebuilt_etc("display.para") {
   part_name = "${displaymgr_part_name}"
   subsystem_name = "powermgr"
 }
+
+ohos_prebuilt_etc("display.para.dac") {
+  source = "display.para.dac"
+  relative_install_dir = "param"
+  part_name = "${displaymgr_part_name}"
+  subsystem_name = "powermgr"
+}
+
+group("param_files") {
+  deps = [
+    ":display.para",
+    ":display.para.dac",
+  ]
+}
