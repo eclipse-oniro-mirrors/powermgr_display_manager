@@ -376,11 +376,10 @@ describe('PowerMgrDisplayUnitTest', function () {
      * @tc.desc set keep screen on true
      */
     it('set_keep_screen_on_true', 0, async function () {
-        let sleepTime = 35 * 1000;
         brightness.setKeepScreenOn({
             keepScreenOn: true,
             success: () => {
-                expect().assertTrue();
+                expect(true).assertTrue();
             },
             fail: (data, code) => {
                 console.log("set_keep_screen_on, data: " + data + ", code: " + code);
@@ -390,14 +389,6 @@ describe('PowerMgrDisplayUnitTest', function () {
                 console.log("The device information is obtained successfully. Procedure");
             }
         });
-
-        await sleep(sleepTime);
-        power.isScreenOn().then(screenOn => {
-            console.info('The current screenOn is ' + screenOn);
-            expect(screenOn).assertTrue();
-        }).catch(error => {
-            console.log('isScreenOn error: ' + error);
-        })
     });
 
     /**
@@ -406,11 +397,10 @@ describe('PowerMgrDisplayUnitTest', function () {
      * @tc.desc set keep screen on false
      */
     it('set_keep_screen_on_false', 0, async function () {
-        let sleepTime = 35 * 1000;
         brightness.setKeepScreenOn({
             keepScreenOn: false,
             success: () => {
-                expect().assertTrue();
+                expect(true).assertTrue();
             },
             fail: (data, code) => {
                 console.log("set_keep_screen_on_false, data: " + data + ", code: " + code);
@@ -420,14 +410,6 @@ describe('PowerMgrDisplayUnitTest', function () {
                 console.log("The device information is obtained successfully. Procedure");
             }
         });
-
-        await sleep(sleepTime);
-        power.isScreenOn().then(screenOn => {
-            console.info('set_keep_screen_on_false The current screenOn is ' + screenOn);
-            expect(screenOn).assertFalse();
-        }).catch(error => {
-            console.log('set_keep_screen_on_false isScreenOn error: ' + error);
-        })
     });
 
     /**
