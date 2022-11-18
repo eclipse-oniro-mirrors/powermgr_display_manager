@@ -444,6 +444,51 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness005, Te
 }
 
 /**
+ * @tc.name: DisplayPowerMgrOverrideBrightness006
+ * @tc.desc: Test device brightness when override brightness is 256
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness006, TestSize.Level0)
+{
+    uint32_t overrideValue = 256;
+    uint32_t brightnessMax = 255;
+    DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue);
+    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(brightnessMax, deviceBrightness);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrOverrideBrightness007
+ * @tc.desc: Test device brightness when override brightness is 0
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, TestSize.Level0)
+{
+    uint32_t overrideValue = 0;
+    uint32_t brightnessMin = 5;
+    EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
+    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(brightnessMin, deviceBrightness);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrOverrideBrightness008
+ * @tc.desc: Test device brightness when override brightness is -1
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, TestSize.Level0)
+{
+    uint32_t overrideValue = -1;
+    uint32_t brightnessMax = 255;
+    EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
+    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(brightnessMax, deviceBrightness);
+}
+
+/**
  * @tc.name: DisplayPowerMgrMaxBrightness001
  * @tc.desc: Test GetMaxBrightness less equals 255
  * @tc.type: FUNC
@@ -741,4 +786,33 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness002, Test
         EXPECT_FALSE(ret);
     }
 }
+
+/**
+ * @tc.name: DisplayPowerMgrAdjustBrightness003
+ * @tc.desc: Test IsAutoAdjustBrightness
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, TestSize.Level0)
+{
+    bool ret = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
+    DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
+    EXPECT_EQ(DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness(), false);
+    DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(ret);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrScreenBrightnessEquality001
+ * @tc.desc: Test whether the screen brightness is equal after the screen is on and before the screen is off
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality001, TestSize.Level0)
+{
+    uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    uint32_t deviceBrightness2 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(deviceBrightness1, deviceBrightness2);
+}
+} // namespace
