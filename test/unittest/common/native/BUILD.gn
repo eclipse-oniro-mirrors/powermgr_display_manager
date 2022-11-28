@@ -49,6 +49,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "ability_base:zuri",
     "ability_runtime:ability_manager",
     "c_utils:utils",
+    "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "power_manager:powermgr_client",
