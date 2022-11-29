@@ -195,6 +195,11 @@ bool DisplayPowerMgrClient::IsAutoAdjustBrightness()
 
 bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
+    if (callback == nullptr) {
+        DISPLAY_HILOGE(COMP_FWK, "callback is nullptr");
+        return false;
+    }
+
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->RegisterCallback(callback);
