@@ -92,6 +92,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS):
             ret = IsAutoAdjustBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(IDisplayPowerMgr::REGISTER_CALLBACK):
+            ret = RegisterCallbackStub(data, reply);
+            break;
         case static_cast<int32_t>(IDisplayPowerMgr::BOOST_BRIGHTNESS):
             ret = BoostBrightnessStub(data, reply);
             break;
@@ -323,7 +326,8 @@ int32_t DisplayPowerMgrStub::RegisterCallbackStub(MessageParcel& data, MessagePa
     RETURN_IF_WITH_RET((obj == nullptr), E_READ_PARCEL_ERROR);
     sptr<IDisplayPowerCallback> callback = iface_cast<IDisplayPowerCallback>(obj);
     RETURN_IF_WITH_RET((callback == nullptr), E_READ_PARCEL_ERROR);
-    RegisterCallback(callback);
+    bool isSucc = RegisterCallback(callback);
+    WRITE_PARCEL_WITH_RET(reply, Bool, isSucc, E_WRITE_PARCEL_ERROR);
     return ERR_OK;
 }
 
