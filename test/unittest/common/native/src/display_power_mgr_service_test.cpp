@@ -231,4 +231,17 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
     DISPLAY_HILOGI(LABEL_TEST, "get error %{public}d", static_cast<int32_t>(error));
     EXPECT_TRUE(error == DisplayErrors::ERR_OK);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrService016
+ * @tc.desc: Test RegisterCallback(Input callback is nullptr, function return false)
+ * @tc.type: FUNC
+ * @tc.require: issueI63PST
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    bool result = DisplayPowerMgrClient::GetInstance().RegisterCallback(nullptr);
+    EXPECT_EQ(result, false);
+}
 } // namespace
