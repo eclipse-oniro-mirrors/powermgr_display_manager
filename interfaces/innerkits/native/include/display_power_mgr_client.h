@@ -54,7 +54,9 @@ public:
     uint32_t GetDeviceBrightness(uint32_t displayId = 0);
     DisplayErrors GetError();
 
+#ifndef DISPLAY_SERVICE_DEATH_UT
 private:
+#endif
     class DisplayDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit DisplayDeathRecipient(DisplayPowerMgrClient& client) : client_(client) {}
