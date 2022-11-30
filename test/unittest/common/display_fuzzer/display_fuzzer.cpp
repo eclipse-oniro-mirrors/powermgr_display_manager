@@ -29,7 +29,7 @@ using namespace std;
 
 namespace {
 auto& g_displayMgrClient = OHOS::DisplayPowerMgr::DisplayPowerMgrClient::GetInstance();
-constexpr int32_t DATANUM = 4;
+constexpr size_t DATANUM = 4;
 constexpr int32_t SIZE = 1;
 constexpr int32_t INDEX_0 = 0;
 }
@@ -92,7 +92,7 @@ static void AdjustBrightness(const uint8_t* data, size_t size)
 {
     int32_t type[1];
     int32_t duration[1];
-    int32_t idSize = 4;
+    size_t idSize = 4;
     if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
         return;
     }
