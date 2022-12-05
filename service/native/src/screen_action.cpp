@@ -118,7 +118,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     });
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
-    HiviewDFX::HiSysEvent::Write("DISPLAY", "SCREEN_STATE",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
     DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState:%{public}d", ret);
     return ret;
@@ -165,7 +165,7 @@ bool ScreenAction::SetBrightness(uint32_t value)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, value);
     // Notify screen brightness change event to battery statistics
-    HiviewDFX::HiSysEvent::Write("DISPLAY", "BRIGHTNESS_NIT",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BRIGHTNESS_NIT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", value);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool isSucc = Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId_, value);
