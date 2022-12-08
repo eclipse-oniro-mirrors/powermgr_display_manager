@@ -256,7 +256,7 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
     auto safeDiscount = GetSafeDiscount(discount, brightness);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
                    displayId, safeDiscount);
-    HiviewDFX::HiSysEvent::Write("DISPLAY", "BACKLIGHT_DISCOUNT",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BACKLIGHT_DISCOUNT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "RATIO", safeDiscount);
     return iter->second->DiscountBrightness(safeDiscount);
 }
@@ -552,7 +552,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent* event)
         pms->AdjustBrightness(mainDispId, brightness, gradualDuration);
     }
     // Notify ambient brightness change event to battery statistics
-    HiviewDFX::HiSysEvent::Write("DISPLAY", "AMBIENT_LIGHT",
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
                                  HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", brightness);
 }
 
