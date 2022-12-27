@@ -22,7 +22,7 @@ class DisplayPowerMgrServiceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    void SetUp() {}
+    void SetUp();
     void TearDown();
 };
 #endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
