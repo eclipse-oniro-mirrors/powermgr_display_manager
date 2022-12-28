@@ -24,11 +24,6 @@ group("displaymgr_native_test") {
   deps = [ "unittest/common/native:unittest_display_mgr_service" ]
 }
 
-group("displaymgr_js_test") {
-  testonly = true
-  deps = [ "unittest/common/napi:PowerMgrDisplayJsTest" ]
-}
-
 group("fuzztest") {
   testonly = true
   deps = [ "unittest/common/display_fuzzer:fuzztest" ]

@@ -75,7 +75,6 @@
         }
       ],
       "test": [
-        "//base/powermgr/display_manager/test:displaymgr_js_test",
         "//base/powermgr/display_manager/test:displaymgr_coverage_test",
         "//base/powermgr/display_manager/test:displaymgr_native_test",
         "//base/powermgr/display_manager/test:fuzztest"
