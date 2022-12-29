@@ -107,9 +107,7 @@ HWTEST_F(DisplayMockObjectTest, DisplayMockObjectTest_002, TestSize.Level0)
     EXPECT_EQ(BRIGHTNESS_DEFAULT_VALUE, client.GetDefaultBrightness());
     EXPECT_EQ(BRIGHTNESS_MAX_VALUE, client.GetMaxBrightness());
     EXPECT_EQ(BRIGHTNESS_MIN_VALUE, client.GetMinBrightness());
-    EXPECT_FALSE(client.AutoAdjustBrightness(true));
     EXPECT_TRUE(client.AdjustBrightness(BRIGHTNESS_ADJUST_VALUE, BRIGHTNESS_DURATION, DISPLAY_ID));
-    EXPECT_FALSE(client.AutoAdjustBrightness(false));
     EXPECT_FALSE(client.IsAutoAdjustBrightness());
     EXPECT_TRUE(client.BoostBrightness(TIMEOUT_MS, DISPLAY_ID));
     EXPECT_TRUE(client.CancelBoostBrightness(DISPLAY_ID));

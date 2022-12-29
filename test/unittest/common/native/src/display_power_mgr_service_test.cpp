@@ -26,11 +26,28 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
+namespace {
+DisplayState beforeDisplayState;
+}
+
+void DisplayPowerMgrServiceTest::SetUp()
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrServiceTest SetUp is start");
+    beforeDisplayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    DISPLAY_HILOGI(LABEL_TEST, "Get displaystate before run testcase, beforeDisplaystate: %{public}d",
+        beforeDisplayState);
+    return;
+}
+
 void DisplayPowerMgrServiceTest::TearDown()
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrServiceTest TearDown is start");
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    if (state != DisplayState::DISPLAY_ON) {
-        DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    DISPLAY_HILOGI(LABEL_TEST, "Get displaystate after run testcase, state: %{public}d", state);
+    if (state != beforeDisplayState) {
+        DisplayPowerMgrClient::GetInstance().SetDisplayState(beforeDisplayState);
+        DISPLAY_HILOGI(LABEL_TEST, "Set displaystate %{public}d to %{public}d",
+            state, beforeDisplayState);
         return;
     }
     return;
@@ -38,12 +55,13 @@ void DisplayPowerMgrServiceTest::TearDown()
 
 namespace {
 /**
- * @tc.name: DisplayPowerMgrService01
+ * @tc.name: DisplayPowerMgrService001
  * @tc.desc: Test DisplayPowerMgrService service ready.
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService001, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService01 is start");
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     EXPECT_TRUE(sam != nullptr) << "DisplayPowerMgrService01 fail to get GetSystemAbilityManager";
     sptr<IRemoteObject> remoteObject_ = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
@@ -57,6 +75,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService01, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService002 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     EXPECT_TRUE(ret);
 }
@@ -68,6 +87,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService003 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     EXPECT_TRUE(ret);
 }
@@ -79,6 +99,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService004 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     EXPECT_TRUE(ret);
 }
@@ -90,6 +111,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService005 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     EXPECT_TRUE(ret);
 }
@@ -101,6 +123,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService006 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
     EXPECT_TRUE(ret);
 }
@@ -112,7 +135,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService007 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     EXPECT_TRUE(ret);
@@ -127,7 +150,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     EXPECT_TRUE(ret);
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -141,7 +164,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     EXPECT_TRUE(ret);
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -155,7 +178,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     EXPECT_TRUE(ret);
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -169,7 +192,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
     EXPECT_TRUE(ret);
     DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
@@ -183,7 +206,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService012 is start");
     std::vector<uint32_t> ret = DisplayPowerMgrClient::GetInstance().GetDisplayIds();
     EXPECT_TRUE(ret.size() != 0);
 }
@@ -195,7 +218,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService013 is start");
     int32_t ret = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
     EXPECT_TRUE(ret == 0);
 }
@@ -207,7 +230,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService014 is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
     if (ret) {
         DISPLAY_HILOGI(LABEL_TEST, "AutoAdjustBrightness: is supported");
@@ -226,7 +249,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService014, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService015 is start");
     DisplayErrors error = DisplayPowerMgrClient::GetInstance().GetError();
     DISPLAY_HILOGI(LABEL_TEST, "get error %{public}d", static_cast<int32_t>(error));
     EXPECT_TRUE(error == DisplayErrors::ERR_OK);
@@ -240,7 +263,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService015, TestSize.Level0)
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService016 is start");
     bool result = DisplayPowerMgrClient::GetInstance().RegisterCallback(nullptr);
     EXPECT_EQ(result, false);
 }
