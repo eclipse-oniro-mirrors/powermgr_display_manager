@@ -126,7 +126,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
 
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayPower: displayId=%{public}u, state=%{public}u, state=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayPower: displayId=%{public}u, state=%{public}u, reason=%{public}u",
                    displayId_, static_cast<uint32_t>(state), reason);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
