@@ -233,10 +233,16 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
-    if (!Permission::IsSystem()) {
+    if (Permission::IsHap()) {
+        if (!Permission::IsSystemHap()) {
+            lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+            return false;
+        }
+    } else if (!Permission::IsSystemApl() && !Permission::IsShell()) {
         lastError_ = DisplayErrors::ERR_PERMISSION_DENIED;
         return false;
     }
+
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
