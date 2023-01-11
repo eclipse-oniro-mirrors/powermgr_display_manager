@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,7 +53,7 @@ const std::string SET_KEEP_SCREENON_ERROR_MGR = "value is not an available boole
 std::map<DisplayErrors, std::string> Brightness::Result::errorTable_ = {
     {DisplayErrors::ERR_CONNECTION_FAIL,   "Connecting to the service failed."},
     {DisplayErrors::ERR_PERMISSION_DENIED, "Permission is denied"             },
-    {DisplayErrors::ERR_SYSTEM_API_DENIED, "System api permission is denied"  },
+    {DisplayErrors::ERR_SYSTEM_API_DENIED, "System permission is denied"      },
     {DisplayErrors::ERR_PARAM_INVALID,     "Invalid input parameter."         }
 };
 
