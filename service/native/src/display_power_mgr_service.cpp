@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -233,13 +233,8 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
 
 bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 {
-    if (Permission::IsHap()) {
-        if (!Permission::IsSystemHap()) {
-            lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
-            return false;
-        }
-    } else if (!Permission::IsSystemApl() && !Permission::IsShell()) {
-        lastError_ = DisplayErrors::ERR_PERMISSION_DENIED;
+    if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
         return false;
     }
 
