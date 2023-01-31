@@ -137,7 +137,9 @@ bool ScreenController::IsScreenOn()
 bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
 {
     if (!CanSetBrightness()) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot set brightness, ignore the change");
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot set brightness, ignore the change,"\
+            "cachedSettingBrightness_ %{public}u -> %{public}u", cachedSettingBrightness_.load(), value);
+        cachedSettingBrightness_ = value;
         return false;
     }
     return UpdateBrightness(value, gradualDuration, true);
@@ -189,8 +191,7 @@ bool ScreenController::RestoreBrightness(uint32_t gradualDuration)
         return false;
     }
     isBrightnessOverridden_ = false;
-    uint32_t settingBrightness = GetSettingBrightness();
-    return UpdateBrightness(settingBrightness, gradualDuration);
+    return UpdateBrightness(cachedSettingBrightness_, gradualDuration, true);
 }
 
 bool ScreenController::IsBrightnessOverridden() const
@@ -228,8 +229,7 @@ bool ScreenController::CancelBoostBrightness(uint32_t gradualDuration)
     }
     handler_->RemoveEvent(DisplayEventHandler::Event::EVENT_CANCEL_BOOST_BRIGHTNESS);
     isBrightnessBoosted_ = false;
-    uint32_t settingBrightness = GetSettingBrightness();
-    return UpdateBrightness(settingBrightness, gradualDuration);
+    return UpdateBrightness(cachedSettingBrightness_, gradualDuration, true);
 }
 
 bool ScreenController::IsBrightnessBoosted() const
@@ -312,7 +312,7 @@ uint32_t ScreenController::GetSettingBrightness(const std::string& key) const
     ErrCode ret = provider.GetIntValue(key, value);
     if (ret != ERR_OK) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "get setting brightness failed, return cachedBrightness_=%{public}u,"\
-                       " key=%{public}s, ret=%{public}d", cachedSettingBrightness_, key.c_str(), ret);
+                       " key=%{public}s, ret=%{public}d", cachedSettingBrightness_.load(), key.c_str(), ret);
         return cachedSettingBrightness_;
     }
     return static_cast<uint32_t>(value);
@@ -332,6 +332,7 @@ void ScreenController::SetSettingBrightness(uint32_t value)
         return;
     }
     cachedSettingBrightness_ = value;
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "set setting brightness=%{public}u", value);
 }
 
 uint32_t ScreenController::GetScreenOnBrightness() const
@@ -375,7 +376,7 @@ void ScreenController::BrightnessSettingUpdateFunc(const string& key)
         return;
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "setting brightness updated, brightness %{public}u -> %{public}u",
-                   cachedSettingBrightness_, settingBrightness);
+                   cachedSettingBrightness_.load(), settingBrightness);
     cachedSettingBrightness_ = settingBrightness;
     UpdateBrightness(settingBrightness);
 }
