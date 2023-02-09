@@ -59,6 +59,14 @@ std::map<DisplayErrors, std::string> Brightness::Result::errorTable_ = {
 
 Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock) : env_(env), runningLock_(runningLock) {}
 
+Brightness::~Brightness()
+{
+    ReleaseReference(successRef_);
+    ReleaseReference(failRef_);
+    ReleaseReference(completeRef_);
+    ReleaseReference(napiValRef_);
+}
+
 void Brightness::GetValue()
 {
     uint32_t brightness = brightnessInfo_.GetBrightness();
@@ -104,7 +112,7 @@ void Brightness::SystemSetValue()
         napi_get_reference_value(env_, napiValRef_, &napiVal);
         napi_get_value_int32(env_, napiVal, &brightness);
         brightnessInfo_.SetBrightness(brightness);
-        napi_delete_reference(env_, napiValRef_);
+        ReleaseReference(napiValRef_);
     }
     ExecuteCallback();
 }
@@ -129,7 +137,7 @@ void Brightness::SetMode()
         if (!brightnessInfo_.SetAutoMode(static_cast<bool>(mode))) {
             result_.Error(COMMON_ERROR_COED, SET_MODE_NOT_SUPPORTED_ERROR_MGR);
         }
-        napi_delete_reference(env_, napiValRef_);
+        ReleaseReference(napiValRef_);
     }
     ExecuteCallback();
 }
@@ -145,7 +153,7 @@ void Brightness::SetKeepScreenOn()
         bool screenOn = false;
         napi_get_value_bool(env_, napiKeep, &screenOn);
         brightnessInfo_.ScreenOn(screenOn, runningLock_);
-        napi_delete_reference(env_, napiValRef_);
+        ReleaseReference(napiValRef_);
     }
     ExecuteCallback();
 }
@@ -375,7 +383,15 @@ void Brightness::CallFunction(napi_ref& callbackRef, size_t argc, napi_value* re
     if (status != napi_ok) {
         DISPLAY_HILOGW(COMP_FWK, "Failed to call the callback function");
     }
-    napi_delete_reference(env_, callbackRef);
+    ReleaseReference(callbackRef);
+}
+
+void Brightness::ReleaseReference(napi_ref& ref)
+{
+    if (ref != nullptr) {
+        napi_delete_reference(env_, ref);
+        ref = nullptr;
+    }
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
