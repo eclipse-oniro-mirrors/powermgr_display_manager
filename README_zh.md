@@ -11,7 +11,7 @@
 1.  显示屏的亮/灭。
 2.  显示屏亮度调节。
 
-**图 1**  显示能效管理组件架构图<a name="fig106301571239"></a> 
+**图 1**  显示能效管理组件架构图<a name="fig106301571239"></a><br>
 ![](figures/power-management-subsystem-architecture.png "显示能效管理组件架构图")
 
 ## 目录<a name="section19472752217"></a>
@@ -19,17 +19,21 @@
 ```
 base/powermgr/display_manager
 ├── figures                  	# 架构图
-├── frameworks                  # FrameWork层
-│   ├── napi                  	# NAPI
-│   └── native                  # Native层
+├── frameworks                  # Framework层
+│   ├── napi                  	# NAPI层
+│   └── native                  # Native层
 ├── interfaces                  # 接口层
-│   ├── innerkits               # 内部 APIs
-│   └── kits                    # 外部接口 APIs
+│   └── inner_api               # 内部接口
 ├── sa_profile                  # SA 配置文件
 ├── service                    	# 服务层
-│   ├── native                  # Native 层
-│   └── zidl                    # zidl 接口层
+│   ├── etc                     # 亮度配置文件
+│   ├── native                  # Native 层
+│   └── zidl                    # Zidl 接口层
 ├── test                        # 测试用例
+│   ├── fuzztest                # Fuzz 测试
+│   ├── unittest                # 单元测试
+│   ├── systemtest              # 系统测试
+│   └── utils                   # 测试工具
 └── utils                       # 工具和通用层
 ```
 
