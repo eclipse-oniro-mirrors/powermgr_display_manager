@@ -32,9 +32,8 @@ namespace {
 const uint32_t MAX_ARGC = 1;
 const uint32_t ARGV_ONE = 0;
 const uint32_t MAX_FAIL_ARGC = 2;
-const int32_t MAX_BRIGHTNESS = 255;
-const int32_t MIN_BRIGHTNESS = 1;
-const int32_t BRIGHTNESS_OFF = 0;
+const uint32_t MAX_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
+const uint32_t MIN_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
 
 const std::string FUNC_SUCEESS_NAME = "success";
 const std::string FUNC_FAIL_NAME = "fail";
@@ -62,7 +61,7 @@ Brightness::Brightness(napi_env env, std::shared_ptr<RunningLock> runningLock) :
 void Brightness::GetValue()
 {
     uint32_t brightness = brightnessInfo_.GetBrightness();
-    if (brightness == BRIGHTNESS_OFF || brightness > MAX_BRIGHTNESS) {
+    if (brightness < MIN_BRIGHTNESS || brightness > MAX_BRIGHTNESS) {
         result_.Error(COMMON_ERROR_COED, GET_VALUE_ERROR_MGR);
     } else {
         result_.SetResult(BRIGHTNESS_VALUE, brightness);
@@ -280,8 +279,8 @@ uint32_t Brightness::BrightnessInfo::GetBrightness() const
 bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d", value);
-    value = value > MAX_BRIGHTNESS ? MAX_BRIGHTNESS : value;
-    value = value < MIN_BRIGHTNESS ? MIN_BRIGHTNESS : value;
+    value = value > static_cast<int32_t>(MAX_BRIGHTNESS) ? static_cast<int32_t>(MAX_BRIGHTNESS) : value;
+    value = value < static_cast<int32_t>(MIN_BRIGHTNESS) ? static_cast<int32_t>(MIN_BRIGHTNESS) : value;
     bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value);
     if (!isSucc) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Failed to set brightness: %{public}d", value);
