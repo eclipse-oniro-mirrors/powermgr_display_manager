@@ -35,6 +35,7 @@ namespace DisplayPowerMgr {
 class Brightness {
 public:
     explicit Brightness(napi_env env, std::shared_ptr<PowerMgr::RunningLock> runningLock = nullptr);
+    ~Brightness();
     void GetValue();
     void SetValue(napi_callback_info& info);
     void SystemSetValue();
@@ -89,6 +90,7 @@ private:
     bool CheckValueType(napi_value& value, napi_valuetype checkType);
     napi_value GetOptions(napi_value& options, const std::string& name, napi_valuetype checkType);
     void CallFunction(napi_ref& callbackRef, size_t argc, napi_value* response);
+    void ReleaseReference(napi_ref& ref);
 
     napi_env env_;
     Result result_;
