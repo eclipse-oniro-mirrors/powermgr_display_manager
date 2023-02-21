@@ -92,7 +92,7 @@ private:
 
     std::atomic<bool> isBrightnessOverridden_ {false};
     std::atomic<bool> isBrightnessBoosted_ {false};
-    uint32_t cachedSettingBrightness_ {102};
+    std::atomic<uint32_t> cachedSettingBrightness_ {102};
     uint32_t overriddenBrightness_ {102};
     std::shared_ptr<ScreenAction> action_ {nullptr};
     std::shared_ptr<AnimateCallback> animateCallback_ {nullptr};

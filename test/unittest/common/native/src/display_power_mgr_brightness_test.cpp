@@ -265,7 +265,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, Te
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002: fun is start");
-    const uint32_t SET_BRIGHTNESS = 98;
+    const uint32_t SET_BRIGHTNESS = 150;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const uint32_t SET_OVERRIDE_BRIGHTNESS = 200;
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(SET_OVERRIDE_BRIGHTNESS);
@@ -508,6 +508,27 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
 }
 
 /**
+ * @tc.name: DisplayPowerMgrOverrideBrightness009
+ * @tc.desc: Set brightness after override brightness, then exit override brightness, the
+ *           restore brightness should be the latest set brightness
+ * @tc.type: FUNC
+ * @tc.require: issueI6ACLX
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is start");
+    const uint32_t OVERRIDE_BRIGHTNESS = 156;
+    const uint32_t SET_BRIGHTNESS = 66;
+    DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    EXPECT_FALSE(ret);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(SET_BRIGHTNESS, deviceBrightness);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is end");
+}
+
+/**
  * @tc.name: DisplayPowerMgrMaxBrightness001
  * @tc.desc: Test GetMaxBrightness less equals 255
  * @tc.type: FUNC
@@ -725,7 +746,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel2, T
 
 /**
  * @tc.name: DisplayPowerMgrBoostBrightnessNotAdjust
- * @tc.desc: Test BoostBrightness do not adjust brightness
+ * @tc.desc: Test BoostBrightness do not adjust brightness, but update cachedSettingBrightness
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust, TestSize.Level0)
@@ -737,6 +758,9 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust,
     EXPECT_TRUE(isBoost);
     bool isSet = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     EXPECT_FALSE(isSet);
+    DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
+    uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_EQ(SET_BRIGHTNESS, currentValue);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust: fun is end");
 }
 
