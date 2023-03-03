@@ -14,20 +14,20 @@
 domain: DISPLAY
 
 SCREEN_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: screen state}
-  STATE: {type: INT32, desc: screen_state}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: current screen status information}
+  STATE: {type: INT32, desc: current screen state}
 
 BRIGHTNESS_NIT:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: lcd brightness }
-  BRIGHTNESS: {type: INT32, desc: brightness}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: screen brightness}
+  BRIGHTNESS: {type: INT32, desc: screen brightness value}
   REASON: {type: STRING, desc: brightness reason}
   NIT: {type: INT32, desc: brightness nit}
 
 BACKLIGHT_DISCOUNT:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: backlight discount}
-  RATIO: {type: INT32, desc: ratio}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: screen brightness discount information}
+  RATIO: {type: INT32, desc: discount ratio}
 
 AMBIENT_LIGHT:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: ambient light}
-  TYPE: {type: INT32, desc: type}
-  LEVEL: {type: INT32, desc: level}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: ambient light information}
+  TYPE: {type: INT32, desc: ambient light type}
+  LEVEL: {type: INT32, desc: ambient light adjusts screen brightness}
