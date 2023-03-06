@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,8 +30,7 @@
 #include "display_common.h"
 #include "display_log.h"
 #include "power_mgr_client.h"
-#include "running_lock_info.h"
-#include "running_lock.h"
+#include "xpower_event_js.h"
 
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS::PowerMgr;
@@ -107,6 +106,7 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
     if (res != nullptr) {
         Brightness brightness(env);
         brightness.SetValue(info);
+        OHOS::HiviewDFX::ReportXPowerJsStackSysEvent(env, "Brightness::SetValue");
     }
     return nullptr;
 }

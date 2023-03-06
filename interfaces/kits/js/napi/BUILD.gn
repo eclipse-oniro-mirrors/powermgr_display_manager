@@ -24,6 +24,7 @@ ohos_shared_library("brightness") {
   deps = [ "${displaymgr_innerkits}:displaymgr" ]
 
   external_deps = [
+    "hiview:libxpower_event_js",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
     "power_manager:powermgr_client",
