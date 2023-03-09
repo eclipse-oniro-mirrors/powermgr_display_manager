@@ -1,4 +1,4 @@
-# display\_manager<a name="EN-US_TOPIC_0000001152026155"></a>
+# Display Power Manager<a name="EN-US_TOPIC_0000001152026155"></a>
 
 -   [Introduction](#section11660541593)
 -   [Directory Structure](#section19472752217)
@@ -6,36 +6,41 @@
 
 ## Introduction<a name="section11660541593"></a>
 
-The Display power manager module of this repository provides the following capabilities:
+The Display Power Manager module provides the following capabilities:
 
 1.  Turning on/off the display
 2.  Adjusting the brightness of the display screen
 
-**Figure  1**  Display power management subsystem architecture<a name="fig106301571239"></a> 
-![](figures/power-management-subsystem-architecture.png "display-power-manager-subsystem-architecture")
+**Figure 1** Architecture of the Display Power Manager module<a name="fig106301571239"></a>
+
+![](figures/power-management-subsystem-architecture.png "Architecture of the power management subsystem")
 
 ## Directory Structure<a name="section19472752217"></a>
 
 ```
 base/powermgr/display_manager
-├── figures                  	# Architecture figures
-├── frameworks                  # FrameWork Layer
-│   ├── napi                  	# NAPI code
-│   └── native                  # Native code
-├── interfaces                  # APIs
-│   ├── innerkits               # Internal APIs
-│   └── kits                    # External APIs
+├── figures                  	# Architecture
+├── frameworks                  # Framework layer
+│   ├── napi                  	# NAPI layer
+│   └── native                  # Native layer
+├── interfaces                  # API layer
+│   └── inner_api               # Internal APIs
 ├── sa_profile                  # SA profile
-├── service                    	# Services
-│   ├── native                  # Native services
-│   └── zidl                    # zidl APIs
-├── test                        # Test code
-└── utils                       # Utilities and common code
+├── service                    	# Server layer
+│   ├── etc                     # Brightness configuration file
+│   ├── native                  # Native layer
+│   └── zidl                    # Zidl API layer
+├── test                        # Test cases
+│   ├── fuzztest                # Fuzz test
+│   ├── unittest                # Unit test
+│   ├── systemtest              # System test
+│   └── utils                   # Test tools
+└── utils                       # Utilities
 ```
 
 ## Repositories Involved<a name="section63151229062"></a>
 
-[Power management subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/power-management.md)
+[Power Management Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/power-management.md)
 
 [powermgr_power_manager](https://gitee.com/openharmony/powermgr_power_manager)
 
