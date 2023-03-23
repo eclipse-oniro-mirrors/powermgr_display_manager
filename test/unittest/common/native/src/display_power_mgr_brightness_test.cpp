@@ -267,6 +267,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002: fun is start");
     const uint32_t SET_BRIGHTNESS = 150;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
     const uint32_t SET_OVERRIDE_BRIGHTNESS = 200;
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(SET_OVERRIDE_BRIGHTNESS);
 
@@ -295,6 +297,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, Te
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness003: fun is start");
     const uint32_t SET_BRIGHTNESS = 99;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
     const uint32_t SET_BOOST_BRIGHTNESS_TIME = 10000;
     DisplayPowerMgrClient::GetInstance().BoostBrightness(SET_BOOST_BRIGHTNESS_TIME);
 
@@ -324,6 +328,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, Te
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness004: fun is start");
     const uint32_t SET_BRIGHTNESS = 100;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
     const double DISCOUNT_VALUE = 0.8;
     bool ret = DisplayPowerMgrClient::GetInstance().DiscountBrightness(DISCOUNT_VALUE);
     EXPECT_TRUE(ret);
@@ -709,6 +715,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel1, T
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel1: fun is start");
     const uint32_t SET_BRIGHTNESS = 106;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SET_SLEEP_TIME = 200000;
+    usleep(SET_SLEEP_TIME); // sleep 200ms, wait for setBrightness
     const uint32_t BOOST_BRIGHTNESS_TIME = 10000;
     const int SLEEP_TIME = 100000;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
