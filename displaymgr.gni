@@ -21,7 +21,7 @@ displaymgr_framework_path = "${displaymgr_root_path}/frameworks"
 
 displaymgr_service_zidl = "${displaymgr_root_path}/service/zidl"
 
-displaymgr_innerkits = "${displaymgr_root_path}/interfaces/innerkits"
+displaymgr_innerkits = "${displaymgr_root_path}/interfaces/inner_api"
 
 displaymgr_kits = "${displaymgr_root_path}/interfaces/kits"
 
