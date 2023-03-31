@@ -53,7 +53,7 @@
         "base_group": [],
         "fwk_group": [
           "//base/powermgr/display_manager/interfaces/kits/js/napi:brightness",
-          "//base/powermgr/display_manager/interfaces/inner_api:displaymgr"
+          "//base/powermgr/display_manager/interfaces/innerkits:displaymgr"
         ],
         "service_group": [
           "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
@@ -64,13 +64,13 @@
       },
       "inner_kits": [
         {
-          "name": "//base/powermgr/display_manager/interfaces/inner_api:displaymgr",
+          "name": "//base/powermgr/display_manager/interfaces/innerkits:displaymgr",
           "header": {
             "header_files": [
               "display_power_info.h",
               "display_power_mgr_client.h"
             ],
-            "header_base": "//base/powermgr/display_manager/interfaces/inner_api/native/include"
+            "header_base": "//base/powermgr/display_manager/interfaces/innerkits/native/include"
           }
         }
       ],
