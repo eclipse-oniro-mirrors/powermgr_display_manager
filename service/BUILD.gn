@@ -19,7 +19,7 @@ config("displaymgr_private_config") {
     "${powermgr_utils_path}/setting/include",
     "${powermgr_utils_path}/native/include",
     "//base/hiviewdfx/hicollie/interfaces/native/innerkits/include/xcollie",
-    "${displaymgr_innerkits}/native/include",
+    "//base/powermgr/display_manager/interfaces/innerkits/native/include",
   ]
 }
 
