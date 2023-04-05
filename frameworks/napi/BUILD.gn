@@ -21,7 +21,7 @@ ohos_shared_library("brightness") {
 
   configs = [ "${displaymgr_utils_path}:utils_config" ]
 
-  deps = [ "${displaymgr_innerkits}:displaymgr" ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
   external_deps = [
     "hiview:libxpower_event_js",

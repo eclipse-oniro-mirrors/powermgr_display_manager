@@ -25,7 +25,7 @@ config("module_private_config") {
     "include",
     "include/mock",
     "mock/include",
-    "${displaymgr_innerkits}/native/include",
+    "${displaymgr_inner_api}/native/include",
     "${displaymgr_service_zidl}/include",
     "${displaymgr_utils_path}/native/include",
   ]
@@ -58,7 +58,7 @@ ohos_unittest("unittest_display_mgr_service") {
   ]
 
   deps = [
-    "${displaymgr_innerkits}:displaymgr",
+    "${displaymgr_inner_api}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
@@ -91,7 +91,7 @@ ohos_unittest("display_service_death_test") {
   defines = [ "DISPLAY_SERVICE_DEATH_UT" ]
 
   deps = [
-    "${displaymgr_innerkits}:displaymgr",
+    "${displaymgr_inner_api}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
@@ -115,7 +115,7 @@ ohos_unittest("display_mock_parcel_test") {
   ]
 
   deps = [
-    "${displaymgr_innerkits}:displaymgr",
+    "${displaymgr_inner_api}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
@@ -145,7 +145,7 @@ ohos_unittest("display_mock_test") {
   ]
 
   deps = [
-    "${displaymgr_innerkits}:displaymgr",
+    "${displaymgr_inner_api}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
@@ -168,7 +168,7 @@ ohos_unittest("display_mock_object_test") {
   ]
 
   deps = [
-    "${displaymgr_innerkits}:displaymgr",
+    "${displaymgr_inner_api}:displaymgr",
     "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]

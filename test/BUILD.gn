@@ -16,15 +16,15 @@ import("//build/test.gni")
 
 group("displaymgr_coverage_test") {
   testonly = true
-  deps = [ "unittest/common/native:unittest" ]
+  deps = [ "unittest:unittest" ]
 }
 
 group("displaymgr_native_test") {
   testonly = true
-  deps = [ "unittest/common/native:unittest_display_mgr_service" ]
+  deps = [ "unittest:unittest_display_mgr_service" ]
 }
 
 group("fuzztest") {
   testonly = true
-  deps = [ "unittest/common/display_fuzzer:fuzztest" ]
+  deps = [ "fuzztest:fuzztest" ]
 }
