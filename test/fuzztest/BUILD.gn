@@ -20,7 +20,7 @@ module_output_path = "${displaymgr_part_name}/displaymgr"
 ohos_fuzztest("DisplayFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/powermgr/display_manager/test/unittest/common/display_fuzzer"
+      "${displaymgr_root_path}/test/fuzztest"
 
   include_dirs = [
     "./",
@@ -33,7 +33,7 @@ ohos_fuzztest("DisplayFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "./display_fuzzer.cpp" ]
-  deps = [ "${displaymgr_innerkits}:displaymgr" ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
   external_deps = [
     "c_utils:utils",
