@@ -52,6 +52,7 @@
       "group_type": {
         "base_group": [],
         "fwk_group": [
+          "//base/powermgr/display_manager/frameworks/napi:brightness",
           "//base/powermgr/display_manager/interfaces/inner_api:displaymgr"
         ],
         "service_group": [
