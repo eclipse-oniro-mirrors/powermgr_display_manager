@@ -189,6 +189,9 @@ void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
 
 bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d", id, state);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
@@ -248,6 +251,9 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
 
 bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
@@ -263,6 +269,9 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
 
 bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
@@ -274,6 +283,9 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
 
 bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u", displayId);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
@@ -309,6 +321,9 @@ uint32_t DisplayPowerMgrService::GetMinBrightness()
 
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetDisplayState %{public}d, %{public}d, %{public}d",
                    id, value, duration);
     auto iterator = controllerMap_.find(id);
@@ -391,6 +406,9 @@ void DisplayPowerMgrService::DeactivateAmbientSensor()
 
 bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGI(COMP_SVC, "RegisterCallback");
     if (callback_ != nullptr) {
         DISPLAY_HILOGI(COMP_SVC, "Callback function exist");
@@ -411,6 +429,9 @@ bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callba
 
 bool DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Timing boost brightness: %{public}d, id: %{public}d", timeoutMs, displayId);
     RETURN_IF_WITH_RET(timeoutMs <= 0, false);
     auto iter = controllerMap_.find(displayId);
@@ -420,6 +441,9 @@ bool DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t display
 
 bool DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Cancel boost brightness, id: %{public}d", displayId);
     auto iter = controllerMap_.find(displayId);
     RETURN_IF_WITH_RET(iter == controllerMap_.end(), false);
@@ -445,6 +469,9 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
 
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
     for (auto& iter: controllerMap_) {
         auto control = iter.second;
