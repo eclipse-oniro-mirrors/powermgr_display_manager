@@ -19,7 +19,10 @@ ohos_shared_library("brightness") {
     "${displaymgr_framework_path}/napi/brightness_module.cpp",
   ]
 
-  configs = [ "${displaymgr_utils_path}:utils_config" ]
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    "${displaymgr_utils_path}:coverage_flags",
+  ]
 
   deps = [ "${displaymgr_inner_api}:displaymgr" ]
 

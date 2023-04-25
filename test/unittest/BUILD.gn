@@ -55,6 +55,7 @@ ohos_unittest("unittest_display_mgr_service") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
   ]
 
   deps = [
@@ -86,6 +87,7 @@ ohos_unittest("display_service_death_test") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
   ]
 
   defines = [ "DISPLAY_SERVICE_DEATH_UT" ]
@@ -112,6 +114,7 @@ ohos_unittest("display_mock_parcel_test") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
   ]
 
   deps = [
@@ -137,6 +140,7 @@ ohos_unittest("display_mock_test") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
   ]
 
   defines = [
@@ -165,6 +169,7 @@ ohos_unittest("display_mock_object_test") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
   ]
 
   deps = [

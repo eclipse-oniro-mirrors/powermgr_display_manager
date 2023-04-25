@@ -19,13 +19,15 @@ module_output_path = "${displaymgr_part_name}/displaymgr"
 ##############################fuzztest##########################################
 ohos_fuzztest("DisplayFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "${displaymgr_root_path}/test/fuzztest"
+  fuzz_config_file = "${displaymgr_root_path}/test/fuzztest"
 
   include_dirs = [
     "./",
     "${displaymgr_utils_path}:utils_config",
   ]
+
+  configs = [ "${displaymgr_utils_path}:coverage_flags" ]
+
   cflags = [
     "-g",
     "-O0",
