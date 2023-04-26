@@ -31,7 +31,10 @@ ohos_shared_library("displaymgr") {
     "${displaymgr_service_zidl}/src/display_power_mgr_proxy.cpp",
   ]
 
-  configs = [ ":displaymgr_private_config" ]
+  configs = [
+    ":displaymgr_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+  ]
 
   public_configs = [
     "${displaymgr_utils_path}:utils_config",
