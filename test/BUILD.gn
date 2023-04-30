@@ -26,5 +26,5 @@ group("displaymgr_native_test") {
 
 group("fuzztest") {
   testonly = true
-  deps = [ "fuzztest:fuzztest" ]
+  deps = [ "fuzztest/display_fuzzer:fuzztest" ]
 }
