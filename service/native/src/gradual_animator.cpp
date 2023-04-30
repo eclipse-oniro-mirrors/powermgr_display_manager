@@ -16,7 +16,7 @@
 #include "gradual_animator.h"
 
 #include "display_log.h"
-#include "watchdog.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

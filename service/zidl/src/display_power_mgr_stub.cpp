@@ -25,8 +25,8 @@
 #include "display_common.h"
 #include "display_mgr_errors.h"
 #include "display_power_info.h"
-#include "xcollie.h"
-#include "xcollie_define.h"
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

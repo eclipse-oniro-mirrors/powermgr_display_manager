@@ -23,7 +23,7 @@
 #include "new"
 #include "screen_action.h"
 #include "sensor_agent.h"
-#include "watchdog.h"
+#include "xcollie/watchdog.h"
 #include "display_log.h"
 #include "display_auto_brightness.h"
 #include "display_param_helper.h"
