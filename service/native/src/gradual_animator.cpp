@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -149,13 +149,8 @@ void GradualAnimator::AnimatorHandler::ProcessEvent(const AppExecFwk::InnerEvent
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animator is nullptr");
         return;
     }
-    switch (event->GetInnerEventId()) {
-        case EVENT_STEP: {
-            animator->NextStep();
-            break;
-        }
-        default:
-            break;
+    if (event->GetInnerEventId() == EVENT_STEP) {
+        animator->NextStep();
     }
 }
 } // namespace DisplayPowerMgr
