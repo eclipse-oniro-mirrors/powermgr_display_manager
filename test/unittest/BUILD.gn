@@ -11,9 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/powermgr/display_manager/displaymgr.gni")
-import("//base/powermgr/power_manager/powermgr.gni")
 import("//build/test.gni")
+import("../../displaymgr.gni")
 
 module_output_path = "${displaymgr_part_name}/displaymgr"
 
@@ -39,6 +38,7 @@ deps_ex = [
   "hiviewdfx_hilog_native:libhilog",
   "ipc:ipc_core",
   "power_manager:powermgr_client",
+  "power_manager:power_setting",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
 ]
@@ -60,7 +60,6 @@ ohos_unittest("unittest_display_mgr_service") {
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
-    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -72,6 +71,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "power_manager:power_setting",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -94,7 +94,6 @@ ohos_unittest("display_service_death_test") {
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
-    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -119,7 +118,6 @@ ohos_unittest("display_mock_parcel_test") {
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
-    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -150,7 +148,6 @@ ohos_unittest("display_mock_test") {
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
-    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -174,7 +171,6 @@ ohos_unittest("display_mock_object_test") {
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
-    "${powermgr_utils_path}/setting:power_setting",
     "//third_party/googletest:gtest_main",
   ]
 

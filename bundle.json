@@ -1,5 +1,5 @@
 {
-  "name": "@ohos/display_power_manager",
+  "name": "@ohos/display_manager",
   "version": "3.1",
   "description": "显示能效管理，包括屏幕亮灭、亮度调节等。",
   "homePage": "https://gitee.com/openharmony",
