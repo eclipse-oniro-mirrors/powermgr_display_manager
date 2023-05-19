@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,8 +72,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
     const uint32_t SET_BRIGHTNESS_VALUE = 223;
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS_VALUE);
     EXPECT_TRUE(ret);
-    const int SLEEP_TIME = 100000;
-    usleep(SLEEP_TIME); // sleep 100ms, wait for setting update
+    const int sleepTime = 100000;
+    usleep(sleepTime); // sleep 100ms, wait for setting update
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(brightness, SET_BRIGHTNESS_VALUE);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness001: fun is end");
@@ -677,8 +677,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout1, 
     const uint32_t BOOST_BRIGHTNESS_TIME = 100;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
     EXPECT_TRUE(isBoost);
-    const int SLEEP_TIME = 200000;
-    usleep(SLEEP_TIME); // sleep 200ms, wait for setting update
+    const int sleepTime = 200000;
+    usleep(sleepTime); // sleep 200ms, wait for setting update
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(beforeValue, currentValue);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout1: fun is end");
