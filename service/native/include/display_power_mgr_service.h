@@ -127,6 +127,7 @@ private:
     time_t lastLuxTime_ {0};
     float lastLux_ {0};
     bool luxChanged_ {false};
+    std::mutex mutex_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

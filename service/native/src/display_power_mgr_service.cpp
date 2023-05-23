@@ -410,6 +410,7 @@ bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callba
     if (!Permission::IsSystem()) {
         return false;
     }
+    std::lock_guard lock(mutex_);
     DISPLAY_HILOGI(COMP_SVC, "RegisterCallback");
     if (callback_ != nullptr) {
         DISPLAY_HILOGI(COMP_SVC, "Callback function exist");
