@@ -464,6 +464,7 @@ uint32_t DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId)
 
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
 {
+    std::lock_guard lock(mutex_);
     if (callback_ != nullptr) {
         callback_->OnDisplayStateChanged(displayId, state);
     }
@@ -715,6 +716,7 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
         return;
     }
 
+    std::lock_guard lock(callbackMutex_);
     pms->callback_ = nullptr;
 }
 } // namespace DisplayPowerMgr
