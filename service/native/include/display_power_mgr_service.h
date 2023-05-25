@@ -73,6 +73,8 @@ private:
         CallbackDeathRecipient() = default;
         virtual ~CallbackDeathRecipient() = default;
         virtual void OnRemoteDied(const wptr<IRemoteObject>& remote);
+    private:
+        std::mutex callbackMutex_;
     };
 
     static const uint32_t AUTO_ADJUST_BRIGHTNESS_STRIDE = 1;
