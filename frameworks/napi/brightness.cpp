@@ -29,6 +29,7 @@ const uint32_t ARGV_ONE = 0;
 const uint32_t MAX_FAIL_ARGC = 2;
 const uint32_t MAX_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
 const uint32_t MIN_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
+const uint32_t DEFAULT_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetDefaultBrightness();
 
 const std::string FUNC_SUCEESS_NAME = "success";
 const std::string FUNC_FAIL_NAME = "fail";
@@ -76,16 +77,21 @@ void Brightness::SetValue(napi_callback_info& info)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
     napi_value napiBrightness = GetCallbackInfo(info, napi_number);
-    if (napiBrightness == nullptr) {
+    napi_value napiUndefined = GetCallbackInfo(info, napi_undefined);
+    if (napiBrightness == nullptr && napiUndefined == nullptr) {
         result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
         return;
     }
 
     int32_t value = MIN_BRIGHTNESS;
     if (napi_ok != napi_get_value_int32(env_, napiBrightness, &value)) {
-        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
-        result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
-        return;
+        if (napiUndefined != nullptr) {
+            return;
+        } else {
+            DISPLAY_HILOGW(COMP_FWK, "Failed to get the input number");
+            result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
+            return;
+        }
     }
     if (!brightnessInfo_.SetBrightness(value)) {
         DisplayErrors error = brightnessInfo_.GetServiceError();
