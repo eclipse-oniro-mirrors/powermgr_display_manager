@@ -15,6 +15,6 @@ import("//build/ohos/sa_profile/sa_profile.gni")
 import("../displaymgr.gni")
 
 ohos_sa_profile("displaymgr_sa_profile") {
-  sources = [ "3308.xml" ]
+  sources = [ "3308.json" ]
   part_name = "${displaymgr_part_name}"
 }
