@@ -694,10 +694,10 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout2, 
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout2: fun is start");
     const uint32_t SET_BRIGHTNESS = 106;
     const uint32_t BOOST_BRIGHTNESS_TIME = 100;
-    const int SLEEP_TIME = 100000;
+    const int sleepTime = 100000;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
     EXPECT_TRUE(isBoost);
-    usleep(SLEEP_TIME); // sleep 100ms, wait for cancel BoostBrightness
+    usleep(sleepTime); // sleep 100ms, wait for cancel BoostBrightness
     bool isSet = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     EXPECT_TRUE(isSet);
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
