@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,267 +15,192 @@
 
 #include "display_fuzzer.h"
 
-#include <iostream>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <random>
 #include <ctime>
-#include "securec.h"
-#include "display_power_mgr_client.h"
+#include <iostream>
+#include <random>
 
+#include "display_power_mgr_client.h"
+#define private   public
+#define protected public
+#include "display_power_mgr_service.h"
+#undef private
+#undef protected
+#include "message_parcel.h"
+#include "new"
+#include "securec.h"
+
+using namespace OHOS::PowerMgr;
 using namespace OHOS::DisplayPowerMgr;
 using namespace std;
+using namespace OHOS;
 
 namespace {
 auto& g_displayMgrClient = OHOS::DisplayPowerMgr::DisplayPowerMgrClient::GetInstance();
-constexpr size_t DATANUM = 4;
-constexpr int32_t SIZE = 1;
-constexpr int32_t INDEX_0 = 0;
+const int32_t REWIND_READ_DATA = 0;
+shared_ptr<DisplayPowerMgrService> g_fuzzService = nullptr;
+} // namespace
+
+static uint32_t GetUint32(const uint8_t* data, size_t size)
+{
+    uint32_t value = 0;
+    if (size < sizeof(value)) {
+        return value;
+    }
+    if (memcpy_s(&value, sizeof(value), data, sizeof(value)) != EOK) {
+        return value;
+    }
+    return value;
 }
 
-static void SetDisplayState(const uint8_t* data)
+static void SetDisplayState(const uint8_t* data, size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.SetDisplayState(static_cast<DisplayState>(type[0]));
+    uint32_t type = GetUint32(data, size);
+    g_displayMgrClient.SetDisplayState(static_cast<OHOS::DisplayPowerMgr::DisplayState>(type), StateChangeReason(type));
 }
 
-static void GetDisplayState(const uint8_t* data)
+static void GetDisplayState(const uint8_t* data, size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-
-    g_displayMgrClient.GetDisplayState();
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.GetDisplayState(value);
 }
 
-static void GetDisplayIds(const uint8_t* data)
+static void GetDisplayIds([[maybe_unused]] const uint8_t* data, [[maybe_unused]] size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-
     g_displayMgrClient.GetDisplayIds();
 }
 
-static void GetMainDisplayId(const uint8_t* data)
+static void GetMainDisplayId([[maybe_unused]] const uint8_t* data, [[maybe_unused]] size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-
     g_displayMgrClient.GetMainDisplayId();
 }
 
-static void SetBrightness(const uint8_t* data)
+static void SetBrightness(const uint8_t* data, size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-
-    g_displayMgrClient.SetBrightness(type[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.SetBrightness(value, value);
 }
 
 static void AdjustBrightness(const uint8_t* data, size_t size)
 {
-    int32_t type[1];
-    int32_t duration[1];
-    size_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    if (size <= (idSize + DATANUM) || (memcpy_s(duration, sizeof(duration), (data + DATANUM), idSize) != EOK)) {
-        duration[INDEX_0] = type[INDEX_0];
-    }
-
-    g_displayMgrClient.AdjustBrightness(type[0], duration[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.AdjustBrightness(value, value, value);
 }
 
-static void AutoAdjustBrightness(const uint8_t* data)
+static void AutoAdjustBrightness([[maybe_unused]] const uint8_t* data, [[maybe_unused]] size_t size)
 {
-    int32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-
-    g_displayMgrClient.AutoAdjustBrightness(type[0]);
+    g_displayMgrClient.AutoAdjustBrightness(true);
+    g_displayMgrClient.AutoAdjustBrightness(false);
 }
 
-static void RegisterCallback(const uint8_t* data)
+static void RegisterCallback(const uint8_t* data, size_t size)
 {
-    static OHOS::sptr<OHOS::DisplayPowerMgr::IDisplayPowerCallback> callback;
-    int32_t idSize = 4;
-    if ((memcpy_s(callback, sizeof(callback), data, idSize)) != EOK) {
+    OHOS::sptr<OHOS::DisplayPowerMgr::IDisplayPowerCallback> callback;
+    if (size < sizeof(callback)) {
+        g_displayMgrClient.RegisterCallback(nullptr);
         return;
     }
-
+    if ((memcpy_s(callback, sizeof(callback), data, sizeof(callback))) != EOK) {
+        g_displayMgrClient.RegisterCallback(nullptr);
+        return;
+    }
     g_displayMgrClient.RegisterCallback(callback);
 }
 
-static void OverrideBrightness(const uint8_t* data)
+static void OverrideBrightness(const uint8_t* data, size_t size)
 {
-    uint32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.OverrideBrightness(type[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.OverrideBrightness(value, value);
 }
 
-static void RestoreBrightness(const uint8_t* data)
+static void RestoreBrightness(const uint8_t* data, size_t size)
 {
-    uint32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.RestoreBrightness(type[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.RestoreBrightness(value);
 }
 
-static void BoostBrightness(const uint8_t* data)
+static void BoostBrightness(const uint8_t* data, size_t size)
 {
-    uint32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.BoostBrightness(type[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.BoostBrightness(value, value);
 }
 
-static void CancelBoostBrightness(const uint8_t* data)
+static void CancelBoostBrightness(const uint8_t* data, size_t size)
 {
-    uint32_t type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.CancelBoostBrightness(type[0]);
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.CancelBoostBrightness(value);
 }
 
-static void DiscountBrightness(const uint8_t* data)
+static void DiscountBrightness(const uint8_t* data, size_t size)
 {
-    double type[1];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.DiscountBrightness(value, value);
+}
+
+static void GetBrightness(const uint8_t* data, size_t size)
+{
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.GetBrightness(value);
+}
+
+static void GetDeviceBrightness(const uint8_t* data, size_t size)
+{
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.GetDeviceBrightness(value);
+}
+
+static void DisplayServiceStub(const uint8_t* data, size_t size)
+{
+    uint32_t code;
+    if (size < sizeof(code)) {
+        return;
+    }
+    if (memcpy_s(&code, sizeof(code), data, sizeof(code)) != EOK) {
         return;
     }
 
-    g_displayMgrClient.DiscountBrightness(type[0]);
+    MessageParcel datas;
+    datas.WriteInterfaceToken(DisplayPowerMgrService::GetDescriptor());
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(REWIND_READ_DATA);
+    MessageParcel reply;
+    MessageOption option;
+    if (g_fuzzService == nullptr) {
+        g_fuzzService = make_shared<DisplayPowerMgrService>();
+        g_fuzzService->Init();
+    }
+    g_fuzzService->OnRemoteRequest(code, datas, reply, option);
 }
 
-static void GetBrightness(const uint8_t* data)
-{
-    uint32_t type[SIZE];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.GetBrightness(type[INDEX_0]);
-}
-
-static void GetDeviceBrightness(const uint8_t* data)
-{
-    uint32_t type[SIZE];
-    int32_t idSize = 4;
-    if ((memcpy_s(type, sizeof(type), data, idSize)) != EOK) {
-        return;
-    }
-    g_displayMgrClient.GetDeviceBrightness(type[INDEX_0]);
-}
+static std::vector<std::function<void(const uint8_t*, size_t)>> fuzzFunc = {
+    &SetDisplayState,
+    &GetDisplayState,
+    &GetDisplayIds,
+    &GetMainDisplayId,
+    &SetBrightness,
+    &AdjustBrightness,
+    &AutoAdjustBrightness,
+    &RegisterCallback,
+    &OverrideBrightness,
+    &RestoreBrightness,
+    &BoostBrightness,
+    &CancelBoostBrightness,
+    &DiscountBrightness,
+    &GetBrightness,
+    &GetDeviceBrightness
+};
 
 namespace OHOS {
 bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
 {
-    int32_t idSize = 4;
-    int32_t cond[1];
-    if (static_cast<int32_t>(size) > idSize) {
-        if ((memcpy_s(cond, sizeof(cond), data, idSize)) != EOK) {
-            return false;
-        }
-        std::random_device rd;
-        std::default_random_engine engine(rd());
-        std::uniform_int_distribution<int32_t> randomNum(static_cast<int32_t>(ApiNumber::NUM_ZERO),
-            static_cast<int32_t>(ApiNumber::NUM_END) - 1);
-        int32_t number = randomNum(engine);
-
-        switch (static_cast<ApiNumber>(number)) {
-            case ApiNumber::NUM_ZERO:
-                SetDisplayState(data);
-                break;
-            case ApiNumber::NUM_ONE:
-                GetDisplayState(data);
-                break;
-            case ApiNumber::NUM_TWO:
-                GetDisplayIds(data);
-                break;
-            case ApiNumber::NUM_THREE:
-                GetMainDisplayId(data);
-                break;
-            case ApiNumber::NUM_FOUR:
-                SetBrightness(data);
-                break;
-            case ApiNumber::NUM_FIVE:
-                AdjustBrightness(data, size);
-                break;
-            case ApiNumber::NUM_SIX:
-                AutoAdjustBrightness(data);
-                break;
-            case ApiNumber::NUM_SEVEN:
-                RegisterCallback(data);
-                break;
-            case ApiNumber::NUM_EIGHT:
-                OverrideBrightness(data);
-                break;
-            case ApiNumber::NUM_NINE:
-                RestoreBrightness(data);
-                break;
-            case ApiNumber::NUM_TEN:
-                BoostBrightness(data);
-                break;
-            case ApiNumber::NUM_ELEVEN:
-                CancelBoostBrightness(data);
-                break;
-            case ApiNumber::NUM_TWELVE:
-                g_displayMgrClient.GetDefaultBrightness();
-                break;
-            case ApiNumber::NUM_THIRTEEN:
-                g_displayMgrClient.GetMaxBrightness();
-                break;
-            case ApiNumber::NUM_FOURTEEN:
-                g_displayMgrClient.GetMinBrightness();
-                break;
-            case ApiNumber::NUM_FIFTEEN:
-                DiscountBrightness(data);
-                break;
-            case ApiNumber::NUM_SIXTEEN:
-                GetBrightness(data);
-                break;
-            case ApiNumber::NUM_SEVENTEEN:
-                GetDeviceBrightness(data);
-                break;
-            case ApiNumber::NUM_EIGHTEEN:
-                g_displayMgrClient.IsAutoAdjustBrightness();
-                break;
-            case ApiNumber::NUM_NINETEEN:
-                g_displayMgrClient.GetError();
-                break;
-            default:
-                break;
-        }
-    }
+    std::random_device rd;
+    std::default_random_engine engine(rd());
+    std::uniform_int_distribution<int32_t> randomNum(0, fuzzFunc.size() - 1);
+    int32_t number = randomNum(engine);
+    fuzzFunc[number](data, size);
+    DisplayServiceStub(data, size);
     return true;
 }
 }
