@@ -50,5 +50,6 @@ ohos_shared_library("displaymgr") {
   relative_install_dir = "platformsdk"
 
   subsystem_name = "powermgr"
+  innerapi_tags = [ "platformsdk" ]
   part_name = "${displaymgr_part_name}"
 }
