@@ -27,13 +27,14 @@
     ],
     "deps": {
       "components": [
-        "bundle_framework",
+        "ability_runtime",
         "c_utils",
+        "data_share",
         "eventhandler",
         "hicollie_native",
         "hisysevent_native",
+        "hiview",
         "hiviewdfx_hilog_native",
-        "init",
         "ipc",
         "multimedia_image_framework",
         "napi",
@@ -43,10 +44,7 @@
         "sensor",
         "window_manager"
       ],
-      "third_party": [
-        "googletest",
-        "node"
-      ]
+      "third_party": []
     },
     "build": {
       "group_type": {
