@@ -690,14 +690,14 @@ bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightne
 
 int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
 {
-    int32_t brightness = static_cast<int32_t>(DisplayAutoBrightness::CalculateAutoBrightness(scalar));
+    uint32_t brightness = DisplayAutoBrightness::CalculateAutoBrightness(scalar);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "scalar: %{public}f, brightness: %{public}d", scalar, brightness);
     if (brightness > BRIGHTNESS_MAX) {
         brightness = BRIGHTNESS_MAX;
     } else if (brightness < BRIGHTNESS_MIN) {
         brightness = BRIGHTNESS_MIN;
     }
-    return brightness;
+    return static_cast<int32_t>(brightness);
 }
 
 DisplayErrors DisplayPowerMgrService::GetError()
