@@ -43,6 +43,7 @@ DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetDefaultBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetMaxBrightness();
+std::atomic_bool DisplayPowerMgrService::isBootCompleted_ = false;
 DisplayPowerMgrService::DisplayPowerMgrService() = default;
 
 void DisplayPowerMgrService::Init()
@@ -81,6 +82,7 @@ void DisplayPowerMgrService::RegisterBootCompletedCallback()
         SetBootCompletedBrightness();
         SetBootCompletedAutoBrightness();
         RegisterSettingObservers();
+        isBootCompleted_ = true;
     };
     DisplayParamHelper::RegisterBootCompletedCallback(g_bootCompletedCallback);
 }
@@ -88,6 +90,7 @@ void DisplayPowerMgrService::RegisterBootCompletedCallback()
 void DisplayPowerMgrService::Deinit()
 {
     UnregisterSettingObservers();
+    isBootCompleted_ = false;
 }
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()
@@ -472,8 +475,11 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
 
 int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
+    if (!isBootCompleted_) {
+        return ERR_NO_INIT;
+    }
     if (!Permission::IsSystem()) {
-        return false;
+        return ERR_PERMISSION_DENIED;
     }
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
     for (auto& iter: controllerMap_) {

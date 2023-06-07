@@ -16,6 +16,7 @@
 #ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 #define DISPLAYMGR_DISPLAY_MGR_SERVICE_H
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -130,6 +131,7 @@ private:
     float lastLux_ {0};
     bool luxChanged_ {false};
     std::mutex mutex_;
+    static std::atomic_bool isBootCompleted_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
