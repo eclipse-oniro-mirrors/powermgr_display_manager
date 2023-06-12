@@ -52,7 +52,7 @@ ohos_shared_library("displaymgrservice") {
     "c_utils:utils",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hisysevent_native:libhisysevent",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
@@ -82,7 +82,7 @@ ohos_shared_library("displaymgr_stub") {
 
   external_deps = [
     "c_utils:utils",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "power_manager:power_setting",
