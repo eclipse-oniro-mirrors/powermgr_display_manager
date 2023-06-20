@@ -40,7 +40,7 @@ ohos_shared_library("displaymgr") {
 
   external_deps = [
     "c_utils:utils",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "power_manager:powermgr_client",

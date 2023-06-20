@@ -34,7 +34,7 @@
         "c_utils",
         "data_share",
         "eventhandler",
-        "hicollie_native",
+        "hicollie",
         "hisysevent_native",
         "hiview",
         "hiviewdfx_hilog_native",
