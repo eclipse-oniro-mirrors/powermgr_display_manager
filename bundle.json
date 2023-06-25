@@ -16,7 +16,8 @@
     "name": "display_manager",
     "subsystem": "powermgr",
     "syscap": [
-      "SystemCapability.PowerManager.DisplayPowerManager"
+      "SystemCapability.PowerManager.DisplayPowerManager",
+      "SystemCapability.PowerManager.DisplayPowerManager.Lite"
     ],
     "features": [],
     "adapted_system_type": [
