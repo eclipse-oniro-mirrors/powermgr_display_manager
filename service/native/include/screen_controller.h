@@ -21,7 +21,6 @@
 #include <mutex>
 #include <cstdint>
 
-#include "display_event_handler.h"
 #include "display_power_info.h"
 #include "gradual_animator.h"
 #include "screen_action.h"
@@ -30,13 +29,12 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class ScreenController {
 public:
-    ScreenController(uint32_t displayId, const std::shared_ptr<DisplayEventHandler>& handler);
+    ScreenController(uint32_t displayId);
     virtual ~ScreenController() = default;
 
     class AnimateCallbackImpl : public AnimateCallback {
     public:
-        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
-            const std::shared_ptr<DisplayEventHandler>& handler);
+        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action);
         ~AnimateCallbackImpl() override = default;
         void OnStart() override;
         void OnChanged(uint32_t currentValue) override;
@@ -44,7 +42,6 @@ public:
         void DiscountBrightness(double discount) override;
     private:
         const std::shared_ptr<ScreenAction>& action_;
-        const std::shared_ptr<DisplayEventHandler>& handler_;
         double discount_ {1.0};
     };
 
@@ -97,7 +94,6 @@ private:
     std::shared_ptr<ScreenAction> action_ {nullptr};
     std::shared_ptr<AnimateCallback> animateCallback_ {nullptr};
     std::shared_ptr<GradualAnimator> animator_;
-    const std::shared_ptr<DisplayEventHandler>& handler_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -45,31 +45,21 @@ public:
     uint32_t GetAnimationUpdateTime() const;
 private:
     static const uint32_t DEFAULT_UPDATE_TIME = 30;
-    static const uint32_t EVENT_STEP = 1;
     static const int32_t STRIDE_ABSOLUTE_MIN = 1;
-    class AnimatorHandler : public AppExecFwk::EventHandler {
-    public:
-        AnimatorHandler(const std::shared_ptr<AppExecFwk::EventRunner>& runner,
-            const std::shared_ptr<GradualAnimator>& owner);
-        ~AnimatorHandler() = default;
-        void ProcessEvent(const AppExecFwk::InnerEvent::Pointer& event) override;
-    private:
-        std::weak_ptr<GradualAnimator> owner_;
-    };
+
     void NextStep();
+
     std::string name_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_;
-    std::shared_ptr<AnimatorHandler> handler_;
     std::shared_ptr<AnimateCallback> callback_;
-    bool animating_ = false;
-    uint32_t fromBrightness_;
-    uint32_t toBrightness_;
-    uint32_t duration_;
-    uint32_t updateTime_;
-    uint32_t totalSteps_;
-    int32_t stride_;
-    uint32_t currentBrightness_;
-    uint32_t currentStep_;
+    std::atomic_bool animating_ = false;
+    std::atomic_uint32_t fromBrightness_;
+    std::atomic_uint32_t toBrightness_;
+    std::atomic_uint32_t duration_;
+    std::atomic_uint32_t updateTime_;
+    std::atomic_uint32_t totalSteps_;
+    std::atomic_int32_t stride_;
+    std::atomic_uint32_t currentBrightness_;
+    std::atomic_uint32_t currentStep_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -31,7 +31,6 @@
 #include "sensor_agent_type.h"
 #include "idisplay_power_callback.h"
 #include "display_power_info.h"
-#include "display_event_handler.h"
 #include "display_common.h"
 #include "display_power_mgr_stub.h"
 #include "screen_controller.h"
@@ -123,8 +122,6 @@ private:
     SensorUser sensorUser_ {};
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner_ {nullptr};
-    std::shared_ptr<DisplayEventHandler> handler_ {nullptr};
 
     DisplayErrors lastError_ {DisplayErrors::ERR_OK};
     time_t lastLuxTime_ {0};
