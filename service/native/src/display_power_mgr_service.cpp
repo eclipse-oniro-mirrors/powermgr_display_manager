@@ -233,7 +233,7 @@ std::vector<uint32_t> DisplayPowerMgrService::GetDisplayIds()
 uint32_t DisplayPowerMgrService::GetMainDisplayId()
 {
     uint32_t id = ScreenAction::GetDefaultDisplayId();
-    DISPLAY_HILOGI(COMP_SVC, "GetMainDisplayId %{public}d", id);
+    DISPLAY_HILOGD(COMP_SVC, "GetMainDisplayId %{public}d", id);
     return id;
 }
 
