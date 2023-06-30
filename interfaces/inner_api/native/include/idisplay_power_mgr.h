@@ -35,6 +35,7 @@ public:
         SET_BRIGHTNESS,
         DISCOUNT_BRIGHTNESS,
         OVERRIDE_BRIGHTNESS,
+        OVERRIDE_DISPLAY_OFF_DELAY,
         RESTORE_BRIGHTNESS,
         GET_BRIGHTNESS,
         GET_DEFAULT_BRIGHTNESS,
@@ -56,6 +57,7 @@ public:
     virtual bool SetBrightness(uint32_t value, uint32_t displayId) = 0;
     virtual bool DiscountBrightness(double discount, uint32_t displayId) = 0;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) = 0;
+    virtual bool OverrideDisplayOffDelay(uint32_t delayMs) = 0;
     virtual bool RestoreBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetDefaultBrightness() = 0;
