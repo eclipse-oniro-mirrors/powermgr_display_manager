@@ -25,6 +25,7 @@
 #include "display_common.h"
 #include "display_mgr_errors.h"
 #include "display_power_info.h"
+#include "display_power_mgr_ipc_interface_code.h"
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 
@@ -47,63 +48,64 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         HiviewDFX::XCOLLIE_FLAG_NOOP);
     int32_t ret = ERR_OK;
     switch (code) {
-        case static_cast<int32_t>(IDisplayPowerMgr::SET_DISPLAY_STATE):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_DISPLAY_STATE):
             ret = SetDisplayStateStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_DISPLAY_STATE):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DISPLAY_STATE):
             ret = GetDisplayStateStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_DISPLAY_IDS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DISPLAY_IDS):
             ret = GetDisplayIdsStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_MAIN_DISPLAY_ID):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MAIN_DISPLAY_ID):
             ret = GetMainDisplayIdStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::SET_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS):
             ret = SetBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::DISCOUNT_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::DISCOUNT_BRIGHTNESS):
             ret = DiscountBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_BRIGHTNESS):
             ret = OverrideBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_DISPLAY_OFF_DELAY):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_DISPLAY_OFF_DELAY):
             ret = OverrideDisplayOffDelayStub(data, reply);
-        case static_cast<int32_t>(IDisplayPowerMgr::RESTORE_BRIGHTNESS):
+            break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::RESTORE_BRIGHTNESS):
             ret = RestoreBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_BRIGHTNESS):
             ret = GetBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_DEFAULT_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEFAULT_BRIGHTNESS):
             ret = GetDefaultBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_MAX_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MAX_BRIGHTNESS):
             ret = GetMaxBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_MIN_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MIN_BRIGHTNESS):
             ret = GetMinBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::ADJUST_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::ADJUST_BRIGHTNESS):
             ret = AdjustBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::AUTO_ADJUST_BRIGHTNESS):
             ret = AutoAdjustBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::IS_AUTO_ADJUST_BRIGHTNESS):
             ret = IsAutoAdjustBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::REGISTER_CALLBACK):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::REGISTER_CALLBACK):
             ret = RegisterCallbackStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::BOOST_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::BOOST_BRIGHTNESS):
             ret = BoostBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::CANCEL_BOOST_BRIGHTNESS):
             ret = CancelBoostBrightnessStub(data, reply);
             break;
-        case static_cast<int32_t>(IDisplayPowerMgr::GET_DEVICE_BRIGHTNESS):
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEVICE_BRIGHTNESS):
             ret = GetDeviceBrightnessStub(data, reply);
             break;
         default:
