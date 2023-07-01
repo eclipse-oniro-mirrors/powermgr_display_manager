@@ -28,8 +28,8 @@ ohos_shared_library("brightness") {
 
   external_deps = [
     "c_utils:utils",
+    "hilog:libhilog",
     "hiview:libxpower_event_js",
-    "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
     "power_manager:powermgr_client",
   ]
