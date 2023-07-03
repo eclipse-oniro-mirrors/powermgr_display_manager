@@ -30,13 +30,17 @@
 #include "display_param_helper.h"
 #include "permission.h"
 #include "setting_provider.h"
+#include "ffrt_utils.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 using namespace OHOS::PowerMgr;
 namespace {
 DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
+FFRTQueue g_queue("display_power_mgr_service");
+FFRTHandle g_screenOffDelayTaskHandle;
 }
+
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetDefaultBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MAX = DisplayParamHelper::GetMaxBrightness();
@@ -135,6 +139,16 @@ bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
 {
     return DisplaySettingHelper::GetSettingAutoBrightness(key);
 }
+void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason)
+{
+    isDisplayDelayOff_ = false;
+    DISPLAY_HILOGI(COMP_SVC, "ScreenOffDelay %{public}d, %{public}d,  %{public}d", id, state, reason);
+    auto iterator = controllerMap_.find(id);
+    if (iterator == controllerMap_.end()) {
+        return;
+    }
+    setDisplayStateRet_ = iterator->second->UpdateState(state, reason);
+}
 
 void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
 {
@@ -157,6 +171,28 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             ActivateAmbientSensor();
         } else if (state == DisplayState::DISPLAY_OFF) {
             DeactivateAmbientSensor();
+        }
+    }
+
+    if (state == DisplayState::DISPLAY_OFF) {
+        if (!isDisplayDelayOff_) {
+            DISPLAY_HILOGI(COMP_SVC, "screen off immediately");
+            return iterator->second->UpdateState(state, reason);
+        }
+        displayId_ = id;
+        displayState_ = state;
+        displayReason_ = reason;
+        FFRTTask task = [this]() { ScreenOffDelay(displayId_, displayState_, displayReason_); };
+        g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, displayOffDelayMs_, g_queue);
+        tempState_ = iterator->second->SetDelayOffState();
+        return true;
+    } else if (state == DisplayState::DISPLAY_ON) {
+        if (isDisplayDelayOff_) {
+            DISPLAY_HILOGI(COMP_SVC, "need remove delay task");
+            FFRTUtils::CancelTask(g_screenOffDelayTaskHandle, g_queue);
+            isDisplayDelayOff_ = false;
+            tempState_ = iterator->second->SetOnState();
+            return true;
         }
     }
     return iterator->second->UpdateState(state, reason);
@@ -234,6 +270,16 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
         return false;
     }
     return iter->second->OverrideBrightness(brightness);
+}
+
+bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
+{
+    DISPLAY_HILOGI(COMP_SVC, "OverrideDisplayOffDelay delayMs=%{public}u", delayMs);
+    if (delayMs != DELAY_TIME_UNSET) {
+        isDisplayDelayOff_ = true;
+        displayOffDelayMs_ = delayMs;
+    }
+    return isDisplayDelayOff_;
 }
 
 bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
