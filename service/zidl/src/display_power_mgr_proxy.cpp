@@ -20,6 +20,7 @@
 #include "message_parcel.h"
 #include "display_log.h"
 #include "display_common.h"
+#include "display_power_mgr_ipc_interface_code.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -42,7 +43,8 @@ bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state, uint
     WRITE_PARCEL_WITH_RET(data, Uint32, static_cast<uint32_t>(state), false);
     WRITE_PARCEL_WITH_RET(data, Uint32, reason, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::SET_DISPLAY_STATE),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_DISPLAY_STATE),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -74,7 +76,8 @@ DisplayState DisplayPowerMgrProxy::GetDisplayState(uint32_t id)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, id, DisplayState::DISPLAY_UNKNOWN);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DISPLAY_STATE),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DISPLAY_STATE),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -106,7 +109,8 @@ std::vector<uint32_t> DisplayPowerMgrProxy::GetDisplayIds()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DISPLAY_IDS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DISPLAY_IDS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -146,7 +150,8 @@ uint32_t DisplayPowerMgrProxy::GetMainDisplayId()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MAIN_DISPLAY_ID),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MAIN_DISPLAY_ID),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -179,7 +184,8 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
     WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::SET_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -215,7 +221,8 @@ bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayI
     WRITE_PARCEL_WITH_RET(data, Double, discount, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::DISCOUNT_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::DISCOUNT_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -248,7 +255,9 @@ bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId
     WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_BRIGHTNESS), data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -279,7 +288,9 @@ bool DisplayPowerMgrProxy::OverrideDisplayOffDelay(uint32_t delayMs)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, delayMs, false);
 
-    int ret = remote->SendRequest(static_cast<int32_t>(IDisplayPowerMgr::OVERRIDE_DISPLAY_OFF_DELAY), data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_DISPLAY_OFF_DELAY),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -311,8 +322,9 @@ bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::RESTORE_BRIGHTNESS),
-                                  data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::RESTORE_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -344,7 +356,7 @@ uint32_t DisplayPowerMgrProxy::GetBrightness(uint32_t displayId)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_BRIGHTNESS),
+    int ret = remote->SendRequest(static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_BRIGHTNESS),
                                   data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -375,8 +387,9 @@ uint32_t DisplayPowerMgrProxy::GetDefaultBrightness()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DEFAULT_BRIGHTNESS),
-                                  data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEFAULT_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -406,8 +419,9 @@ uint32_t DisplayPowerMgrProxy::GetMaxBrightness()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MAX_BRIGHTNESS),
-                                  data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MAX_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -437,8 +451,9 @@ uint32_t DisplayPowerMgrProxy::GetMinBrightness()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_MIN_BRIGHTNESS),
-                                  data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_MIN_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;
@@ -471,7 +486,8 @@ bool DisplayPowerMgrProxy::AdjustBrightness(uint32_t id, int32_t value, uint32_t
     WRITE_PARCEL_WITH_RET(data, Int32, value, false);
     WRITE_PARCEL_WITH_RET(data, Int32, duration, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::ADJUST_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -503,7 +519,8 @@ bool DisplayPowerMgrProxy::AutoAdjustBrightness(bool enable)
 
     WRITE_PARCEL_WITH_RET(data, Bool, enable, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::AUTO_ADJUST_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::AUTO_ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -533,7 +550,8 @@ bool DisplayPowerMgrProxy::IsAutoAdjustBrightness()
         return result;
     }
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::IS_AUTO_ADJUST_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::IS_AUTO_ADJUST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -565,7 +583,8 @@ bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback
 
     WRITE_PARCEL_WITH_RET(data, RemoteObject, callback->AsObject(), false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::REGISTER_CALLBACK),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::REGISTER_CALLBACK),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -598,7 +617,8 @@ bool DisplayPowerMgrProxy::BoostBrightness(int32_t timeoutMs, uint32_t displayId
     WRITE_PARCEL_WITH_RET(data, Int32, timeoutMs, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::BOOST_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::BOOST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -629,7 +649,8 @@ bool DisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId)
     }
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::CANCEL_BOOST_BRIGHTNESS),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::CANCEL_BOOST_BRIGHTNESS),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
@@ -662,8 +683,9 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerMgr::GET_DEVICE_BRIGHTNESS),
-                                  data, reply, option);
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEVICE_BRIGHTNESS),
+        data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
         return result;

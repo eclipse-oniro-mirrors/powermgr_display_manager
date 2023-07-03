@@ -21,6 +21,7 @@
 #include "display_log.h"
 #include "display_mgr_errors.h"
 #include "display_power_info.h"
+#include "display_power_callback_ipc_interface_code.h"
 #include "idisplay_power_callback.h"
 #include "ipc_object_stub.h"
 #include "message_option.h"
@@ -45,7 +46,7 @@ int32_t DisplayPowerCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
     int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerCallbackStub", DFX_DELAY_MS, nullptr, nullptr,
         HiviewDFX::XCOLLIE_FLAG_NOOP);
     int32_t ret = ERR_OK;
-    if (code == static_cast<uint32_t>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED)) {
+    if (code == static_cast<uint32_t>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED)) {
         ret = OnDisplayStateChangedStub(data, reply);
     } else {
         ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);

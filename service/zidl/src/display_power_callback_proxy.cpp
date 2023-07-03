@@ -20,6 +20,7 @@
 #include "message_parcel.h"
 #include "display_log.h"
 #include "display_common.h"
+#include "display_power_callback_ipc_interface_code.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -40,7 +41,8 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
     WRITE_PARCEL_NO_RET(data, Uint32, displayId);
     WRITE_PARCEL_NO_RET(data, Uint32, static_cast<uint32_t>(state));
 
-    int ret = remote->SendRequest(static_cast<int>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED),
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED),
         data, reply, option);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
