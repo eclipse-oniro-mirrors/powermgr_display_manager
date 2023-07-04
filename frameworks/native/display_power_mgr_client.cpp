@@ -137,13 +137,6 @@ bool DisplayPowerMgrClient::OverrideBrightness(uint32_t value, uint32_t displayI
     return proxy->OverrideBrightness(value, displayId);
 }
 
-bool DisplayPowerMgrClient::OverrideDisplayOffDelay(uint32_t delayMs)
-{
-    auto proxy = GetProxy();
-    RETURN_IF_WITH_RET(proxy == nullptr, false);
-    return proxy->OverrideDisplayOffDelay(delayMs);
-}
-
 bool DisplayPowerMgrClient::RestoreBrightness(uint32_t displayId)
 {
     auto proxy = GetProxy();

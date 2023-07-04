@@ -47,7 +47,6 @@ public:
     virtual bool SetBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool DiscountBrightness(double discount, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
-    virtual bool OverrideDisplayOffDelay(uint32_t delayMs) override;
     virtual bool RestoreBrightness(uint32_t displayId) override;
     virtual uint32_t GetBrightness(uint32_t displayId) override;
     virtual uint32_t GetDefaultBrightness() override;
@@ -91,7 +90,6 @@ private:
     static const uint32_t BRIGHTNESS_MIN;
     static const uint32_t BRIGHTNESS_DEFAULT;
     static const uint32_t BRIGHTNESS_MAX;
-    static const uint32_t DELAY_TIME_UNSET = 0;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
     static void AmbientLightCallback(SensorEvent* event);
@@ -115,7 +113,6 @@ private:
     static void AutoBrightnessSettingUpdateFunc(const std::string& key);
     static void SetSettingAutoBrightness(bool enable);
     static bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
-    void ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason);
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
@@ -132,13 +129,6 @@ private:
     bool luxChanged_ {false};
     std::mutex mutex_;
     static std::atomic_bool isBootCompleted_;
-    uint32_t displayOffDelayMs_;
-    bool isDisplayDelayOff_ = false;
-    bool setDisplayStateRet_ = true;
-    uint32_t displayId_;
-    DisplayState displayState_;
-    DisplayState tempState_;
-    uint32_t displayReason_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
