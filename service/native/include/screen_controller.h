@@ -46,6 +46,8 @@ public:
     };
 
     DisplayState GetState();
+    DisplayState SetDelayOffState();
+    DisplayState SetOnState();
     bool UpdateState(DisplayState state, uint32_t reason);
     bool IsScreenOn();
 
