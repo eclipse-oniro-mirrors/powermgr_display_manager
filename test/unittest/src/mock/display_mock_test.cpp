@@ -16,7 +16,6 @@
 #include "display_mock_test.h"
 #include "display_log.h"
 #include "display_mgr_errors.h"
-#include "display_power_callback_ipc_interface_code.h"
 #include "display_power_mgr_client.h"
 #include "display_power_mgr_proxy.h"
 #include "ipc_object_stub.h"
@@ -79,7 +78,7 @@ HWTEST_F(DisplayMockTest, DisplayMockTest_002, TestSize.Level0)
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
-    uint32_t code = static_cast<int32_t>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED);
+    uint32_t code = static_cast<int32_t>(IDisplayPowerCallback::ON_DISPLAY_STATE_CHANGED);
     EXPECT_NE(ERR_OK, callbackPtr->OnRemoteRequest(code, data, reply, option));
 }
 

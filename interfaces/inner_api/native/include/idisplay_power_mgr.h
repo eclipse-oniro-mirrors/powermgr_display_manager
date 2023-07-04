@@ -27,6 +27,29 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class IDisplayPowerMgr : public IRemoteBroker {
 public:
+    enum {
+        SET_DISPLAY_STATE = 0,
+        GET_DISPLAY_STATE,
+        GET_DISPLAY_IDS,
+        GET_MAIN_DISPLAY_ID,
+        SET_BRIGHTNESS,
+        DISCOUNT_BRIGHTNESS,
+        OVERRIDE_BRIGHTNESS,
+        OVERRIDE_DISPLAY_OFF_DELAY,
+        RESTORE_BRIGHTNESS,
+        GET_BRIGHTNESS,
+        GET_DEFAULT_BRIGHTNESS,
+        GET_MAX_BRIGHTNESS,
+        GET_MIN_BRIGHTNESS,
+        ADJUST_BRIGHTNESS,
+        AUTO_ADJUST_BRIGHTNESS,
+        IS_AUTO_ADJUST_BRIGHTNESS,
+        REGISTER_CALLBACK,
+        BOOST_BRIGHTNESS,
+        CANCEL_BOOST_BRIGHTNESS,
+        GET_DEVICE_BRIGHTNESS
+    };
+
     virtual bool SetDisplayState(uint32_t id, DisplayState state, uint32_t reason) = 0;
     virtual DisplayState GetDisplayState(uint32_t id) = 0;
     virtual std::vector<uint32_t> GetDisplayIds() = 0;
