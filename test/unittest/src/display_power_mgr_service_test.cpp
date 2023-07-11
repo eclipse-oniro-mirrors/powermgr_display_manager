@@ -267,4 +267,72 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService016, TestSize.Level0)
     bool result = DisplayPowerMgrClient::GetInstance().RegisterCallback(nullptr);
     EXPECT_EQ(result, false);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrService017
+ * @tc.desc: Test OverrideDisplayOffDelay para
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService017, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService017 is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(0);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService018
+ * @tc.desc: Test prohibitting writing delay screen off time in screen off state
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService018, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService018 is start");
+    DisplayState State = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    if (State != DisplayState::DISPLAY_OFF) {
+        DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    }
+    bool ret = DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    EXPECT_FALSE(ret);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService019
+ * @tc.desc: Test srceen delay off
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019 is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayState delayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(delayState == DisplayState::DISPLAY_DELAY_OFF);
+    int sleepTime = 30000;
+    usleep(sleepTime);
+    DisplayState offState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(offState == DisplayState::DISPLAY_OFF);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService020
+ * @tc.desc: Test srceen delay off interrupt
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020 is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+
+    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 5000;
+    usleep(sleepTime);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    sleepTime = 30000;
+    usleep(sleepTime);
+    DisplayState onState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(onState == DisplayState::DISPLAY_ON);
+}
 } // namespace
