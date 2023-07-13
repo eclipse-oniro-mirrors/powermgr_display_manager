@@ -274,11 +274,14 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
 
 bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
 {
-    DISPLAY_HILOGI(COMP_SVC, "OverrideDisplayOffDelay delayMs=%{public}u", delayMs);
-    if (delayMs != DELAY_TIME_UNSET) {
-        isDisplayDelayOff_ = true;
-        displayOffDelayMs_ = delayMs;
+    if (GetDisplayState(GetMainDisplayId()) != DisplayState::DISPLAY_ON || delayMs == DELAY_TIME_UNSET) {
+        isDisplayDelayOff_ = false;
+        return isDisplayDelayOff_;
     }
+    DISPLAY_HILOGI(COMP_SVC, "OverrideDisplayOffDelay delayMs=%{public}u", delayMs);
+    isDisplayDelayOff_ = true;
+    displayOffDelayMs_ = delayMs;
+
     return isDisplayDelayOff_;
 }
 
