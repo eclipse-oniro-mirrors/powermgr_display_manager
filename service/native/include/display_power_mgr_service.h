@@ -132,13 +132,13 @@ private:
     bool luxChanged_ {false};
     std::mutex mutex_;
     static std::atomic_bool isBootCompleted_;
-    uint32_t displayOffDelayMs_;
+    uint32_t displayOffDelayMs_ {0};
     bool isDisplayDelayOff_ = false;
     bool setDisplayStateRet_ = true;
-    uint32_t displayId_;
+    uint32_t displayId_ {0};
     DisplayState displayState_;
     DisplayState tempState_;
-    uint32_t displayReason_;
+    uint32_t displayReason_ {0};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
