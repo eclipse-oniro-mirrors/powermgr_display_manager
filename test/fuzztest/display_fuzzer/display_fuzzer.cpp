@@ -151,6 +151,12 @@ static void GetDeviceBrightness(const uint8_t* data, size_t size)
     g_displayMgrClient.GetDeviceBrightness(value);
 }
 
+static void OverrideDisplayOffDelay(const uint8_t* data, size_t size)
+{
+    uint32_t value = GetUint32(data, size);
+    g_displayMgrClient.OverrideDisplayOffDelay(value);
+}
+
 static void DisplayServiceStub(const uint8_t* data, size_t size)
 {
     uint32_t code;
@@ -189,7 +195,8 @@ static std::vector<std::function<void(const uint8_t*, size_t)>> fuzzFunc = {
     &CancelBoostBrightness,
     &DiscountBrightness,
     &GetBrightness,
-    &GetDeviceBrightness
+    &GetDeviceBrightness,
+    &OverrideDisplayOffDelay
 };
 
 namespace OHOS {
