@@ -46,7 +46,7 @@ static constexpr double DISCOUNT_VALUE = 0.30;
 } // namespace
 
 void DisplayMockTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
-    uint32_t displayId, DisplayPowerMgr::DisplayState state)
+    uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }

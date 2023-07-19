@@ -73,7 +73,7 @@ void DisplayMockParcelTest::DisplayProxyTestFunc(std::shared_ptr<DisplayPowerMgr
 }
 
 void DisplayMockParcelTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
-    uint32_t displayId, DisplayPowerMgr::DisplayState state)
+    uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }

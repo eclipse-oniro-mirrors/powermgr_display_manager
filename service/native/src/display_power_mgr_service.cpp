@@ -465,11 +465,11 @@ uint32_t DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId)
     return iter->second->GetDeviceBrightness();
 }
 
-void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state)
+void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason)
 {
     std::lock_guard lock(mutex_);
     if (callback_ != nullptr) {
-        callback_->OnDisplayStateChanged(displayId, state);
+        callback_->OnDisplayStateChanged(displayId, state, reason);
     }
 }
 

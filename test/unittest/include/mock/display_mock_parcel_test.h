@@ -29,7 +29,8 @@ public:
     public:
         DisplayPowerMgrTestCallback() {};
         virtual ~DisplayPowerMgrTestCallback() {};
-        virtual void OnDisplayStateChanged(uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state) override;
+        virtual void OnDisplayStateChanged(
+            uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
     };
 };
 } // namespace PowerMgr

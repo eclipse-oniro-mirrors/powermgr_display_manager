@@ -62,7 +62,7 @@ public:
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     virtual DisplayErrors GetError() override;
-    void NotifyStateChangeCallback(uint32_t displayId, DisplayState state);
+    void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
     void Init();
     void Deinit();
     static uint32_t GetSafeBrightness(uint32_t value);

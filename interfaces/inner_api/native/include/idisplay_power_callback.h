@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class IDisplayPowerCallback : public IRemoteBroker {
 public:
-    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state) = 0;
+    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state, uint32_t reason) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.powermgr.IDisplayPowerCallback");
 };

@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, DisplayState state)
+void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, DisplayState state, uint32_t reason)
 {
     sptr<IRemoteObject> remote = Remote();
     RETURN_IF(remote == nullptr);
@@ -40,6 +40,7 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
 
     WRITE_PARCEL_NO_RET(data, Uint32, displayId);
     WRITE_PARCEL_NO_RET(data, Uint32, static_cast<uint32_t>(state));
+    WRITE_PARCEL_NO_RET(data, Uint32, reason);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED),
