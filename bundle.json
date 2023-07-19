@@ -41,7 +41,7 @@
         "hiview",
         "hilog",
         "ipc",
-        "multimedia_image_framework",
+        "image_framework",
         "napi",
         "power_manager",
         "safwk",
