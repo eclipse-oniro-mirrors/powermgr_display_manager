@@ -579,7 +579,7 @@ void DisplayPowerMgrService::AmbientLightCallback(SensorEvent* event)
         return;
     }
     AmbientLightData* data = (AmbientLightData*) event->data;
-    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetBrightness());
+    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetCachedSettingBrightness());
     uint32_t animationUpdateTime = mainDisp->second->GetAnimationUpdateTime();
     int32_t changeBrightness = 0;
     if (pms->CalculateBrightness(data->intensity, brightness, changeBrightness)) {

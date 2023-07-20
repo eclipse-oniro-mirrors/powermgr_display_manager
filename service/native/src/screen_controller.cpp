@@ -44,13 +44,16 @@ ScreenController::ScreenController(uint32_t displayId)
 
     string name = "BrightnessController_" + to_string(displayId);
     if (animateCallback_ == nullptr) {
-        animateCallback_ = make_shared<AnimateCallbackImpl>(action_);
+        animateCallback_ = make_shared<AnimateCallbackImpl>(action_, [this](uint32_t brightness) {
+            SetSettingBrightness(brightness);
+        });
     }
     animator_ = make_shared<GradualAnimator>(name, animateCallback_);
 }
 
-ScreenController::AnimateCallbackImpl::AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action)
-    : action_(action)
+ScreenController::AnimateCallbackImpl::AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
+    std::function<void(uint32_t)> callback)
+    : action_(action), callback_(callback)
 {
 }
 
@@ -64,7 +67,8 @@ void ScreenController::AnimateCallbackImpl::OnChanged(uint32_t currentValue)
     auto brightness = DisplayPowerMgrService::GetSafeBrightness(static_cast<uint32_t>(currentValue * discount_));
     bool isSucc = action_->SetBrightness(brightness);
     if (isSucc) {
-        FFRTUtils::SubmitTask(std::bind(&DisplaySettingHelper::SetSettingBrightness, currentValue));
+        FFRTTask task = std::bind([this](uint32_t value) { callback_(value); }, currentValue);
+        FFRTUtils::SubmitTask(task);
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Update brightness, brightness=%{public}u", currentValue);
     } else {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Update brightness failed, brightness=%{public}d", currentValue);
@@ -163,6 +167,11 @@ uint32_t ScreenController::GetBrightness()
 uint32_t ScreenController::GetDeviceBrightness()
 {
     return action_->GetBrightness();
+}
+
+uint32_t ScreenController::GetCachedSettingBrightness() const
+{
+    return cachedSettingBrightness_;
 }
 
 bool ScreenController::DiscountBrightness(double discount, uint32_t gradualDuration)
@@ -310,7 +319,7 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Updated brightness is %{public}s, brightness: %{public}u",
                    isSucc ? "succ" : "failed", brightness);
     if (isSucc && updateSetting) {
-        FFRTUtils::SubmitTask(std::bind(&DisplaySettingHelper::SetSettingBrightness, value));
+        FFRTUtils::SubmitTask(std::bind(&ScreenController::SetSettingBrightness, this, value));
     }
     return isSucc;
 }
