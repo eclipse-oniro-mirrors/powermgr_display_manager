@@ -136,8 +136,8 @@ private:
     bool isDisplayDelayOff_ = false;
     bool setDisplayStateRet_ = true;
     uint32_t displayId_ {0};
-    DisplayState displayState_;
-    DisplayState tempState_;
+    DisplayState displayState_ {DisplayState::DISPLAY_UNKNOWN};
+    DisplayState tempState_ {DisplayState::DISPLAY_UNKNOWN};
     uint32_t displayReason_ {0};
 };
 } // namespace DisplayPowerMgr
