@@ -34,7 +34,8 @@ public:
 
     class AnimateCallbackImpl : public AnimateCallback {
     public:
-        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action);
+        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
+            std::function<void(uint32_t)> callback);
         ~AnimateCallbackImpl() override = default;
         void OnStart() override;
         void OnChanged(uint32_t currentValue) override;
@@ -42,6 +43,7 @@ public:
         void DiscountBrightness(double discount) override;
     private:
         const std::shared_ptr<ScreenAction>& action_;
+        std::function<void(uint32_t)> callback_;
         double discount_ {1.0};
     };
 
@@ -54,6 +56,7 @@ public:
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
+    uint32_t GetCachedSettingBrightness() const;
 
     bool DiscountBrightness(double discount, uint32_t gradualDuration = 0);
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = 0);
