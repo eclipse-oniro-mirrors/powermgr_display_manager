@@ -113,7 +113,8 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     switch (state) {
         case DisplayState::DISPLAY_ON:
         case DisplayState::DISPLAY_OFF: {
-            function<void(DisplayState)> callback = bind(&ScreenController::OnStateChanged, this, placeholders::_1);
+            function<void(DisplayState)> callback =
+                bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
             bool ret = action_->SetDisplayState(state, callback);
             if (!ret) {
                 DISPLAY_HILOGW(FEAT_STATE, "SetDisplayState failed state=%{public}d", state);
@@ -257,7 +258,7 @@ bool ScreenController::IsBrightnessBoosted() const
     return isBrightnessBoosted_;
 }
 
-void ScreenController::OnStateChanged(DisplayState state)
+void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
 {
     auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     if (pms == nullptr) {
@@ -273,7 +274,7 @@ void ScreenController::OnStateChanged(DisplayState state)
     }
 
     if (ret) {
-        pms->NotifyStateChangeCallback(action_->GetDisplayId(), state);
+        pms->NotifyStateChangeCallback(action_->GetDisplayId(), state, reason);
     }
 }
 

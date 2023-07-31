@@ -32,7 +32,7 @@ public:
     explicit DisplayPowerCallbackProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<IDisplayPowerCallback>(impl) {}
     ~DisplayPowerCallbackProxy() override = default;
-    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state) override;
+    virtual void OnDisplayStateChanged(uint32_t displayId, DisplayState state, uint32_t reason) override;
 
 private:
     static inline BrokerDelegator<DisplayPowerCallbackProxy> delegator_;
