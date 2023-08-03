@@ -27,6 +27,9 @@ REGISTER_SYSTEM_ABILITY_BY_ID(DisplaySystemAbility, DISPLAY_MANAGER_SERVICE_ID, 
 }
 void DisplaySystemAbility::OnStart()
 {
+    DISPLAY_HILOGE(COMP_SVC, "Add DISPLAY_MANAGER_SERVICE_SA_ID Listener.");
+    AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+
     DISPLAY_HILOGI(COMP_SVC, "Start service");
     auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     service->Init();
