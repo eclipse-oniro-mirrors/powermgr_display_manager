@@ -34,6 +34,7 @@ public:
 
     void OnStart() override;
     void OnStop() override;
+    virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 
 private:
     sptr<DisplayPowerMgrService> service_;
