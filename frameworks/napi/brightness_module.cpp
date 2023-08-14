@@ -63,7 +63,7 @@ static napi_value SyncWork(napi_env env, const std::string resName, const std::s
         complete,
         reinterpret_cast<void*>(asyncBrightness.get()),
         &asyncBrightness->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncBrightness->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncBrightness->asyncWork, napi_qos_utility));
     asyncBrightness.release();
 
     return nullptr;
@@ -173,7 +173,7 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
         },
         reinterpret_cast<void*>(asyncBrightness.get()),
         &asyncBrightness->asyncWork);
-    NAPI_CALL(env, napi_queue_async_work(env, asyncBrightness->asyncWork));
+    NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncBrightness->asyncWork, napi_qos_utility));
     asyncBrightness.release();
 
     return nullptr;
