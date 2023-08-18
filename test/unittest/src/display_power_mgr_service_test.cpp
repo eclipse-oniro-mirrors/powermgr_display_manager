@@ -292,7 +292,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService018, TestSize.Level0)
     if (State != DisplayState::DISPLAY_OFF) {
         DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     }
-    bool ret = DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    uint32_t delayTime = 10; //delay time is 10ms
+    bool ret = DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
     EXPECT_FALSE(ret);
 }
 
@@ -305,12 +306,13 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    uint32_t delayTime = 10; //delay time is 10ms
+    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     DisplayState delayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(delayState == DisplayState::DISPLAY_DELAY_OFF);
-    int sleepTime = 30000;
-    usleep(sleepTime);
+    int sleepTime = 1; // sleep time is 1s
+    sleep(sleepTime);
     DisplayState offState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(offState == DisplayState::DISPLAY_OFF);
 }
@@ -324,13 +326,13 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-
-    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(10);
+    uint32_t delayTime = 10; //delay time is 10ms
+    DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    int sleepTime = 5000;
+    int sleepTime = 5000; // sleep time is 5ms
     usleep(sleepTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    sleepTime = 30000;
+    sleepTime = 30000; // sleep time is 30ms
     usleep(sleepTime);
     DisplayState onState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(onState == DisplayState::DISPLAY_ON);
