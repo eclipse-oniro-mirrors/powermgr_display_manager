@@ -28,7 +28,9 @@
 #include "refbase.h"
 #include "event_runner.h"
 #include "iremote_object.h"
+#ifdef HAS_SENSORS_SENSOR_PART
 #include "sensor_agent_type.h"
+#endif
 #include "idisplay_power_callback.h"
 #include "display_power_info.h"
 #include "display_common.h"
@@ -78,6 +80,16 @@ private:
         std::mutex callbackMutex_;
     };
 
+#ifdef HAS_SENSORS_SENSOR_PART
+    static void AmbientLightCallback(SensorEvent* event);
+    void InitSensors();
+    void ActivateAmbientSensor();
+    void DeactivateAmbientSensor();
+    bool supportLightSensor_ {false};
+    bool ambientSensorEnabled_ {false};
+    SensorUser sensorUser_ {};
+#endif
+
     static const uint32_t AUTO_ADJUST_BRIGHTNESS_STRIDE = 1;
     static const uint32_t SAMPLING_RATE = 100000000;
     static const int32_t BRIGHTNESS_CHANGE_MIN = 2;
@@ -94,17 +106,13 @@ private:
     static const uint32_t DELAY_TIME_UNSET = 0;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
-    static void AmbientLightCallback(SensorEvent* event);
 
     friend DelayedSpSingleton<DisplayPowerMgrService>;
 
     DisplayPowerMgrService();
-    void InitSensors();
     bool IsChangedLux(float scalar);
     bool CalculateBrightness(float scalar, int32_t& brightness, int32_t& change);
     int32_t GetBrightnessFromLightScalar(float scalar);
-    void ActivateAmbientSensor();
-    void DeactivateAmbientSensor();
     static void RegisterBootCompletedCallback();
     static void SetBootCompletedBrightness();
     static void SetBootCompletedAutoBrightness();
@@ -119,10 +127,7 @@ private:
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
-    bool supportLightSensor_ {false};
     bool autoBrightness_ {false};
-    bool ambientSensorEnabled_ {false};
-    SensorUser sensorUser_ {};
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
 

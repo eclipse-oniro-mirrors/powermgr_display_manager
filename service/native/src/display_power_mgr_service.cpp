@@ -22,7 +22,9 @@
 #include "errors.h"
 #include "new"
 #include "screen_action.h"
+#ifdef HAS_SENSORS_SENSOR_PART
 #include "sensor_agent.h"
+#endif
 #include "xcollie/watchdog.h"
 #include "display_log.h"
 #include "display_auto_brightness.h"
@@ -58,8 +60,9 @@ void DisplayPowerMgrService::Init()
 
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
-
+#ifdef HAS_SENSORS_SENSOR_PART
     InitSensors();
+#endif
     RegisterBootCompletedCallback();
 }
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
@@ -165,6 +168,8 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
     if (iterator == controllerMap_.end()) {
         return false;
     }
+
+#ifdef HAS_SENSORS_SENSOR_PART
     if (id == GetMainDisplayId()) {
         DISPLAY_HILOGI(COMP_SVC, "change ambient sensor status");
         if (state == DisplayState::DISPLAY_ON) {
@@ -173,6 +178,7 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             DeactivateAmbientSensor();
         }
     }
+#endif
 
     if (state == DisplayState::DISPLAY_OFF) {
         if (!isDisplayDelayOff_) {
@@ -323,6 +329,7 @@ uint32_t DisplayPowerMgrService::GetMinBrightness()
     return BRIGHTNESS_MIN;
 }
 
+#ifdef HAS_SENSORS_SENSOR_PART
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
     if (!Permission::IsSystem()) {
@@ -368,11 +375,6 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
     return true;
 }
 
-bool DisplayPowerMgrService::IsAutoAdjustBrightness()
-{
-    return autoBrightness_;
-}
-
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
     if (!autoBrightness_) {
@@ -406,6 +408,12 @@ void DisplayPowerMgrService::DeactivateAmbientSensor()
     DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
     UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
     ambientSensorEnabled_ = false;
+}
+#endif
+
+bool DisplayPowerMgrService::IsAutoAdjustBrightness()
+{
+    return autoBrightness_;
 }
 
 bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callback)
@@ -506,6 +514,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append("\n");
     }
 
+#ifdef HAS_SENSORS_SENSOR_PART
     result.append("Support Ambient Light: ");
     if (supportLightSensor_) {
         result.append("TRUE");
@@ -521,6 +530,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append("OFF");
     }
     result.append("\n");
+#endif
 
     result.append("Brightness Limits: ");
     result.append("Max=" + std::to_string(GetMaxBrightness()) + " ");
@@ -534,6 +544,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     return ERR_OK;
 }
 
+#ifdef HAS_SENSORS_SENSOR_PART
 void DisplayPowerMgrService::InitSensors()
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "InitSensors start");
@@ -638,6 +649,7 @@ bool DisplayPowerMgrService::IsChangedLux(float scalar)
     }
     return false;
 }
+#endif
 
 uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
 {
@@ -676,9 +688,13 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightn
 bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness, int32_t& change)
 {
     const float lastLux = lastLux_;
+
+#ifdef HAS_SENSORS_SENSOR_PART
     if (!IsChangedLux(scalar)) {
         return false;
     }
+#endif
+
     int32_t calcBrightness = GetBrightnessFromLightScalar(scalar);
     int32_t difference = abs(calcBrightness - brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "lux: %{public}f -> %{public}f, screen: %{public}d -> %{public}d",

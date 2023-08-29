@@ -13,6 +13,13 @@
 
 import("//build/ohos.gni")
 
+if (!defined(global_parts_info) || defined(global_parts_info.sensors_sensor)) {
+  has_sensors_sensor_part = true
+  cflags_cc = [ "-DHAS_SENSORS_SENSOR_PART" ]
+} else {
+  has_sensor_part = false
+}
+
 displaymgr_part_name = "display_manager"
 
 displaymgr_root_path = "//base/powermgr/display_manager"
