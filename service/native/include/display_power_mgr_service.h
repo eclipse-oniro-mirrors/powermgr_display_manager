@@ -46,7 +46,7 @@ public:
     virtual DisplayState GetDisplayState(uint32_t id) override;
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;
-    virtual bool SetBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool SetBrightness(uint32_t value, uint32_t displayId, bool continuous = false) override;
     virtual bool DiscountBrightness(double discount, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool OverrideDisplayOffDelay(uint32_t delayMs) override;

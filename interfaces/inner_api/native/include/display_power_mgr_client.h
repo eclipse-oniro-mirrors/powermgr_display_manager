@@ -37,7 +37,7 @@ public:
     DisplayState GetDisplayState(uint32_t id = 0);
     std::vector<uint32_t> GetDisplayIds();
     int32_t GetMainDisplayId();
-    bool SetBrightness(uint32_t value, uint32_t displayId = 0);
+    bool SetBrightness(uint32_t value, uint32_t displayId = 0, bool continuous = false);
     bool DiscountBrightness(double discount, uint32_t displayId = 0);
     bool OverrideBrightness(uint32_t value, uint32_t displayId = 0);
     bool OverrideDisplayOffDelay(uint32_t delayMs);

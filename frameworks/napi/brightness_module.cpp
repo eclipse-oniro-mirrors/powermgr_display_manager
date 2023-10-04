@@ -46,7 +46,7 @@ static napi_value SyncWork(napi_env env, const std::string resName, const std::s
     napi_get_undefined(env, &undefined);
     std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env);
     RETURN_IF_WITH_RET(asyncBrightness == nullptr, undefined);
-    napi_value options = asyncBrightness->GetCallbackInfo(info, napi_object);
+    napi_value options = asyncBrightness->GetCallbackInfo(info, 0, napi_object);
     RETURN_IF_WITH_RET(options == nullptr, undefined);
     RETURN_IF_WITH_RET(!asyncBrightness->CreateCallbackRef(options), undefined);
     if (!valName.empty()) {
@@ -151,7 +151,7 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
 {
     std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env, runningLock);
     RETURN_IF_WITH_RET(asyncBrightness == nullptr, nullptr);
-    napi_value options = asyncBrightness->GetCallbackInfo(info, napi_object);
+    napi_value options = asyncBrightness->GetCallbackInfo(info, 0, napi_object);
     RETURN_IF_WITH_RET(options == nullptr, nullptr);
     RETURN_IF_WITH_RET(!asyncBrightness->CreateCallbackRef(options), nullptr);
     asyncBrightness->CreateValueRef(options, Brightness::KEEP_SCREENON, napi_boolean);

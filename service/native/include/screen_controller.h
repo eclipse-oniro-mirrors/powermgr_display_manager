@@ -54,7 +54,7 @@ public:
     bool UpdateState(DisplayState state);
     bool IsScreenOn();
 
-    bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0);
+    bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
     uint32_t GetCachedSettingBrightness() const;

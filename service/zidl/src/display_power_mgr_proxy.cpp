@@ -166,7 +166,7 @@ uint32_t DisplayPowerMgrProxy::GetMainDisplayId()
     return result;
 }
 
-bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId, bool continuous)
 {
     sptr<IRemoteObject> remote = Remote();
     RETURN_IF_WITH_RET(remote == nullptr, false);
@@ -183,6 +183,7 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId)
 
     WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
     WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    WRITE_PARCEL_WITH_RET(data, Bool, continuous, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS),
