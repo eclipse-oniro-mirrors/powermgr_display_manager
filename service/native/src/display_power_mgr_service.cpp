@@ -230,7 +230,7 @@ uint32_t DisplayPowerMgrService::GetMainDisplayId()
     return id;
 }
 
-bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, bool continuous)
 {
     if (!Permission::IsSystem()) {
         lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
@@ -238,12 +238,13 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId)
     }
 
     auto brightness = GetSafeBrightness(value);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u, continuous=%{public}d",
+        displayId, brightness, continuous);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return iter->second->SetBrightness(brightness);
+    return iter->second->SetBrightness(brightness, 0, continuous);
 }
 
 bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId)

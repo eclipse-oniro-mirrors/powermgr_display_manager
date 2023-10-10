@@ -24,8 +24,11 @@ using namespace OHOS::PowerMgr;
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
-const uint32_t MAX_ARGC = 1;
-const uint32_t ARGV_ONE = 0;
+const uint32_t MAX_ARGC = 2;
+const uint32_t ARGV_BRIGHTNESS_INDEX = 0;
+const uint32_t ARGV_CONTINUOUS_INDEX = 1;
+const uint32_t ERR_DATA_INDEX = 0;
+const uint32_t ERR_CODE_INDEX = 1;
 const uint32_t MAX_FAIL_ARGC = 2;
 const uint32_t MAX_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
 const uint32_t MIN_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
@@ -76,15 +79,16 @@ void Brightness::GetValue()
 void Brightness::SetValue(napi_callback_info& info)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness interface");
-    napi_value napiBrightness = GetCallbackInfo(info, napi_number);
-    napi_value napiUndefined = GetCallbackInfo(info, napi_undefined);
+    napi_value napiBrightness = GetCallbackInfo(info, ARGV_BRIGHTNESS_INDEX, napi_number);
+    napi_value napiUndefined = GetCallbackInfo(info, ARGV_BRIGHTNESS_INDEX, napi_undefined);
     if (napiBrightness == nullptr && napiUndefined == nullptr) {
         result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
         return;
     }
 
     int32_t value = MIN_BRIGHTNESS;
-    if (napi_ok != napi_get_value_int32(env_, napiBrightness, &value)) {
+    bool continuous = false;
+    if (napi_get_value_int32(env_, napiBrightness, &value) != napi_ok) {
         if (napiUndefined != nullptr) {
             return;
         } else {
@@ -93,7 +97,12 @@ void Brightness::SetValue(napi_callback_info& info)
             return;
         }
     }
-    if (!brightnessInfo_.SetBrightness(value)) {
+    napi_value napiContinuous = GetCallbackInfo(info, ARGV_CONTINUOUS_INDEX, napi_boolean);
+    if (napiContinuous != nullptr) {
+        napi_get_value_bool(env_, napiContinuous, &continuous);
+    }
+
+    if (!brightnessInfo_.SetBrightness(value, continuous)) {
         DisplayErrors error = brightnessInfo_.GetServiceError();
         if (error != DisplayErrors::ERR_OK) {
             result_.ThrowError(env_, error);
@@ -111,7 +120,7 @@ void Brightness::SystemSetValue()
         napi_value napiVal = nullptr;
         napi_get_reference_value(env_, napiValRef_, &napiVal);
         napi_get_value_int32(env_, napiVal, &brightness);
-        brightnessInfo_.SetBrightness(brightness);
+        brightnessInfo_.SetBrightness(brightness, false);
         ReleaseReference(napiValRef_);
     }
     ExecuteCallback();
@@ -158,7 +167,7 @@ void Brightness::SetKeepScreenOn()
     ExecuteCallback();
 }
 
-napi_value Brightness::GetCallbackInfo(napi_callback_info& info, napi_valuetype checkType)
+napi_value Brightness::GetCallbackInfo(napi_callback_info& info, uint32_t index, napi_valuetype checkType)
 {
     size_t argc = MAX_ARGC;
     napi_value argv[argc];
@@ -169,12 +178,12 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info& info, napi_valuetype 
         return nullptr;
     }
 
-    if (argc != MAX_ARGC) {
-        DISPLAY_HILOGW(COMP_FWK, "Lack of parameter");
+    if (argc > MAX_ARGC || index >= argc) {
+        DISPLAY_HILOGW(COMP_FWK, "parameter %{pulic}u is invalid", index);
         return nullptr;
     }
 
-    napi_value options = argv[ARGV_ONE];
+    napi_value options = argv[index];
     RETURN_IF_WITH_RET(!CheckValueType(options, checkType), nullptr);
     return options;
 }
@@ -226,8 +235,8 @@ void Brightness::Result::GetError(napi_env env, napi_value* error, size_t& size)
     napi_create_string_utf8(env, msg_.c_str(), msg_.size(), &data);
     napi_create_int32(env, code_, &code);
     size = MAX_FAIL_ARGC;
-    error[ARGV_ONE] = data;
-    error[MAX_ARGC] = code;
+    error[ERR_DATA_INDEX] = data;
+    error[ERR_CODE_INDEX] = code;
 }
 
 napi_value Brightness::Result::GetError(napi_env& env)
@@ -285,12 +294,12 @@ uint32_t Brightness::BrightnessInfo::GetBrightness() const
     return brightness;
 }
 
-bool Brightness::BrightnessInfo::SetBrightness(int32_t value)
+bool Brightness::BrightnessInfo::SetBrightness(int32_t value, bool continuous)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d", value);
     value = value > static_cast<int32_t>(MAX_BRIGHTNESS) ? static_cast<int32_t>(MAX_BRIGHTNESS) : value;
     value = value < static_cast<int32_t>(MIN_BRIGHTNESS) ? static_cast<int32_t>(MIN_BRIGHTNESS) : value;
-    bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value);
+    bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value, 0, continuous);
     if (!isSucc) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Failed to set brightness: %{public}d", value);
     }

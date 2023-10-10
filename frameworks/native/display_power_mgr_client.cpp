@@ -116,11 +116,11 @@ int32_t DisplayPowerMgrClient::GetMainDisplayId()
     return static_cast<int32_t>(proxy->GetMainDisplayId());
 }
 
-bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId, bool continuous)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, false);
-    return proxy->SetBrightness(value, displayId);
+    return proxy->SetBrightness(value, displayId, continuous);
 }
 
 bool DisplayPowerMgrClient::DiscountBrightness(double discount, uint32_t displayId)

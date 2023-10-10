@@ -149,7 +149,7 @@ bool ScreenController::IsScreenOn()
     return (state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM);
 }
 
-bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
+bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
 {
     if (!CanSetBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot set brightness, ignore the change,"\
@@ -157,7 +157,7 @@ bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration)
         cachedSettingBrightness_ = value;
         return false;
     }
-    return UpdateBrightness(value, gradualDuration, true);
+    return UpdateBrightness(value, gradualDuration, !continuous);
 }
 
 uint32_t ScreenController::GetBrightness()

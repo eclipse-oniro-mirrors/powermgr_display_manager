@@ -178,11 +178,13 @@ int32_t DisplayPowerMgrStub::SetBrightnessStub(MessageParcel& data, MessageParce
 {
     uint32_t value = 0;
     uint32_t displayId = 0;
+    bool continuous = false;
 
     READ_PARCEL_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
     READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    READ_PARCEL_WITH_RET(data, Bool, continuous, E_READ_PARCEL_ERROR);
 
-    bool ret = SetBrightness(value, displayId);
+    bool ret = SetBrightness(value, displayId, continuous);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write SetBrightness return value");
         return E_WRITE_PARCEL_ERROR;

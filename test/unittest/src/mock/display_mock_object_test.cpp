@@ -62,7 +62,7 @@ HWTEST_F(DisplayMockObjectTest, DisplayMockObjectTest_001, TestSize.Level0)
     result.push_back(DISPLAY_ID);
     EXPECT_NE(result, sptrDisplayProxy->GetDisplayIds());
     EXPECT_EQ(MAIN_ID_PROXY, sptrDisplayProxy->GetMainDisplayId());
-    EXPECT_FALSE(sptrDisplayProxy->SetBrightness(BRIGHTNESS_SETTING_VALUE, DISPLAY_ID));
+    EXPECT_FALSE(sptrDisplayProxy->SetBrightness(BRIGHTNESS_SETTING_VALUE, DISPLAY_ID, false));
     EXPECT_FALSE(sptrDisplayProxy->DiscountBrightness(DISCOUNT_VALUE, DISPLAY_ID));
     EXPECT_FALSE(sptrDisplayProxy->OverrideBrightness(BRIGHTNESS_OVERRIDE_VALUE, DISPLAY_ID));
     EXPECT_FALSE(sptrDisplayProxy->RestoreBrightness(DISPLAY_ID));

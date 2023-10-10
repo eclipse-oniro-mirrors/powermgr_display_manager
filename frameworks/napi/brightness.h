@@ -42,7 +42,7 @@ public:
     void GetMode();
     void SetMode();
     void SetKeepScreenOn();
-    napi_value GetCallbackInfo(napi_callback_info& info, napi_valuetype checkType);
+    napi_value GetCallbackInfo(napi_callback_info& info, uint32_t index, napi_valuetype checkType);
     bool CreateCallbackRef(napi_value& options);
     void CreateValueRef(napi_value& options, const std::string& valName, napi_valuetype checkType);
 
@@ -79,7 +79,7 @@ private:
     class BrightnessInfo {
     public:
         uint32_t GetBrightness() const;
-        bool SetBrightness(int32_t value);
+        bool SetBrightness(int32_t value, bool continuous);
         int32_t GetAutoMode() const;
         bool SetAutoMode(bool mode);
         void ScreenOn(bool keep, std::shared_ptr<PowerMgr::RunningLock>& runningLock);
