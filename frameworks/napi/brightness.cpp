@@ -25,6 +25,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
 const uint32_t MAX_ARGC = 2;
+const uint32_t CALLBACK_ARGC = 1;
 const uint32_t ARGV_BRIGHTNESS_INDEX = 0;
 const uint32_t ARGV_CONTINUOUS_INDEX = 1;
 const uint32_t ERR_DATA_INDEX = 0;
@@ -340,7 +341,7 @@ void Brightness::ExecuteCallback()
     if (!error) {
         DISPLAY_HILOGI(COMP_FWK, "Call the js success method");
         napi_value result = result_.GetResult(env_);
-        size_t argc = result ? MAX_ARGC : 0;
+        size_t argc = result ? CALLBACK_ARGC : 0;
         CallFunction(successRef_, argc, result ? &result : nullptr);
     }
 
