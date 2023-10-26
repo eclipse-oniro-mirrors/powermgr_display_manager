@@ -326,13 +326,13 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    uint32_t delayTime = 10; //delay time is 10ms
+    uint32_t delayTime = 200; //delay time is 200ms
     DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    int sleepTime = 5000; // sleep time is 5ms
+    int sleepTime = 100000; // sleep time is 100ms
     usleep(sleepTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    sleepTime = 30000; // sleep time is 30ms
+    sleepTime = 300000; // sleep time is 300ms
     usleep(sleepTime);
     DisplayState onState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(onState == DisplayState::DISPLAY_ON);
