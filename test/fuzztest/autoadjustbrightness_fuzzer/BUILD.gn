@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../displaymgr.gni")
 
-module_output_path = "display_manager/display_power_manager"
+module_output_path = "display_manager/display_state_manager"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("AutoAdjustBrightnessFuzzTest") {
