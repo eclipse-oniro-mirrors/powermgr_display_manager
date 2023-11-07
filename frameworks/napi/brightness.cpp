@@ -297,7 +297,7 @@ uint32_t Brightness::BrightnessInfo::GetBrightness() const
 
 bool Brightness::BrightnessInfo::SetBrightness(int32_t value, bool continuous)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d", value);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d, %{public}d", value, continuous);
     value = value > static_cast<int32_t>(MAX_BRIGHTNESS) ? static_cast<int32_t>(MAX_BRIGHTNESS) : value;
     value = value < static_cast<int32_t>(MIN_BRIGHTNESS) ? static_cast<int32_t>(MIN_BRIGHTNESS) : value;
     bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value, 0, continuous);
