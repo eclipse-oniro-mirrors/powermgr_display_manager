@@ -41,6 +41,10 @@ namespace {
 DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
 FFRTQueue g_queue("display_power_mgr_service");
 FFRTHandle g_screenOffDelayTaskHandle;
+const uint32_t GET_DISPLAY_ID_DELAY_MS = 50;
+const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
+const uint32_t DEFALUT_DISPLAY_ID = 0;
+uint32_t g_getDisplayIdRetryCount = 0;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -53,6 +57,16 @@ void DisplayPowerMgrService::Init()
 {
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
+    uint32_t retryCount = GET_DISPLAY_ID_RETRY_COUNT;
+    if (displayIds.empty()) {
+        if (g_getDisplayIdRetryCount < GET_DISPLAY_ID_RETRY_COUNT) {
+            DISPLAY_HILOGI(COMP_SVC, "cannot find any display id, retry!");
+            g_getDisplayIdRetryCount++;
+            FFRTTask task = [this]() { Init(); };
+            FFRTUtils::SubmitDelayTask(task, GET_DISPLAY_ID_DELAY_MS, g_queue);
+            return;
+        }
+    }
     for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id));
@@ -166,7 +180,14 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
     DISPLAY_HILOGI(COMP_SVC, "SetDisplayState %{public}d, %{public}d", id, state);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
-        return false;
+        if (id != DEFALUT_DISPLAY_ID) {
+            return false;
+        }
+        id = GetMainDisplayId();
+        iterator = controllerMap_.find(id);
+        if (iterator == controllerMap_.end()) {
+            return false;
+        }
     }
 
 #ifdef HAS_SENSORS_SENSOR_PART
@@ -209,7 +230,14 @@ DisplayState DisplayPowerMgrService::GetDisplayState(uint32_t id)
     DISPLAY_HILOGD(COMP_SVC, "GetDisplayState %{public}d", id);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
-        return DisplayState::DISPLAY_UNKNOWN;
+        if (id != DEFALUT_DISPLAY_ID) {
+            return DisplayState::DISPLAY_UNKNOWN;
+        }
+        id = GetMainDisplayId();
+        iterator = controllerMap_.find(id);
+        if (iterator == controllerMap_.end()) {
+            return DisplayState::DISPLAY_UNKNOWN;
+        }
     }
     return iterator->second->GetState();
 }
