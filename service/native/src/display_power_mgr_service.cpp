@@ -482,7 +482,7 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
     }
 }
 
-void DisplayPowerMgrService::DumpDisplayInfo(std::string result)
+void DisplayPowerMgrService::DumpDisplayInfo(std::string& result)
 {
     for (auto& iter: controllerMap_) {
         auto control = iter.second;
@@ -518,7 +518,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         return ERR_PERMISSION_DENIED;
     }
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
-    DisplayPowerMgrService::DumpDisplayInfo(result);
+    DumpDisplayInfo(result);
 #ifdef HAS_SENSORS_SENSOR_PART
     result.append("Support Ambient Light: ");
     if (supportLightSensor_) {

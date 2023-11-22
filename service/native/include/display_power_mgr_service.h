@@ -63,7 +63,7 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
-    void DumpDisplayInfo(std::string result);
+    void DumpDisplayInfo(std::string& result);
     virtual DisplayErrors GetError() override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
     void Init();
