@@ -63,7 +63,6 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
-    void DumpDisplayInfo(std::string& result);
     virtual DisplayErrors GetError() override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
     void Init();
@@ -114,6 +113,7 @@ private:
     bool IsChangedLux(float scalar);
     bool CalculateBrightness(float scalar, int32_t& brightness, int32_t& change);
     int32_t GetBrightnessFromLightScalar(float scalar);
+    void DumpDisplayInfo(std::string& result);
     static void RegisterBootCompletedCallback();
     static void SetBootCompletedBrightness();
     static void SetBootCompletedAutoBrightness();
