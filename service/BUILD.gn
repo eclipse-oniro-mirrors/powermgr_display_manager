@@ -25,6 +25,13 @@ config("displaymgr_public_config") {
 }
 
 ohos_shared_library("displaymgrservice") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
   sources = [
     "native/src/display_auto_brightness.cpp",
     "native/src/display_param_helper.cpp",
