@@ -40,12 +40,14 @@ public:
     bool SetDisplayPower(DisplayState state, uint32_t reason);
     uint32_t GetBrightness();
     bool SetBrightness(uint32_t value);
+    void SetCoordinated(bool coordinated);
 
 private:
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
     std::mutex mutexBrightness_;
     uint32_t brightness_ {102};
     uint32_t displayId_ {DEFAULT_DISPLAY_ID};
+    bool coordinated_ {false};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

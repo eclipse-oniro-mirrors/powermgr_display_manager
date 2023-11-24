@@ -700,6 +700,40 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
     return result;
 }
 
+bool DisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t displayId)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Bool, coordinated, false);
+    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_COORDINATED),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
 DisplayErrors DisplayPowerMgrProxy::GetError()
 {
     return lastError_;

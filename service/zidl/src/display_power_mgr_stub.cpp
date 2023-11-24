@@ -108,6 +108,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEVICE_BRIGHTNESS):
             ret = GetDeviceBrightnessStub(data, reply);
             break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_COORDINATED):
+            ret = SetCoordinatedStub(data, reply);
+            break;
         default:
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -389,6 +392,22 @@ int32_t DisplayPowerMgrStub::GetDeviceBrightnessStub(MessageParcel& data, Messag
     uint32_t ret = GetDeviceBrightness(displayId);
     if (!reply.WriteUint32(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write GetDeviceBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::SetCoordinatedStub(MessageParcel& data, MessageParcel& reply)
+{
+    bool coordinated = false;
+    uint32_t displayId = 0;
+
+    READ_PARCEL_WITH_RET(data, Bool, coordinated, E_READ_PARCEL_ERROR);
+    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+
+    bool ret = SetCoordinated(coordinated, displayId);
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetCoordinatedStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;

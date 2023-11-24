@@ -47,6 +47,7 @@ public:
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) = 0;
     virtual bool CancelBoostBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) = 0;
+    virtual bool SetCoordinated(bool coordinated, uint32_t displayId) = 0;
     virtual DisplayErrors GetError() = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");

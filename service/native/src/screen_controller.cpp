@@ -117,7 +117,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                 bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
             bool ret = action_->SetDisplayState(state, callback);
             if (!ret) {
-                DISPLAY_HILOGW(FEAT_STATE, "SetDisplayState failed state=%{public}d", state);
+                DISPLAY_HILOGW(FEAT_STATE, "Update display state failed, state=%{public}d", state);
                 return ret;
             }
             break;
@@ -126,7 +126,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
         case DisplayState::DISPLAY_SUSPEND: {
             bool ret = action_->SetDisplayPower(state, stateChangeReason_);
             if (!ret) {
-                DISPLAY_HILOGW(FEAT_STATE, "SetDisplayPower failed state=%{public}d", state);
+                DISPLAY_HILOGW(FEAT_STATE, "Update display power failed, state=%{public}d", state);
                 return ret;
             }
             break;
@@ -394,6 +394,11 @@ double ScreenController::GetDiscount() const
 uint32_t ScreenController::GetAnimationUpdateTime() const
 {
     return animator_->GetAnimationUpdateTime();
+}
+
+void ScreenController::SetCoordinated(bool coordinated)
+{
+    action_->SetCoordinated(coordinated);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

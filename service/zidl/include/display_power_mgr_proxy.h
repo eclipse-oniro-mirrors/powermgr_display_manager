@@ -56,6 +56,7 @@ public:
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) override;
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
+    virtual bool SetCoordinated(bool coordinated, uint32_t displayId) override;
     virtual DisplayErrors GetError() override;
 
 private:
