@@ -337,4 +337,24 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
     DisplayState onState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(onState == DisplayState::DISPLAY_ON);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrService021
+ * @tc.desc: Test set coordinated and set display state
+ * @tc.type: FUNC
+ * @tc.require: issueI8JBT4
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021 is start");
+    bool coordinated = true;
+    auto ret = DisplayPowerMgrClient::GetInstance().SetCoordinated(coordinated);
+    EXPECT_TRUE(ret);
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
+        DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
+    EXPECT_TRUE(ret);
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
+        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
+    EXPECT_TRUE(ret);
+}
 } // namespace

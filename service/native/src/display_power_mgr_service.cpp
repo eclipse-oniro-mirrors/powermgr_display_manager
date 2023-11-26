@@ -502,6 +502,18 @@ uint32_t DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId)
     return iter->second->GetDeviceBrightness();
 }
 
+bool DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displayId)
+{
+    if (!Permission::IsSystem()) {
+        return false;
+    }
+    DISPLAY_HILOGD(FEAT_STATE, "Set coordinated=%{public}d, displayId=%{public}u", coordinated, displayId);
+    auto iter = controllerMap_.find(displayId);
+    RETURN_IF_WITH_RET(iter == controllerMap_.end(), false);
+    iter->second->SetCoordinated(coordinated);
+    return true;
+}
+
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason)
 {
     std::lock_guard lock(mutex_);

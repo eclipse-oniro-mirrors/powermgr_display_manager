@@ -51,7 +51,6 @@ public:
     DisplayState SetDelayOffState();
     DisplayState SetOnState();
     bool UpdateState(DisplayState state, uint32_t reason);
-    bool UpdateState(DisplayState state);
     bool IsScreenOn();
 
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
@@ -75,6 +74,7 @@ public:
     double GetDiscount() const;
 
     uint32_t GetAnimationUpdateTime() const;
+    void SetCoordinated(bool coordinated);
 private:
     void OnStateChanged(DisplayState state, uint32_t reason);
 

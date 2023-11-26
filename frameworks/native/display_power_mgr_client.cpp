@@ -233,6 +233,13 @@ uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
     return proxy->GetDeviceBrightness(displayId);
 }
 
+bool DisplayPowerMgrClient::SetCoordinated(bool coordinated, uint32_t displayId)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, 0);
+    return proxy->SetCoordinated(coordinated, displayId);
+}
+
 DisplayErrors DisplayPowerMgrClient::GetError()
 {
     if (lastError_ != DisplayErrors::ERR_OK) {

@@ -16,11 +16,12 @@
 #include "screen_action.h"
 
 #include <hisysevent.h>
-
 #include <ipc_skeleton.h>
+
 #include "dm_common.h"
 #include "display_manager.h"
 #include "display_log.h"
+#include "power_state_machine_info.h"
 #include "screen_manager.h"
 
 namespace OHOS {
@@ -84,9 +85,7 @@ DisplayState ScreenAction::GetDisplayState()
 
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState: displayId=%{public}u, state=%{public}u",
-                   displayId_, static_cast<uint32_t>(state));
-
+    DISPLAY_HILOGI(FEAT_STATE, "displayId=%{public}u, state=%{public}u", displayId_, static_cast<uint32_t>(state));
     Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -101,8 +100,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds,
         [callback](Rosen::DisplayState rosenState) {
-            DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState Callback:%{public}d",
-                static_cast<uint32_t>(rosenState));
+            DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState Callback:%{public}d", static_cast<uint32_t>(rosenState));
             DisplayState state;
             switch (rosenState) {
                 case Rosen::DisplayState::ON:
@@ -126,7 +124,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
 
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayPower: displayId=%{public}u, state=%{public}u, reason=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "displayId=%{public}u, state=%{public}u, reason=%{public}u",
                    displayId_, static_cast<uint32_t>(state), reason);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
@@ -145,9 +143,16 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
         default:
             break;
     }
-    bool ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status,
-        Rosen::PowerStateChangeReason::POWER_BUTTON);
-    DISPLAY_HILOGI(FEAT_STATE, "SetScreenPowerForAll:%{public}d", ret);
+
+    bool ret = false;
+    if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
+        ret = Rosen::ScreenManager::GetInstance().SetSpecifiedScreenPower(
+            displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
+    } else {
+        ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(
+            status, Rosen::PowerStateChangeReason::POWER_BUTTON);
+    }
+    DISPLAY_HILOGI(FEAT_STATE, "Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
     return true;
 }
 
@@ -173,6 +178,11 @@ bool ScreenAction::SetBrightness(uint32_t value)
     std::lock_guard lock(mutexBrightness_);
     brightness_ = isSucc ? value : brightness_;
     return isSucc;
+}
+
+void ScreenAction::SetCoordinated(bool coordinated)
+{
+    coordinated_ = coordinated;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
