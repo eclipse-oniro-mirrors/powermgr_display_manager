@@ -54,6 +54,9 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
         totalSteps_ = 1;
     }
     int32_t changeBrightness = static_cast<int32_t>(toBrightness_) - static_cast<int32_t>(fromBrightness_);
+    if (changeBrightness == 0) {
+        return;
+    }
     stride_ = changeBrightness / static_cast<int32_t>(totalSteps_);
     if (abs(stride_) < STRIDE_ABSOLUTE_MIN) {
         stride_ = (changeBrightness / abs(changeBrightness)) * STRIDE_ABSOLUTE_MIN;
