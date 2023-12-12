@@ -109,7 +109,10 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     DISPLAY_HILOGI(FEAT_STATE, "UpdateState, state=%{public}u, current state=%{public}u",
                    static_cast<uint32_t>(state), static_cast<uint32_t>(state_));
     RETURN_IF_WITH_RET(state == state_, true);
-
+    if (state == DisplayState::DISPLAY_DIM && state_ == DisplayState::DISPLAY_OFF) {
+        DISPLAY_HILOGI(FEAT_STATE, "Not allowed to set DIM state.");
+        return true;
+    }
     switch (state) {
         case DisplayState::DISPLAY_ON:
         case DisplayState::DISPLAY_OFF: {
