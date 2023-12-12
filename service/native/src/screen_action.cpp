@@ -153,7 +153,7 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
             status, Rosen::PowerStateChangeReason::POWER_BUTTON);
     }
     DISPLAY_HILOGI(FEAT_STATE, "Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
-    return true;
+    return (state == DisplayState::DISPLAY_DIM || state == DisplayState::DISPLAY_SUSPEND) ? true : ret;
 }
 
 uint32_t ScreenAction::GetBrightness()
