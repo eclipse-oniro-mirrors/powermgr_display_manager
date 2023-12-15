@@ -19,23 +19,25 @@ The Display Power Manager module provides the following capabilities:
 
 ```
 base/powermgr/display_manager
-├── figures                  	# Architecture
-├── frameworks                  # Framework layer
-│   ├── napi                  	# NAPI layer
-│   └── native                  # Native layer
-├── interfaces                  # API layer
-│   └── inner_api               # Internal APIs
-├── sa_profile                  # SA profile
-├── service                    	# Server layer
-│   ├── etc                     # Brightness configuration file
-│   ├── native                  # Native layer
-│   └── zidl                    # Zidl API layer
-├── test                        # Test cases
-│   ├── fuzztest                # Fuzz test
-│   ├── unittest                # Unit test
-│   ├── systemtest              # System test
-│   └── utils                   # Test tools
-└── utils                       # Utilities
+├───state_manager                   # state manager 
+│   ├── figures                     # Architecture
+│   ├── frameworks                  # Framework layer
+│   │   ├── napi                    # NAPI layer
+│   │   └── native                  # Native layer
+│   ├── interfaces                  # API layer
+│   │   └── inner_api               # Internal APIs
+│   ├── sa_profile                  # SA profile
+│   ├── service                     # Server layer
+│   │   ├── etc                     # Brightness configuration file
+│   │   ├── native                  # Native layer
+│   │   └── zidl                    # Zidl API layer
+│   ├── test                        # Test cases
+│   │   ├── fuzztest                # Fuzz test
+│   │   ├── unittest                # Unit test
+│   │   ├── systemtest              # System test
+│   │   └── utils                   # Test tools
+│   └── utils                       # Utilities
+├───brightness_manager              # brightness manager 
 ```
 
 ## Repositories Involved<a name="section63151229062"></a>

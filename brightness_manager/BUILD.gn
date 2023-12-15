@@ -1,0 +1,74 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("../displaymgr.gni")
+
+config("brightness_manager_config") {
+  include_dirs = [ "include" ]
+}
+
+ohos_static_library("brightness_manager") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/brightness_action.cpp",
+    "src/brightness_dimming.cpp",
+    "src/brightness_manager.cpp",
+    "src/brightness_param_helper.cpp",
+    "src/brightness_service.cpp",
+    "src/brightness_setting_helper.cpp",
+    "src/calculation_config_parser.cpp",
+    "src/calculation_curve.cpp",
+    "src/calculation_manager.cpp",
+    "src/config_parser.cpp",
+    "src/config_parser_base.cpp",
+    "src/light_lux_buffer.cpp",
+    "src/light_lux_manager.cpp",
+    "src/lux_filter_config_parser.cpp",
+    "src/lux_threshold_config_parser.cpp",
+  ]
+
+  configs = [
+    ":brightness_manager_config",
+    "${displaymgr_utils_path}:utils_config",
+    "${displaymgr_inner_api}:displaymgr_public_config",
+  ]
+
+  deps = [ "//third_party/jsoncpp:jsoncpp" ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "ffrt:libffrt",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+    "power_manager:power_ffrt",
+    "power_manager:power_setting",
+    "power_manager:power_sysparam",
+    "safwk:system_ability_fwk",
+    "sensor:sensor_interface_native",
+    "window_manager:libdm",
+  ]
+
+  subsystem_name = "powermgr"
+  part_name = "${displaymgr_part_name}"
+}
