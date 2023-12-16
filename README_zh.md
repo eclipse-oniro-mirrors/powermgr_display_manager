@@ -18,23 +18,25 @@
 
 ```
 base/powermgr/display_manager
-├── figures                  	# 架构图
-├── frameworks                  # Framework层
-│   ├── napi                  	# NAPI层
-│   └── native                  # Native层
-├── interfaces                  # 接口层
-│   └── inner_api               # 内部接口
-├── sa_profile                  # SA 配置文件
-├── service                    	# 服务层
-│   ├── etc                     # 亮度配置文件
-│   ├── native                  # Native 层
-│   └── zidl                    # Zidl 接口层
-├── test                        # 测试用例
-│   ├── fuzztest                # Fuzz 测试
-│   ├── unittest                # 单元测试
-│   ├── systemtest              # 系统测试
-│   └── utils                   # 测试工具
-└── utils                       # 工具和通用层
+├───state_manager                   # 显示状态管理 
+│   ├── figures                     # 架构图
+│   ├── frameworks                  # Framework层
+│   │   ├── napi                    # NAPI层
+│   │   └── native                  # Native层
+│   ├── interfaces                  # 接口层
+│   │   └── inner_api               # 内部接口
+│   ├── sa_profile                  # SA 配置文件
+│   ├── service                     # 服务层
+│   │   ├── etc                     # 亮度配置文件
+│   │   ├── native                  # Native 层
+│   │   └── zidl                    # Zidl 接口层
+│   ├── test                        # 测试用例
+│   │   ├── fuzztest                # Fuzz 测试
+│   │   ├── unittest                # 单元测试
+│   │   ├── systemtest              # 系统测试
+│   │   └── utils                   # 测试工具
+│   └── utils                       # 工具和通用层
+├───brightness_manager              # 显示亮度管理
 ```
 
 ## 相关仓<a name="section63151229062"></a>

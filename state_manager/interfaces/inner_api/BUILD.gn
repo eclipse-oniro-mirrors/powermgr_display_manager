@@ -1,0 +1,55 @@
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("../../../displaymgr.gni")
+
+config("displaymgr_private_config") {
+  include_dirs = [ "${displaymgr_service_zidl}/include" ]
+}
+
+config("displaymgr_public_config") {
+  include_dirs = [ "native/include" ]
+}
+
+ohos_shared_library("displaymgr") {
+  sources = [
+    "${displaymgr_framework_path}/native/display_power_mgr_client.cpp",
+    "${displaymgr_service_zidl}/src/display_power_callback_stub.cpp",
+    "${displaymgr_service_zidl}/src/display_power_mgr_proxy.cpp",
+  ]
+
+  configs = [
+    ":displaymgr_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+  ]
+
+  public_configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":displaymgr_public_config",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "power_manager:powermgr_client",
+    "samgr:samgr_proxy",
+  ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "platformsdk"
+
+  subsystem_name = "powermgr"
+  innerapi_tags = [ "platformsdk" ]
+  part_name = "${displaymgr_part_name}"
+}

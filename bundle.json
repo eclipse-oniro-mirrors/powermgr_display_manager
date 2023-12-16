@@ -49,38 +49,41 @@
         "sensor",
         "window_manager"
       ],
-      "third_party": []
+      "third_party": [
+        "jsoncpp"
+      ]
     },
     "build": {
       "group_type": {
         "base_group": [],
         "fwk_group": [
-          "//base/powermgr/display_manager/frameworks/napi:brightness",
-          "//base/powermgr/display_manager/interfaces/inner_api:displaymgr"
+          "//base/powermgr/display_manager/state_manager/frameworks/napi:brightness",
+          "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr"
         ],
         "service_group": [
-          "//base/powermgr/display_manager/sa_profile:displaymgr_sa_profile",
-          "//base/powermgr/display_manager/service:displaymgrservice",
-          "//base/powermgr/display_manager/service:displaymgr_stub",
-          "//base/powermgr/display_manager/service/etc:param_files"
+          "//base/powermgr/display_manager/state_manager/sa_profile:displaymgr_sa_profile",
+          "//base/powermgr/display_manager/state_manager/service:displaymgrservice",
+          "//base/powermgr/display_manager/state_manager/service:displaymgr_stub",
+          "//base/powermgr/display_manager/state_manager/service/etc:param_files",
+          "//base/powermgr/display_manager/brightness_manager:brightness_manager"
         ]
       },
       "inner_api": [
         {
-          "name": "//base/powermgr/display_manager/interfaces/inner_api:displaymgr",
+          "name": "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr",
           "header": {
             "header_files": [
               "display_power_info.h",
               "display_power_mgr_client.h"
             ],
-            "header_base": "//base/powermgr/display_manager/interfaces/inner_api/native/include"
+            "header_base": "//base/powermgr/display_manager/state_manager/interfaces/inner_api/native/include"
           }
         }
       ],
       "test": [
-        "//base/powermgr/display_manager/test:displaymgr_coverage_test",
-        "//base/powermgr/display_manager/test:displaymgr_native_test",
-        "//base/powermgr/display_manager/test:fuzztest"
+        "//base/powermgr/display_manager/state_manager/test:displaymgr_coverage_test",
+        "//base/powermgr/display_manager/state_manager/test:displaymgr_native_test",
+        "//base/powermgr/display_manager/state_manager/test:fuzztest"
       ]
     }
   }
