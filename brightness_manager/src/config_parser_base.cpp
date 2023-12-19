@@ -60,8 +60,7 @@ void ConfigParserBase::Initialize()
     mIsInitialized = true;
 }
 
-std::unordered_map<int, OHOS::DisplayPowerMgr::ConfigParserBase::ConfigInfo>::
-    iterator ConfigParserBase::GetDispIter(int displayId)
+std::unordered_map<int, ConfigParserBase::ConfigInfo>::iterator ConfigParserBase::GetDispIter(int displayId)
 {
     std::unordered_map<int, ConfigInfo>::iterator itDisp = mConfigInfo.find(displayId);
     if (itDisp == mConfigInfo.end()) {
@@ -70,8 +69,8 @@ std::unordered_map<int, OHOS::DisplayPowerMgr::ConfigParserBase::ConfigInfo>::
     return itDisp;
 }
 
-std::unordered_map<int, OHOS::DisplayPowerMgr::ConfigParserBase::ConfigInfo>::
-    const_iterator ConfigParserBase::GetConstDispIter(int displayId) const
+std::unordered_map<int, ConfigParserBase::ConfigInfo>::const_iterator ConfigParserBase::GetConstDispIter(
+    int displayId) const
 {
     std::unordered_map<int, ConfigInfo>::const_iterator itDisp = mConfigInfo.find(displayId);
     if (itDisp == mConfigInfo.end()) {

@@ -702,7 +702,8 @@ uint32_t BrightnessService::GetMappingBrightnessLevel(uint32_t level)
     return static_cast<uint32_t>(levelOut);
 }
 
-uint32_t BrightnessService::GetOrigBrightnessLevel(uint32_t level) {
+uint32_t BrightnessService::GetOrigBrightnessLevel(uint32_t level)
+{
     if (level < MIN_MAPPING_BRGIHTNESS_LEVEL) {
         level = MIN_MAPPING_BRGIHTNESS_LEVEL;
     }
