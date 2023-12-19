@@ -350,6 +350,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
     bool coordinated = true;
     auto ret = DisplayPowerMgrClient::GetInstance().SetCoordinated(coordinated);
     EXPECT_TRUE(ret);
+    // Prepare test environment.
+    // If the state of display is DISPLAY_ON, change it to DISPLAY_OFF.
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(
+        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
+
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
     EXPECT_TRUE(ret);
