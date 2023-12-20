@@ -546,15 +546,8 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
     }
 }
 
-int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
+void DisplayPowerMgrService::DumpDisplayInfo(std::string& result)
 {
-    if (!isBootCompleted_) {
-        return ERR_NO_INIT;
-    }
-    if (!Permission::IsSystem()) {
-        return ERR_PERMISSION_DENIED;
-    }
-    std::string result("DISPLAY POWER MANAGER DUMP:\n");
     for (auto& iter: controllerMap_) {
         auto control = iter.second;
         result.append("Display Id=").append(std::to_string(iter.first));
@@ -571,7 +564,18 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
         result.append("DeviceBrightness=");
         result.append(std::to_string(control->GetDeviceBrightness())).append("\n");
     }
+}
 
+int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16string>& args)
+{
+    if (!isBootCompleted_) {
+        return ERR_NO_INIT;
+    }
+    if (!Permission::IsSystem()) {
+        return ERR_PERMISSION_DENIED;
+    }
+    std::string result("DISPLAY POWER MANAGER DUMP:\n");
+    DumpDisplayInfo(result);
 #ifdef HAS_SENSORS_SENSOR_PART
     result.append("Support Ambient Light: ");
     if (supportLightSensor_) {

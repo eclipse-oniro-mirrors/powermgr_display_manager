@@ -117,6 +117,7 @@ private:
     bool IsChangedLux(float scalar);
     bool CalculateBrightness(float scalar, int32_t& brightness, int32_t& change);
     int32_t GetBrightnessFromLightScalar(float scalar);
+    void DumpDisplayInfo(std::string& result);
     static void RegisterBootCompletedCallback();
     static void SetBootCompletedBrightness();
     static void SetBootCompletedAutoBrightness();
