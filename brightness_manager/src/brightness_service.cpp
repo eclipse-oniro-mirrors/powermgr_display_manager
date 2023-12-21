@@ -38,7 +38,7 @@
 #include "setting_provider.h"
 #include "system_ability_definition.h"
 
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 #include "sensor_agent.h"
 #endif
 
@@ -92,7 +92,7 @@ BrightnessService& BrightnessService::Get()
 
 void BrightnessService::Init()
 {
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     InitSensors();
     mIsFoldDevice = Rosen::DisplayManager::GetInstance().IsFoldable();
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Init mIsFoldDevice=%{public}d", mIsFoldDevice);
@@ -223,7 +223,7 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
     isAutoMode = isScreenOn && isSettingOn;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState id=%{public}d, isAutoMode=%{public}d, isScreenOn=%{public}d, "\
         "isSettingOn=%{public}d, state=%{public}d", id, isAutoMode, isScreenOn, isSettingOn, state);
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     bool isModeChange = AutoAdjustBrightness(isAutoMode);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState id=%{public}d, isAutoMode=%{public}d, isModeChange=%{public}d",
         id, isAutoMode, isModeChange);
@@ -253,7 +253,7 @@ void BrightnessService::SetSettingAutoBrightness(bool enable)
     BrightnessSettingHelper::SetSettingAutoBrightness(enable);
 }
 
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 bool BrightnessService::AutoAdjustBrightness(bool enable)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetAutoBrightnessEnable start, enable=%{public}d, isEnabled=%{public}d, "\

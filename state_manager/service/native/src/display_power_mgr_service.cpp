@@ -22,7 +22,7 @@
 #include "errors.h"
 #include "new"
 #include "screen_action.h"
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 #include "sensor_agent.h"
 #endif
 #include "xcollie/watchdog.h"
@@ -74,7 +74,7 @@ void DisplayPowerMgrService::Init()
 
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
     BrightnessManager::Get().Init();
@@ -378,7 +378,6 @@ uint32_t DisplayPowerMgrService::GetMinBrightness()
     return BRIGHTNESS_MIN;
 }
 
-#ifdef HAS_SENSORS_SENSOR_PART
 bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration)
 {
     if (!Permission::IsSystem()) {
@@ -424,6 +423,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
     return true;
 }
 
+#ifdef ENABLE_SENSOR_PART
 void DisplayPowerMgrService::ActivateAmbientSensor()
 {
     if (!autoBrightness_) {
@@ -576,7 +576,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     }
     std::string result("DISPLAY POWER MANAGER DUMP:\n");
     DumpDisplayInfo(result);
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     result.append("Support Ambient Light: ");
     if (supportLightSensor_) {
         result.append("TRUE");
@@ -604,7 +604,7 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     return ERR_OK;
 }
 
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 void DisplayPowerMgrService::InitSensors()
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "InitSensors start");
@@ -748,7 +748,7 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightn
 bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness, int32_t& change)
 {
     const float lastLux = lastLux_;
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     if (!IsChangedLux(scalar)) {
         return false;
     }

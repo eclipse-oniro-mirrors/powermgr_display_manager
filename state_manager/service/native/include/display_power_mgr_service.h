@@ -28,7 +28,7 @@
 #include "refbase.h"
 #include "event_runner.h"
 #include "iremote_object.h"
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 #include "sensor_agent_type.h"
 #endif
 #include "idisplay_power_callback.h"
@@ -84,15 +84,15 @@ private:
         std::mutex callbackMutex_;
     };
 
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     static void AmbientLightCallback(SensorEvent* event);
     void InitSensors();
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
-    bool supportLightSensor_ {false};
     bool ambientSensorEnabled_ {false};
     SensorUser sensorUser_ {};
 #endif
+    bool supportLightSensor_ {false};
 
     static const uint32_t AUTO_ADJUST_BRIGHTNESS_STRIDE = 1;
     static const uint32_t SAMPLING_RATE = 100000000;
