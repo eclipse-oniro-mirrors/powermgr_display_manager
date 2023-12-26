@@ -238,6 +238,11 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
     mState = state;
 }
 
+DisplayState BrightnessService::GetDisplayState()
+{
+    return mState;
+}
+
 bool BrightnessService::IsScreenOnState(DisplayState state)
 {
     return state == DisplayState::DISPLAY_ON || state == DisplayState::DISPLAY_DIM;

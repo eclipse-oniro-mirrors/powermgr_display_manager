@@ -38,6 +38,11 @@ void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state)
     BrightnessService::Get().SetDisplayState(id, state);
 }
 
+DisplayState BrightnessManager::GetState()
+{
+    return BrightnessService::Get().GetDisplayState();
+}
+
 bool BrightnessManager::AutoAdjustBrightness(bool enable)
 {
 #ifdef ENABLE_SENSOR_PART
@@ -57,9 +62,19 @@ bool BrightnessManager::DiscountBrightness(double discount)
     return BrightnessService::Get().DiscountBrightness(discount);
 }
 
+double BrightnessManager::GetDiscount() const
+{
+    return BrightnessService::Get().GetDiscount();
+}
+
 void BrightnessManager::SetScreenOnBrightness()
 {
     BrightnessService::Get().SetScreenOnBrightness();
+}
+
+uint32_t BrightnessManager::GetScreenOnBrightness() const
+{
+    return BrightnessService::Get().GetScreenOnBrightness(false);
 }
 
 void BrightnessManager::ClearOffset()
@@ -97,5 +112,14 @@ uint32_t BrightnessManager::GetDeviceBrightness()
     return BrightnessService::Get().GetDeviceBrightness();
 }
 
+bool BrightnessManager::IsBrightnessOverridden() const
+{
+    return BrightnessService::Get().IsBrightnessOverridden();
+}
+
+bool BrightnessManager::IsBrightnessBoosted() const
+{
+    return BrightnessService::Get().IsBrightnessBoosted();
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
