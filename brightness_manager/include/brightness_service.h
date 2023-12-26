@@ -105,6 +105,7 @@ public:
     void Init();
     void DeInit();
     void SetDisplayState(uint32_t id, DisplayState state);
+    DisplayState GetDisplayState();
     bool IsScreenOnState(DisplayState state);
     bool AutoAdjustBrightness(bool enable);
     bool IsAutoAdjustBrightness();

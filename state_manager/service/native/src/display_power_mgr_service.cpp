@@ -551,18 +551,20 @@ void DisplayPowerMgrService::DumpDisplayInfo(std::string& result)
     for (auto& iter: controllerMap_) {
         auto control = iter.second;
         result.append("Display Id=").append(std::to_string(iter.first));
-        result.append(" State=").append(std::to_string(static_cast<uint32_t>(control->GetState())));
-        result.append(" Discount=").append(std::to_string(control->GetDiscount()));
-        result.append(" Brightness=").append(std::to_string(control->GetBrightness()));
-        if (control->IsBrightnessOverridden()) {
-            result.append(" OverrideBrightness=").append(std::to_string(control->GetScreenOnBrightness()));
+        result.append(" State=").append(std::to_string(static_cast<uint32_t>(BrightnessManager::Get().GetState())));
+        result.append(" Discount=").append(std::to_string(BrightnessManager::Get().GetDiscount()));
+        result.append(" Brightness=").append(std::to_string(BrightnessManager::Get().GetBrightness()));
+        if (BrightnessManager::Get().IsBrightnessOverridden()) {
+            result.append(" OverrideBrightness=")
+                .append(std::to_string(BrightnessManager::Get().GetScreenOnBrightness()));
         }
-        if (control->IsBrightnessBoosted()) {
-            result.append(" BoostBrightness=").append(std::to_string(control->GetScreenOnBrightness()));
+        if (BrightnessManager::Get().IsBrightnessBoosted()) {
+            result.append(" BoostBrightness=")
+                .append(std::to_string(BrightnessManager::Get().GetScreenOnBrightness()));
         }
         result.append("\n");
         result.append("DeviceBrightness=");
-        result.append(std::to_string(control->GetDeviceBrightness())).append("\n");
+        result.append(std::to_string(BrightnessManager::Get().GetDeviceBrightness())).append("\n");
     }
 }
 
