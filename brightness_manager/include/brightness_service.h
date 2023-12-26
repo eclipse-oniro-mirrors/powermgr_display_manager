@@ -39,7 +39,7 @@
 #include "light_lux_manager.h"
 #include "refbase.h"
 
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
 #include "sensor_agent_type.h"
 #endif
 
@@ -148,15 +148,15 @@ private:
     virtual ~BrightnessService() = default;
 
     static uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY);
-#ifdef HAS_SENSORS_SENSOR_PART
+#ifdef ENABLE_SENSOR_PART
     static void AmbientLightCallback(SensorEvent* event);
     void InitSensors();
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
     bool mIsSupportLightSensor{false};
-    bool mIsLightSensorEnabled{false};
     SensorUser mSensorUser{};
 #endif
+    bool mIsLightSensorEnabled{false};
 
     void UpdateCurrentBrightnessLevel(float lux, bool isFastDuration);
     void SetBrightnessLevel(uint32_t value, uint32_t duration);

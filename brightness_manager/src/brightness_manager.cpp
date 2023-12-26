@@ -40,7 +40,11 @@ void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state)
 
 bool BrightnessManager::AutoAdjustBrightness(bool enable)
 {
+#ifdef ENABLE_SENSOR_PART
     return BrightnessService::Get().AutoAdjustBrightness(enable);
+#else
+    return false;
+#endif
 }
 
 bool BrightnessManager::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)

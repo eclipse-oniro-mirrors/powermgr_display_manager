@@ -56,9 +56,7 @@ ohos_shared_library("displaymgrservice") {
     "${brightnessmgr_root_path}:brightness_manager_config",
   ]
 
-  public_deps = [
-    "${brightnessmgr_root_path}:brightness_manager",
-  ]
+  public_deps = [ "${brightnessmgr_root_path}:brightness_manager" ]
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
@@ -69,8 +67,8 @@ ohos_shared_library("displaymgrservice") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
-    "ipc:ipc_core",
     "image_framework:image_native",
+    "ipc:ipc_core",
     "power_manager:power_ffrt",
     "power_manager:power_setting",
     "power_manager:power_sysparam",
@@ -79,8 +77,10 @@ ohos_shared_library("displaymgrservice") {
     "window_manager:libdm",
   ]
 
+  defines = []
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "ENABLE_SENSOR_PART" ]
   }
 
   shlib_type = "sa"
