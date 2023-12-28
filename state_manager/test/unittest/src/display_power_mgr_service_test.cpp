@@ -347,6 +347,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021 is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     bool coordinated = true;
     auto ret = DisplayPowerMgrClient::GetInstance().SetCoordinated(coordinated);
     EXPECT_TRUE(ret);
@@ -356,10 +357,44 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
 
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
-        DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
+        DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
     EXPECT_TRUE(ret);
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
-        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
+        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
+    EXPECT_TRUE(ret);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService022
+ * @tc.desc: Test pre process
+ * @tc.type: FUNC
+ * @tc.require: issueI8LHHR
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService022, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService022 is start");
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    DISPLAY_HILOGE(LABEL_TEST, "1213: DisplayPowerMgrService022 is start");
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_PROCESS);
+    EXPECT_TRUE(ret);
+    EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().GetBrightness() == brightness);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService023
+ * @tc.desc: Test cancel pre process
+ * @tc.type: FUNC
+ * @tc.require: issueI8LHHR
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService023, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService023 is start");
+    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    EXPECT_TRUE(ret);
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_CANCEL_PRE_PROCESS);
     EXPECT_TRUE(ret);
 }
 } // namespace

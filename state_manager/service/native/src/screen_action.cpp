@@ -148,6 +148,9 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
         ret = Rosen::ScreenManager::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
+    } else if (reason == static_cast<uint32_t>(DisplayPowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_PROCESS)) {
+        ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status,
+            Rosen::PowerStateChangeReason::POWER_BUTTON);
     } else {
         ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(
             status, Rosen::PowerStateChangeReason::POWER_BUTTON);
