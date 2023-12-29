@@ -184,6 +184,7 @@ private:
     std::atomic<bool> mIsBrightnessBoosted{false};
     uint32_t mCachedSettingBrightness{DEFAULT_BRIGHTNESS};
     uint32_t mOverriddenBrightness{DEFAULT_BRIGHTNESS};
+    uint32_t mBeforeOverriddenBrightness{DEFAULT_BRIGHTNESS};
     std::shared_ptr<BrightnessAction> mAction{nullptr};
     std::shared_ptr<BrightnessDimmingCallback> mDimmingCallback{nullptr};
     std::shared_ptr<BrightnessDimming> mDimming;

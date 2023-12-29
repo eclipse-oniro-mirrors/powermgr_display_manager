@@ -386,6 +386,11 @@ void BrightnessService::ProcessLightLux(float lux)
 
 void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDuration)
 {
+    if (!CanSetBrightness()) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot UpdateCurrentBrightnessLevel, ignore the change");
+        return;
+    }
+
     uint32_t brightnessLevel = GetBrightnessLevel(lux);
     if (mBrightnessLevel != brightnessLevel) {
         uint32_t duration = DEFAULT_BRIGHTEN_DURATION;
@@ -520,6 +525,7 @@ bool BrightnessService::OverrideBrightness(uint32_t value, uint32_t gradualDurat
         mIsBrightnessOverridden = true;
     }
     mOverriddenBrightness = value;
+    mBeforeOverriddenBrightness = GetSettingBrightness();
     return UpdateBrightness(value, gradualDuration);
 }
 
@@ -530,7 +536,7 @@ bool BrightnessService::RestoreBrightness(uint32_t gradualDuration)
         return false;
     }
     mIsBrightnessOverridden = false;
-    return UpdateBrightness(mCachedSettingBrightness, gradualDuration, true);
+    return UpdateBrightness(mBeforeOverriddenBrightness, gradualDuration, true);
 }
 
 bool BrightnessService::IsBrightnessOverridden()
