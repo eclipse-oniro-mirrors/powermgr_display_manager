@@ -218,7 +218,7 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
     bool isScreenOn = IsScreenOnState(state); // depend on state on
     bool isSettingOn = false;
     if (isScreenOn) {
-        isSettingOn = GetSettingAutoBrightness();
+        isSettingOn = IsAutoAdjustBrightness();
     }
     isAutoMode = isScreenOn && isSettingOn;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState id=%{public}d, isAutoMode=%{public}d, isScreenOn=%{public}d, "\
@@ -439,7 +439,7 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
         return false;
     }
     if (gradualDuration == 0) {
-        bool isSettingOn = GetSettingAutoBrightness();
+        bool isSettingOn = IsAutoAdjustBrightness();
         if (isSettingOn && mIsLightSensorEnabled) {
         mBrightnessCalculationManager.UpdateBrightnessOffset(value, mLightLuxManager.GetSmoothedLux());
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightnessOffset level=%{public}d, mLightLux=%{public}f",
