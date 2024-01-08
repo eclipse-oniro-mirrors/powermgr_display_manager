@@ -455,9 +455,13 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
 void BrightnessService::SetScreenOnBrightness()
 {
     uint32_t screenOnBrightness = GetScreenOnBrightness(true);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness screenOnBrightness=%{public}d",
-        screenOnBrightness);
-    UpdateBrightness(screenOnBrightness, 0, true);
+    bool needUpdateBrightness = true;
+    if (IsBrightnessBoosted() || IsBrightnessOverridden()) {
+        needUpdateBrightness = false;
+    }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness screenOnBrightness=%{public}d, needUpdate=%{public}d",
+        screenOnBrightness, needUpdateBrightness);
+    UpdateBrightness(screenOnBrightness, 0, needUpdateBrightness);
 }
 
 void BrightnessService::ClearOffset()
