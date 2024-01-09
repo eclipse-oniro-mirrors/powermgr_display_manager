@@ -39,7 +39,6 @@ namespace DisplayPowerMgr {
 using namespace OHOS::PowerMgr;
 namespace {
 DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
-FFRTQueue g_queue("display_power_mgr_service");
 FFRTHandle g_screenOffDelayTaskHandle;
 const uint32_t GET_DISPLAY_ID_DELAY_MS = 50;
 const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
@@ -55,6 +54,7 @@ DisplayPowerMgrService::DisplayPowerMgrService() = default;
 
 void DisplayPowerMgrService::Init()
 {
+    queue_ = std::make_shared<FFRTQueue> ("display_power_mgr_service");
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
     uint32_t retryCount = GET_DISPLAY_ID_RETRY_COUNT;
@@ -63,7 +63,7 @@ void DisplayPowerMgrService::Init()
             DISPLAY_HILOGI(COMP_SVC, "cannot find any display id, retry!");
             g_getDisplayIdRetryCount++;
             FFRTTask task = [this]() { Init(); };
-            FFRTUtils::SubmitDelayTask(task, GET_DISPLAY_ID_DELAY_MS, g_queue);
+            FFRTUtils::SubmitDelayTask(task, GET_DISPLAY_ID_DELAY_MS, queue_);
             return;
         }
     }
@@ -96,6 +96,17 @@ void DisplayPowerMgrService::Deinit()
     UnregisterSettingObservers();
     BrightnessManager::Get().DeInit();
     isBootCompleted_ = false;
+}
+
+void DisplayPowerMgrService::Reset()
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "reset begin");
+    if (queue_) {
+        queue_.reset();
+        g_screenOffDelayTaskHandle = nullptr;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct display_power_queue");
+    }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "reset end");
 }
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()
@@ -222,13 +233,13 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
         displayState_ = state;
         displayReason_ = reason;
         FFRTTask task = [this]() { ScreenOffDelay(displayId_, displayState_, displayReason_); };
-        g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, displayOffDelayMs_, g_queue);
+        g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, displayOffDelayMs_, queue_);
         tempState_ = iterator->second->SetDelayOffState();
         return true;
     } else if (state == DisplayState::DISPLAY_ON) {
         if (isDisplayDelayOff_) {
             DISPLAY_HILOGI(COMP_SVC, "need remove delay task");
-            FFRTUtils::CancelTask(g_screenOffDelayTaskHandle, g_queue);
+            FFRTUtils::CancelTask(g_screenOffDelayTaskHandle, queue_);
             isDisplayDelayOff_ = false;
             tempState_ = iterator->second->SetOnState();
             return true;

@@ -37,6 +37,7 @@
 #include "display_power_mgr_stub.h"
 #include "screen_controller.h"
 #include "brightness_manager.h"
+#include "ffrt_utils.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -69,6 +70,7 @@ public:
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
     void Init();
     void Deinit();
+    void Reset();
     void ClearOffset();
     void SetScreenOnBrightness();
     static uint32_t GetSafeBrightness(uint32_t value);
@@ -149,6 +151,7 @@ private:
     DisplayState displayState_ {DisplayState::DISPLAY_UNKNOWN};
     DisplayState tempState_ {DisplayState::DISPLAY_UNKNOWN};
     uint32_t displayReason_ {0};
+    std::shared_ptr<PowerMgr::FFRTQueue> queue_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
