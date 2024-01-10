@@ -55,6 +55,9 @@ DisplayPowerMgrService::DisplayPowerMgrService() = default;
 void DisplayPowerMgrService::Init()
 {
     queue_ = std::make_shared<FFRTQueue> ("display_power_mgr_service");
+    if (queue_ == nullptr) {
+        return;
+    }
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
     uint32_t retryCount = GET_DISPLAY_ID_RETRY_COUNT;
@@ -336,6 +339,9 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
 
 bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     if (GetDisplayState(GetMainDisplayId()) != DisplayState::DISPLAY_ON || delayMs == DELAY_TIME_UNSET) {
         isDisplayDelayOff_ = false;
         return isDisplayDelayOff_;

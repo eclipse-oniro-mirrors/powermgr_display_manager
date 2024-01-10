@@ -58,7 +58,6 @@ constexpr uint32_t DEFAULT_ANIMATING_DURATION = 500;
 constexpr uint32_t DEFAULT_BRIGHTEN_DURATION = 2000;
 constexpr uint32_t DEFAULT_DARKEN_DURATION = 5000;
 
-FFRTQueue g_queue("brightness_manager");
 FFRTHandle g_cancelBoostTaskHandle{};
 }
 
@@ -92,6 +91,10 @@ BrightnessService& BrightnessService::Get()
 
 void BrightnessService::Init()
 {
+    queue_ = std::make_shared<FFRTQueue> ("brightness_manager");
+    if (queue_ == nullptr) {
+        return;
+    }
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
     mIsFoldDevice = Rosen::DisplayManager::GetInstance().IsFoldable();
@@ -114,6 +117,11 @@ void BrightnessService::DeInit()
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d", isFoldable);
     if (isFoldable) {
         UnRegisterFoldStatusListener();
+    }
+    if (queue_) {
+        queue_.reset();
+        g_cancelBoostTaskHandle = nullptr;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct brightness ffrt queue");
     }
 }
 
@@ -563,9 +571,9 @@ bool BrightnessService::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDura
     }
 
     // If boost multi-times, we will resend the cancel boost event.
-    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, g_queue);
+    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, queue_);
     FFRTTask task = std::bind(&BrightnessService::CancelBoostBrightness, this, gradualDuration);
-    g_cancelBoostTaskHandle = FFRTUtils::SubmitDelayTask(task, timeoutMs, g_queue);
+    g_cancelBoostTaskHandle = FFRTUtils::SubmitDelayTask(task, timeoutMs, queue_);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BoostBrightness update timeout=%{public}u, isSuccess=%{public}d", timeoutMs,
         isSuccess);
     return isSuccess;
@@ -578,7 +586,7 @@ bool BrightnessService::CancelBoostBrightness(uint32_t gradualDuration)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not boost, no need to restore");
         return false;
     }
-    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, g_queue);
+    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, queue_);
     mIsBrightnessBoosted = false;
     return UpdateBrightness(mCachedSettingBrightness, gradualDuration, true);
 }

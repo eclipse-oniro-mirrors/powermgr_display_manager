@@ -38,7 +38,7 @@
 #include "iremote_object.h"
 #include "light_lux_manager.h"
 #include "refbase.h"
-
+#include "ffrt_utils.h"
 #ifdef ENABLE_SENSOR_PART
 #include "sensor_agent_type.h"
 #endif
@@ -191,6 +191,7 @@ private:
     LightLuxManager mLightLuxManager{};
     BrightnessCalculationManager mBrightnessCalculationManager{};
     sptr<Rosen::DisplayManager::IFoldStatusListener> mFoldStatusistener;
+    std::shared_ptr<PowerMgr::FFRTQueue> queue_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
