@@ -517,7 +517,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
 /**
  * @tc.name: DisplayPowerMgrOverrideBrightness009
  * @tc.desc: Set brightness after override brightness, then exit override brightness, the
- *           restore brightness should be the latest set brightness
+ *           restore brightness should be brightness value of thr current device
  * @tc.type: FUNC
  * @tc.require: issueI6ACLX
  */
@@ -526,12 +526,13 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, Te
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is start");
     const uint32_t OVERRIDE_BRIGHTNESS = 156;
     const uint32_t SET_BRIGHTNESS = 66;
+    auto currentBrightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     EXPECT_FALSE(ret);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(SET_BRIGHTNESS, deviceBrightness);
+    EXPECT_EQ(currentBrightness, deviceBrightness);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is end");
 }
 
