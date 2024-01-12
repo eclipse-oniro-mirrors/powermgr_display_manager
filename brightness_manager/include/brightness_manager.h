@@ -48,6 +48,9 @@ public:
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
     void ClearOffset();
+    uint32_t GetCurrentDisplayId() const;
+    void SetDisplayId(uint32_t id = 0);
+
 private:
     BrightnessManager() = default;
     virtual ~BrightnessManager() = default;

@@ -121,5 +121,15 @@ bool BrightnessManager::IsBrightnessBoosted() const
 {
     return BrightnessService::Get().IsBrightnessBoosted();
 }
+
+uint32_t BrightnessManager::GetCurrentDisplayId() const
+{
+    return BrightnessService::Get().GetCurrentDisplayId();
+}
+
+void BrightnessManager::SetDisplayId(uint32_t id)
+{
+    return BrightnessService::Get().SetDisplayId(id);
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
