@@ -229,7 +229,7 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState id=%{public}d, isAutoMode=%{public}d, isScreenOn=%{public}d, "\
         "isSettingOn=%{public}d, state=%{public}d", id, isAutoMode, isScreenOn, isSettingOn, state);
 #ifdef ENABLE_SENSOR_PART
-    bool isModeChange = AutoAdjustBrightness(isAutoMode);
+    bool isModeChange = StateChangedSetAutoBrightness(isAutoMode);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetDisplayState id=%{public}d, isAutoMode=%{public}d, isModeChange=%{public}d",
         id, isAutoMode, isModeChange);
 #endif
@@ -289,6 +289,33 @@ bool BrightnessService::AutoAdjustBrightness(bool enable)
         DeactivateAmbientSensor();
         mIsAutoBrightnessEnabled = false;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetAutoBrightnessEnable disable");
+    }
+    return true;
+}
+
+bool BrightnessService::StateChangedSetAutoBrightness(bool enable)
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness start, enable=%{public}d, "\
+        "isSensorEnabled=%{public}d, isSupport=%{public}d", enable, mIsLightSensorEnabled, mIsSupportLightSensor);
+    if (!mIsSupportLightSensor) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness not support");
+        SetSettingAutoBrightness(false);
+        return false;
+    }
+    if (enable) {
+        if (mIsLightSensorEnabled) {
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness is already enabled");
+            return true;
+        }
+        ActivateAmbientSensor();
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness enable");
+    } else {
+        if (!mIsLightSensorEnabled) {
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness is already disabled");
+            return true;
+        }
+        DeactivateAmbientSensor();
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness disable");
     }
     return true;
 }
