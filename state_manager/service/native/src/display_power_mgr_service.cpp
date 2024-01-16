@@ -116,7 +116,10 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
 {
     uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
     uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
+    uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId();
+    BrightnessManager::Get().SetDisplayId(currentDisplayId);
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->SetBrightness(brightness, mainDisplayId);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedBrightness currentDisplayId=%{public}d", currentDisplayId);
 }
 
 void DisplayPowerMgrService::SetBootCompletedAutoBrightness()

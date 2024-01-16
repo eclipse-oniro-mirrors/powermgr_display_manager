@@ -178,6 +178,11 @@ uint32_t BrightnessService::GetDisplayId()
     return mDisplayId;
 }
 
+uint32_t BrightnessService::GetCurrentDisplayId() const
+{
+    return mAction->GetCurrentDisplayId();
+}
+
 void BrightnessService::SetDisplayId(uint32_t displayId)
 {
     mDisplayId = displayId;
