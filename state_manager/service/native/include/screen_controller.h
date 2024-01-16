@@ -86,8 +86,6 @@ private:
     void SetSettingBrightness(uint32_t value);
     uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;
     void BrightnessSettingUpdateFunc(const std::string& key);
-    bool SetDisplayPreProcess();
-    bool DisplayOnReady();
 
     static const constexpr char* SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
     DisplayState state_;

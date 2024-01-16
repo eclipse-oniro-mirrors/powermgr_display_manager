@@ -261,15 +261,6 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         return;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged state=%{public}d", static_cast<int>(state));
-
-    if (reason == static_cast<uint32_t>(DisplayPowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_PROCESS)) {
-        if (!SetDisplayPreProcess()) {
-            DISPLAY_HILOGE(FEAT_STATE, "pre process is error");
-            reason = static_cast<uint32_t>(DisplayPowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
-            stateChangeReason_ = reason;
-        }
-    }
-
     bool ret = action_->SetDisplayPower(state, stateChangeReason_);
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness();
@@ -403,26 +394,6 @@ uint32_t ScreenController::GetAnimationUpdateTime() const
 void ScreenController::SetCoordinated(bool coordinated)
 {
     action_->SetCoordinated(coordinated);
-}
-
-bool ScreenController::SetDisplayPreProcess()
-{
-    bool ret = action_->SetDisplayPower(DisplayState::DISPLAY_ON,
-        static_cast<uint32_t>(DisplayPowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_PROCESS));
-    if (!ret) {
-        DISPLAY_HILOGE(COMP_SVC, "Pro process wrong");
-        return ret;
-    }
-    UpdateBrightness(0);
-    if (!DisplayOnReady()) {
-        DISPLAY_HILOGE(COMP_SVC, "Pro process not ready");
-    }
-    return true;
-}
-
-bool ScreenController::DisplayOnReady()
-{
-    return true;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
