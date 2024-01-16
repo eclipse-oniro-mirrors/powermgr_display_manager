@@ -108,6 +108,7 @@ public:
     DisplayState GetDisplayState();
     bool IsScreenOnState(DisplayState state);
     bool AutoAdjustBrightness(bool enable);
+    bool StateChangedSetAutoBrightness(bool enable);
     bool IsAutoAdjustBrightness();
     void ProcessLightLux(float lux);
     void RegisterSettingBrightnessObserver();
