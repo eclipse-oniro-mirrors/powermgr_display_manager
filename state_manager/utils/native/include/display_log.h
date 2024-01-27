@@ -23,8 +23,6 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr  {
-#define FILE_NAME           (__builtin_strrchr("/" __FILE__, '/') + 1)
-#define FORMAT(fmt, ...) "[%{public}s:%{public}d] %{public}s# " fmt, FILE_NAME, __LINE__, __FUNCTION__, ##__VA_ARGS__
 
 #ifdef DISPLAY_HILOGF
 #undef DISPLAY_HILOGF
@@ -82,26 +80,36 @@ enum DisplayManagerLogDomain {
     DOMAIN_END = DISPLAY_DOMAIN_ID_END, // Max to 0xD00299F, keep the sequence and length same as DisplayManagerLogLabel
 };
 
+struct DisplayManagerLogLabelDomain {
+    uint32_t domainId;
+    const char* tag;
+};
+
 // Keep the sequence and length same as DisplayManagerLogDomain
-static constexpr OHOS::HiviewDFX::HiLogLabel DISPLAY_LABEL[LABEL_END] = {
-    {LOG_CORE, DOMAIN_APP,               "DisplayPowerApp"},
-    {LOG_CORE, DOMAIN_FRAMEWORK,         "DisplayPowerFwk"},
-    {LOG_CORE, DOMAIN_SERVICE,           "DisplayPowerSvc"},
-    {LOG_CORE, DOMAIN_HDI,               "DisplayPowerHdi"},
-    {LOG_CORE, DOMAIN_DRIVER,            "DisplayPowerDrv"},
-    {LOG_CORE, DOMAIN_UTILS,             "DisplayPowerUts"},
-    {LOG_CORE, DOMAIN_FEAT_BRIGHTNESS,   "DisplayPowerBrightness"},
-    {LOG_CORE, DOMAIN_FEAT_STATE,        "DisplayPowerState"},
-    {LOG_CORE, DOMAIN_TEST,              "DisplayPowerTest"},
+static const DisplayManagerLogLabelDomain DISPLAY_LABEL[LABEL_END] = {
+    {DOMAIN_APP,               "DisplayPowerApp"},
+    {DOMAIN_FRAMEWORK,         "DisplayPowerFwk"},
+    {DOMAIN_SERVICE,           "DisplayPowerSvc"},
+    {DOMAIN_HDI,               "DisplayPowerHdi"},
+    {DOMAIN_DRIVER,            "DisplayPowerDrv"},
+    {DOMAIN_UTILS,             "DisplayPowerUts"},
+    {DOMAIN_FEAT_BRIGHTNESS,   "DisplayPowerBrightness"},
+    {DOMAIN_FEAT_STATE,        "DisplayPowerState"},
+    {DOMAIN_TEST,              "DisplayPowerTest"},
 };
 
 // In order to improve performance, do not check the module range.
 // Besides, make sure module is less than LABEL_END.
-#define DISPLAY_HILOGF(domain, ...) (void)OHOS::HiviewDFX::HiLog::Fatal(DISPLAY_LABEL[domain], FORMAT(__VA_ARGS__))
-#define DISPLAY_HILOGE(domain, ...) (void)OHOS::HiviewDFX::HiLog::Error(DISPLAY_LABEL[domain], FORMAT(__VA_ARGS__))
-#define DISPLAY_HILOGW(domain, ...) (void)OHOS::HiviewDFX::HiLog::Warn(DISPLAY_LABEL[domain], FORMAT(__VA_ARGS__))
-#define DISPLAY_HILOGI(domain, ...) (void)OHOS::HiviewDFX::HiLog::Info(DISPLAY_LABEL[domain], FORMAT(__VA_ARGS__))
-#define DISPLAY_HILOGD(domain, ...) (void)OHOS::HiviewDFX::HiLog::Debug(DISPLAY_LABEL[domain], FORMAT(__VA_ARGS__))
+#define DISPLAY_HILOGF(domain, ...) \
+    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+#define DISPLAY_HILOGE(domain, ...) \
+    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+#define DISPLAY_HILOGW(domain, ...) \
+    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+#define DISPLAY_HILOGI(domain, ...) \
+    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+#define DISPLAY_HILOGD(domain, ...) \
+    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 
