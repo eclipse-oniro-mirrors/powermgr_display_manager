@@ -227,6 +227,7 @@ void BrightnessService::DimmingCallbackImpl::DiscountBrightness(double discount)
 
 void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
 {
+    mState = state;
     bool isAutoMode = false;
     bool isScreenOn = IsScreenOnState(state); // depend on state on
     bool isSettingOn = false;
@@ -248,7 +249,6 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
             mDimming->StopDimming();
         }
     }
-    mState = state;
 }
 
 DisplayState BrightnessService::GetDisplayState()
@@ -428,6 +428,7 @@ void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDurat
 {
     if (!CanSetBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot UpdateCurrentBrightnessLevel, ignore the change");
+        mLightLuxManager.ClearLuxData(); //clear luxData, prevent the next lux unadjusted
         return;
     }
 
@@ -709,7 +710,7 @@ uint32_t BrightnessService::GetScreenOnBrightness(bool isUpdateTarget)
             mOverriddenBrightness);
         screenOnbrightness = mOverriddenBrightness;
     } else if (isUpdateTarget && mBrightnessTarget > 0) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget=%{public}d", mBrightnessTarget);
         screenOnbrightness = mBrightnessTarget;
     } else {
         screenOnbrightness = GetSettingBrightness();
