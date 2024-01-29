@@ -235,7 +235,7 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
         id, isAutoMode, isModeChange);
 #endif
     if (state == DisplayState::DISPLAY_OFF) {
-        mBrightnessTarget = 0;
+        mBrightnessTarget.store(0);
         if (mDimming->IsDimming()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DISPLAY_OFF StopDimming");
             mDimming->StopDimming();
@@ -434,10 +434,10 @@ void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDurat
             duration = DEFAULT_ANIMATING_DURATION;
         }
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateCurrentBrightnessLevel lux=%{public}f, mBrightnessLevel=%{public}d, "\
-            "brightnessLevel=%{public}d, duration=%{publid}d", lux, mBrightnessLevel, brightnessLevel, duration);
-        SetBrightnessLevel(brightnessLevel, duration);
+            "brightnessLevel=%{public}d, duration=%{public}d", lux, mBrightnessLevel, brightnessLevel, duration);
         mBrightnessLevel = brightnessLevel;
-        mBrightnessTarget = brightnessLevel;
+        mBrightnessTarget.store(brightnessLevel);
+        SetBrightnessLevel(brightnessLevel, duration);
     }
 }
 
@@ -479,7 +479,7 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
             value, mLightLuxManager.GetSmoothedLux());
         }
     }
-    mBrightnessTarget = value;
+    mBrightnessTarget.store(value);
     bool isSuccess = UpdateBrightness(value, gradualDuration, !continuous);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}d, isSuccess=%{public}d", value, isSuccess);
     return isSuccess;
@@ -504,7 +504,7 @@ void BrightnessService::ClearOffset()
         mDimming->StopDimming();
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ClearOffset mLightLux=%{public}f", mLightLuxManager.GetSmoothedLux());
-    mBrightnessTarget = 0;
+    mBrightnessTarget.store(0);
     mBrightnessCalculationManager.UpdateBrightnessOffset(0, mLightLuxManager.GetSmoothedLux());
 }
 
@@ -701,9 +701,9 @@ uint32_t BrightnessService::GetScreenOnBrightness(bool isUpdateTarget)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is overridden, return overridden brightness=%{public}u",
             mOverriddenBrightness);
         screenOnbrightness = mOverriddenBrightness;
-    } else if (isUpdateTarget && mBrightnessTarget > 0) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget=%{public}d", mBrightnessTarget);
-        screenOnbrightness = mBrightnessTarget;
+    } else if (isUpdateTarget && mBrightnessTarget.load() > 0) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget=%{public}d", mBrightnessTarget.load());
+        screenOnbrightness = mBrightnessTarget.load();
     } else {
         screenOnbrightness = GetSettingBrightness();
     }
