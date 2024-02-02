@@ -179,7 +179,7 @@ private:
     DisplayState mState{DisplayState::DISPLAY_UNKNOWN};
     uint32_t mStateChangeReason{0};
     uint32_t mBrightnessLevel{0};
-    uint32_t mBrightnessTarget{0};
+    std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};
     double mDiscount{1.0f};
     std::atomic<bool> mIsBrightnessOverridden{false};
