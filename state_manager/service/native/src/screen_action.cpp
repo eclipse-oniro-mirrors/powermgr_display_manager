@@ -124,7 +124,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
 
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "displayId=%{public}u, state=%{public}u, reason=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
                    displayId_, static_cast<uint32_t>(state), reason);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
@@ -149,8 +149,11 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
         ret = Rosen::ScreenManager::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
     } else {
-        ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(
-            status, Rosen::PowerStateChangeReason::POWER_BUTTON);
+        auto changeReason = Rosen::PowerStateChangeReason::POWER_BUTTON;
+        if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_SWITCH)) {
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_SWITCH;
+        }
+        ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
     DISPLAY_HILOGI(FEAT_STATE, "Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
     return (state == DisplayState::DISPLAY_DIM || state == DisplayState::DISPLAY_SUSPEND) ? true : ret;

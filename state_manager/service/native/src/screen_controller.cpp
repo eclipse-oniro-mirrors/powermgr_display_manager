@@ -98,8 +98,8 @@ DisplayState ScreenController::SetOnState()
 
 bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "UpdateState, state=%{public}u, current state=%{public}u",
-                   static_cast<uint32_t>(state), static_cast<uint32_t>(state_));
+    DISPLAY_HILOGI(FEAT_STATE, "UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u",
+                   static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason);
     RETURN_IF_WITH_RET(state == state_, true);
     if (state == DisplayState::DISPLAY_DIM && state_ == DisplayState::DISPLAY_OFF) {
         DISPLAY_HILOGI(FEAT_STATE, "Not allowed to set DIM state.");
@@ -260,8 +260,9 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         DISPLAY_HILOGW(FEAT_STATE, "pms is nullptr");
         return;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged state=%{public}d", static_cast<int>(state));
-    bool ret = action_->SetDisplayPower(state, stateChangeReason_);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged state=%{public}d, reason=%{public}u",
+        static_cast<int>(state), reason);
+    bool ret = action_->SetDisplayPower(state, reason);
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness();
         // Restore the brightness before screen off
