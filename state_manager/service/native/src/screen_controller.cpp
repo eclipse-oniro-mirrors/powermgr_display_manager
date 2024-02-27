@@ -267,7 +267,8 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         pms->SetScreenOnBrightness();
         // Restore the brightness before screen off
         uint32_t screenOnBrightness = GetScreenOnBrightness();
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
+        DISPLAY_HILOGI(
+            FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
     }
 
     if (ret) {
