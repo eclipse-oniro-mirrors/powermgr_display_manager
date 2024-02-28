@@ -95,6 +95,9 @@ void BrightnessService::Init()
     if (queue_ == nullptr) {
         return;
     }
+    if (!mDimming->Init()) {
+        return;
+    }
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
     mIsFoldDevice = Rosen::DisplayManager::GetInstance().IsFoldable();
@@ -123,6 +126,8 @@ void BrightnessService::DeInit()
         g_cancelBoostTaskHandle = nullptr;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct brightness ffrt queue");
     }
+
+    mDimming->Reset();
 }
 
 void BrightnessService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
