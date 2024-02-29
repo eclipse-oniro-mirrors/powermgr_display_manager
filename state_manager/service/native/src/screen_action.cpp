@@ -85,8 +85,8 @@ DisplayState ScreenAction::GetDisplayState()
 
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
-    DISPLAY_HILOGI(
-        FEAT_STATE, "[UL_POWER] displayId=%{public}u, state=%{public}u", displayId_, static_cast<uint32_t>(state));
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
+        static_cast<uint32_t>(state));
     Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -118,7 +118,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     // Notify screen state change event to battery statistics
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState:%{public}d", ret);
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: ret=%{public}d", ret);
     return ret;
 }
 
