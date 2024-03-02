@@ -23,7 +23,6 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 using namespace PowerMgr;
 namespace {
-FFRTQueue g_animatorQueue("brightness_animator_queue");
 FFRTHandle g_animatorTaskHandle;
 }
 
@@ -37,6 +36,25 @@ BrightnessDimming::BrightnessDimming(const std::string& name, std::shared_ptr<Br
     mTotalSteps = 0;
     mStride = 0;
     mUpdateTime = DEFAULT_UPDATE_TIME;
+}
+
+bool BrightnessDimming::Init()
+{
+    mQueue = std::make_shared<FFRTQueue> ("brightness_animator_queue");
+    if (mQueue == nullptr) {
+        return false;
+    }
+    return true;
+}
+
+void BrightnessDimming::Reset()
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "start dimming queue");
+    if (mQueue) {
+        mQueue.reset();
+        g_animatorTaskHandle = nullptr;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct dimming_queue");
+    }
 }
 
 void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t duration)
@@ -76,13 +94,13 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
     mCurrentStep = 0;
     mDimming = true;
     FFRTTask task = std::bind(&BrightnessDimming::NextStep, this);
-    g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, g_animatorQueue);
+    g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, mQueue);
 }
 
 void BrightnessDimming::StopDimming()
 {
     mDimming = false;
-    FFRTUtils::CancelTask(g_animatorTaskHandle, g_animatorQueue);
+    FFRTUtils::CancelTask(g_animatorTaskHandle, mQueue);
     if (mCallback == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Callback is nullptr");
         return;
@@ -131,7 +149,7 @@ void BrightnessDimming::NextStep()
             mCurrentBrightness = nextBrightness;
             mCallback->OnChanged(mCurrentBrightness);
             FFRTTask task = std::bind(&BrightnessDimming::NextStep, this);
-            g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, g_animatorQueue);
+            g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, mQueue);
         }
     } else {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "next step last mCurrentBrightness=%{public}u, mToBrightness=%{public}u",

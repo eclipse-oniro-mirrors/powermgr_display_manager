@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <event_handler.h>
 #include <event_runner.h>
+#include "ffrt_utils.h"
 #include <iosfwd>
 #include <memory>
 #include <string>
@@ -42,6 +43,8 @@ public:
     void StopDimming();
     bool IsDimming() const;
     uint32_t GetDimmingUpdateTime() const;
+    bool Init();
+    void Reset();
 private:
     static const uint32_t DEFAULT_UPDATE_TIME = 32;
     static const int32_t STRIDE_ABSOLUTE_MIN = 1;
@@ -59,6 +62,7 @@ private:
     std::atomic_int32_t mStride{};
     std::atomic_uint32_t mCurrentBrightness{};
     std::atomic_uint32_t mCurrentStep{};
+    std::shared_ptr<PowerMgr::FFRTQueue> mQueue;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
