@@ -73,6 +73,7 @@ void DisplayPowerMgrService::Init()
     for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id));
+        BrightnessManager::Get().SetDisplayId(id);
     }
 
     callback_ = nullptr;
@@ -116,7 +117,7 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
 {
     uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
     uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
-    uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId();
+    uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId(mainDisplayId);
     BrightnessManager::Get().SetDisplayId(currentDisplayId);
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->SetBrightness(brightness, mainDisplayId);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedBrightness currentDisplayId=%{public}d", currentDisplayId);
@@ -297,10 +298,6 @@ bool DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, b
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u, continuous=%{public}d",
         displayId, brightness, continuous);
-    auto iter = controllerMap_.find(displayId);
-    if (iter == controllerMap_.end()) {
-        return false;
-    }
     return BrightnessManager::Get().SetBrightness(brightness, 0, continuous);
 }
 

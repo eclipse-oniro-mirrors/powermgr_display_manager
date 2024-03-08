@@ -48,7 +48,7 @@ public:
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
     void ClearOffset();
-    uint32_t GetCurrentDisplayId() const;
+    uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);
 
 private:

@@ -37,7 +37,7 @@ public:
     BrightnessAction& operator=(BrightnessAction&&) = delete;
 
     static uint32_t GetDefaultDisplayId();
-    static uint32_t GetCurrentDisplayId();
+    static uint32_t GetCurrentDisplayId(uint32_t defaultId);
     static std::vector<uint32_t> GetAllDisplayId();
 
     uint32_t GetDisplayId();

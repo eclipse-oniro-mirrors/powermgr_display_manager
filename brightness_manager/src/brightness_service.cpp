@@ -65,8 +65,7 @@ using namespace OHOS::PowerMgr;
 
 BrightnessService::BrightnessService()
 {
-    mDisplayId = DEFAULT_DISPLAY_ID;
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService created");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService created for displayId=%{public}d", mDisplayId);
     mAction = std::make_shared<BrightnessAction>(mDisplayId);
     if (mAction == nullptr) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "mAction is null");
@@ -183,15 +182,20 @@ uint32_t BrightnessService::GetDisplayId()
     return mDisplayId;
 }
 
-uint32_t BrightnessService::GetCurrentDisplayId() const
+uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId) const
 {
-    return mAction->GetCurrentDisplayId();
+    return mAction->GetCurrentDisplayId(defaultId);
 }
 
 void BrightnessService::SetDisplayId(uint32_t displayId)
 {
     mDisplayId = displayId;
+    if (mAction == nullptr) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::SetDisplayId mAction == nullptr");
+        return;
+    }
     mAction->SetDisplayId(displayId);
+    mState = mAction->GetDisplayState();
 }
 
 BrightnessService::DimmingCallbackImpl::DimmingCallbackImpl(
@@ -232,6 +236,7 @@ void BrightnessService::DimmingCallbackImpl::DiscountBrightness(double discount)
 
 void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
 {
+    SetDisplayId(id);
     mState = state;
     bool isAutoMode = false;
     bool isScreenOn = IsScreenOnState(state); // depend on state on
