@@ -122,9 +122,9 @@ bool BrightnessManager::IsBrightnessBoosted() const
     return BrightnessService::Get().IsBrightnessBoosted();
 }
 
-uint32_t BrightnessManager::GetCurrentDisplayId() const
+uint32_t BrightnessManager::GetCurrentDisplayId(uint32_t defaultId) const
 {
-    return BrightnessService::Get().GetCurrentDisplayId();
+    return BrightnessService::Get().GetCurrentDisplayId(defaultId);
 }
 
 void BrightnessManager::SetDisplayId(uint32_t id)

@@ -136,7 +136,7 @@ public:
     void UpdateBrightnessSceneMode(BrightnessSceneMode mode);
     uint32_t GetDisplayId();
     void SetDisplayId(uint32_t displayId);
-    uint32_t GetCurrentDisplayId() const;
+    uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
 
 private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY{"settings.display.screen_brightness_status"};
