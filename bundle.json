@@ -42,6 +42,7 @@
         "hilog",
         "ipc",
         "image_framework",
+        "jsoncpp",
         "napi",
         "power_manager",
         "safwk",
