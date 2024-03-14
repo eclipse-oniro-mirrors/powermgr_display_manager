@@ -98,7 +98,7 @@ DisplayState ScreenController::SetOnState()
 
 bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u",
                    static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason);
     RETURN_IF_WITH_RET(state == state_, true);
     if (state == DisplayState::DISPLAY_DIM && state_ == DisplayState::DISPLAY_OFF) {
@@ -112,7 +112,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                 bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
             bool ret = action_->SetDisplayState(state, callback);
             if (!ret) {
-                DISPLAY_HILOGW(FEAT_STATE, "Update display state failed, state=%{public}d", state);
+                DISPLAY_HILOGW(FEAT_STATE, "[UL_POWER] Update display state failed, state=%{public}d", state);
                 return ret;
             }
             break;
@@ -134,7 +134,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     state_ = state;
     stateChangeReason_ = reason;
 
-    DISPLAY_HILOGI(FEAT_STATE, "Update screen state to %{public}u", state);
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] Update screen state to %{public}u", state);
     return true;
 }
 
@@ -260,14 +260,15 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         DISPLAY_HILOGW(FEAT_STATE, "pms is nullptr");
         return;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged state=%{public}d, reason=%{public}u",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged state=%{public}d, reason=%{public}u",
         static_cast<int>(state), reason);
     bool ret = action_->SetDisplayPower(state, reason);
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness();
         // Restore the brightness before screen off
         uint32_t screenOnBrightness = GetScreenOnBrightness();
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
+        DISPLAY_HILOGI(
+            FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
     }
 
     if (ret) {

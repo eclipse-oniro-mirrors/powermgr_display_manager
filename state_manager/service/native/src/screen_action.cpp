@@ -85,7 +85,8 @@ DisplayState ScreenAction::GetDisplayState()
 
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "displayId=%{public}u, state=%{public}u", displayId_, static_cast<uint32_t>(state));
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
+        static_cast<uint32_t>(state));
     Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -98,33 +99,32 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
             break;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds,
-        [callback](Rosen::DisplayState rosenState) {
-            DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState Callback:%{public}d", static_cast<uint32_t>(rosenState));
-            DisplayState state;
-            switch (rosenState) {
-                case Rosen::DisplayState::ON:
-                    state = DisplayState::DISPLAY_ON;
-                    break;
-                case Rosen::DisplayState::OFF:
-                    state = DisplayState::DISPLAY_OFF;
-                    break;
-                default:
-                    return;
-            }
-            callback(state);
+    bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds, [callback](Rosen::DisplayState rosenState) {
+        DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState Callback:%{public}d", static_cast<uint32_t>(rosenState));
+        DisplayState state;
+        switch (rosenState) {
+            case Rosen::DisplayState::ON:
+                state = DisplayState::DISPLAY_ON;
+                break;
+            case Rosen::DisplayState::OFF:
+                state = DisplayState::DISPLAY_OFF;
+                break;
+            default:
+                return;
+        }
+        callback(state);
     });
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
-    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayState:%{public}d", ret);
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: ret=%{public}d", ret);
     return ret;
 }
 
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
                    displayId_, static_cast<uint32_t>(state), reason);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
@@ -155,7 +155,8 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
         }
         ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
-    DISPLAY_HILOGI(FEAT_STATE, "Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
+    DISPLAY_HILOGI(
+        FEAT_STATE, "[UL_POWER] Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
     return (state == DisplayState::DISPLAY_DIM || state == DisplayState::DISPLAY_SUSPEND) ? true : ret;
 }
 
