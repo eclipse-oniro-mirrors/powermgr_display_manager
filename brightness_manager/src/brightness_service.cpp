@@ -211,11 +211,20 @@ void BrightnessService::DimmingCallbackImpl::OnStart()
 
 void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
 {
+    if (!BrightnessService::Get().IsDimming()) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d already stopDimming, return",
+            currentValue);
+        return;
+    }
     auto brightness = GetMappingBrightnessLevel(currentValue);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d, mapBrightness=%{public}d",
         currentValue, brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
     if (isSuccess) {
+        if (!BrightnessService::Get().IsDimming()) {
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged already stopDimming , not update setting brightness");
+            return;
+        }
         FFRTTask task = std::bind([this](uint32_t value) { mCallback(value); }, currentValue);
         FFRTUtils::SubmitTask(task);
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update OnChanged,Setting brightness=%{public}d", currentValue);
@@ -815,5 +824,14 @@ uint32_t BrightnessService::GetMappingHighBrightnessLevel(uint32_t level)
 void BrightnessService::UpdateBrightnessSceneMode(BrightnessSceneMode mode)
 {
 }
+
+bool BrightnessService::IsDimming()
+{
+    if (mDimming == nullptr) {
+        return false;
+    }
+    return mDimming->IsDimming();
+}
+
 } // namespace DisplayPowerMgr
 } // namespace OHOS

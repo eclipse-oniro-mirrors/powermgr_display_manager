@@ -137,7 +137,8 @@ public:
     uint32_t GetDisplayId();
     void SetDisplayId(uint32_t displayId);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
-
+    bool IsDimming();
+    
 private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY{"settings.display.screen_brightness_status"};
     static const uint32_t SAMPLING_RATE = 100000000;
