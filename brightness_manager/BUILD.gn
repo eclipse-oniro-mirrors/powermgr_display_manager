@@ -49,8 +49,6 @@ ohos_static_library("brightness_manager") {
     "${displaymgr_inner_api}:displaymgr_public_config",
   ]
 
-  deps = [ "//third_party/jsoncpp:jsoncpp" ]
-
   external_deps = [
     "ability_runtime:ability_manager",
     "c_utils:utils",
@@ -61,6 +59,7 @@ ohos_static_library("brightness_manager") {
     "hisysevent:libhisysevent",
     "image_framework:image_native",
     "ipc:ipc_core",
+    "jsoncpp:jsoncpp",
     "power_manager:power_ffrt",
     "power_manager:power_setting",
     "power_manager:power_sysparam",
