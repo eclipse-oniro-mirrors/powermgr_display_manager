@@ -18,8 +18,6 @@
 #include <hisysevent.h>
 #include <ipc_skeleton.h>
 
-#include "dm_common.h"
-#include "display_manager.h"
 #include "display_log.h"
 #include "power_state_machine_info.h"
 #include "screen_manager.h"
@@ -83,6 +81,14 @@ DisplayState ScreenAction::GetDisplayState()
     return state;
 }
 
+bool ScreenAction::EnableSkipSetDisplayState(uint32_t reason)
+{
+    if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS)) {
+        return true;
+    }
+    return false;
+}
+
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
@@ -122,6 +128,34 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     return ret;
 }
 
+Rosen::PowerStateChangeReason ScreenAction::ParseSpecialReason(uint32_t reason)
+{
+    auto changeReason = Rosen::PowerStateChangeReason::POWER_BUTTON;
+    switch (reason) {
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT;
+            break;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_ON):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_ON;
+            break;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS;
+            break;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF;
+            break;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_SWITCH):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_SWITCH;
+            break;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_POWER_KEY):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_POWER_KEY;
+            break;
+        default:
+            break;
+    }
+    return changeReason;
+}
+
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
@@ -145,14 +179,11 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     }
 
     bool ret = false;
+    auto changeReason = ParseSpecialReason(reason);
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
         ret = Rosen::ScreenManager::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
     } else {
-        auto changeReason = Rosen::PowerStateChangeReason::POWER_BUTTON;
-        if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_SWITCH)) {
-            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_SWITCH;
-        }
         ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
     DISPLAY_HILOGI(

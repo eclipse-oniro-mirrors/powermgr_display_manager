@@ -25,6 +25,7 @@
 #include "refbase.h"
 #include "setting_provider.h"
 #include "system_ability_definition.h"
+#include "power_state_machine_info.h"
 
 using namespace std;
 using namespace OHOS::PowerMgr;
@@ -100,7 +101,10 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u",
                    static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason);
-    RETURN_IF_WITH_RET(state == state_, true);
+    if (reason != static_cast<uint32_t>
+        (PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF)) {
+        RETURN_IF_WITH_RET(state == state_, true);
+    }
     if (state == DisplayState::DISPLAY_DIM && state_ == DisplayState::DISPLAY_OFF) {
         DISPLAY_HILOGI(FEAT_STATE, "Not allowed to set DIM state.");
         return true;
@@ -108,12 +112,16 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     switch (state) {
         case DisplayState::DISPLAY_ON:
         case DisplayState::DISPLAY_OFF: {
-            function<void(DisplayState)> callback =
-                bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
-            bool ret = action_->SetDisplayState(state, callback);
-            if (!ret) {
-                DISPLAY_HILOGW(FEAT_STATE, "[UL_POWER] Update display state failed, state=%{public}d", state);
-                return ret;
+            if (action_->EnableSkipSetDisplayState(reason)) {
+                OnStateChanged(state, reason);
+            } else {
+                function<void(DisplayState)> callback =
+                    bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
+                bool ret = action_->SetDisplayState(state, callback);
+                if (!ret) {
+                    DISPLAY_HILOGW(FEAT_STATE, "Update display state failed, state=%{public}d", state);
+                    return ret;
+                }
             }
             break;
         }
@@ -128,6 +136,12 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
         }
         default:
             break;
+    }
+
+    if (IsNeedSkipNextProc(reason)) {
+        DISPLAY_HILOGI(FEAT_STATE,
+            "Need interrupt next process when updating state because of reason = %{public}d", reason);
+        return false;
     }
 
     lock_guard lock(mutexState_);
@@ -253,6 +267,16 @@ bool ScreenController::IsBrightnessBoosted() const
     return isBrightnessBoosted_;
 }
 
+bool ScreenController::IsNeedSkipNextProc(uint32_t reason)
+{
+    if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT) ||
+        reason == static_cast<uint32_t>(
+            PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF)) {
+        return true;
+    }
+    return false;
+}
+
 void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
 {
     auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
@@ -263,12 +287,15 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged state=%{public}d, reason=%{public}u",
         static_cast<int>(state), reason);
     bool ret = action_->SetDisplayPower(state, reason);
+    if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT)) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "No need to set brightness, reason=%{public}d", reason);
+        return;
+    }
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness();
         // Restore the brightness before screen off
         uint32_t screenOnBrightness = GetScreenOnBrightness();
-        DISPLAY_HILOGI(
-            FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
     }
 
     if (ret) {

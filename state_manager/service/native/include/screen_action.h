@@ -22,6 +22,8 @@
 #include <mutex>
 #include <vector>
 
+#include "dm_common.h"
+#include "display_manager.h"
 #include "display_power_info.h"
 
 namespace OHOS {
@@ -41,6 +43,7 @@ public:
     uint32_t GetBrightness();
     bool SetBrightness(uint32_t value);
     void SetCoordinated(bool coordinated);
+    bool EnableSkipSetDisplayState(uint32_t reason);
 
 private:
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
@@ -48,6 +51,8 @@ private:
     uint32_t brightness_ {102};
     uint32_t displayId_ {DEFAULT_DISPLAY_ID};
     bool coordinated_ {false};
+    bool skipSetDisplayState_ {false};
+    Rosen::PowerStateChangeReason ParseSpecialReason(uint32_t reason);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
