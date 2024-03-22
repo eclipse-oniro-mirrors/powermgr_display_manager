@@ -43,10 +43,6 @@ std::vector<uint32_t> ScreenAction::GetAllDisplayId()
     std::vector<uint64_t> allIds = Rosen::DisplayManager::GetInstance().GetAllDisplayIds();
     IPCSkeleton::SetCallingIdentity(identity);
     std::vector<uint32_t> displayIds;
-    if (allIds.empty()) {
-        displayIds.push_back(DEFAULT_DISPLAY_ID);
-        return displayIds;
-    }
     std::transform(allIds.begin(), allIds.end(), back_inserter(displayIds), [](uint64_t id) {
         return static_cast<uint32_t>(id);
     });

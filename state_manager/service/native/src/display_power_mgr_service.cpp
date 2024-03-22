@@ -41,9 +41,9 @@ namespace {
 DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
 FFRTHandle g_screenOffDelayTaskHandle;
 const uint32_t GET_DISPLAY_ID_DELAY_MS = 50;
+const uint32_t US_PER_MS = 1000;
 const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
-uint32_t g_getDisplayIdRetryCount = 0;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -55,19 +55,19 @@ DisplayPowerMgrService::DisplayPowerMgrService() = default;
 void DisplayPowerMgrService::Init()
 {
     queue_ = std::make_shared<FFRTQueue> ("display_power_mgr_service");
-    if (queue_ == nullptr) {
-        return;
-    }
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
-    std::vector<uint32_t> displayIds = ScreenAction::GetAllDisplayId();
-    uint32_t retryCount = GET_DISPLAY_ID_RETRY_COUNT;
-    if (displayIds.empty()) {
-        if (g_getDisplayIdRetryCount < GET_DISPLAY_ID_RETRY_COUNT) {
-            DISPLAY_HILOGI(COMP_SVC, "cannot find any display id, retry!");
-            g_getDisplayIdRetryCount++;
-            FFRTTask task = [this]() { Init(); };
-            FFRTUtils::SubmitDelayTask(task, GET_DISPLAY_ID_DELAY_MS, queue_);
-            return;
+    std::vector<uint32_t> displayIds;
+    for (int tryCount = 0; tryCount <= GET_DISPLAY_ID_RETRY_COUNT; tryCount++) {
+        displayIds = ScreenAction::GetAllDisplayId();
+        if (!displayIds.empty()) {
+            break;
+        }
+        if (tryCount < GET_DISPLAY_ID_RETRY_COUNT) {
+            usleep(GET_DISPLAY_ID_DELAY_MS * US_PER_MS);
+            DISPLAY_HILOGI(COMP_SVC, "cannot find any display id, retry! count: %{public}u", tryCount + 1);
+        } else {
+            displayIds.emplace_back(DEFALUT_DISPLAY_ID);
+            DISPLAY_HILOGE(COMP_SVC, "cannot find any display id after max retry, fill with 0");
         }
     }
     for (const auto& id: displayIds) {
