@@ -140,13 +140,10 @@ void BrightnessService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnFoldStatusChanged currentBrightness=%{public}d", currentBrightness);
     if (foldStatus == Rosen::FoldStatus::FOLDED) {
         BrightnessService::Get().SetDisplayId(OUTTER_SCREEN_DISPLAY_ID);
-        BrightnessService::Get().SetBrightness(currentBrightness);
-    } else if (foldStatus == Rosen::FoldStatus::EXPAND) {
-        BrightnessService::Get().SetDisplayId(DEFAULT_DISPLAY_ID);
-        BrightnessService::Get().SetBrightness(currentBrightness);
     } else {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "no need to changed displayID");
+        BrightnessService::Get().SetDisplayId(DEFAULT_DISPLAY_ID);
     }
+    BrightnessService::Get().SetBrightness(currentBrightness);
 }
 
 void BrightnessService::RegisterFoldStatusListener()
@@ -245,7 +242,6 @@ void BrightnessService::DimmingCallbackImpl::DiscountBrightness(double discount)
 
 void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
 {
-    SetDisplayId(id);
     mState = state;
     bool isAutoMode = false;
     bool isScreenOn = IsScreenOnState(state); // depend on state on
