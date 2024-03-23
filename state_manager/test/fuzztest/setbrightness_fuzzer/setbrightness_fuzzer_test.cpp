@@ -23,13 +23,13 @@
 using namespace OHOS::PowerMgr;
 
 namespace {
-DisplayFuzzerTest g_serviceTest;
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
+    DisplayFuzzerTest g_serviceTest;
     g_serviceTest.TestDisplayServiceStub(
         static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS), data, size);
     return 0;
