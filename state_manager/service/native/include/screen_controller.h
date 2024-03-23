@@ -82,6 +82,7 @@ private:
     bool CanDiscountBrightness();
     bool CanOverrideBrightness();
     bool CanBoostBrightness();
+    bool IsNeedSkipNextProc(uint32_t reason);
     bool UpdateBrightness(uint32_t value, uint32_t gradualDuration = 0, bool updateSetting = false);
     void SetSettingBrightness(uint32_t value);
     uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY) const;

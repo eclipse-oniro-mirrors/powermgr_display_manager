@@ -363,4 +363,86 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
     EXPECT_TRUE(ret);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrService022
+ * @tc.desc: Test set display state in Pre-light the screen
+ * @tc.type: FUNCs
+ * @tc.require: issue#I9AJ1S
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService022, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService022 is start");
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+
+    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT);
+    EXPECT_FALSE(ret);
+    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService023
+ * @tc.desc: Test set display state in Pre-light the screen and auth success
+ * @tc.type: FUNC
+ * @tc.require: issue#I9AJ1S
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService023, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService023 is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS);
+    EXPECT_TRUE(ret);
+    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_ON);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService024
+ * @tc.desc: Test set display state in Pre-light the screen and auth failed but screen on
+ * @tc.type: FUNC
+ * @tc.require: issue#I9AJ1S
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService024, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService024 is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_ON);
+    EXPECT_TRUE(ret);
+    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_ON);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService025
+ * @tc.desc: Test set display state in Pre-light the screen and auth failed but screen on
+ * @tc.type: FUNC
+ * @tc.require: issue#I9AJ1S
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService025, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService025 is start");
+    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+
+    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF);
+    EXPECT_FALSE(ret);
+    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+}
+
 } // namespace
