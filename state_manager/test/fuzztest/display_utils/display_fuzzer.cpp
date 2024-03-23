@@ -37,6 +37,7 @@ DisplayFuzzerTest::DisplayFuzzerTest()
 DisplayFuzzerTest::~DisplayFuzzerTest()
 {
     if (service_ != nullptr) {
+        sleep(1);
         service_->Deinit();
         service_->Reset();
     }
