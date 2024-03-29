@@ -415,6 +415,9 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
 
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
     if (!supportLightSensor_) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
