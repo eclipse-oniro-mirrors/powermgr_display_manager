@@ -216,6 +216,7 @@ void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
     auto brightness = GetMappingBrightnessLevel(currentValue);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d, mapBrightness=%{public}d",
         currentValue, brightness);
+    BrightnessService::Get().ReportBrightnessBigData(currentValue);
     bool isSuccess = mAction->SetBrightness(brightness);
     if (isSuccess) {
         if (!BrightnessService::Get().IsDimming()) {
@@ -382,6 +383,10 @@ void BrightnessService::AmbientLightCallback(SensorEvent* event)
         return;
     }
     BrightnessService::Get().ProcessLightLux(data->intensity);
+    // Notify ambient lux change event to battery statistics
+    // type:0 auto brightness, 1 manual brightness, 2 window brightness, 3 others
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", data->intensity, "TYPE", 0);
 }
 
 void BrightnessService::ActivateAmbientSensor()
@@ -497,14 +502,16 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
     if (gradualDuration == 0) {
         bool isSettingOn = IsAutoAdjustBrightness();
         if (isSettingOn && mIsLightSensorEnabled) {
-        mBrightnessCalculationManager.UpdateBrightnessOffset(value, mLightLuxManager.GetSmoothedLux());
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightnessOffset level=%{public}d, mLightLux=%{public}f",
-            value, mLightLuxManager.GetSmoothedLux());
+            mIsUserMode = true;
+            mBrightnessCalculationManager.UpdateBrightnessOffset(value, mLightLuxManager.GetSmoothedLux());
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightnessOffset level=%{public}d, mLightLux=%{public}f",
+                value, mLightLuxManager.GetSmoothedLux());
         }
     }
     mBrightnessTarget.store(value);
     bool isSuccess = UpdateBrightness(value, gradualDuration, !continuous);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}d, isSuccess=%{public}d", value, isSuccess);
+    mIsUserMode = false;
     return isSuccess;
 }
 
@@ -688,6 +695,7 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
     }
     auto brightness = static_cast<uint32_t>(value * mDiscount);
     brightness = GetMappingBrightnessLevel(brightness);
+    ReportBrightnessBigData(value);
     bool isSuccess = mAction->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness is %{public}s, brightness: %{public}u",
         isSuccess ? "succ" : "failed", brightness);
@@ -827,6 +835,31 @@ bool BrightnessService::IsDimming()
         return false;
     }
     return mDimming->IsDimming();
+}
+
+std::string BrightnessService::GetReason()
+{
+    if (mIsBrightnessOverridden) {
+        return "APP";
+    }
+    if (mIsUserMode) {
+        return "USER";
+    }
+    if (mIsAutoBrightnessEnabled) {
+        return "AUTO";
+    }
+    return "MANUAL";
+}
+
+void BrightnessService::ReportBrightnessBigData(uint32_t brightness)
+{
+    std::string reason = GetReason();
+    uint32_t nit = GetMappingBrightnessNit(brightness);
+    // Notify screen brightness change event to battery statistics
+    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BRIGHTNESS_NIT",
+        HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", brightness, "REASON", reason, "NIT", nit);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BigData brightness=%{public}d,reason=%{public}s,nit=%{public}d",
+        brightness, reason.c_str(), nit);
 }
 
 } // namespace DisplayPowerMgr
