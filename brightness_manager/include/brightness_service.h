@@ -138,6 +138,7 @@ public:
     void SetDisplayId(uint32_t displayId);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     bool IsDimming();
+    void ReportBrightnessBigData(uint32_t brightness);
     
 private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY{"settings.display.screen_brightness_status"};
@@ -174,6 +175,7 @@ private:
     void UpdateBrightnessSettingFunc(const std::string& key);
     void RegisterFoldStatusListener();
     void UnRegisterFoldStatusListener();
+    std::string GetReason();
 
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
@@ -195,6 +197,7 @@ private:
     BrightnessCalculationManager mBrightnessCalculationManager{};
     sptr<Rosen::DisplayManager::IFoldStatusListener> mFoldStatusistener;
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
+    bool mIsUserMode{false};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
