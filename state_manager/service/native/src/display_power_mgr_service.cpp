@@ -57,7 +57,7 @@ void DisplayPowerMgrService::Init()
     queue_ = std::make_shared<FFRTQueue> ("display_power_mgr_service");
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerMgrService Create");
     std::vector<uint32_t> displayIds;
-    for (int tryCount = 0; tryCount <= GET_DISPLAY_ID_RETRY_COUNT; tryCount++) {
+    for (uint32_t tryCount = 0; tryCount <= GET_DISPLAY_ID_RETRY_COUNT; tryCount++) {
         displayIds = ScreenAction::GetAllDisplayId();
         if (!displayIds.empty()) {
             break;
