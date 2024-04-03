@@ -34,6 +34,7 @@ const uint32_t MAX_FAIL_ARGC = 2;
 const uint32_t MAX_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
 const uint32_t MIN_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
 const uint32_t DEFAULT_BRIGHTNESS = DisplayPowerMgrClient::GetInstance().GetDefaultBrightness();
+const uint32_t MAIN_DISPLAY_ID = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
 
 const std::string FUNC_SUCEESS_NAME = "success";
 const std::string FUNC_FAIL_NAME = "fail";
@@ -290,7 +291,7 @@ napi_value Brightness::Result::GetResult(napi_env env)
 
 uint32_t Brightness::BrightnessInfo::GetBrightness() const
 {
-    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness(MAIN_DISPLAY_ID);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Get brightness: %{public}d", brightness);
     return brightness;
 }
