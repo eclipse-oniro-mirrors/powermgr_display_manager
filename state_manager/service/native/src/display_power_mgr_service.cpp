@@ -164,6 +164,7 @@ void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& 
     bool isSettingEnable = GetSettingAutoBrightness(key);
     bool isSystemEnable = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->IsAutoAdjustBrightness();
     if (isSettingEnable == isSystemEnable) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "no need change autoAdjustSwitch");
         return;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoBrightnessSettingUpdateFunc isSettingEnable=%{public}d", isSettingEnable);
@@ -431,6 +432,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
             return true;
         }
         autoBrightness_ = true;
+        BrightnessManager::Get().AutoAdjustBrightness(true);
     } else {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness disable");
         if (!autoBrightness_) {
@@ -438,6 +440,7 @@ bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
             return true;
         }
         autoBrightness_ = false;
+        BrightnessManager::Get().AutoAdjustBrightness(false);
     }
     SetSettingAutoBrightness(enable);
     return true;
