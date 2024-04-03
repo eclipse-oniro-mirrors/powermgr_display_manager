@@ -111,7 +111,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     }
     switch (state) {
         case DisplayState::DISPLAY_ON:
-            if (state_ == DisplayState::DISPLAY_DIM){
+            if (state_ == DisplayState::DISPLAY_DIM) {
                 break;
             }
         case DisplayState::DISPLAY_OFF: {
@@ -129,17 +129,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
             break;
         }
         case DisplayState::DISPLAY_DIM:
-            if (state_ == DisplayState::DISPLAY_ON) {
-                break;
-            }
-        case DisplayState::DISPLAY_SUSPEND: {
-            bool ret = action_->SetDisplayPower(state, stateChangeReason_);
-            if (!ret) {
-                DISPLAY_HILOGW(FEAT_STATE, "Update display power failed, state=%{public}d", state);
-                return ret;
-            }
-            break;
-        }
+        case DisplayState::DISPLAY_SUSPEND:
         default:
             break;
     }
