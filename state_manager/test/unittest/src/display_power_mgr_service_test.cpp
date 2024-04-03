@@ -26,31 +26,14 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 
-namespace {
-DisplayState beforeDisplayState;
-}
-
 void DisplayPowerMgrServiceTest::SetUp()
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrServiceTest SetUp is start");
-    beforeDisplayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    DISPLAY_HILOGI(LABEL_TEST, "Get displaystate before run testcase, beforeDisplaystate: %{public}d",
-        beforeDisplayState);
-    return;
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
 }
 
 void DisplayPowerMgrServiceTest::TearDown()
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrServiceTest TearDown is start");
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    DISPLAY_HILOGI(LABEL_TEST, "Get displaystate after run testcase, state: %{public}d", state);
-    if (state != beforeDisplayState) {
-        DisplayPowerMgrClient::GetInstance().SetDisplayState(beforeDisplayState);
-        DISPLAY_HILOGI(LABEL_TEST, "Set displaystate %{public}d to %{public}d",
-            state, beforeDisplayState);
-        return;
-    }
-    return;
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
 }
 
 namespace {
