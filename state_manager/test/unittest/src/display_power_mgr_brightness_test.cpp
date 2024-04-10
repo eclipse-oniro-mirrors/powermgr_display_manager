@@ -846,9 +846,13 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness002, Test
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
     if (ret) {
         DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is supported");
         ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
+        //waiting to find correct isSettingEnable value
+        usleep(50000);
         EXPECT_TRUE(ret);
     } else {
         DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is not supported");
@@ -867,8 +871,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, Test
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
     DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
     EXPECT_EQ(DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness(), false);
     DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(ret);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003: fun is end");
 }
 
@@ -883,6 +891,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality0
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001: fun is start");
     uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
+    DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     uint32_t deviceBrightness2 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(deviceBrightness1, deviceBrightness2);
