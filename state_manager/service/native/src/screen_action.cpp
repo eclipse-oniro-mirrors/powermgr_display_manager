@@ -111,6 +111,9 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
             case Rosen::DisplayState::OFF:
                 state = DisplayState::DISPLAY_OFF;
                 break;
+            case Rosen::DisplayState::ON_SUSPEND:
+                state = DisplayState::DISPLAY_SUSPEND
+                break;
             default:
                 return;
         }
