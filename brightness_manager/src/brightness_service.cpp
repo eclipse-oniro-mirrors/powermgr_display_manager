@@ -218,7 +218,7 @@ void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
         currentValue, brightness);
     BrightnessService::Get().ReportBrightnessBigData(currentValue);
     bool isSuccess = mAction->SetBrightness(brightness);
-    if (isSuccess) {
+    if (isSuccess && !BrightnessService::Get().IsSleepStatus()) {
         if (!BrightnessService::Get().IsDimming()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged already stopDimming , not update setting brightness");
             return;
@@ -259,10 +259,21 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
         id, isAutoMode, isModeChange);
 #endif
     if (state == DisplayState::DISPLAY_OFF) {
+        if (mIsSleepStatus) {
+            mIsBrightnessOverridden = false;
+            mIsSleepStatus = false;
+        }
         mBrightnessTarget.store(0);
         if (mDimming->IsDimming()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DISPLAY_OFF StopDimming");
             mDimming->StopDimming();
+        }
+    } else if (state == DisplayState::DISPLAY_DIM) {
+        SetSleepBrightness();
+    } else if (state == DisplayState::DISPLAY_ON) {
+        if (mIsSleepStatus) {
+            RestoreBrightness(0);
+            mIsSleepStatus = false;
         }
     }
 }
@@ -581,6 +592,26 @@ bool BrightnessService::DiscountBrightness(double discount, uint32_t gradualDura
     return UpdateBrightness(screenOnBrightness, gradualDuration);
 }
 
+void BrightnessService::SetSleepBrightness()
+{
+    uint32_t value = GetSettingBrightness();
+    if (value <= MIN_DEFAULT_BRGIHTNESS_LEVEL) {
+        return;
+    }
+    uint32_t sleepBrightness = BrightnessParamHelper::GetSleepBrightness();
+    uint32_t sleepMinumumReductionBrightness = BrightnessParamHelper::GetSleepMinumumReductionBrightness();
+    if (value < sleepMinumumReductionBrightness) {
+        value = sleepMinumumReductionBrightness;
+    }
+    uint32_t enterSleepBrightness = std::max(std::min(value - sleepMinumumReductionBrightness, sleepBrightness),
+        MIN_DEFAULT_BRGIHTNESS_LEVEL);
+    uint32_t sleepDarkenTime = BrightnessParamHelper::GetSleepDarkenTime();
+    mIsSleepStatus = true;
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetSleepBrightness enterSleepBrightness=%{pulblic}d, sleepDarkenTime=%{public}d",
+        enterSleepBrightness, sleepDarkenTime);
+    OverrideBrightness(enterSleepBrightness, sleepDarkenTime);
+}
+
 bool BrightnessService::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
 {
     if (!CanOverrideBrightness()) {
@@ -860,6 +891,11 @@ void BrightnessService::ReportBrightnessBigData(uint32_t brightness)
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", brightness, "REASON", reason, "NIT", nit);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BigData brightness=%{public}d,reason=%{public}s,nit=%{public}d",
         brightness, reason.c_str(), nit);
+}
+
+bool BrightnessService::IsSleepStatus()
+{
+    return mIsSleepStatus;
 }
 
 } // namespace DisplayPowerMgr

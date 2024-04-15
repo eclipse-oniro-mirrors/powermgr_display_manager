@@ -38,6 +38,24 @@ uint32_t BrightnessParamHelper::GetMinBrightness()
     return static_cast<uint32_t>(value);
 }
 
+uint32_t BrightnessParamHelper::GetSleepBrightness()
+{
+    int32_t value = SysParam::GetIntValue(KEY_SLEEP_BRIGHTNESS, BRIGHTNESS_SLEEP);
+    return static_cast<uint32_t>(value);
+}
+
+uint32_t BrightnessParamHelper::GetSleepMinumumReductionBrightness()
+{
+    int32_t value = SysParam::GetIntValue(KEY_SLEEP_MINUMUM_REDUCTION_BRIGHTNESS, BRIGHTNESS_SLEEP_MINUMUM_REDUCTION);
+    return static_cast<uint32_t>(value);
+}
+
+uint32_t BrightnessParamHelper::GetSleepDarkenTime()
+{
+    int32_t value = SysParam::GetIntValue(KEY_SLEEP_DARKEN_TIME, BRIGHTNESS_SLEEP_DARKEN_TIME);
+    return static_cast<uint32_t>(value);
+}
+
 void BrightnessParamHelper::RegisterBootCompletedCallback(BootCompletedCallback& callback)
 {
     SysParam::RegisterBootCompletedCallback(callback);
