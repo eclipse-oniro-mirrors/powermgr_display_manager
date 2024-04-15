@@ -228,9 +228,7 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
         }
     }
 
-    if (id == GetMainDisplayId()) {
-        BrightnessManager::Get().SetDisplayState(id, state);
-    }
+    BrightnessManager::Get().SetDisplayState(id, state);
 
     if (state == DisplayState::DISPLAY_OFF) {
         if (!isDisplayDelayOff_) {

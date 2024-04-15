@@ -902,4 +902,24 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality0
     EXPECT_EQ(deviceBrightness1, deviceBrightness2);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001: fun is end");
 }
+
+/**
+ * @tc.name: DisplayPowerMgrSleepBrightness001
+ * @tc.desc: Test after entering the dim mode, settings brightness to remain unchanged
+ * @tc.type: FUNC
+ * @tc.require: issueI5YZQR
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSleepBrightness001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSleepBrightness001: fun is start");
+    uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
+    //waiting to find correct isSettingEnable value
+    usleep(50000);
+    uint32_t deviceBrightness2 = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(deviceBrightness1, deviceBrightness2);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSleepBrightness001: fun is end");
+}
+
 } // namespace

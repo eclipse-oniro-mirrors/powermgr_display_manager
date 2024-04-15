@@ -29,6 +29,9 @@ public:
     static uint32_t GetDefaultBrightness();
     static uint32_t GetMaxBrightness();
     static uint32_t GetMinBrightness();
+    static uint32_t GetSleepBrightness();
+    static uint32_t GetSleepMinumumReductionBrightness();
+    static uint32_t GetSleepDarkenTime();
     typedef void (* BootCompletedCallback)();
     static void RegisterBootCompletedCallback(BootCompletedCallback&);
 
@@ -36,9 +39,15 @@ private:
     static constexpr const char* KEY_DEFAULT_BRIGHTNESS {"const.display.brightness.default"};
     static constexpr const char* KEY_MAX_BRIGHTNESS {"const.display.brightness.max"};
     static constexpr const char* KEY_MIN_BRIGHTNESS {"const.display.brightness.min"};
+    static constexpr const char* KEY_SLEEP_BRIGHTNESS {"const.display.brightness.sleep"};
+    static constexpr const char* KEY_SLEEP_MINUMUM_REDUCTION_BRIGHTNESS {"const.display.brightness.sleepMinReduction"};
+    static constexpr const char* KEY_SLEEP_DARKEN_TIME {"const.display.brightness.sleepDarkenTime"};
     static constexpr uint32_t BRIGHTNESS_MIN = 1;
     static constexpr uint32_t BRIGHTNESS_DEFAULT = 102;
     static constexpr uint32_t BRIGHTNESS_MAX = 255;
+    static constexpr uint32_t BRIGHTNESS_SLEEP = 10;
+    static constexpr uint32_t BRIGHTNESS_SLEEP_MINUMUM_REDUCTION = 10;
+    static constexpr uint32_t BRIGHTNESS_SLEEP_DARKEN_TIME = 1000;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
