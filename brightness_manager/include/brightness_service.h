@@ -90,6 +90,7 @@ public:
     };
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
+    static const int LUX_LEVEL_LENGTH = 23;
 
     BrightnessService(const BrightnessService&) = delete;
     BrightnessService& operator=(const BrightnessService&) = delete;
@@ -150,6 +151,7 @@ private:
     static constexpr uint32_t DEFAULT_BRIGHTNESS = 102;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
+    static const uint32_t AMBIENT_LUX_LEVELS[LUX_LEVEL_LENGTH];
 
     BrightnessService();
     virtual ~BrightnessService() = default;
@@ -186,6 +188,7 @@ private:
     uint32_t mBrightnessLevel{0};
     std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};
+    int mLuxLevel{-1};
     double mDiscount{1.0f};
     std::atomic<bool> mIsBrightnessOverridden{false};
     std::atomic<bool> mIsBrightnessBoosted{false};
