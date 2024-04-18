@@ -293,7 +293,9 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         uint32_t screenOnBrightness = GetScreenOnBrightness();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
     }
-
+    if (state == DisplayState::DISPLAY_SUSPEND) {
+        state = DisplayState::DISPLAY_OFF;
+    }
     if (ret) {
         pms->NotifyStateChangeCallback(action_->GetDisplayId(), state, reason);
     }
