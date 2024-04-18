@@ -61,6 +61,9 @@ constexpr uint32_t DEFAULT_DARKEN_DURATION = 5000;
 FFRTHandle g_cancelBoostTaskHandle{};
 }
 
+const uint32_t BrightnessService::AMBIENT_LUX_LEVELS[BrightnessService::LUX_LEVEL_LENGTH] = { 1, 3, 5, 10, 20, 50, 200,
+    500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, INT_MAX };
+
 using namespace OHOS::PowerMgr;
 
 BrightnessService::BrightnessService()
@@ -394,10 +397,6 @@ void BrightnessService::AmbientLightCallback(SensorEvent* event)
         return;
     }
     BrightnessService::Get().ProcessLightLux(data->intensity);
-    // Notify ambient lux change event to battery statistics
-    // type:0 auto brightness, 1 manual brightness, 2 window brightness, 3 others
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", data->intensity, "TYPE", 0);
 }
 
 void BrightnessService::ActivateAmbientSensor()
@@ -452,6 +451,19 @@ void BrightnessService::ProcessLightLux(float lux)
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateLightLux, lux=%{public}f, mLightLux=%{public}f, isFirst=%{public}d",
             lux, mLightLuxManager.GetSmoothedLux(), mLightLuxManager.GetIsFirstLux());
         UpdateCurrentBrightnessLevel(lux, mLightLuxManager.GetIsFirstLux());
+    }
+
+    for (int index = 0; index < LUX_LEVEL_LENGTH; index++) {
+        if (static_cast<uint32_t>(lux) < AMBIENT_LUX_LEVELS[index]) {
+            if (index != mLuxLevel || mLightLuxManager.GetIsFirstLux()) {
+                mLuxLevel = index;
+                // Notify ambient lux change event to battery statistics
+                // type:0 auto brightness, 1 manual brightness, 2 window brightness, 3 others
+                HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
+                    HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", mLuxLevel, "TYPE", 0);
+            }
+            break;
+        }
     }
 }
 
