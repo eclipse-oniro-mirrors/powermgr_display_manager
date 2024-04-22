@@ -294,7 +294,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     DisplayState delayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(delayState == DisplayState::DISPLAY_DELAY_OFF);
-    int sleepTime = 1; // sleep time is 1s
+    //Callback for waiting window
+    int sleepTime = 2; // sleep time is 2s
     sleep(sleepTime);
     DisplayState offState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(offState == DisplayState::DISPLAY_OFF);
@@ -331,6 +332,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
     bool coordinated = true;
     auto ret = DisplayPowerMgrClient::GetInstance().SetCoordinated(coordinated);
     EXPECT_TRUE(ret);
@@ -338,7 +342,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
     // If the state of display is DISPLAY_ON, change it to DISPLAY_OFF.
     DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
-
+    sleep(sleepTime);
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
     EXPECT_TRUE(ret);
@@ -358,6 +362,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService022, TestSize.Level0)
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService022 is start");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
     DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
 
@@ -378,6 +385,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService023, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService023 is start");
     bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
     DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
 
@@ -398,6 +408,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService024, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService024 is start");
     bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
     DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
 
