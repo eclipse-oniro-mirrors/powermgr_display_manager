@@ -114,6 +114,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
             if (state_ == DisplayState::DISPLAY_DIM) {
                 break;
             }
+            [[fallthrough]];
         case DisplayState::DISPLAY_OFF: {
             if (action_->EnableSkipSetDisplayState(reason)) {
                 OnStateChanged(state, reason);
