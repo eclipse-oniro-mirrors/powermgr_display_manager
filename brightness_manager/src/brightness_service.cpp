@@ -195,7 +195,6 @@ void BrightnessService::SetDisplayId(uint32_t displayId)
         return;
     }
     mAction->SetDisplayId(displayId);
-    mState = mAction->GetDisplayState();
 }
 
 BrightnessService::DimmingCallbackImpl::DimmingCallbackImpl(
