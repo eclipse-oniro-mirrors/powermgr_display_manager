@@ -431,11 +431,15 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService025, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService025 is start");
     bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
     DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
 
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF);
+    sleep(sleepTime);
     EXPECT_FALSE(ret);
     currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
