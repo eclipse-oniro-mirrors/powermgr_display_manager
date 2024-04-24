@@ -59,7 +59,9 @@ static napi_value SyncWork(napi_env env, const std::string resName, const std::s
         env,
         nullptr,
         resource,
-        [](napi_env env, void *data) {},
+        [](napi_env env, void *data) {
+	    DISPLAY_HILOGD(COMP_FWK, "async_work callback function is called");
+	},
         complete,
         reinterpret_cast<void*>(asyncBrightness.get()),
         &asyncBrightness->asyncWork);
@@ -162,7 +164,9 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
         env,
         nullptr,
         resource,
-        [](napi_env env, void *data) {},
+        [](napi_env env, void *data) {
+	    DISPLAY_HILOGD(COMP_FWK, "async_work callback function is called");
+	},
         [](napi_env env, napi_status status, void *data) {
             Brightness *asyncBrightness = reinterpret_cast<Brightness*>(data);
             if (asyncBrightness != nullptr) {
