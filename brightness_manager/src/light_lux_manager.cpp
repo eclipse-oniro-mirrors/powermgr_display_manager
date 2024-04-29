@@ -30,6 +30,10 @@ const int LIGHT_LUX_MAX_COLORTEMP = 2000;
 const int INVALID_VALUE = -1;
 const int LOG_INTERVAL_MS = 2000;
 const int LUX_BUFFER_NUM_FOR_LOG = 6;
+const std::string ScenceLabel[static_cast<int>(BrightnessSceneMode::SCENCE_END)] = {
+    "DefaultMode", "GameMode", "VideoMode" };
+const std::string FilterLabel[static_cast<int>(BrightnessFilterMode::FITLER_END)] = {
+    "meanFilter", "weightFilter" };
 }
 
 float LightLuxManager::GetLux() const

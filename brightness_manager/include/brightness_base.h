@@ -17,17 +17,17 @@
 #define BRIGHTNESS_BASE_H
 
 #include <ctime>
-#include <math.h>
+#include <cmath>
 #include <string>
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 
-static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
-static constexpr uint32_t OUTTER_SCREEN_DISPLAY_ID = 5;
-static const float EPSILON = 0.0000001f;
-static const int MSECPERSEC = 1000;
-static const int NSECPERMSEC = 1000000;
+constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
+constexpr uint32_t OUTTER_SCREEN_DISPLAY_ID = 5;
+const float EPSILON = 0.0000001f;
+const int MSECPERSEC = 1000;
+const int NSECPERMSEC = 1000000;
 
 enum class BrightnessFilterMode {
     MEAN_FILTER = 0,
@@ -48,12 +48,7 @@ enum class BrightnessModeState {
     DEFAULT_MODE
 };
 
-static std::string ScenceLabel[static_cast<int>(BrightnessSceneMode::SCENCE_END)] = {
-    "DefaultMode", "GameMode", "VideoMode" };
-static std::string FilterLabel[static_cast<int>(BrightnessFilterMode::FITLER_END)] = {
-    "meanFilter", "weightFilter" };
-
-static inline int64_t GetCurrentTimeMillis()
+inline int64_t GetCurrentTimeMillis()
 {
     struct timespec val {};
     if (clock_gettime(CLOCK_BOOTTIME, &val) == 0) {
@@ -62,7 +57,7 @@ static inline int64_t GetCurrentTimeMillis()
     return 0;
 }
 
-static bool IsEqualF(float a, float b)
+inline bool IsEqualF(float a, float b)
 {
     return fabs(a - b) < EPSILON;
 }
