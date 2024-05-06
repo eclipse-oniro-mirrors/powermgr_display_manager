@@ -218,7 +218,7 @@ void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
     auto brightness = GetMappingBrightnessLevel(currentValue);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d, mapBrightness=%{public}d",
         currentValue, brightness);
-    BrightnessService::Get().ReportBrightnessBigData(currentValue);
+    BrightnessService::Get().ReportBrightnessBigData(brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
     if (isSuccess && !BrightnessService::Get().IsSleepStatus()) {
         if (!BrightnessService::Get().IsDimming()) {
@@ -737,7 +737,7 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
     }
     auto brightness = static_cast<uint32_t>(value * mDiscount);
     brightness = GetMappingBrightnessLevel(brightness);
-    ReportBrightnessBigData(value);
+    ReportBrightnessBigData(brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness is %{public}s, brightness: %{public}u",
         isSuccess ? "succ" : "failed", brightness);
@@ -840,16 +840,16 @@ uint32_t BrightnessService::GetOrigBrightnessLevel(uint32_t level)
 uint32_t BrightnessService::GetMappingBrightnessNit(uint32_t level)
 {
     uint32_t levelIn = level;
-    if (levelIn < MIN_DEFAULT_BRGIHTNESS_LEVEL) {
-        levelIn = MIN_DEFAULT_BRGIHTNESS_LEVEL;
+    if (levelIn < MIN_MAPPING_BRGIHTNESS_LEVEL) {
+        levelIn = MIN_MAPPING_BRGIHTNESS_LEVEL;
     }
-    if (levelIn > MAX_DEFAULT_BRGIHTNESS_LEVEL) {
-        levelIn = MAX_DEFAULT_BRGIHTNESS_LEVEL;
+    if (levelIn > MAX_MAPPING_BRGIHTNESS_LEVEL) {
+        levelIn = MAX_MAPPING_BRGIHTNESS_LEVEL;
     }
-    uint32_t nitOut = (levelIn - MIN_DEFAULT_BRGIHTNESS_LEVEL)
+    double nitOut = (double)(levelIn - MIN_MAPPING_BRGIHTNESS_LEVEL)
         * (MAX_DEFAULT_BRGIHTNESS_NIT - MIN_DEFAULT_BRGIHTNESS_NIT)
-         / (MAX_DEFAULT_BRGIHTNESS_LEVEL - MIN_DEFAULT_BRGIHTNESS_LEVEL) + MIN_DEFAULT_BRGIHTNESS_NIT;
-    return nitOut;
+         / (MAX_MAPPING_BRGIHTNESS_LEVEL - MIN_MAPPING_BRGIHTNESS_LEVEL) + MIN_DEFAULT_BRGIHTNESS_NIT;
+    return round(nitOut);
 }
 
 uint32_t BrightnessService::GetMappingHighBrightnessLevel(uint32_t level)
