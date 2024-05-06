@@ -81,7 +81,8 @@
       "test": [
         "//base/powermgr/display_manager/state_manager/test:displaymgr_coverage_test",
         "//base/powermgr/display_manager/state_manager/test:displaymgr_native_test",
-        "//base/powermgr/display_manager/state_manager/test:fuzztest"
+        "//base/powermgr/display_manager/state_manager/test:fuzztest",
+        "//base/powermgr/display_manager/brightness_manager/test:brightness_manager_test"
       ]
     }
   }
