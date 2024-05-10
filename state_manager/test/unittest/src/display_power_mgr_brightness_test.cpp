@@ -936,7 +936,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     uint32_t type = 1;
     bool state = false;
     const uint32_t SUCCESS_RESULT = 1;
-    sptr<DisplayBrightnessCallbackStub> callbak = new DisplayBrightnessCallbackStub();
+    sptr<DisplayBrightnessCallbackStub> callback = new DisplayBrightnessCallbackStub();
     callback->OnNotifyApsLightBrightnessChange(type, state);
     uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
     EXPECT_EQ(result, SUCCESS_RESULT);
@@ -956,7 +956,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     uint32_t type = 1;
     bool state = false;
     const uint32_t FAILD_RESULT = 0;
-    sptr<DisplayBrightnessCallbackStub> callbak = new DisplayBrightnessCallbackStub();
+    sptr<DisplayBrightnessCallbackStub> callback = new DisplayBrightnessCallbackStub();
     callback->OnNotifyApsLightBrightnessChange(type, state);
     uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
     EXPECT_EQ(result, FAILD_RESULT);
