@@ -202,7 +202,7 @@ void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
 
     // brightness
     if (type == BRIGHTNESS_TYPE) {
-        uint32_t nitValue = GetMappingBrightnessNit(static_cast<uint32_t>(value));
+        int32_t nitValue = static_cast<int32_t>(GetMappingBrightnessNit(static_cast<uint32_t>(value)));
         int32_t brightness = mLightBrightnessThreshold[0];
         if (!mIsBrightnessValidate && nitValue >= brightness) {
             mIsBrightnessValidate = true;
@@ -211,7 +211,6 @@ void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
             mIsBrightnessValidate = false;
             mApsListenLightChangeCallback->OnNotifyApsLightBrightnessChange(type, mIsBrightnessValidate);
         }
-
         return;
     }
 
