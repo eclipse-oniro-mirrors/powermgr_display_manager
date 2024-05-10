@@ -240,6 +240,14 @@ bool DisplayPowerMgrClient::SetCoordinated(bool coordinated, uint32_t displayId)
     return proxy->SetCoordinated(coordinated, displayId);
 }
 
+uint32_t DisplayPowerMgrClient::SetLightBrightnessThreshold(
+    std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, 0);
+    return proxy->SetLightBrightnessThreshold(threshold, callback);
+}
+
 DisplayErrors DisplayPowerMgrClient::GetError()
 {
     if (lastError_ != DisplayErrors::ERR_OK) {

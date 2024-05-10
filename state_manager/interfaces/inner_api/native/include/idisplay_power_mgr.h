@@ -21,6 +21,7 @@
 
 #include "display_mgr_errors.h"
 #include "display_power_info.h"
+#include "idisplay_brightness_callback.h"
 #include "idisplay_power_callback.h"
 
 namespace OHOS {
@@ -48,6 +49,8 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) = 0;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) = 0;
     virtual bool SetCoordinated(bool coordinated, uint32_t displayId) = 0;
+    virtual uint32_t SetLightBrightnessThreshold(
+        std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) = 0;
     virtual DisplayErrors GetError() = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");

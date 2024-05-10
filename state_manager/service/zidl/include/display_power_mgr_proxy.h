@@ -57,6 +57,8 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual bool SetCoordinated(bool coordinated, uint32_t displayId) override;
+    virtual uint32_t SetLightBrightnessThreshold(
+        std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) override;
     virtual DisplayErrors GetError() override;
 
 private:

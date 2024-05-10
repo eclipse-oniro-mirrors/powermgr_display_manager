@@ -734,6 +734,41 @@ bool DisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t displayId)
     return result;
 }
 
+uint32_t DisplayPowerMgrProxy::SetLightBrightnessThreshold(
+    std::vector<int32_t> threshold, sptr<DisplayBrightnessCallback> callback)
+{
+    sptr<IRemoteObject> remote = Remote();
+    uint32_t result = 0;
+    RETURN_IF_WITH_RET(remote == nullptr, result);
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    WRITE_PARCEL_WITH_RET(data, Int32Vector, threshold, result);
+    WRITE_PARCEL_WITH_RET(data, RemoteObject, callback->AsObject(), result);
+
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD), data, reply,
+        option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return result;
+    }
+
+    if (!reply.ReadUint32(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
 DisplayErrors DisplayPowerMgrProxy::GetError()
 {
     return lastError_;

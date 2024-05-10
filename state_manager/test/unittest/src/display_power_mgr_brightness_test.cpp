@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "idisplay_brightness_callback_stub.h"
 #include "display_power_mgr_client.h"
 #include "setting_provider.h"
 #include "system_ability_definition.h"
@@ -920,6 +921,46 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSleepBrightness001, TestS
     EXPECT_EQ(deviceBrightness1, deviceBrightness2);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSleepBrightness001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetLightBrightnessThreshold001
+ * @tc.desc: Test the Function of setting Ambient Light Monitor (success is returned)
+ * @tc.type: FUNC
+ * @tc.require: issueI8ZHFN
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThreshold001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001: fun is start");
+    std::vector<int32_t> threshold = {200, 200, 20};
+    uint32_t type = 1;
+    bool state = false;
+    const uint32_t SUCCESS_RESULT = 1;
+    sptr<DisplayBrightnessCallbackStub> callbak = new DisplayBrightnessCallbackStub();
+    callback->OnNotifyApsLightBrightnessChange(type, state);
+    uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
+    EXPECT_EQ(result, SUCCESS_RESULT);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetLightBrightnessThreshold002
+ * @tc.desc: Test the Function of setting Ambient Light Monitor (success is returned)
+ * @tc.type: FUNC
+ * @tc.require: issueI8ZHFN
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThreshold002, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is start");
+    std::vector<int32_t> threshold = {};
+    uint32_t type = 1;
+    bool state = false;
+    const uint32_t FAILD_RESULT = 0;
+    sptr<DisplayBrightnessCallbackStub> callbak = new DisplayBrightnessCallbackStub();
+    callback->OnNotifyApsLightBrightnessChange(type, state);
+    uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
+    EXPECT_EQ(result, FAILD_RESULT);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is end");
 }
 
 } // namespace

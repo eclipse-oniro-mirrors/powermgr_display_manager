@@ -52,6 +52,7 @@ private:
     int32_t CancelBoostBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetDeviceBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetCoordinatedStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetLightBrightnessThresholdStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

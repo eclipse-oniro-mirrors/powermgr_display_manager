@@ -72,6 +72,9 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_DISPLAY_OFF_DELAY):
             ret = OverrideDisplayOffDelayStub(data, reply);
             break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD):
+            ret = SetLightBrightnessThresholdStub(data, reply);
+            break;
         default:
             ret = RemoteRequest(code, data, reply, option);
             break;
@@ -425,5 +428,22 @@ int32_t DisplayPowerMgrStub::SetCoordinatedStub(MessageParcel& data, MessageParc
     }
     return ERR_OK;
 }
+
+int32_t DisplayPowerMgrStub::SetLightBrightnessThresholdStub(MessageParcel& data, MessageParcel& reply)
+{
+    std::vector<int32_t> threshold;
+    READ_PARCEL_WITH_RET(data, Int32Vector, &threshold, E_READ_PARCEL_ERROR);
+    sptr<IRemoteObject> obj = data.ReadRemoteObject();
+    RETURN_IF_WITH_RET((obj == nullptr), E_READ_PARCEL_ERROR);
+    sptr<IDisplayBrightnessCallback> callbak = iface_cast<IDisplayBrightnessCallback>(obj);
+    RETURN_IF_WITH_RET((callback == nullptr), E_READ_PARCEL_ERROR);
+    uint32_t ret = SetLightBrightnessThreshold(threshold, callback);
+    if (!reply.WriteUint32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetLightBrightnessThresholdStub return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
 } // namespace DisplayPowerMgr
 } // namespace OHOS
