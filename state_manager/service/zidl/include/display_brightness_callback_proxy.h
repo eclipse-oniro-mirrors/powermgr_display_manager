@@ -29,8 +29,8 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class DisplayBrightnessCallbackProxy : public IRemoteProxy<IDisplayBrightnessCallback> {
 public:
-    explicit DisplayBrightnessCallbackProxy(const sptr<IRemoteObject>& impl) :
-        IRemoteProxy<IDisplayBrightnessCallback>(impl) {}
+    explicit DisplayBrightnessCallbackProxy(const sptr<IRemoteObject>& impl)
+        : IRemoteProxy<IDisplayBrightnessCallback>(impl) {}
     ~DisplayBrightnessCallbackProxy() override = default;
     virtual void OnNotifyApsLightBrightnessChange(uint32_t type, bool state) override;
 private:

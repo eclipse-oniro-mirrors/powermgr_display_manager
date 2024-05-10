@@ -735,7 +735,7 @@ bool DisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t displayId)
 }
 
 uint32_t DisplayPowerMgrProxy::SetLightBrightnessThreshold(
-    std::vector<int32_t> threshold, sptr<DisplayBrightnessCallback> callback)
+    std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {
     sptr<IRemoteObject> remote = Remote();
     uint32_t result = 0;
