@@ -18,7 +18,7 @@
 
 #include <iremote_stub.h>
 
-#include "idisplay_brightness_callback.h";
+#include "idisplay_brightness_callback.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
