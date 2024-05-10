@@ -366,7 +366,7 @@ uint32_t BrightnessService::SetLightBrightnessThreshold(
     result = 1;
     mLightBrightnessThreshold = threshold;
     mApsListenLightChangeCallback = callback;
-    SPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::SetLightBrightnessThreshold set listener success");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::SetLightBrightnessThreshold set listener success");
     return result;
 }
 
