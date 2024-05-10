@@ -435,7 +435,7 @@ int32_t DisplayPowerMgrStub::SetLightBrightnessThresholdStub(MessageParcel& data
     READ_PARCEL_WITH_RET(data, Int32Vector, &threshold, E_READ_PARCEL_ERROR);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     RETURN_IF_WITH_RET((obj == nullptr), E_READ_PARCEL_ERROR);
-    sptr<IDisplayBrightnessCallback> callbak = iface_cast<IDisplayBrightnessCallback>(obj);
+    sptr<IDisplayBrightnessCallback> callback = iface_cast<IDisplayBrightnessCallback>(obj);
     RETURN_IF_WITH_RET((callback == nullptr), E_READ_PARCEL_ERROR);
     uint32_t ret = SetLightBrightnessThreshold(threshold, callback);
     if (!reply.WriteUint32(ret)) {
