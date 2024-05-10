@@ -14,7 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "idisplay_brightness_callback_stub.h"
+#include "display_brightness_callback_stub.h"
 #include "display_power_mgr_client.h"
 #include "setting_provider.h"
 #include "system_ability_definition.h"
