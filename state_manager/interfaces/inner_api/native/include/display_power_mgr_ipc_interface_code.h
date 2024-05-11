@@ -40,7 +40,8 @@ enum class DisplayPowerMgrInterfaceCode {
     BOOST_BRIGHTNESS,
     CANCEL_BOOST_BRIGHTNESS,
     GET_DEVICE_BRIGHTNESS,
-    SET_COORDINATED
+    SET_COORDINATED,
+    SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD = 21,
 };
 } // space PowerMgr
 } // namespace OHOS

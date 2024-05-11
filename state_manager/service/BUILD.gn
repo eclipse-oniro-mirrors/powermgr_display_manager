@@ -41,6 +41,7 @@ ohos_shared_library("displaymgrservice") {
     "native/src/gradual_animator.cpp",
     "native/src/screen_action.cpp",
     "native/src/screen_controller.cpp",
+    "zidl/src/display_brightness_callback_proxy.cpp",
     "zidl/src/display_power_callback_proxy.cpp",
     "zidl/src/display_power_mgr_stub.cpp",
   ]

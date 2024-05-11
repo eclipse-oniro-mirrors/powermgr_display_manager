@@ -65,6 +65,8 @@ public:
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
     virtual uint32_t GetDeviceBrightness(uint32_t displayId) override;
     virtual bool SetCoordinated(bool coordinated, uint32_t displayId) override;
+    virtual uint32_t SetLightBrightnessThreshold(
+        std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     virtual DisplayErrors GetError() override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);

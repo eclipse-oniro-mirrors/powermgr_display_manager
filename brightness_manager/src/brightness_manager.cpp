@@ -112,6 +112,11 @@ uint32_t BrightnessManager::GetDeviceBrightness()
     return BrightnessService::Get().GetDeviceBrightness();
 }
 
+uint32_t BrightnessManager::SetLightBrightnessThreshold(
+    std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
+{
+    return BrightnessService::Get().SetLightBrightnessThreshold(threshold, callback);
+}
 bool BrightnessManager::IsBrightnessOverridden() const
 {
     return BrightnessService::Get().IsBrightnessOverridden();

@@ -561,6 +561,15 @@ bool DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displayId
     return true;
 }
 
+uint32_t DisplayPowerMgrService::SetLightBrightnessThreshold(
+    std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
+{
+    if (!Permission::IsSystem()) {
+        return static_cast<uint32_t>(ERR_PERMISSION_DENIED);
+    }
+    return BrightnessManager::Get().SetLightBrightnessThreshold(threshold, callback);
+}
+
 void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason)
 {
     std::lock_guard lock(mutex_);

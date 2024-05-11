@@ -36,6 +36,7 @@
 #include "dm_common.h"
 #include "event_runner.h"
 #include "iremote_object.h"
+#include "idisplay_brightness_callback.h"
 #include "light_lux_manager.h"
 #include "refbase.h"
 #include "ffrt_utils.h"
@@ -137,6 +138,7 @@ public:
     void UpdateBrightnessSceneMode(BrightnessSceneMode mode);
     uint32_t GetDisplayId();
     void SetDisplayId(uint32_t displayId);
+    uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     bool IsDimming();
     void ReportBrightnessBigData(uint32_t brightness);
@@ -180,6 +182,7 @@ private:
     void RegisterFoldStatusListener();
     void UnRegisterFoldStatusListener();
     std::string GetReason();
+    void NotifyLightChangeToAps(uint32_t type, float value);
 
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
@@ -204,6 +207,11 @@ private:
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool mIsUserMode{false};
     std::atomic<bool> mIsSleepStatus{false};
+    std::vector<int32_t> mLightBrightnessThreshold;
+    sptr<IDisplayBrightnessCallback> mApsListenLightChangeCallback = nullptr;
+    bool mIsBrightnessValidate = false;
+    bool mIsLightValidate = false;
+    time_t mLastCallApsTime {0};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
