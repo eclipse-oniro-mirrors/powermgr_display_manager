@@ -26,8 +26,8 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class LightLuxManager : public ILightLuxManager {
 public:
-    LightLuxManager()  = default;
-    virtual ~LightLuxManager()  = default;
+    LightLuxManager() = default;
+    ~LightLuxManager() override = default;
 
     LightLuxManager(const LightLuxManager&) = delete;
     LightLuxManager& operator=(const LightLuxManager&) = delete;
