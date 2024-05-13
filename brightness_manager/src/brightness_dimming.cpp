@@ -88,7 +88,8 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "animation orig mTotalSteps=%{public}d", static_cast<int32_t>(mTotalSteps));
     if (mTotalSteps > 1 && abs(mStride) >= 1) {
-        mTotalSteps = (abs(changeBrightness) - abs(mStride) * mTotalSteps) / abs(mStride) + mTotalSteps;
+        mTotalSteps = static_cast<uint32_t>((abs(changeBrightness) - abs(mStride) *
+            mTotalSteps)) / abs(mStride) + mTotalSteps;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "animation update mTotalSteps=%{public}d", static_cast<int32_t>(mTotalSteps));
     }
     mCurrentStep = 0;
@@ -134,7 +135,7 @@ void BrightnessDimming::NextStep()
         mCallback->OnStart();
     }
     if (mCurrentStep <= mTotalSteps) {
-        uint32_t nextBrightness = mCurrentBrightness + mStride;
+        uint32_t nextBrightness = mCurrentBrightness + static_cast<uint32_t>(mStride);
         bool isOutRange = (mStride > 0 ? (nextBrightness >= mToBrightness) : (nextBrightness <= mToBrightness));
         if (isOutRange) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "next step brightness is out range, brightness=%{public}u",
