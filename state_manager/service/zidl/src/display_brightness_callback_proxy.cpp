@@ -38,8 +38,8 @@ void DisplayBrightnessCallbackProxy::OnNotifyApsLightBrightnessChange(uint32_t t
         return;
     }
 
-    WRITE_PARCEL_NO_RET(data, Uint32, type);
-    WRITE_PARCEL_NO_RET(data, Bool, state);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, type);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Bool, state);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayBrightnessCallbackInterfaceCode::ON_NOTIFY_APS_LIGHT_BRIGHTNESS_CHANGE), data,
