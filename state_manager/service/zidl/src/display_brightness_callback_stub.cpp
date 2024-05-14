@@ -62,8 +62,8 @@ int32_t DisplayBrightnessCallbackStub::OnNotifyApsLightBrightnessChangeStub(Mess
     uint32_t type = 0;
     bool state = false;
 
-    READ_PARCEL_WITH_RET(data, Uint32, type, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Bool, state, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, type, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Bool, state, E_READ_PARCEL_ERROR);
 
     OnNotifyApsLightBrightnessChange(type, state);
     return ERR_OK;
