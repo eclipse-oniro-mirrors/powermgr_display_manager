@@ -70,6 +70,7 @@ void DisplayPowerMgrService::Init()
             DISPLAY_HILOGE(COMP_SVC, "cannot find any display id after max retry, fill with 0");
         }
     }
+    BrightnessManager::Get().Init();
     for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id));
@@ -81,7 +82,6 @@ void DisplayPowerMgrService::Init()
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
-    BrightnessManager::Get().Init();
     RegisterBootCompletedCallback();
 }
 void DisplayPowerMgrService::RegisterBootCompletedCallback()

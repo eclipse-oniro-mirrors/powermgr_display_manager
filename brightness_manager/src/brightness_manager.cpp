@@ -25,116 +25,205 @@ BrightnessManager& BrightnessManager::Get()
 
 void BrightnessManager::Init()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.Init();
+#else
     BrightnessService::Get().Init();
+#endif
 }
 
 void BrightnessManager::DeInit()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.DeInit();
+#else
     BrightnessService::Get().DeInit();
+#endif
 }
 
 void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.SetDisplayState(id, state);
+#else
     BrightnessService::Get().SetDisplayState(id, state);
+#endif
 }
 
 DisplayState BrightnessManager::GetState()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetState();
+#else
     return BrightnessService::Get().GetDisplayState();
+#endif
 }
 
 bool BrightnessManager::AutoAdjustBrightness(bool enable)
 {
-#ifdef ENABLE_SENSOR_PART
-    return BrightnessService::Get().AutoAdjustBrightness(enable);
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.AutoAdjustBrightness(enable);
 #else
-    return false;
+    #ifdef ENABLE_SENSOR_PART
+        return BrightnessService::Get().AutoAdjustBrightness(enable);
+    #else
+        return false;
+    #endif
 #endif
 }
 
 bool BrightnessManager::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.SetBrightness(value, gradualDuration, continuous);
+#else
     return BrightnessService::Get().SetBrightness(value, gradualDuration, continuous);
+#endif
 }
 
 bool BrightnessManager::DiscountBrightness(double discount)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.DiscountBrightness(discount);
+#else
     return BrightnessService::Get().DiscountBrightness(discount);
+#endif
 }
 
 double BrightnessManager::GetDiscount() const
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetDiscount();
+#else
     return BrightnessService::Get().GetDiscount();
+#endif
 }
 
 void BrightnessManager::SetScreenOnBrightness()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.SetScreenOnBrightness();
+#else
     BrightnessService::Get().SetScreenOnBrightness();
+#endif
 }
 
 uint32_t BrightnessManager::GetScreenOnBrightness() const
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetScreenOnBrightness();
+#else
     return BrightnessService::Get().GetScreenOnBrightness(false);
+#endif
 }
 
 void BrightnessManager::ClearOffset()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.ClearOffset();
+#else
     BrightnessService::Get().ClearOffset();
+#endif
 }
 
 bool BrightnessManager::OverrideBrightness(uint32_t value, uint32_t gradualDuration)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.OverrideBrightness(value, gradualDuration);
+#else
     return BrightnessService::Get().OverrideBrightness(value, gradualDuration);
+#endif
 }
 
 bool BrightnessManager::RestoreBrightness(uint32_t gradualDuration)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.RestoreBrightness(gradualDuration);
+#else
     return BrightnessService::Get().RestoreBrightness(gradualDuration);
+#endif
 }
 
 bool BrightnessManager::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDuration)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.BoostBrightness(timeoutMs, gradualDuration);
+#else
     return BrightnessService::Get().BoostBrightness(timeoutMs, gradualDuration);
+#endif
 }
 
 bool BrightnessManager::CancelBoostBrightness(uint32_t gradualDuration)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.CancelBoostBrightness(gradualDuration);
+#else
     return BrightnessService::Get().CancelBoostBrightness(gradualDuration);
+#endif
 }
 
 uint32_t BrightnessManager::GetBrightness()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetBrightness();
+#else
     return BrightnessService::Get().GetBrightness();
+#endif
 }
 
 uint32_t BrightnessManager::GetDeviceBrightness()
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetDeviceBrightness();
+#else
     return BrightnessService::Get().GetDeviceBrightness();
+#endif
 }
 
 uint32_t BrightnessManager::SetLightBrightnessThreshold(
     std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return -1;
+#else
     return BrightnessService::Get().SetLightBrightnessThreshold(threshold, callback);
+#endif
 }
+
 bool BrightnessManager::IsBrightnessOverridden() const
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.IsBrightnessOverridden();
+#else
     return BrightnessService::Get().IsBrightnessOverridden();
+#endif
 }
 
 bool BrightnessManager::IsBrightnessBoosted() const
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.IsBrightnessBoosted();
+#else
     return BrightnessService::Get().IsBrightnessBoosted();
+#endif
 }
 
 uint32_t BrightnessManager::GetCurrentDisplayId(uint32_t defaultId) const
 {
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetCurrentDisplayId(defaultId);
+#else
     return BrightnessService::Get().GetCurrentDisplayId(defaultId);
+#endif
 }
 
 void BrightnessManager::SetDisplayId(uint32_t id)
 {
-    return BrightnessService::Get().SetDisplayId(id);
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.SetDisplayId(id);
+#else
+    BrightnessService::Get().SetDisplayId(id);
+#endif
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

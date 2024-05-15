@@ -17,6 +17,7 @@
 #define BRIGHTNESS_MANAGER_H
 
 #include "brightness_service.h"
+#include "brightness_manager_ext.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -55,6 +56,9 @@ public:
 private:
     BrightnessManager() = default;
     virtual ~BrightnessManager() = default;
+
+private:
+    BrightnessManagerExt mBrightnessManagerExt;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
