@@ -29,6 +29,7 @@ ohos_static_library("brightness_manager") {
     "src/brightness_action.cpp",
     "src/brightness_dimming.cpp",
     "src/brightness_manager.cpp",
+    "src/brightness_manager_ext.cpp",
     "src/brightness_param_helper.cpp",
     "src/brightness_service.cpp",
     "src/brightness_setting_helper.cpp",
@@ -71,6 +72,9 @@ ohos_static_library("brightness_manager") {
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
+  }
+  if (input_feature_brightnessmanagerext != "") {
+    defines += [ "OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER" ]
   }
 
   subsystem_name = "powermgr"
