@@ -181,7 +181,7 @@ napi_value Brightness::GetCallbackInfo(napi_callback_info& info, uint32_t index,
     }
 
     if (argc > MAX_ARGC || index >= argc) {
-        DISPLAY_HILOGW(COMP_FWK, "parameter %{pulic}u is invalid", index);
+        DISPLAY_HILOGW(COMP_FWK, "parameter %{public}u is invalid", index);
         return nullptr;
     }
 
@@ -340,20 +340,20 @@ void Brightness::ExecuteCallback()
 {
     bool error = result_.IsError();
     if (!error) {
-        DISPLAY_HILOGI(COMP_FWK, "Call the js success method");
+        DISPLAY_HILOGD(COMP_FWK, "Call the js success method");
         napi_value result = result_.GetResult(env_);
         size_t argc = result ? CALLBACK_ARGC : 0;
         CallFunction(successRef_, argc, result ? &result : nullptr);
     }
 
     if (error) {
-        DISPLAY_HILOGI(COMP_FWK, "Call the js fail method");
+        DISPLAY_HILOGD(COMP_FWK, "Call the js fail method");
         size_t argc = MAX_FAIL_ARGC;
         napi_value argv[argc];
         result_.GetError(env_, argv, argc);
         CallFunction(failRef_, argc, argv);
     }
-    DISPLAY_HILOGI(COMP_FWK, "Call the js complete method");
+    DISPLAY_HILOGD(COMP_FWK, "Call the js complete method");
     CallFunction(completeRef_, 0, nullptr);
 }
 
@@ -362,7 +362,7 @@ bool Brightness::CheckValueType(napi_value& value, napi_valuetype checkType)
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env_, value, &valueType);
     if (valueType != checkType) {
-        DISPLAY_HILOGW(COMP_FWK, "Check input parameter error");
+        DISPLAY_HILOGD(COMP_FWK, "Check input parameter error");
         return false;
     }
     return true;

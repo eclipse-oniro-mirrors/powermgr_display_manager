@@ -62,7 +62,7 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
 
     proxy_ = iface_cast<IDisplayPowerMgr>(obj);
     deathRecipient_ = dr;
-    DISPLAY_HILOGI(COMP_FWK, "Succeed to connect display manager service");
+    DISPLAY_HILOGD(COMP_FWK, "Succeed to connect display manager service");
     return proxy_;
 }
 
