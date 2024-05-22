@@ -51,6 +51,7 @@ public:
     void ClearOffset();
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);
+    uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
 
 private:
     bool LoadBrightnessExtLibrary();
@@ -83,6 +84,7 @@ private:
     void* mClearOffsetFunc = nullptr;
     void* mGetCurrentDisplayIdFunc = nullptr;
     void* mSetDisplayIdFunc = nullptr;
+    void* mSetLightBrightnessThresholdFunc = nullptr;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
