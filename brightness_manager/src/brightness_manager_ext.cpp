@@ -79,6 +79,11 @@ bool BrightnessManagerExt::LoadBrightnessOps()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetDisplayId func failed!");
         return false;
     }
+    mSetLightBrightnessThresholdFunc = dlsym(mBrightnessManagerExtHandle, "SetLightBrightnessThreshold");
+    if (!mSetLightBrightnessThresholdFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetLightBrightnessThreshold func failed!");
+        return false;
+    }
     return true;
 }
 
@@ -376,5 +381,22 @@ void BrightnessManagerExt::SetDisplayId(uint32_t id)
     auto setDisplayIdFunc = reinterpret_cast<void (*)(uint32_t)>(mSetDisplayIdFunc);
     setDisplayIdFunc(id);
 }
+
+uint32_t BrightnessManagerExt::SetLightBrightnessThreshold(
+    std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
+{
+    uint32_t result = 0;
+    if (!mBrightnessManagerExtEnable) {
+        return result;
+    }
+    auto setLightBrightnessThresholdFunc =
+        reinterpret_cast<uint32_t (*)(std::vector<int32_t>, sptr<IDisplayBrightnessCallback>)>(
+        mSetLightBrightnessThresholdFunc);
+    if (!setLightBrightnessThresholdFunc) {
+        return result;
+    }
+    return setLightBrightnessThresholdFunc(threshold, callback);
+}
+
 } // namespace DisplayPowerMgr
 } // namespace OHOS

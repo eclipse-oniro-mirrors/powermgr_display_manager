@@ -184,7 +184,7 @@ uint32_t BrightnessManager::SetLightBrightnessThreshold(
     std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
-    return -1;
+    return mBrightnessManagerExt.SetLightBrightnessThreshold(threshold, callback);
 #else
     return BrightnessService::Get().SetLightBrightnessThreshold(threshold, callback);
 #endif
