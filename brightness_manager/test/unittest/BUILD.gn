@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../displaymgr.gni")
 
-module_output_path = "${brightnessmgr_root_path}/test"
+module_output_path = "${displaymgr_part_name}/brightness_manager/test"
 
 config("module_private_config") {
   visibility = [ ":*" ]

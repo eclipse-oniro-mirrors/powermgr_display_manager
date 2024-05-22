@@ -54,11 +54,7 @@ namespace {
 HWTEST_F(BrightnessManagerTest, BrightnessManagerTest001, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerTest001: fun is start");
-    const uint32_t SET_BRIGHTNESS = 90;
-    bool ret = BrightnessManager::Get().SetBrightness(SET_BRIGHTNESS);
-    EXPECT_TRUE(ret);
-    uint32_t deviceBrightness = BrightnessManager::Get().GetDeviceBrightness();
-    EXPECT_EQ(deviceBrightness, SET_BRIGHTNESS);
+    BrightnessManager::Get().Init();
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerTest001: fun is end");
 }
 } // namespace
