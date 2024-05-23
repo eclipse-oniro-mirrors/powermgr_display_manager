@@ -26,6 +26,7 @@ using namespace OHOS;
 
 namespace {
 const int32_t REWIND_READ_DATA = 0;
+const int32_t SLEEP_TIME = 5;
 } // namespace
 
 DisplayFuzzerTest::DisplayFuzzerTest()
@@ -37,7 +38,7 @@ DisplayFuzzerTest::DisplayFuzzerTest()
 DisplayFuzzerTest::~DisplayFuzzerTest()
 {
     if (service_ != nullptr) {
-        sleep(1);
+        sleep(SLEEP_TIME);
         service_->Deinit();
         service_->Reset();
     }
