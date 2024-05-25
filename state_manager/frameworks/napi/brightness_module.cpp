@@ -186,7 +186,7 @@ static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports)
 {
-    DISPLAY_HILOGI(COMP_FWK, "brightness init");
+    DISPLAY_HILOGD(COMP_FWK, "brightness init");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("getValue", GetValue),
         DECLARE_NAPI_FUNCTION("setValue", SetValue),
@@ -196,7 +196,7 @@ static napi_value Init(napi_env env, napi_value exports)
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    DISPLAY_HILOGI(COMP_FWK, "brightness init end");
+    DISPLAY_HILOGD(COMP_FWK, "brightness init end");
     return exports;
 }
 EXTERN_C_END
