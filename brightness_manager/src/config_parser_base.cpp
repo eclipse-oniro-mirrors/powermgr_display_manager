@@ -26,7 +26,7 @@ namespace DisplayPowerMgr {
 namespace {
 constexpr int DISPLAY_ID_MAX = 5;
 constexpr uint16_t POINT_XY_SIZE = 2;
-const std::string CONFIG_PATH_FOR_ROOT = "/etc/display/";
+const std::string CONFIG_PATH_FOR_ROOT = "/sys_prod/etc/display/";
 const std::string CONFIG_PATH_TYP = ".json";
 const std::string CONFIG_PATHS[DISPLAY_ID_MAX] = {
     "brightness_config/", // Unkonwn config, default path
@@ -187,5 +187,43 @@ const std::string ConfigParserBase::PointXyToString(
     return text;
 }
 
+
+void ConfigParserBase::ParseScreenData(const Json::Value& root, const std::string& name,
+    std::unordered_map<int, ScreenData>& data, const std::string paramName) const
+{
+    data.clear();
+    if (!root[name.c_str()].isArray()) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found!", name.c_str());
+        return;
+    }
+    Json::Value array = root[name.c_str()];
+    for (auto value : array) {
+        ScreenData screenData{};
+        int displayMode = 0;
+        if (value[paramName].isNumeric()) {
+            displayMode = value[paramName].asInt();
+        }
+        if (value["displayId"].isNumeric()) {
+            screenData.displayId = value["displayId"].asInt();
+        }
+        if (value["sensorId"].isNumeric()) {
+            screenData.sensorId = value["sensorId"].asInt();
+        }
+        data[displayMode] = screenData;
+    }
+}
+
+const std::string ConfigParserBase::ScreenDataToString(const std::string& name,
+    const std::unordered_map<int, ScreenData>& data, const std::string paramName) const
+{
+    std::string text{};
+    text.append(name).append(": ");
+    for (const auto& [key, value] : data) {
+        text.append(paramName).append(": ").append(std::to_string(key)).append(" ");
+        text.append("displayId").append(": ").append(std::to_string(value.displayId)).append(" ");
+        text.append("sensorId").append(": ").append(std::to_string(value.sensorId)).append(" ");
+    }
+    return text;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -101,7 +101,11 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
 void BrightnessDimming::StopDimming()
 {
     mDimming = false;
-    FFRTUtils::CancelTask(g_animatorTaskHandle, mQueue);
+    if (g_animatorTaskHandle == nullptr) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "handle is nullptr");
+    } else {
+        FFRTUtils::CancelTask(g_animatorTaskHandle, mQueue);
+    }
     if (mCallback == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Callback is nullptr");
         return;

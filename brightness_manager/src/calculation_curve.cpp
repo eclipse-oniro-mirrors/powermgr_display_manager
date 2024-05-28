@@ -36,6 +36,8 @@ using std::vector;
 
 void BrightnessCalculationCurve::InitParameters()
 {
+    const ScreenConfig screenConfig = ConfigParse::Get().GetScreenConfig();
+    mScreenConfig = screenConfig;
     int displayId = 0;
     const std::unordered_map<int, Config>& brightnessConfig =
         ConfigParse::Get().GetBrightnessConfig();
@@ -87,6 +89,42 @@ void BrightnessCalculationCurve::UpdateCurveAmbientLux(float lux)
 void BrightnessCalculationCurve::UpdateCurrentUserId(int userId)
 {
     mCurrentUserId = userId;
+}
+
+int BrightnessCalculationCurve::GetDisplayIdWithDisplayMode(int displayMode)
+{
+    std::unordered_map<int, ScreenData> displayModeMap = mScreenConfig.brightnessConfig.displayModeMap;
+    if (displayModeMap.find(displayMode) != displayModeMap.end()) {
+        return displayModeMap[displayMode].displayId;
+    }
+    return DEFAULT_DISPLAY_ID;
+}
+
+int BrightnessCalculationCurve::GetSensorIdWithDisplayMode(int displayMode)
+{
+    std::unordered_map<int, ScreenData> displayModeMap = mScreenConfig.brightnessConfig.displayModeMap;
+    if (displayModeMap.find(displayMode) != displayModeMap.end()) {
+        return displayModeMap[displayMode].sensorId;
+    }
+    return DEFAULT_SENSOR_ID;
+}
+
+int BrightnessCalculationCurve::GetDisplayIdWithFoldstatus(int foldStatus)
+{
+    std::unordered_map<int, ScreenData> displayModeMap = mScreenConfig.brightnessConfig.foldStatusModeMap;
+    if (displayModeMap.find(foldStatus) != displayModeMap.end()) {
+        return displayModeMap[foldStatus].displayId;
+    }
+    return DEFAULT_DISPLAY_ID;
+}
+
+int BrightnessCalculationCurve::GetSensorIdWithFoldstatus(int foldStatus)
+{
+    std::unordered_map<int, ScreenData> displayModeMap = mScreenConfig.brightnessConfig.foldStatusModeMap;
+    if (displayModeMap.find(foldStatus) != displayModeMap.end()) {
+        return displayModeMap[foldStatus].sensorId;
+    }
+    return DEFAULT_SENSOR_ID;
 }
 
 } // namespace DisplayPowerMgr

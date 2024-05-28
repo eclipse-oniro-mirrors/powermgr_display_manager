@@ -40,6 +40,10 @@ public:
     void SetGameModeEnable(bool isGameCurveEnable);
     void SetCameraModeEnable(bool isCameraCurveEnable);
     void ResetOffsetFromHumanFactor(bool isOffsetResetEnable, int minOffsetBrightness, int maxOffsetBrightness);
+    int GetDisplayIdWithDisplayMode(int displayMode);
+    int GetSensorIdWithDisplayMode(int displayMode);
+    int GetDisplayIdWithFoldstatus(int foldStatus);
+    int GetSensorIdWithFoldstatus(int foldStatus);
 
 private:
     void UpdateParaFromReboot();

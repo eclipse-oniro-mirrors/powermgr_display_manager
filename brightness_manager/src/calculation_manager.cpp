@@ -309,5 +309,24 @@ void BrightnessCalculationManager::ResetOffsetFromHumanFactor(bool isOffsetReset
     }
 }
 
+int BrightnessCalculationManager::GetDisplayIdWithDisplayMode(int displayMode)
+{
+    return mBrightnessCalculationCurve.GetDisplayIdWithDisplayMode(displayMode);
+}
+
+int BrightnessCalculationManager::GetSensorIdWithDisplayMode(int displayMode)
+{
+    return mBrightnessCalculationCurve.GetSensorIdWithDisplayMode(displayMode);
+}
+
+int BrightnessCalculationManager::GetDisplayIdWithFoldstatus(int foldStatus)
+{
+    return mBrightnessCalculationCurve.GetDisplayIdWithFoldstatus(foldStatus);
+}
+
+int BrightnessCalculationManager::GetSensorIdWithFoldstatus(int foldStatus)
+{
+    return mBrightnessCalculationCurve.GetSensorIdWithFoldstatus(foldStatus);
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

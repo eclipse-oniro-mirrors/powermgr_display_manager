@@ -21,6 +21,7 @@
 #include "calculation_config_parser.h"
 #include "lux_filter_config_parser.h"
 #include "lux_threshold_config_parser.h"
+#include "brightness_config_parser.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -28,6 +29,9 @@ struct Config {
     CalculationConfig::Data calculationConfig{};
     std::unordered_map<std::string, LuxFilterConfig::Data> luxFilterConfig{};
     LuxThresholdConfig::Data luxThresholdConfig{};
+};
+struct ScreenConfig {
+    BrightnessConfig::Data brightnessConfig{};
 };
 class ConfigParse {
 public:
@@ -40,6 +44,7 @@ public:
 
     void Initialize();
     const std::unordered_map<int, Config>& GetBrightnessConfig() const;
+    const ScreenConfig& GetScreenConfig() const;
 
 private:
     ConfigParse() = default;
@@ -52,6 +57,7 @@ private:
     // Guarded by mLock begin
     std::atomic<bool> mIsInitialized{false};
     std::unordered_map<int, Config> mConfig{};
+    ScreenConfig mScreenConfig{};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
