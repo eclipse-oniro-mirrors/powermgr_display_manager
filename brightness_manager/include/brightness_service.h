@@ -54,7 +54,7 @@ public:
     public:
         DimmingCallbackImpl(const std::shared_ptr<BrightnessAction>& action,
             std::function<void(uint32_t)> callback);
-        ~DimmingCallbackImpl() = default;
+        ~DimmingCallbackImpl() override = default;
         DimmingCallbackImpl(const DimmingCallbackImpl&) = delete;
         DimmingCallbackImpl& operator=(const DimmingCallbackImpl&) = delete;
         DimmingCallbackImpl(DimmingCallbackImpl&&) = delete;

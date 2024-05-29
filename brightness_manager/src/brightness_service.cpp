@@ -571,8 +571,8 @@ void BrightnessService::SetBrightnessLevel(uint32_t value, uint32_t duration)
 
 uint32_t BrightnessService::GetBrightnessLevel(float lux)
 {
-    uint32_t brightnessLevel = static_cast<int>(mBrightnessCalculationManager.GetInterpolatedValue(lux)
-        * MAX_DEFAULT_BRGIHTNESS_LEVEL);
+    uint32_t brightnessLevel = static_cast<uint32_t>(mBrightnessCalculationManager.GetInterpolatedValue(lux) *
+        MAX_DEFAULT_BRGIHTNESS_LEVEL);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "GetBrightnessLevel lux=%{public}f, brightnessLevel=%{public}d",
         lux, brightnessLevel);
     return brightnessLevel;
@@ -822,8 +822,13 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
 
 uint32_t BrightnessService::GetSettingBrightness(const std::string& key)
 {
-    uint32_t settingBrightness;
+    uint32_t settingBrightness = DEFAULT_BRIGHTNESS;
     auto isSuccess = BrightnessSettingHelper::GetSettingBrightness(settingBrightness, key);
+    if (isSuccess != ERR_OK) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS,
+            "get setting brightness failed, return default=%{public}d, key=%{public}s, ret=%{public}d",
+            settingBrightness, key.c_str(), isSuccess);
+    }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "GetSettingBrightness=%{public}d", settingBrightness);
     return settingBrightness;
 }

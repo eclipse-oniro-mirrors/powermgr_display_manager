@@ -65,8 +65,8 @@ private:
     void ResetDefaultBrightnessOffset();
 
     BrightnessCalculationCurve mBrightnessCalculationCurve{};
-    uint32_t mDisplayId;
-    int mCurrentUserId;
+    uint32_t mDisplayId{0};
+    int mCurrentUserId{0};
     bool mIsCameraCurveEnable{false};
     bool mIsGameCurveEnable{false};
     float mDefaultBrightness{false};

@@ -29,7 +29,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class BrightnessAction {
 public:
-    BrightnessAction(uint32_t displayId);
+    explicit BrightnessAction(uint32_t displayId);
     ~BrightnessAction() = default;
     BrightnessAction(const BrightnessAction&) = delete;
     BrightnessAction& operator=(const BrightnessAction&) = delete;
