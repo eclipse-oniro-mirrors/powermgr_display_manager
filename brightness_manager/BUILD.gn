@@ -69,6 +69,10 @@ ohos_static_library("brightness_manager") {
   ]
 
   defines = []
+  if (use_libfuzzer) {
+    defines += [ "FUZZ_TEST" ]
+  }
+
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
