@@ -27,6 +27,7 @@ ohos_static_library("brightness_manager") {
 
   sources = [
     "src/brightness_action.cpp",
+    "src/brightness_config_parser.cpp",
     "src/brightness_dimming.cpp",
     "src/brightness_manager.cpp",
     "src/brightness_manager_ext.cpp",

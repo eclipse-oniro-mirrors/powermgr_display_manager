@@ -38,7 +38,14 @@ public:
     float GetCurrentBrightness(float lux);
     void UpdateCurveAmbientLux(float lux);
     void UpdateCurrentUserId(int userId);
+    int GetDisplayIdWithDisplayMode(int displayMode);
+    int GetSensorIdWithDisplayMode(int displayMode);
+    int GetDisplayIdWithFoldstatus(int foldStatus);
+    int GetSensorIdWithFoldstatus(int foldStatus);
 private:
+    static const uint32_t DEFAULT_DISPLAY_ID = 0;
+    static const uint32_t DEFAULT_SENSOR_ID = 5;
+
     float GetBrightnessCurveLevel(std::vector<PointXy>& linePointsList, float lux);
 
     Config mCurveConfig{};
@@ -46,6 +53,7 @@ private:
     float mDefaultBrightness {100.0f};
     float mCurveAmbientLux {0.0f};
     int mCurrentUserId {0};
+    ScreenConfig mScreenConfig{};
 };
 
 } // namespace DisplayPowerMgr

@@ -39,6 +39,8 @@ void ConfigParse::Initialize()
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Already init!");
         return;
     }
+    BrightnessConfigParser::ParseConfig(mScreenConfig.brightnessConfig);
+    BrightnessConfigParser::PrintConfig(mScreenConfig.brightnessConfig);
     for (int displayId = 0; displayId < DISPLAY_ID_MAX; displayId++) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] Already init!", displayId);
         Config brightnessConfig{};
@@ -52,6 +54,11 @@ void ConfigParse::Initialize()
 const std::unordered_map<int, Config>& ConfigParse::GetBrightnessConfig() const
 {
     return mConfig;
+}
+
+const ScreenConfig& ConfigParse::GetScreenConfig() const
+{
+    return mScreenConfig;
 }
 
 bool ConfigParse::ParseConfig(int displayId, Config& data) const

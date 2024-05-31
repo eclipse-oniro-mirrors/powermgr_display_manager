@@ -63,6 +63,7 @@ constexpr uint32_t APS_LISTEN_PARAMS_LENGHT = 3;
 constexpr time_t CALL_APS_INTERVAL = 2;
 
 FFRTHandle g_cancelBoostTaskHandle{};
+FFRTHandle g_waitForFirstLuxTaskHandle{};
 }
 
 const uint32_t BrightnessService::AMBIENT_LUX_LEVELS[BrightnessService::LUX_LEVEL_LENGTH] = { 1, 3, 5, 10, 20, 50, 200,
@@ -130,6 +131,7 @@ void BrightnessService::DeInit()
     if (queue_) {
         queue_.reset();
         g_cancelBoostTaskHandle = nullptr;
+        g_waitForFirstLuxTaskHandle = nullptr;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct brightness ffrt queue");
     }
 
@@ -143,14 +145,41 @@ void BrightnessService::FoldStatusLisener::OnFoldStatusChanged(Rosen::FoldStatus
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "no need set foldStatus");
         return;
     }
+    bool isSensorEnable = BrightnessService::Get().GetIsSupportLightSensor();
+    bool isAutoEnable = BrightnessService::Get().GetSettingAutoBrightness();
+    bool isScreenOn = BrightnessService::Get().IsScreenOn();
+    int displayId = BrightnessService::Get().GetDisplayIdWithFoldstatus(foldStatus);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnFoldStatusChanged isSensorEnable=%{public}d, isAutoEnable=%{public}d"\
+        ", isScreenOn=%{public}d, displayid=%{public}d", isSensorEnable, isAutoEnable, isScreenOn, displayId);
     uint32_t currentBrightness = BrightnessService::Get().GetBrightness();
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnFoldStatusChanged currentBrightness=%{public}d", currentBrightness);
-    if (foldStatus == Rosen::FoldStatus::FOLDED) {
-        BrightnessService::Get().SetDisplayId(OUTTER_SCREEN_DISPLAY_ID);
-    } else {
-        BrightnessService::Get().SetDisplayId(DEFAULT_DISPLAY_ID);
+    BrightnessService::Get().SetDisplayId(displayId);
+
+    if (Rosen::FoldStatus::FOLDED == foldStatus || Rosen::FoldStatus::EXPAND == foldStatus) {
+        int sensorId = BrightnessService::Get().GetSensorIdWithFoldstatus(foldStatus);
+        BrightnessService::Get().SetCurrentSensorId(static_cast<uint32_t>(sensorId));
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnFoldStatusChanged sensorid=%{public}d", sensorId);
+        if (isSensorEnable && isAutoEnable && isScreenOn) {
+            if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+                BrightnessService::Get().ActivateAmbientSensor();
+            } else if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+                BrightnessService::Get().ActivateAmbientSensor1();
+            }
+        }
+    } else if (Rosen::FoldStatus::HALF_FOLD == foldStatus) {
+        uint32_t currentEffectSensorId = BrightnessService::Get().GetCurrentSensorId();
+        if (isSensorEnable && isAutoEnable && isScreenOn) {
+            if (currentEffectSensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+                BrightnessService::Get().DeactivateAmbientSensor();
+            } else if (currentEffectSensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+                BrightnessService::Get().DeactivateAmbientSensor1();
+            }
+        }
     }
-    BrightnessService::Get().SetBrightness(currentBrightness);
+
+    if (BrightnessService::Get().CanSetBrightness()) {
+        BrightnessService::Get().UpdateBrightness(currentBrightness, 0, true);
+    }
+    mLastFoldStatus = foldStatus;
 }
 
 void BrightnessService::RegisterFoldStatusListener()
@@ -224,7 +253,7 @@ void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
             return;
         }
         mLastCallApsTime = currentTime;
-        
+
         int32_t light = mLightBrightnessThreshold[1];
         int32_t range = mLightBrightnessThreshold[2];
         if (!mIsLightValidate && value >= light) {
@@ -237,9 +266,20 @@ void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
     }
 }
 
-uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId) const
+uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
 {
-    return mAction->GetCurrentDisplayId(defaultId);
+    uint32_t currentId = defaultId;
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
+        DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId not fold phone return default id=%{public}d", defaultId);
+        return currentId;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    currentId = GetDisplayIdWithDisplayMode(foldMode);
+    DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId foldMode=%{public}u", foldMode);
+    IPCSkeleton::SetCallingIdentity(identity);
+    return static_cast<uint32_t>(currentId);
 }
 
 void BrightnessService::SetDisplayId(uint32_t displayId)
@@ -250,6 +290,16 @@ void BrightnessService::SetDisplayId(uint32_t displayId)
         return;
     }
     mAction->SetDisplayId(displayId);
+}
+
+uint32_t BrightnessService::GetCurrentSensorId()
+{
+    return mCurrentSensorId;
+}
+
+void BrightnessService::SetCurrentSensorId(uint32_t sensorId)
+{
+    mCurrentSensorId = sensorId;
 }
 
 BrightnessService::DimmingCallbackImpl::DimmingCallbackImpl(
@@ -273,8 +323,10 @@ void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
     auto brightness = GetMappingBrightnessLevel(currentValue);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d, mapBrightness=%{public}d",
         currentValue, brightness);
-    BrightnessService::Get().ReportBrightnessBigData(brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
+    if (isSuccess) {
+        BrightnessService::Get().ReportBrightnessBigData(brightness);
+    }
     if (isSuccess && !BrightnessService::Get().IsSleepStatus()) {
         if (!BrightnessService::Get().IsDimming()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged already stopDimming , not update setting brightness");
@@ -328,6 +380,7 @@ void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
     } else if (state == DisplayState::DISPLAY_DIM) {
         SetSleepBrightness();
     } else if (state == DisplayState::DISPLAY_ON) {
+        mIsDisplayOnWhenFirstLuxReport.store(true);
         if (mIsSleepStatus) {
             RestoreBrightness(0);
             mIsSleepStatus = false;
@@ -386,14 +439,14 @@ bool BrightnessService::AutoAdjustBrightness(bool enable)
             return true;
         }
         mIsAutoBrightnessEnabled = true;
-        ActivateAmbientSensor();
+        ActivateValidAmbientSensor();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetAutoBrightnessEnable enable");
     } else {
         if (!mIsAutoBrightnessEnabled) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetAutoBrightnessEnable is already disabled");
             return true;
         }
-        DeactivateAmbientSensor();
+        DeactivateAllAmbientSensor();
         mIsAutoBrightnessEnabled = false;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetAutoBrightnessEnable disable");
     }
@@ -410,18 +463,18 @@ bool BrightnessService::StateChangedSetAutoBrightness(bool enable)
         return false;
     }
     if (enable) {
-        if (mIsLightSensorEnabled) {
+        if (IsCurrentSensorEnable()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness is already enabled");
             return true;
         }
-        ActivateAmbientSensor();
+        ActivateValidAmbientSensor();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness enable");
     } else {
-        if (!mIsLightSensorEnabled) {
+        if (!IsCurrentSensorEnable()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness is already disabled");
             return true;
         }
-        DeactivateAmbientSensor();
+        DeactivateAllAmbientSensor();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "StateChangedSetAutoBrightness disable");
     }
     return true;
@@ -439,7 +492,8 @@ void BrightnessService::InitSensors()
     }
     mIsSupportLightSensor = false;
     for (int i = 0; i < count; i++) {
-        if (sensorInfo[i].sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+        if (sensorInfo[i].sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT ||
+            sensorInfo[i].sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT Support");
             mIsSupportLightSensor = true;
             break;
@@ -456,8 +510,8 @@ void BrightnessService::AmbientLightCallback(SensorEvent* event)
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor event is nullptr");
         return;
     }
-    if (event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback is not AMBIENT_LIGHT");
+    if (event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT && event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback is not AMBIENT_LIGHT id=%{public}d", event->sensorTypeId);
         return;
     }
     AmbientLightData* data = reinterpret_cast<AmbientLightData*>(event->data);
@@ -505,6 +559,98 @@ void BrightnessService::DeactivateAmbientSensor()
     mLightLuxManager.ClearLuxData();
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateAmbientSensor");
 }
+
+void BrightnessService::ActivateAmbientSensor1()
+{
+    if (!mIsAutoBrightnessEnabled) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness1 is not enabled");
+        return;
+    }
+    if (mIsLightSensor1Enabled) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor1 is already on");
+        return;
+    }
+    (void)strcpy_s(mSensorUser1.name, sizeof(mSensorUser1.name), "BrightnessService");
+    mSensorUser1.userData = nullptr;
+    mSensorUser1.callback = &AmbientLightCallback;
+    SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1);
+    SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1, SAMPLING_RATE, SAMPLING_RATE);
+    ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1);
+    SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1, SENSOR_ON_CHANGE);
+    mIsLightSensor1Enabled = true;
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateAmbientSensor1");
+}
+
+void BrightnessService::DeactivateAmbientSensor1()
+{
+    if (!mIsAutoBrightnessEnabled) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "auto brightness1 is not enabled");
+        return;
+    }
+    if (!mIsLightSensor1Enabled) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Ambient Sensor1 is already off");
+        return;
+    }
+    DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1);
+    UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT1, &mSensorUser1);
+    mIsLightSensor1Enabled = false;
+    mLightLuxManager.ClearLuxData();
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateAmbientSensor1");
+}
+
+void BrightnessService::ActivateValidAmbientSensor()
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateValidAmbientSensor");
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
+        ActivateAmbientSensor();
+        return;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    int sensorId = GetSensorIdWithDisplayMode(foldMode);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateValidAmbientSensor sensorId=%{public}d, mode=%{public}d",
+        sensorId, foldMode);
+    if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+        ActivateAmbientSensor();
+    } else if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+        ActivateAmbientSensor1();
+    }
+    IPCSkeleton::SetCallingIdentity(identity);
+}
+
+void BrightnessService::DeactivateValidAmbientSensor()
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateValidAmbientSensor");
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
+        DeactivateAmbientSensor();
+        return;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    int sensorId = GetSensorIdWithDisplayMode(foldMode);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateValidAmbientSensor sensorId=%{public}d, mode=%{public}d",
+        sensorId, foldMode);
+    if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+        DeactivateAmbientSensor();
+    } else if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+        DeactivateAmbientSensor1();
+    }
+    IPCSkeleton::SetCallingIdentity(identity);
+}
+
+void BrightnessService::DeactivateAllAmbientSensor()
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateAllAmbientSensor");
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
+        DeactivateAmbientSensor();
+        return;
+    }
+    DeactivateAmbientSensor();
+    DeactivateAmbientSensor1();
+}
 #endif
 
 bool BrightnessService::IsAutoAdjustBrightness()
@@ -516,6 +662,10 @@ void BrightnessService::ProcessLightLux(float lux)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "ProcessLightLux, lux=%{public}f, mLightLux=%{public}f",
         lux, mLightLuxManager.GetSmoothedLux());
+    if (!CanSetBrightness()) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "ProcessLightLux , ignore the change");
+        return;
+    }
     NotifyLightChangeToAps(AMBIENT_LIGHT_TYPE, lux);
     if (mLightLuxManager.IsNeedUpdateBrightness(lux)) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateLightLux, lux=%{public}f, mLightLux=%{public}f, isFirst=%{public}d",
@@ -539,14 +689,8 @@ void BrightnessService::ProcessLightLux(float lux)
 
 void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDuration)
 {
-    if (!CanSetBrightness()) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot UpdateCurrentBrightnessLevel, ignore the change");
-        mLightLuxManager.ClearLuxData(); //clear luxData, prevent the next lux unadjusted
-        return;
-    }
-
     uint32_t brightnessLevel = GetBrightnessLevel(lux);
-    if (mBrightnessLevel != brightnessLevel) {
+    if (mBrightnessLevel != brightnessLevel || isFastDuration) {
         uint32_t duration = DEFAULT_BRIGHTEN_DURATION;
         if (brightnessLevel < mBrightnessLevel) {
             duration = DEFAULT_DARKEN_DURATION;
@@ -554,9 +698,18 @@ void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDurat
         if (isFastDuration) {
             duration = DEFAULT_ANIMATING_DURATION;
         }
+        if (isFastDuration && mIsDisplayOnWhenFirstLuxReport) {
+            duration = 0;
+            mIsDisplayOnWhenFirstLuxReport.store(false);
+        }
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateCurrentBrightnessLevel lux=%{public}f, mBrightnessLevel=%{public}d, "\
             "brightnessLevel=%{public}d, duration=%{public}d", lux, mBrightnessLevel, brightnessLevel, duration);
         mBrightnessLevel = brightnessLevel;
+        if (mWaitForFirstLux) {
+            FFRTUtils::CancelTask(g_waitForFirstLuxTaskHandle, queue_);
+            mWaitForFirstLux = false;
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateCurrentBrightnessLevel CancelScreenOn waitforFisrtLux Task");
+        }
         mBrightnessTarget.store(brightnessLevel);
         SetBrightnessLevel(brightnessLevel, duration);
     }
@@ -573,6 +726,7 @@ uint32_t BrightnessService::GetBrightnessLevel(float lux)
 {
     uint32_t brightnessLevel = static_cast<uint32_t>(mBrightnessCalculationManager.GetInterpolatedValue(lux) *
         MAX_DEFAULT_BRGIHTNESS_LEVEL);
+
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "GetBrightnessLevel lux=%{public}f, brightnessLevel=%{public}d",
         lux, brightnessLevel);
     return brightnessLevel;
@@ -594,7 +748,7 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
     }
     if (gradualDuration == 0) {
         bool isSettingOn = IsAutoAdjustBrightness();
-        if (isSettingOn && mIsLightSensorEnabled) {
+        if (isSettingOn && IsCurrentSensorEnable()) {
             mIsUserMode = true;
             mBrightnessCalculationManager.UpdateBrightnessOffset(value, mLightLuxManager.GetSmoothedLux());
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightnessOffset level=%{public}d, mLightLux=%{public}f",
@@ -612,6 +766,17 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
 void BrightnessService::SetScreenOnBrightness()
 {
     uint32_t screenOnBrightness = GetScreenOnBrightness(true);
+    if (mWaitForFirstLux) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux");
+        FFRTUtils::CancelTask(g_waitForFirstLuxTaskHandle, queue_);
+        screenOnBrightness = mCachedSettingBrightness;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux,GetSettingBrightness=%{public}d",
+            screenOnBrightness);
+        FFRTTask setBrightnessTask = std::bind(&BrightnessService::UpdateBrightness, this, screenOnBrightness, 0, true);
+        g_waitForFirstLuxTaskHandle = FFRTUtils::SubmitDelayTask(setBrightnessTask, WAIT_FOR_FIRST_LUX_MAX_TIME,
+            queue_);
+        return;
+    }
     bool needUpdateBrightness = true;
     if (IsBrightnessBoosted() || IsBrightnessOverridden()) {
         needUpdateBrightness = false;
@@ -799,6 +964,7 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness, value=%{public}u, discount=%{public}lf,"\
         "duration=%{public}u, updateSetting=%{public}d", value, mDiscount, gradualDuration, updateSetting);
+    mWaitForFirstLux = false;
     if (mDimming->IsDimming()) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness StopDimming");
         mDimming->StopDimming();
@@ -809,13 +975,15 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
     }
     auto brightness = static_cast<uint32_t>(value * mDiscount);
     brightness = GetMappingBrightnessLevel(brightness);
-    ReportBrightnessBigData(brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness is %{public}s, brightness: %{public}u",
         isSuccess ? "succ" : "failed", brightness);
     if (isSuccess && updateSetting) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness, settings, value=%{public}u", value);
         FFRTUtils::SubmitTask(std::bind(&BrightnessService::SetSettingBrightness, this, value));
+    }
+    if (isSuccess) {
+        ReportBrightnessBigData(brightness);
     }
     return isSuccess;
 }
@@ -851,9 +1019,14 @@ uint32_t BrightnessService::GetScreenOnBrightness(bool isUpdateTarget)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is overridden, return overridden brightness=%{public}u",
             mOverriddenBrightness);
         screenOnbrightness = mOverriddenBrightness;
-    } else if (isUpdateTarget && mBrightnessTarget.load() > 0) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget=%{public}d", mBrightnessTarget.load());
-        screenOnbrightness = mBrightnessTarget.load();
+    } else if (isUpdateTarget && mIsAutoBrightnessEnabled) {
+        if (mBrightnessTarget.load() > 0) {
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "update, return mBrightnessTarget=%{public}d", mBrightnessTarget.load());
+            screenOnbrightness = mBrightnessTarget.load();
+        } else {
+            screenOnbrightness = 0;
+            mWaitForFirstLux = true;
+        }
     } else {
         screenOnbrightness = GetSettingBrightness();
     }
@@ -986,5 +1159,48 @@ bool BrightnessService::IsSleepStatus()
     return mIsSleepStatus;
 }
 
+bool BrightnessService::GetIsSupportLightSensor()
+{
+    return mIsSupportLightSensor;
+}
+
+bool BrightnessService::IsCurrentSensorEnable()
+{
+    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    if (!isFoldable) {
+        return mIsLightSensorEnabled;
+    }
+    bool result = false;
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    int sensorId = GetSensorIdWithDisplayMode(foldMode);
+    if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
+        result = mIsLightSensorEnabled;
+    } else if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT1) {
+        result = mIsLightSensor1Enabled;
+    }
+    IPCSkeleton::SetCallingIdentity(identity);
+    return result;
+}
+
+int BrightnessService::GetDisplayIdWithFoldstatus(Rosen::FoldStatus foldStatus)
+{
+    return mBrightnessCalculationManager.GetDisplayIdWithFoldstatus(static_cast<int>(foldStatus));
+}
+
+int BrightnessService::GetSensorIdWithFoldstatus(Rosen::FoldStatus foldStatus)
+{
+    return mBrightnessCalculationManager.GetSensorIdWithFoldstatus(static_cast<int>(foldStatus));
+}
+
+int BrightnessService::GetDisplayIdWithDisplayMode(Rosen::FoldDisplayMode mode)
+{
+    return mBrightnessCalculationManager.GetDisplayIdWithDisplayMode(static_cast<int>(mode));
+}
+
+int BrightnessService::GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode)
+{
+    return mBrightnessCalculationManager.GetSensorIdWithDisplayMode(static_cast<int>(mode));
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -22,6 +22,7 @@
 #include <string>
 
 #include "calculation_config_parser.h"
+#include "brightness_config_parser.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -39,6 +40,10 @@ public:
     const Json::Value LoadConfigRoot(int displayId, const std::string& configName) const;
     void ParsePointXy(const Json::Value& root, const std::string& name, std::vector<PointXy>& data) const;
     const std::string PointXyToString(const std::string& name, const std::vector<PointXy>& data) const;
+    void ParseScreenData(const Json::Value& root, const std::string& name, std::unordered_map<int, ScreenData>& data,
+       const std::string paramName) const;
+    const std::string ScreenDataToString(const std::string& name, const std::unordered_map<int, ScreenData>& data,
+       const std::string paramName) const;
 
 private:
     struct ConfigInfo {

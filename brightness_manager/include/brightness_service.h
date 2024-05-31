@@ -139,12 +139,18 @@ public:
     uint32_t GetDisplayId();
     void SetDisplayId(uint32_t displayId);
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
-    uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
+    uint32_t GetCurrentDisplayId(uint32_t defaultId);
     bool IsDimming();
     void ReportBrightnessBigData(uint32_t brightness);
     bool IsSleepStatus();
     void SetSleepBrightness();
-    
+    int GetDisplayIdWithFoldstatus(Rosen::FoldStatus foldStatus);
+    int GetSensorIdWithFoldstatus(Rosen::FoldStatus foldStatus);
+    int GetDisplayIdWithDisplayMode(Rosen::FoldDisplayMode mode);
+    int GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode);
+    uint32_t GetCurrentSensorId();
+    void SetCurrentSensorId(uint32_t sensorId);
+
 private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY{"settings.display.screen_brightness_status"};
     static const uint32_t SAMPLING_RATE = 100000000;
@@ -154,6 +160,8 @@ private:
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
     static const uint32_t AMBIENT_LUX_LEVELS[LUX_LEVEL_LENGTH];
+    static const uint32_t WAIT_FOR_FIRST_LUX_MAX_TIME = 200;
+    static const uint32_t WAIT_FOR_FIRST_LUX_STEP = 10;
 
     BrightnessService();
     virtual ~BrightnessService() = default;
@@ -164,10 +172,17 @@ private:
     void InitSensors();
     void ActivateAmbientSensor();
     void DeactivateAmbientSensor();
+    void ActivateAmbientSensor1();
+    void DeactivateAmbientSensor1();
+    void ActivateValidAmbientSensor();
+    void DeactivateValidAmbientSensor();
+    void DeactivateAllAmbientSensor();
     bool mIsSupportLightSensor{false};
     SensorUser mSensorUser{};
+    SensorUser mSensorUser1{};
 #endif
     bool mIsLightSensorEnabled{false};
+    bool mIsLightSensor1Enabled{false};
 
     void UpdateCurrentBrightnessLevel(float lux, bool isFastDuration);
     void SetBrightnessLevel(uint32_t value, uint32_t duration);
@@ -183,6 +198,8 @@ private:
     void UnRegisterFoldStatusListener();
     std::string GetReason();
     void NotifyLightChangeToAps(uint32_t type, float value);
+    bool GetIsSupportLightSensor();
+    bool IsCurrentSensorEnable();
 
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
@@ -191,6 +208,7 @@ private:
     uint32_t mBrightnessLevel{0};
     std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};
+    uint32_t mCurrentSensorId{5};
     int mLuxLevel{-1};
     double mDiscount{1.0f};
     std::atomic<bool> mIsBrightnessOverridden{false};
@@ -212,6 +230,8 @@ private:
     bool mIsBrightnessValidate = false;
     bool mIsLightValidate = false;
     time_t mLastCallApsTime {0};
+    std::atomic<bool> mIsDisplayOnWhenFirstLuxReport{false};
+    std::atomic<bool> mWaitForFirstLux{false};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
