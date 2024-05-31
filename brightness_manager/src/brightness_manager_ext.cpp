@@ -185,7 +185,9 @@ bool BrightnessManagerExt::LoadBrightnessControl()
 void BrightnessManagerExt::CloseBrightnessExtLibrary()
 {
     if (mBrightnessManagerExtHandle) {
+#ifndef FUZZ_TEST
         dlclose(mBrightnessManagerExtHandle);
+#endif
         mBrightnessManagerExtHandle = nullptr;
     }
     mBrightnessManagerInitFunc = nullptr;
