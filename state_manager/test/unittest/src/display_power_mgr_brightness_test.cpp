@@ -28,6 +28,9 @@ using namespace OHOS::DisplayPowerMgr;
 namespace {
 const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
 const double NO_DISCOUNT = 1.00;
+const uint32_t MAX_DEFAULT_BRIGHTNESS_LEVEL = 255;
+const uint32_t TEST_MODE = 1;
+const uint32_t NORMAL_MODE = 2;
 }
 
 class DisplayPowerMgrBrightnessTest : public Test {
@@ -36,12 +39,18 @@ public:
     {
         DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
         DisplayPowerMgrClient::GetInstance().DiscountBrightness(NO_DISCOUNT);
+        uint32_t maxBrightness = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
+        DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)maxBrightness / MAX_DEFAULT_BRIGHTNESS_LEVEL,
+            TEST_MODE);
     }
 
     void TearDown()
     {
         DisplayPowerMgrClient::GetInstance().RestoreBrightness();
         DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
+        uint32_t maxBrightness = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
+        DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)maxBrightness / MAX_DEFAULT_BRIGHTNESS_LEVEL,
+            NORMAL_MODE);
     }
 };
 
@@ -246,7 +255,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, Te
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_BRIGHTNESS));
 
-    const uint32_t SET_OVERRIDE_BRIGHTNESS = 200;
+    const uint32_t SET_OVERRIDE_BRIGHTNESS = 202;
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(SET_OVERRIDE_BRIGHTNESS);
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_OVERRIDE_BRIGHTNESS));
@@ -270,7 +279,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = 200000;
     usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
-    const uint32_t SET_OVERRIDE_BRIGHTNESS = 200;
+    const uint32_t SET_OVERRIDE_BRIGHTNESS = 202;
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(SET_OVERRIDE_BRIGHTNESS);
 
     const double DISCOUNT_VALUE = 0.7;
@@ -491,7 +500,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, Te
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007: fun is start");
     uint32_t overrideValue = 0;
-    uint32_t brightnessMin = 5;
+    uint32_t brightnessMin = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(brightnessMin, deviceBrightness);
@@ -963,4 +972,104 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is end");
 }
 
+/**
+ * @tc.name: DisplayPowerMgrSetMaxBrightnessNit001
+ * @tc.desc: Test if SetMaxBrightness is less than the current screen brightness,
+ *           then turn down the screen brightness to the set value.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001: fun is start");
+    const uint32_t SET_BRIGHTNESS = 150; // mapping nit = 350
+    const uint32_t SET_BRIGHTNESS_NIT = 350;
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
+
+    const uint32_t SET_MAX_BRIGHTNESS = 98; // mapping nit = 231
+    const uint32_t SET_MAX_BRIGHTNESS_NIT = 231;
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_MAX_BRIGHTNESS_NIT, 2);
+    EXPECT_TRUE(ret);
+    const int32_t SLEEP_TIME_BRIGHTNESS = 10000000;
+    usleep(SLEEP_TIME_BRIGHTNESS); // sleep 10s, wait for setBrightness
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(SET_MAX_BRIGHTNESS, brightness);
+    DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_BRIGHTNESS_NIT, 1);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetMaxBrightnessNit002
+ * @tc.desc: Test if SetMaxBrightness is higher than the current screen brightness, just set the max range
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit002, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002: fun is start");
+    const uint32_t SET_BRIGHTNESS = 150; // mapping nit = 350
+    const uint32_t SET_BRIGHTNESS_NIT = 350;
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
+
+    const uint32_t SET_MAX_BRIGHTNESS_NIT = 469; // mapping level = 200;
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_MAX_BRIGHTNESS_NIT, 2);
+    EXPECT_TRUE(ret);
+    const int32_t SLEEP_TIME_BRIGHTNESS = 10000000;
+    usleep(SLEEP_TIME_BRIGHTNESS); // sleep 10s, wait for setBrightness
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(SET_BRIGHTNESS, brightness);
+    DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_BRIGHTNESS_NIT, 1);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetMaxBrightness001
+ * @tc.desc: Test if SetMaxBrightness is less than the current screen brightness,
+ *           then turn down the screen brightness to the set value.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001: fun is start");
+    const uint32_t SET_BRIGHTNESS = 150;
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
+
+    const uint32_t SET_MAX_BRIGHTNESS = 100;
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 2);
+    EXPECT_TRUE(ret);
+    const int32_t SLEEP_TIME_BRIGHTNESS = 10000000;
+    usleep(SLEEP_TIME_BRIGHTNESS); // sleep 10s, wait for setBrightness
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(SET_MAX_BRIGHTNESS, brightness);
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS, 1);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001: fun is end");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetMaxBrightness002
+ * @tc.desc: Test if SetMaxBrightness is higher than the current screen brightness, just set the max range
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002: fun is start");
+    const uint32_t SET_BRIGHTNESS = 150;
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    const int32_t SLEEP_TIME = 200000;
+    usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
+
+    const uint32_t SET_MAX_BRIGHTNESS = 200;
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 2);
+    EXPECT_TRUE(ret);
+    const int32_t SLEEP_TIME_BRIGHTNESS = 10000000;
+    usleep(SLEEP_TIME_BRIGHTNESS); // sleep 10s, wait for setBrightness
+    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    EXPECT_EQ(SET_BRIGHTNESS, brightness);
+    DisplayPowerMgrClient::GetInstance().SetMaxBrightness(SET_BRIGHTNESS, 1);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002: fun is end");
+}
 } // namespace

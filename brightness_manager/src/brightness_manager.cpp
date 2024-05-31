@@ -23,12 +23,12 @@ BrightnessManager& BrightnessManager::Get()
     return brightnessManager;
 }
 
-void BrightnessManager::Init()
+void BrightnessManager::Init(uint32_t defaultMax, uint32_t defaultMin)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
-    mBrightnessManagerExt.Init();
+    mBrightnessManagerExt.Init(defaultMax, defaultMin);
 #else
-    BrightnessService::Get().Init();
+    BrightnessService::Get().Init(defaultMax, defaultMin);
 #endif
 }
 
@@ -223,6 +223,24 @@ void BrightnessManager::SetDisplayId(uint32_t id)
     mBrightnessManagerExt.SetDisplayId(id);
 #else
     BrightnessService::Get().SetDisplayId(id);
+#endif
+}
+
+bool BrightnessManager::SetMaxBrightness(double value)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.SetMaxBrightness(value);
+#else
+    return BrightnessService::Get().SetMaxBrightness(value);
+#endif
+}
+
+bool BrightnessManager::SetMaxBrightnessNit(uint32_t nit)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.SetMaxBrightnessNit(nit);
+#else
+    return BrightnessService::Get().SetMaxBrightnessNit(nit);
 #endif
 }
 } // namespace DisplayPowerMgr

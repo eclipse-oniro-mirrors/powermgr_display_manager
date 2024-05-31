@@ -49,6 +49,8 @@ public:
     virtual std::vector<uint32_t> GetDisplayIds() override;
     virtual uint32_t GetMainDisplayId() override;
     virtual bool SetBrightness(uint32_t value, uint32_t displayId, bool continuous = false) override;
+    virtual bool SetMaxBrightness(double value, uint32_t mode) override;
+    virtual bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode) override;
     virtual bool DiscountBrightness(double discount, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool OverrideDisplayOffDelay(uint32_t delayMs) override;
@@ -154,6 +156,7 @@ private:
     DisplayState tempState_ {DisplayState::DISPLAY_UNKNOWN};
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
+    bool isInTestMode_ {false};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

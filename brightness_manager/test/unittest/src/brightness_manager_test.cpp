@@ -54,7 +54,9 @@ namespace {
 HWTEST_F(BrightnessManagerTest, BrightnessManagerTest001, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerTest001: fun is start");
-    BrightnessManager::Get().Init();
+    const uint32_t maxBrightness = 255;
+    const uint32_t minBrightness = 1;
+    BrightnessManager::Get().Init(maxBrightness, minBrightness);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerTest001: fun is end");
 }
 } // namespace

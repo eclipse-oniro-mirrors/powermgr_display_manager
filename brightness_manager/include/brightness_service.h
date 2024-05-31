@@ -104,7 +104,7 @@ public:
     static void SetSettingAutoBrightness(bool enable);
     static bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
 
-    void Init();
+    void Init(uint32_t defaultMax, uint32_t defaultMin);
     void DeInit();
     void SetDisplayState(uint32_t id, DisplayState state);
     DisplayState GetDisplayState();
@@ -122,6 +122,7 @@ public:
     uint32_t GetBrightnessLevel(float lux);
     uint32_t GetBrightnessHighLevel(uint32_t level);
     uint32_t GetMappingBrightnessNit(uint32_t level);
+    uint32_t GetBrightnessLevelFromNit(uint32_t nit);
     uint32_t GetMappingHighBrightnessLevel(uint32_t level);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     void SetScreenOnBrightness();
@@ -151,6 +152,9 @@ public:
     uint32_t GetCurrentSensorId();
     void SetCurrentSensorId(uint32_t sensorId);
 
+    static uint32_t GetSafeBrightness(uint32_t value);
+    bool SetMaxBrightness(double value);
+    bool SetMaxBrightnessNit(uint32_t maxNit);
 private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY{"settings.display.screen_brightness_status"};
     static const uint32_t SAMPLING_RATE = 100000000;
@@ -162,6 +166,8 @@ private:
     static const uint32_t AMBIENT_LUX_LEVELS[LUX_LEVEL_LENGTH];
     static const uint32_t WAIT_FOR_FIRST_LUX_MAX_TIME = 200;
     static const uint32_t WAIT_FOR_FIRST_LUX_STEP = 10;
+    static uint32_t brightnessValueMin;
+    static uint32_t brightnessValueMax;
 
     BrightnessService();
     virtual ~BrightnessService() = default;
@@ -232,6 +238,7 @@ private:
     time_t mLastCallApsTime {0};
     std::atomic<bool> mIsDisplayOnWhenFirstLuxReport{false};
     std::atomic<bool> mWaitForFirstLux{false};
+    std::atomic<uint32_t> mCurrentBrightness{DEFAULT_BRIGHTNESS};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

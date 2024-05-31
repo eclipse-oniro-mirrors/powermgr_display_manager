@@ -41,6 +41,8 @@ public:
     virtual uint32_t GetMainDisplayId() override;
 
     virtual bool SetBrightness(uint32_t value, uint32_t displayId, bool continuous) override;
+    virtual bool SetMaxBrightness(double value, uint32_t enterTestMode) override;
+    virtual bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode) override;
     virtual bool DiscountBrightness(double value, uint32_t displayId) override;
     virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
     virtual bool OverrideDisplayOffDelay(uint32_t delayMs) override;
