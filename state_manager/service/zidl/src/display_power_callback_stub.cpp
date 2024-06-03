@@ -61,9 +61,9 @@ int32_t DisplayPowerCallbackStub::OnDisplayStateChangedStub(MessageParcel& data,
     uint32_t state = 0;
     uint32_t reason = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
 
     OnDisplayStateChanged(id, static_cast<DisplayState>(state), reason);
     return ERR_OK;

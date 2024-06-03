@@ -38,9 +38,9 @@ void DisplayPowerCallbackProxy::OnDisplayStateChanged(uint32_t displayId, Displa
         return;
     }
 
-    WRITE_PARCEL_NO_RET(data, Uint32, displayId);
-    WRITE_PARCEL_NO_RET(data, Uint32, static_cast<uint32_t>(state));
-    WRITE_PARCEL_NO_RET(data, Uint32, reason);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, displayId);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, static_cast<uint32_t>(state));
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, reason);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED),

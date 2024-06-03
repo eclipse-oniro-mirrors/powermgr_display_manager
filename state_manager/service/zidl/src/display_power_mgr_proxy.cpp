@@ -39,9 +39,9 @@ bool DisplayPowerMgrProxy::SetDisplayState(uint32_t id, DisplayState state, uint
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, id, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, static_cast<uint32_t>(state), false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, reason, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, id, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, static_cast<uint32_t>(state), false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, reason, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_DISPLAY_STATE),
@@ -74,7 +74,7 @@ DisplayState DisplayPowerMgrProxy::GetDisplayState(uint32_t id)
         return DisplayState::DISPLAY_UNKNOWN;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, id, DisplayState::DISPLAY_UNKNOWN);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, id, DisplayState::DISPLAY_UNKNOWN);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DISPLAY_STATE),
@@ -181,9 +181,9 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId, boo
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
-    WRITE_PARCEL_WITH_RET(data, Bool, continuous, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, value, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Bool, continuous, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS),
@@ -198,7 +198,7 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId, boo
         return result;
     }
     int32_t error;
-    READ_PARCEL_WITH_RET(reply, Int32, error, result);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(reply, Int32, error, result);
     lastError_ = static_cast<DisplayErrors>(error);
 
     return result;
@@ -219,8 +219,8 @@ bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayI
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Double, discount, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Double, discount, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::DISCOUNT_BRIGHTNESS),
@@ -253,8 +253,8 @@ bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, value, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, value, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_BRIGHTNESS),
@@ -287,7 +287,7 @@ bool DisplayPowerMgrProxy::OverrideDisplayOffDelay(uint32_t delayMs)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, delayMs, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, delayMs, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_DISPLAY_OFF_DELAY),
@@ -321,7 +321,7 @@ bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::RESTORE_BRIGHTNESS),
@@ -355,7 +355,7 @@ uint32_t DisplayPowerMgrProxy::GetBrightness(uint32_t displayId)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_BRIGHTNESS),
                                   data, reply, option);
@@ -483,9 +483,9 @@ bool DisplayPowerMgrProxy::AdjustBrightness(uint32_t id, int32_t value, uint32_t
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, id, false);
-    WRITE_PARCEL_WITH_RET(data, Int32, value, false);
-    WRITE_PARCEL_WITH_RET(data, Int32, duration, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, id, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Int32, value, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Int32, duration, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::ADJUST_BRIGHTNESS),
@@ -518,7 +518,7 @@ bool DisplayPowerMgrProxy::AutoAdjustBrightness(bool enable)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Bool, enable, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Bool, enable, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::AUTO_ADJUST_BRIGHTNESS),
@@ -582,7 +582,7 @@ bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, RemoteObject, callback->AsObject(), false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, RemoteObject, callback->AsObject(), false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::REGISTER_CALLBACK),
@@ -615,8 +615,8 @@ bool DisplayPowerMgrProxy::BoostBrightness(int32_t timeoutMs, uint32_t displayId
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Int32, timeoutMs, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Int32, timeoutMs, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::BOOST_BRIGHTNESS),
@@ -648,7 +648,7 @@ bool DisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId)
         DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
         return result;
     }
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::CANCEL_BOOST_BRIGHTNESS),
@@ -682,7 +682,7 @@ uint32_t DisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::GET_DEVICE_BRIGHTNESS),
@@ -715,8 +715,8 @@ bool DisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t displayId)
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Bool, coordinated, false);
-    WRITE_PARCEL_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Bool, coordinated, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_COORDINATED),
@@ -750,8 +750,8 @@ uint32_t DisplayPowerMgrProxy::SetLightBrightnessThreshold(
         return result;
     }
 
-    WRITE_PARCEL_WITH_RET(data, Int32Vector, threshold, result);
-    WRITE_PARCEL_WITH_RET(data, RemoteObject, callback->AsObject(), result);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Int32Vector, threshold, result);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, RemoteObject, callback->AsObject(), result);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD), data, reply,

@@ -142,9 +142,9 @@ int32_t DisplayPowerMgrStub::SetDisplayStateStub(MessageParcel& data, MessagePar
     uint32_t state = 0;
     uint32_t reason = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
 
     bool ret = SetDisplayState(id, static_cast<DisplayState>(state), reason);
     if (!reply.WriteBool(ret)) {
@@ -158,7 +158,7 @@ int32_t DisplayPowerMgrStub::GetDisplayStateStub(MessageParcel& data, MessagePar
 {
     uint32_t id = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
 
     DisplayState ret = GetDisplayState(id);
     if (!reply.WriteUint32(static_cast<uint32_t>(ret))) {
@@ -199,9 +199,9 @@ int32_t DisplayPowerMgrStub::SetBrightnessStub(MessageParcel& data, MessageParce
     uint32_t displayId = 0;
     bool continuous = false;
 
-    READ_PARCEL_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Bool, continuous, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Bool, continuous, E_READ_PARCEL_ERROR);
 
     bool ret = SetBrightness(value, displayId, continuous);
     if (!reply.WriteBool(ret)) {
@@ -209,7 +209,7 @@ int32_t DisplayPowerMgrStub::SetBrightnessStub(MessageParcel& data, MessageParce
         return E_WRITE_PARCEL_ERROR;
     }
     int32_t error = static_cast<int32_t>(GetError());
-    WRITE_PARCEL_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
     return ERR_OK;
 }
 
@@ -218,8 +218,8 @@ int32_t DisplayPowerMgrStub::DiscountBrightnessStub(MessageParcel& data, Message
     double discount = 0;
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Double, discount, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Double, discount, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     bool ret = DiscountBrightness(discount, displayId);
     if (!reply.WriteBool(ret)) {
@@ -234,8 +234,8 @@ int32_t DisplayPowerMgrStub::OverrideBrightnessStub(MessageParcel& data, Message
     uint32_t value = 0;
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     bool ret = OverrideBrightness(value, displayId);
     if (!reply.WriteBool(ret)) {
@@ -249,7 +249,7 @@ int32_t DisplayPowerMgrStub::OverrideDisplayOffDelayStub(MessageParcel& data, Me
 {
     uint32_t delayMs = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, delayMs, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, delayMs, E_READ_PARCEL_ERROR);
 
     bool ret = OverrideDisplayOffDelay(delayMs);
     if (!reply.WriteBool(ret)) {
@@ -263,7 +263,7 @@ int32_t DisplayPowerMgrStub::RestoreBrightnessStub(MessageParcel& data, MessageP
 {
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     bool ret = RestoreBrightness(displayId);
     if (!reply.WriteBool(ret)) {
@@ -277,7 +277,7 @@ int32_t DisplayPowerMgrStub::GetBrightnessStub(MessageParcel& data, MessageParce
 {
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     uint32_t ret = GetBrightness(displayId);
     if (!reply.WriteUint32(ret)) {
@@ -323,9 +323,9 @@ int32_t DisplayPowerMgrStub::AdjustBrightnessStub(MessageParcel& data, MessagePa
     int32_t value = 0;
     uint32_t duration = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Int32, value, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, duration, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Int32, value, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, duration, E_READ_PARCEL_ERROR);
 
     bool ret = AdjustBrightness(id, value, duration);
     if (!reply.WriteBool(ret)) {
@@ -339,7 +339,7 @@ int32_t DisplayPowerMgrStub::AutoAdjustBrightnessStub(MessageParcel& data, Messa
 {
     bool enable = 0;
 
-    READ_PARCEL_WITH_RET(data, Bool, enable, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Bool, enable, E_READ_PARCEL_ERROR);
 
     bool ret = AutoAdjustBrightness(enable);
     if (!reply.WriteBool(ret)) {
@@ -366,7 +366,7 @@ int32_t DisplayPowerMgrStub::RegisterCallbackStub(MessageParcel& data, MessagePa
     sptr<IDisplayPowerCallback> callback = iface_cast<IDisplayPowerCallback>(obj);
     RETURN_IF_WITH_RET((callback == nullptr), E_READ_PARCEL_ERROR);
     bool isSucc = RegisterCallback(callback);
-    WRITE_PARCEL_WITH_RET(reply, Bool, isSucc, E_WRITE_PARCEL_ERROR);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(reply, Bool, isSucc, E_WRITE_PARCEL_ERROR);
     return ERR_OK;
 }
 
@@ -374,8 +374,8 @@ int32_t DisplayPowerMgrStub::BoostBrightnessStub(MessageParcel& data, MessagePar
 {
     int32_t timeoutMs = -1;
     uint32_t id = 0;
-    READ_PARCEL_WITH_RET(data, Int32, timeoutMs, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Int32, timeoutMs, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, id, E_READ_PARCEL_ERROR);
 
     bool isScuu = BoostBrightness(timeoutMs, id);
     if (!reply.WriteBool(isScuu)) {
@@ -389,7 +389,7 @@ int32_t DisplayPowerMgrStub::CancelBoostBrightnessStub(MessageParcel& data, Mess
 {
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     bool isScuu = CancelBoostBrightness(displayId);
     if (!reply.WriteBool(isScuu)) {
@@ -403,7 +403,7 @@ int32_t DisplayPowerMgrStub::GetDeviceBrightnessStub(MessageParcel& data, Messag
 {
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     uint32_t ret = GetDeviceBrightness(displayId);
     if (!reply.WriteUint32(ret)) {
@@ -418,8 +418,8 @@ int32_t DisplayPowerMgrStub::SetCoordinatedStub(MessageParcel& data, MessageParc
     bool coordinated = false;
     uint32_t displayId = 0;
 
-    READ_PARCEL_WITH_RET(data, Bool, coordinated, E_READ_PARCEL_ERROR);
-    READ_PARCEL_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Bool, coordinated, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
 
     bool ret = SetCoordinated(coordinated, displayId);
     if (!reply.WriteBool(ret)) {
@@ -432,7 +432,7 @@ int32_t DisplayPowerMgrStub::SetCoordinatedStub(MessageParcel& data, MessageParc
 int32_t DisplayPowerMgrStub::SetLightBrightnessThresholdStub(MessageParcel& data, MessageParcel& reply)
 {
     std::vector<int32_t> threshold;
-    READ_PARCEL_WITH_RET(data, Int32Vector, &threshold, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Int32Vector, &threshold, E_READ_PARCEL_ERROR);
     sptr<IRemoteObject> obj = data.ReadRemoteObject();
     RETURN_IF_WITH_RET((obj == nullptr), E_READ_PARCEL_ERROR);
     sptr<IDisplayBrightnessCallback> callback = iface_cast<IDisplayBrightnessCallback>(obj);
