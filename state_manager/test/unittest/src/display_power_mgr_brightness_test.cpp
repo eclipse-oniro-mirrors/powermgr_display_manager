@@ -57,6 +57,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetBrightness001, TestSiz
     const uint32_t SET_BRIGHTNESS = 90;
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     EXPECT_TRUE(ret);
+    const int sleepTime = 100000;
+    usleep(sleepTime);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(deviceBrightness, SET_BRIGHTNESS);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetBrightness001: fun is end");
