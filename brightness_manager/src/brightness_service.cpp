@@ -276,7 +276,7 @@ uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
-    currentId = GetDisplayIdWithDisplayMode(foldMode);
+    currentId = static_cast<uint32_t>(GetDisplayIdWithDisplayMode(foldMode));
     DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId foldMode=%{public}u", foldMode);
     IPCSkeleton::SetCallingIdentity(identity);
     return static_cast<uint32_t>(currentId);
