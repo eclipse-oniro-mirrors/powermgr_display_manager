@@ -46,6 +46,15 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
     constexpr int dfxDelayMs = 10000;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerMgrStub", dfxDelayMs, nullptr, nullptr,
         HiviewDFX::XCOLLIE_FLAG_NOOP);
+
+    int32_t ret = ProcessMessage(code, data, reply, option);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    return ret;
+}
+
+int32_t DisplayPowerMgrStub::ProcessMessage(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
     int32_t ret = ERR_OK;
     switch (code) {
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_DISPLAY_STATE):
@@ -75,12 +84,16 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD):
             ret = SetLightBrightnessThresholdStub(data, reply);
             break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_MAX_BRIGHTNESS):
+            ret = SetMaxBrightnessStub(data, reply);
+            break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_MAX_BRIGHTNESS_NIT):
+            ret = SetMaxBrightnessNitStub(data, reply);
+            break;
         default:
             ret = RemoteRequest(code, data, reply, option);
             break;
     }
-
-    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
     return ret;
 }
 
@@ -445,5 +458,40 @@ int32_t DisplayPowerMgrStub::SetLightBrightnessThresholdStub(MessageParcel& data
     return ERR_OK;
 }
 
+int32_t DisplayPowerMgrStub::SetMaxBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    double value = 0;
+    uint32_t enterTestMode = 0;
+
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Double, value, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, enterTestMode, E_READ_PARCEL_ERROR);
+
+    bool ret = SetMaxBrightness(value, enterTestMode);
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetMaxBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    int32_t error = static_cast<int32_t>(GetError());
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::SetMaxBrightnessNitStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t value = 0;
+    uint32_t enterTestMode = 0;
+
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, enterTestMode, E_READ_PARCEL_ERROR);
+
+    bool ret = SetMaxBrightnessNit(value, enterTestMode);
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetMaxBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    int32_t error = static_cast<int32_t>(GetError());
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
+    return ERR_OK;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

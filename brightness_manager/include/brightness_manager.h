@@ -30,7 +30,7 @@ public:
 
     static BrightnessManager& Get();
 
-    void Init();
+    void Init(uint32_t defaultMax, uint32_t defaultMin);
     void DeInit();
     void SetDisplayState(uint32_t id, DisplayState state);
     DisplayState GetState();
@@ -52,6 +52,8 @@ public:
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);
+    bool SetMaxBrightness(double value);
+    bool SetMaxBrightnessNit(uint32_t nit);
 
 private:
     BrightnessManager() = default;

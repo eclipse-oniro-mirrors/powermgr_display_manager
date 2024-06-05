@@ -46,9 +46,9 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
 constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_LEVEL = 255;
-constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_LEVEL = 4;
+constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_LEVEL = 1;
 constexpr uint32_t MAX_MAPPING_BRGIHTNESS_LEVEL = 223;
-constexpr uint32_t MIN_MAPPING_BRGIHTNESS_LEVEL = 4;
+constexpr uint32_t MIN_MAPPING_BRGIHTNESS_LEVEL = 1;
 constexpr uint32_t MAX_HBM_BRGIHTNESS_NIT = 1000;
 constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_NIT = 600;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_NIT = 2;
@@ -57,6 +57,7 @@ constexpr uint32_t MIN_DEFAULT_HIGH_BRGIHTNESS_LEVEL = 156;
 constexpr uint32_t DEFAULT_ANIMATING_DURATION = 500;
 constexpr uint32_t DEFAULT_BRIGHTEN_DURATION = 2000;
 constexpr uint32_t DEFAULT_DARKEN_DURATION = 5000;
+constexpr uint32_t DEFAULT_MAX_BRIGHTNESS_DURATION = 3000;
 constexpr uint32_t BRIGHTNESS_TYPE = 0;
 constexpr uint32_t AMBIENT_LIGHT_TYPE = 1;
 constexpr uint32_t APS_LISTEN_PARAMS_LENGHT = 3;
@@ -70,6 +71,9 @@ const uint32_t BrightnessService::AMBIENT_LUX_LEVELS[BrightnessService::LUX_LEVE
     500, 1000, 2000, 3000, 5000, 10000, 20000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, INT_MAX };
 
 using namespace OHOS::PowerMgr;
+
+uint32_t BrightnessService::brightnessValueMax = MAX_DEFAULT_BRGIHTNESS_LEVEL;
+uint32_t BrightnessService::brightnessValueMin = MIN_DEFAULT_BRGIHTNESS_LEVEL;
 
 BrightnessService::BrightnessService()
 {
@@ -96,7 +100,7 @@ BrightnessService& BrightnessService::Get()
     return brightnessManager;
 }
 
-void BrightnessService::Init()
+void BrightnessService::Init(uint32_t defaultMax, uint32_t defaultMin)
 {
     queue_ = std::make_shared<FFRTQueue> ("brightness_manager");
     if (queue_ == nullptr) {
@@ -115,7 +119,10 @@ void BrightnessService::Init()
     mBrightnessCalculationManager.InitParameters();
 
     bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d", isFoldable);
+    brightnessValueMax = defaultMax;
+    brightnessValueMin = defaultMin;
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d, max=%{public}u, min=%{public}u",
+        isFoldable, brightnessValueMax, brightnessValueMin);
     if (isFoldable) {
         RegisterFoldStatusListener();
     }
@@ -705,6 +712,7 @@ void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDurat
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateCurrentBrightnessLevel lux=%{public}f, mBrightnessLevel=%{public}d, "\
             "brightnessLevel=%{public}d, duration=%{public}d", lux, mBrightnessLevel, brightnessLevel, duration);
         mBrightnessLevel = brightnessLevel;
+        mCurrentBrightness.store(brightnessLevel);
         if (mWaitForFirstLux) {
             FFRTUtils::CancelTask(g_waitForFirstLuxTaskHandle, queue_);
             mWaitForFirstLux = false;
@@ -756,6 +764,7 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
         }
     }
     mBrightnessTarget.store(value);
+    mCurrentBrightness.store(value);
     NotifyLightChangeToAps(BRIGHTNESS_TYPE, static_cast<float>(value));
     bool isSuccess = UpdateBrightness(value, gradualDuration, !continuous);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}d, isSuccess=%{public}d", value, isSuccess);
@@ -962,25 +971,26 @@ bool BrightnessService::CanBoostBrightness()
 
 bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuration, bool updateSetting)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness, value=%{public}u, discount=%{public}lf,"\
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness, value=%{public}u, discount=%{public}f,"\
         "duration=%{public}u, updateSetting=%{public}d", value, mDiscount, gradualDuration, updateSetting);
     mWaitForFirstLux = false;
+    auto safeBrightness = GetSafeBrightness(value);
     if (mDimming->IsDimming()) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness StopDimming");
         mDimming->StopDimming();
     }
     if (gradualDuration > 0) {
-        mDimming->StartDimming(GetSettingBrightness(), value, gradualDuration);
+        mDimming->StartDimming(GetSettingBrightness(), safeBrightness, gradualDuration);
         return true;
     }
-    auto brightness = static_cast<uint32_t>(value * mDiscount);
+    auto brightness = static_cast<uint32_t>(safeBrightness * mDiscount);
     brightness = GetMappingBrightnessLevel(brightness);
     bool isSuccess = mAction->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness is %{public}s, brightness: %{public}u",
         isSuccess ? "succ" : "failed", brightness);
     if (isSuccess && updateSetting) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness, settings, value=%{public}u", value);
-        FFRTUtils::SubmitTask(std::bind(&BrightnessService::SetSettingBrightness, this, value));
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness, settings, value=%{public}u", safeBrightness);
+        FFRTUtils::SubmitTask(std::bind(&BrightnessService::SetSettingBrightness, this, safeBrightness));
     }
     if (isSuccess) {
         ReportBrightnessBigData(brightness);
@@ -1102,6 +1112,21 @@ uint32_t BrightnessService::GetMappingBrightnessNit(uint32_t level)
     return round(nitOut);
 }
 
+uint32_t BrightnessService::GetBrightnessLevelFromNit(uint32_t nit)
+{
+    uint32_t nitIn = nit;
+    if (nitIn < MIN_DEFAULT_BRGIHTNESS_NIT) {
+        nitIn = MIN_DEFAULT_BRGIHTNESS_NIT;
+    }
+    if (nitIn > MAX_DEFAULT_BRGIHTNESS_NIT) {
+        nitIn = MAX_DEFAULT_BRGIHTNESS_NIT;
+    }
+    double levelOut = (double)(nitIn - MIN_DEFAULT_BRGIHTNESS_NIT)
+        * (MAX_DEFAULT_BRGIHTNESS_LEVEL - MIN_DEFAULT_BRGIHTNESS_LEVEL)
+         / (MAX_DEFAULT_BRGIHTNESS_NIT - MIN_DEFAULT_BRGIHTNESS_NIT) + MIN_DEFAULT_BRGIHTNESS_LEVEL;
+    return round(levelOut);
+}
+
 uint32_t BrightnessService::GetMappingHighBrightnessLevel(uint32_t level)
 {
     uint32_t levelIn = level;
@@ -1201,6 +1226,54 @@ int BrightnessService::GetDisplayIdWithDisplayMode(Rosen::FoldDisplayMode mode)
 int BrightnessService::GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode)
 {
     return mBrightnessCalculationManager.GetSensorIdWithDisplayMode(static_cast<int>(mode));
+}
+
+bool BrightnessService::SetMaxBrightness(double value)
+{
+    int32_t intMaxValue = round(value * MAX_DEFAULT_BRGIHTNESS_LEVEL);
+    if (intMaxValue < 0) {
+        intMaxValue = brightnessValueMin;
+    }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=%{public}u, oldMax=%{public}u",
+        intMaxValue, brightnessValueMax);
+    brightnessValueMax =
+        (intMaxValue > MAX_DEFAULT_BRGIHTNESS_LEVEL ? MAX_DEFAULT_BRGIHTNESS_LEVEL : intMaxValue);
+    uint32_t currentBrightness = GetSettingBrightness();
+    if (brightnessValueMax < currentBrightness) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness currentBrightness=%{public}u", currentBrightness);
+        return UpdateBrightness(brightnessValueMax, DEFAULT_MAX_BRIGHTNESS_DURATION, true);
+    }
+    return UpdateBrightness(mCurrentBrightness.load(), DEFAULT_MAX_BRIGHTNESS_DURATION, true);
+}
+
+bool BrightnessService::SetMaxBrightnessNit(uint32_t maxNit)
+{
+    uint32_t max_value = GetBrightnessLevelFromNit(maxNit);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightnessNit nitIn=%{public}u, levelOut=%{public}u",
+        maxNit, max_value);
+    brightnessValueMax =
+        (max_value > MAX_DEFAULT_BRGIHTNESS_LEVEL ? MAX_DEFAULT_BRGIHTNESS_LEVEL : max_value);
+    uint32_t currentBrightness = GetSettingBrightness();
+    if (brightnessValueMax < currentBrightness) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightnessNit currentBrightness=%{public}u", currentBrightness);
+        return UpdateBrightness(brightnessValueMax, DEFAULT_MAX_BRIGHTNESS_DURATION, true);
+    }
+    return UpdateBrightness(mCurrentBrightness.load(), DEFAULT_MAX_BRIGHTNESS_DURATION, true);
+}
+
+uint32_t BrightnessService::GetSafeBrightness(uint32_t value)
+{
+    auto brightnessValue = value;
+    if (brightnessValue > brightnessValueMax) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "value is bigger than max=%{public}u, value=%{public}u",
+            brightnessValueMax, value);
+        brightnessValue = brightnessValueMax;
+    }
+    if (brightnessValue < brightnessValueMin) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "brightness value is less than min, value=%{public}u", value);
+        brightnessValue = brightnessValueMin;
+    }
+    return brightnessValue;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

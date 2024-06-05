@@ -36,6 +36,8 @@ private:
     int32_t GetDisplayIdsStub(MessageParcel& data, MessageParcel& reply);
     int32_t GetMainDisplayIdStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetMaxBrightnessStub(MessageParcel& data, MessageParcel& reply);
+    int32_t SetMaxBrightnessNitStub(MessageParcel& data, MessageParcel& reply);
     int32_t DiscountBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t OverrideBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t OverrideDisplayOffDelayStub(MessageParcel& data, MessageParcel& reply);
@@ -53,6 +55,7 @@ private:
     int32_t GetDeviceBrightnessStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetCoordinatedStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetLightBrightnessThresholdStub(MessageParcel& data, MessageParcel& reply);
+    int32_t ProcessMessage(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -204,6 +204,79 @@ bool DisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId, boo
     return result;
 }
 
+bool DisplayPowerMgrProxy::SetMaxBrightness(double value, uint32_t enterTestMode)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Double, value, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, enterTestMode, false);
+
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_MAX_BRIGHTNESS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+    int32_t error;
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(reply, Int32, error, result);
+    lastError_ = static_cast<DisplayErrors>(error);
+    return result;
+}
+
+bool DisplayPowerMgrProxy::SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode)
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, maxNit, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, enterTestMode, false);
+
+    int ret = remote->SendRequest(
+        static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_MAX_BRIGHTNESS_NIT),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+    int32_t error;
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(reply, Int32, error, result);
+    lastError_ = static_cast<DisplayErrors>(error);
+
+    return result;
+}
+
 bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayId)
 {
     sptr<IRemoteObject> remote = Remote();

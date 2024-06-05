@@ -27,13 +27,13 @@ BrightnessManagerExt::~BrightnessManagerExt()
     CloseBrightnessExtLibrary();
 }
 
-void BrightnessManagerExt::Init()
+void BrightnessManagerExt::Init(uint32_t defaultMax, uint32_t defaultMin)
 {
     if (!LoadBrightnessExtLibrary()) {
         return;
     }
-    auto init = reinterpret_cast<void (*)()>(mBrightnessManagerInitFunc);
-    init();
+    auto init = reinterpret_cast<void (*)(uint32_t, uint32_t)>(mBrightnessManagerInitFunc);
+    init(defaultMax, defaultMin);
 }
 
 void BrightnessManagerExt::DeInit()
@@ -82,6 +82,16 @@ bool BrightnessManagerExt::LoadBrightnessOps()
     mSetLightBrightnessThresholdFunc = dlsym(mBrightnessManagerExtHandle, "SetLightBrightnessThreshold");
     if (!mSetLightBrightnessThresholdFunc) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetLightBrightnessThreshold func failed!");
+        return false;
+    }
+    mSetMaxBrightnessFunc = dlsym(mBrightnessManagerExtHandle, "SetMaxBrightness");
+    if (!mSetMaxBrightnessFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetMaxBrightness func failed!");
+        return false;
+    }
+    mSetMaxBrightnessNitFunc = dlsym(mBrightnessManagerExtHandle, "SetMaxBrightnessNit");
+    if (!mSetMaxBrightnessNitFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetMaxBrightnessNit func failed!");
         return false;
     }
     return true;
@@ -211,6 +221,8 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mClearOffsetFunc = nullptr;
     mGetCurrentDisplayIdFunc = nullptr;
     mSetDisplayIdFunc = nullptr;
+    mSetMaxBrightnessFunc = nullptr;
+    mSetMaxBrightnessNitFunc = nullptr;
 }
 
 void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state)
@@ -400,5 +412,22 @@ uint32_t BrightnessManagerExt::SetLightBrightnessThreshold(
     return setLightBrightnessThresholdFunc(threshold, callback);
 }
 
+bool BrightnessManagerExt::SetMaxBrightness(double value)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto setMaxBrightnessFunc = reinterpret_cast<bool (*)(double)>(mSetMaxBrightnessFunc);
+    return setMaxBrightnessFunc(value);
+}
+
+bool BrightnessManagerExt::SetMaxBrightnessNit(uint32_t nit)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto setMaxBrightnessNitFunc = reinterpret_cast<bool (*)(uint32_t)>(mSetMaxBrightnessNitFunc);
+    return setMaxBrightnessNitFunc(nit);
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

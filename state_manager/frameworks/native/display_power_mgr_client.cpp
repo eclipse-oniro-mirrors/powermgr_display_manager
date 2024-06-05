@@ -259,5 +259,19 @@ DisplayErrors DisplayPowerMgrClient::GetError()
     RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
     return proxy->GetError();
 }
+
+bool DisplayPowerMgrClient::SetMaxBrightness(double value, uint32_t enterTestMode)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    return proxy->SetMaxBrightness(value, enterTestMode);
+}
+
+bool DisplayPowerMgrClient::SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    return proxy->SetMaxBrightnessNit(maxNit, enterTestMode);
+}
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

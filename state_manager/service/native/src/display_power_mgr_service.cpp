@@ -44,6 +44,8 @@ const uint32_t GET_DISPLAY_ID_DELAY_MS = 50;
 const uint32_t US_PER_MS = 1000;
 const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
+const uint32_t TEST_MODE = 1;
+const uint32_t NORMAL_MODE = 2;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -70,7 +72,7 @@ void DisplayPowerMgrService::Init()
             DISPLAY_HILOGE(COMP_SVC, "cannot find any display id after max retry, fill with 0");
         }
     }
-    BrightnessManager::Get().Init();
+    BrightnessManager::Get().Init(BRIGHTNESS_MAX, BRIGHTNESS_MIN);
     for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id));
@@ -829,6 +831,68 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
 
     std::lock_guard lock(callbackMutex_);
     pms->callback_ = nullptr;
+}
+
+/**
+* @brief Function to limit maximum screen brightness
+* @param value  The max brightness level that needs to be restricted
+* @param mode  0 = default mode, set param value as maxBrightness;
+*               1 = enter testMode, when running unittest set maxBrightness to default value;
+*               2 = exit testMode
+* @return false = set failed; true = set Sucess
+*/
+bool DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode)
+{
+    if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        DISPLAY_HILOGE(COMP_SVC, "SetMaxBrightness Permission Error!");
+        return false;
+    }
+    if (mode == TEST_MODE) {
+        isInTestMode_ = true;
+        DISPLAY_HILOGI(COMP_SVC, "SetMaxBrightness enter TestMode");
+    }
+    if (mode == NORMAL_MODE) {
+        isInTestMode_ = false;
+        DISPLAY_HILOGI(COMP_SVC, "SetMaxBrightness cancel TestMode");
+    }
+    if (isInTestMode_) {
+        DISPLAY_HILOGI(COMP_SVC, "in the TestMode SetMaxBrightness to Default Value!");
+        double maxBrightness = 1.0;
+        return BrightnessManager::Get().SetMaxBrightness(maxBrightness);
+    }
+    return BrightnessManager::Get().SetMaxBrightness(value);
+}
+
+/**
+* @brief Function to limit maximum screen brightness
+* @param maxNit  The max brightness Nit that needs to be restricted
+* @param mode  0 = default mode, set param value as maxBrightness;
+*               1 = enter testMode, when running unittest set maxBrightness to default value;
+*               2 = exit testMode
+* @return false = set failed; true = set Sucess
+*/
+bool DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode)
+{
+    if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        DISPLAY_HILOGE(COMP_SVC, "SetMaxBrightness Permission Error!");
+        return false;
+    }
+    if (mode == TEST_MODE) {
+        isInTestMode_ = true;
+        DISPLAY_HILOGI(COMP_SVC, "SetMaxBrightness enter TestMode");
+    }
+    if (mode == NORMAL_MODE) {
+        isInTestMode_ = false;
+        DISPLAY_HILOGI(COMP_SVC, "SetMaxBrightness cancel TestMode");
+    }
+    if (isInTestMode_) {
+        DISPLAY_HILOGI(COMP_SVC, "in the TestMode SetMaxBrightness to Default Value!");
+        uint32_t default_max_nit = 600;
+        return BrightnessManager::Get().SetMaxBrightnessNit(default_max_nit);
+    }
+    return BrightnessManager::Get().SetMaxBrightnessNit(maxNit);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS
