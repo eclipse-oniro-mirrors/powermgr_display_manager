@@ -39,13 +39,17 @@ void BrightnessManagerExt::Init(uint32_t defaultMax, uint32_t defaultMin)
 void BrightnessManagerExt::DeInit()
 {
     auto deInit = reinterpret_cast<void (*)()>(mBrightnessManagerDeInitFunc);
-    deInit();
+    if (deInit) {
+        deInit();
+    }
     CloseBrightnessExtLibrary();
 }
 
 bool BrightnessManagerExt::LoadBrightnessExtLibrary()
 {
+#ifndef FUZZ_TEST
     mBrightnessManagerExtHandle = dlopen("libbrightness_wrapper.z.so", RTLD_NOW);
+#endif
     if (!mBrightnessManagerExtHandle) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlopen libbrightness_wrapper.z.so failed!");
         return false;
