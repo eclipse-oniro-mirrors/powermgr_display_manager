@@ -31,5 +31,6 @@ group("fuzztest") {
     "overridedisplayoffdelay_fuzzer:OverrideDisplayOffDelayFuzzTest",
     "registercallback_fuzzer:RegisterCallbackFuzzTest",
     "setbrightness_fuzzer:SetBrightnessFuzzTest",
+    "setcoordinated_fuzzer:SetCoordinatedFuzzTest",
   ]
 }
