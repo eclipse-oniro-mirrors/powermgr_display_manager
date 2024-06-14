@@ -91,6 +91,7 @@ ErrCode DisplaySettingHelper::GetSettingBrightness(uint32_t& brightness, const s
 
 void DisplaySettingHelper::RegisterSettingAutoBrightnessObserver(SettingObserver::UpdateFunc func)
 {
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Register setting auto brightness observer start");
     if (autoBrightnessObserver_) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "setting auto brightness observer is already registered");
         return;
@@ -102,6 +103,7 @@ void DisplaySettingHelper::RegisterSettingAutoBrightnessObserver(SettingObserver
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "register setting auto brightness observer failed, ret=%{public}d", ret);
         autoBrightnessObserver_ = nullptr;
     }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Register setting auto brightness observer end");
 }
 void DisplaySettingHelper::UnregisterSettingAutoBrightnessObserver()
 {

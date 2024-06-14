@@ -1231,8 +1231,12 @@ int BrightnessService::GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode)
 bool BrightnessService::SetMaxBrightness(double value)
 {
     int32_t intMaxValue = round(value * MAX_DEFAULT_BRGIHTNESS_LEVEL);
-    if (intMaxValue < 0) {
+    if (intMaxValue <= 0) {
         intMaxValue = brightnessValueMin;
+    }
+    if (intMaxValue == brightnessValueMax) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=oldMax");
+        return true;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=%{public}u, oldMax=%{public}u",
         intMaxValue, brightnessValueMax);
@@ -1243,6 +1247,10 @@ bool BrightnessService::SetMaxBrightness(double value)
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness currentBrightness=%{public}u", currentBrightness);
         return UpdateBrightness(brightnessValueMax, DEFAULT_MAX_BRIGHTNESS_DURATION, true);
     }
+    if (mCurrentBrightness.load() == 0) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "No need to update brightne during init");
+        return true;
+    }
     return UpdateBrightness(mCurrentBrightness.load(), DEFAULT_MAX_BRIGHTNESS_DURATION, true);
 }
 
@@ -1251,12 +1259,20 @@ bool BrightnessService::SetMaxBrightnessNit(uint32_t maxNit)
     uint32_t max_value = GetBrightnessLevelFromNit(maxNit);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightnessNit nitIn=%{public}u, levelOut=%{public}u",
         maxNit, max_value);
+    if (max_value == brightnessValueMax) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=oldMax");
+        return true;
+    }
     brightnessValueMax =
         (max_value > MAX_DEFAULT_BRGIHTNESS_LEVEL ? MAX_DEFAULT_BRGIHTNESS_LEVEL : max_value);
     uint32_t currentBrightness = GetSettingBrightness();
     if (brightnessValueMax < currentBrightness) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightnessNit currentBrightness=%{public}u", currentBrightness);
         return UpdateBrightness(brightnessValueMax, DEFAULT_MAX_BRIGHTNESS_DURATION, true);
+    }
+    if (mCurrentBrightness.load() == 0) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "No need to update brightne during init");
+        return true;
     }
     return UpdateBrightness(mCurrentBrightness.load(), DEFAULT_MAX_BRIGHTNESS_DURATION, true);
 }
