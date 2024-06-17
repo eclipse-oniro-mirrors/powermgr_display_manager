@@ -51,7 +51,7 @@ const std::string SET_KEEP_SCREENON_ERROR_MGR = "value is not an available boole
 } // namespace
 
 std::map<DisplayErrors, std::string> Brightness::Result::errorTable_ = {
-    {DisplayErrors::ERR_CONNECTION_FAIL,   "Connecting to the service failed."},
+    {DisplayErrors::ERR_CONNECTION_FAIL,   "Failed to connect to the service."},
     {DisplayErrors::ERR_PERMISSION_DENIED, "Permission is denied"             },
     {DisplayErrors::ERR_SYSTEM_API_DENIED, "System permission is denied"      },
     {DisplayErrors::ERR_PARAM_INVALID,     "Invalid input parameter."         }
