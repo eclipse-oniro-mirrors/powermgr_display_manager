@@ -123,7 +123,8 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     // Notify screen state change event to battery statistics
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: ret=%{public}d", ret);
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d",
+        displayId_, static_cast<uint32_t>(state), ret);
     return ret;
 }
 
@@ -185,8 +186,9 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     } else {
         ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
-    DISPLAY_HILOGI(
-        FEAT_STATE, "[UL_POWER] Set screen power, ret=%{public}d, coordinated=%{public}d", ret, coordinated_);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER] SetDisplayPower state=%{public}u, reason=%{public}u, ret=%{public}d, coordinated=%{public}d",
+        static_cast<uint32_t>(state), reason, ret, coordinated_);
     return (state == DisplayState::DISPLAY_DIM || state == DisplayState::DISPLAY_SUSPEND) ? true : ret;
 }
 

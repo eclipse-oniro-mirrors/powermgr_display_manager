@@ -75,6 +75,10 @@ private:
         DisplayPowerMgrClient& client_;
     };
 
+    // block frequent GetProxy() call
+    int64_t lastCall_ {-1};
+    uint32_t skipCount_ {0};
+
     sptr<IDisplayPowerMgr> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
     static constexpr int32_t INVALID_DISPLAY_ID {-1};
