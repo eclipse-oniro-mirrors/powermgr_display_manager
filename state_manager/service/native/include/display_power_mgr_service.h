@@ -41,16 +41,6 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-class OverrideBrightnessLogData : public PowerMgr::LogFilterData {
-public:
-    OverrideBrightnessLogData(uint32_t displayId = 0, uint32_t brightness = 0);
-    virtual bool IsSame(const LogFilterData *other) const override;
-    virtual bool Update(const LogFilterData *other) override;
-    virtual void Print(uint32_t count) const override;
-    uint32_t displayId_;
-    uint32_t brightness_;
-};
-
 class DisplayPowerMgrService : public DisplayPowerMgrStub {
 public:
     virtual ~DisplayPowerMgrService() = default;
@@ -167,9 +157,6 @@ private:
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool isInTestMode_ {false};
-    // log filter
-    PowerMgr::LogFilter *logFilter_ {nullptr};
-    void LogFilterInit();
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

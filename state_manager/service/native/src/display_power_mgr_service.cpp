@@ -85,52 +85,6 @@ void DisplayPowerMgrService::Init()
     InitSensors();
 #endif
     RegisterBootCompletedCallback();
-    LogFilterInit();
-}
-
-OverrideBrightnessLogData::OverrideBrightnessLogData(uint32_t displayId, uint32_t brightness):
-    displayId_(displayId), brightness_(brightness)
-{
-}
-
-bool OverrideBrightnessLogData::IsSame(const LogFilterData *other)
-{
-    const OverrideBrightnessLogData *data = static_cast<const OverrideBrightnessLogData*>(other);
-    return (data != nullptr) && (displayId_ == data->displayId_) && (brightness_ == data->brightness_);
-}
-
-bool OverrideBrightnessLogData::Update(const LogFilterData *other)
-{
-    const OverrideBrightnessLogData *data = static_cast<const OverrideBrightnessLogData*>(other);
-    if (data == nullptr) {
-        return false;
-    }
-    displayId_ = data->displayId_;
-    brightness_ = data->brightness_;
-    return true;
-}
-
-void OverrideBrightnessLogData::Print(uint32_t count) const
-{
-    if (count == 0) {
-        DISPLAY_HILOGI(COMP_SVC, "'OverrideBrightness displayId=%{public}u, value=%{public}u'",
-            displayId_, brightness_);
-    } else {
-        DISPLAY_HILOGI(COMP_SVC, "'OverrideBrightness displayId=%{public}u, value=%{public}u' x %{public}u",
-            displayId_, brightness_, count);
-    }
-}
-
-void DisplayPowerMgrService::LogFilterInit()
-{
-    static OverrideBrightnessLogData data;
-    logFilter = logFilter::GetInstance();
-    if (logFilter_ == nullptr) {
-        return;
-    }
-
-    bool result = logFilter_->RegisterLogEntry(LOG_FILTER_ID_OVERRIDE_BRIGHTNESS, &data);
-    DISPLAY_HILOGI(COMP_SVC, "RegisterLogEntry[%{public}d] ret=%{public}d", LOG_FILTER_ID_OVERRIDE_BRIGHTNESS, result);
 }
 
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
@@ -379,13 +333,8 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
         return false;
     }
     auto brightness = GetSafeBrightness(value);
-    //DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto data = OverrideBrightnessLogData(displayId, brightness);
-    if (logFilter_ && logFilter_->AddLog(LOG_FILTER_ID_OVERRIDE_BRIGHTNESS, &data)) {
-        // log filter is working, do nothing
-    } else {
-        data.Print(0);
-    }
+    DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
