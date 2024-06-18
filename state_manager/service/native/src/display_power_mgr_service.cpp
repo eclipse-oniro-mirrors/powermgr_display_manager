@@ -86,7 +86,6 @@ void DisplayPowerMgrService::Init()
 #endif
     RegisterBootCompletedCallback();
 }
-
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
 {
     g_bootCompletedCallback = []() {
@@ -333,7 +332,6 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
         return false;
     }
     auto brightness = GetSafeBrightness(value);
-    auto data = OverrideBrightnessLogData(displayId, brightness);
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
