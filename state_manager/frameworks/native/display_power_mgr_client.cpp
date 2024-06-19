@@ -28,13 +28,11 @@
 #include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
 #include "power_state_machine_info.h"
-#include "datetime_ex.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
 DisplayPowerMgrClient::DisplayPowerMgrClient() = default;
 DisplayPowerMgrClient::~DisplayPowerMgrClient() = default;
-constexpr int64_t PROXY_RETRY_INTERVAL_MS = 1000;
 
 sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
 {
@@ -42,17 +40,6 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
     if (proxy_ != nullptr) {
         return proxy_;
     }
-
-    int64_t now = GetTickCount();
-    // try to skip if lastCall_ is valid
-    bool trySkip = lastCall_ >= 0 && lastCall_ < now;
-    if (trySkip && (now < lastCall_ + PROXY_RETRY_INTERVAL_MS)) {
-        ++skipCount_;
-        DISPLAY_HILOGI(COMP_FWK, "skip get display manager service, count=%{public}u", skipCount_);
-        return nullptr;
-    }
-    lastCall_ = now;
-    skipCount_ = 0;
 
     sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
@@ -63,7 +50,8 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
     sptr<IRemoteObject> obj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     if (obj == nullptr) {
         lastError_ = DisplayErrors::ERR_CONNECTION_FAIL;
-        DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service");
+        static uint32_t count = 0;
+        DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service, count=%{public}u", ++count);
         return nullptr;
     }
     sptr<IRemoteObject::DeathRecipient> dr = new DisplayDeathRecipient(*this);
