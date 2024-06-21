@@ -504,8 +504,8 @@ bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callba
     callback_ = callback;
     sptr<IRemoteObject> remote = callback_->AsObject();
     if (!remote->IsProxyObject()) {
-        DISPLAY_HILOGI(COMP_FWK, "Callback is not proxy");
-        return true;
+        DISPLAY_HILOGE(COMP_FWK, "Callback is not proxy");
+        return false;
     }
     if (cbDeathRecipient_ == nullptr) {
         cbDeathRecipient_ = new CallbackDeathRecipient();
