@@ -50,7 +50,8 @@ sptr<IDisplayPowerMgr> DisplayPowerMgrClient::GetProxy()
     sptr<IRemoteObject> obj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
     if (obj == nullptr) {
         lastError_ = DisplayErrors::ERR_CONNECTION_FAIL;
-        DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service");
+        static uint32_t count = 0;
+        DISPLAY_HILOGE(COMP_FWK, "Failed to get display manager service, count=%{public}u", ++count);
         return nullptr;
     }
     sptr<IRemoteObject::DeathRecipient> dr = new DisplayDeathRecipient(*this);
