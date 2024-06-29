@@ -19,6 +19,7 @@
 #include "setting_provider.h"
 #include "system_ability_definition.h"
 #include "display_log.h"
+#include "power_mgr_client.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -38,10 +39,17 @@ public:
     void SetUp()
     {
         DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+        DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
         DisplayPowerMgrClient::GetInstance().DiscountBrightness(NO_DISCOUNT);
         uint32_t maxBrightness = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
         DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)maxBrightness / MAX_DEFAULT_BRIGHTNESS_LEVEL,
             TEST_MODE);
+
+        auto& powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
+        PowerMgr::PowerMode mode = powerMgrClient.GetDeviceMode();
+        if (mode == PowerMgr::PowerMode::POWER_SAVE_MODE || mode == PowerMgr::PowerMode::EXTREME_POWER_SAVE_MODE) {
+            powerMgrClient.SetDeviceMode(PowerMgr::PowerMode::NORMAL_MODE);
+        }
     }
 
     void TearDown()
@@ -1040,7 +1048,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, Test
     const int32_t SLEEP_TIME = 200000;
     usleep(SLEEP_TIME); // sleep 200ms, wait for setBrightness
 
-    const uint32_t SET_MAX_BRIGHTNESS = 100;
+    const uint32_t SET_MAX_BRIGHTNESS = 98;
     bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 2);
     EXPECT_TRUE(ret);
     const int32_t SLEEP_TIME_BRIGHTNESS = 10000000;
