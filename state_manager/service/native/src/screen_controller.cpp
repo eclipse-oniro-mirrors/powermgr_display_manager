@@ -241,7 +241,7 @@ bool ScreenController::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDurat
 
     // If boost multi-times, we will resend the cancel boost event.
     FFRTUtils::CancelTask(g_cancelBoostTaskHandle, g_queue);
-    FFRTTask task = std::bind(&ScreenController::CancelBoostBrightness, this, gradualDuration);
+    FFRTTask task = [this, gradualDuration] { this->CancelBoostBrightness(gradualDuration); };
     g_cancelBoostTaskHandle = FFRTUtils::SubmitDelayTask(task, timeoutMs, g_queue);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BoostBrightness update timeout=%{public}u, ret=%{public}d", timeoutMs, ret);
     return ret;
@@ -344,7 +344,7 @@ bool ScreenController::UpdateBrightness(uint32_t value, uint32_t gradualDuration
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Updated brightness is %{public}s, brightness: %{public}u",
                    isSucc ? "succ" : "failed", brightness);
     if (isSucc && updateSetting) {
-        FFRTUtils::SubmitTask(std::bind(&ScreenController::SetSettingBrightness, this, value));
+        FFRTUtils::SubmitTask([this, value] { this->SetSettingBrightness(value); });
     }
     return isSucc;
 }

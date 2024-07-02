@@ -339,7 +339,7 @@ void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged already stopDimming , not update setting brightness");
             return;
         }
-        FFRTTask task = std::bind([this](uint32_t value) { mCallback(value); }, currentValue);
+        FFRTTask task = [this, currentValue] { this->mCallback(currentValue); };
         FFRTUtils::SubmitTask(task);
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update OnChanged,Setting brightness=%{public}d", currentValue);
     } else {
@@ -781,7 +781,9 @@ void BrightnessService::SetScreenOnBrightness()
         screenOnBrightness = mCachedSettingBrightness;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux,GetSettingBrightness=%{public}d",
             screenOnBrightness);
-        FFRTTask setBrightnessTask = std::bind(&BrightnessService::UpdateBrightness, this, screenOnBrightness, 0, true);
+        FFRTTask setBrightnessTask = [this, screenOnBrightness] {
+            this->UpdateBrightness(screenOnBrightness, 0, true);
+        };
         g_waitForFirstLuxTaskHandle = FFRTUtils::SubmitDelayTask(setBrightnessTask, WAIT_FOR_FIRST_LUX_MAX_TIME,
             queue_);
         return;
@@ -915,7 +917,7 @@ bool BrightnessService::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDura
 
     // If boost multi-times, we will resend the cancel boost event.
     FFRTUtils::CancelTask(g_cancelBoostTaskHandle, queue_);
-    FFRTTask task = std::bind(&BrightnessService::CancelBoostBrightness, this, gradualDuration);
+    FFRTTask task = [this, gradualDuration] { this->CancelBoostBrightness(gradualDuration); };
     g_cancelBoostTaskHandle = FFRTUtils::SubmitDelayTask(task, timeoutMs, queue_);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BoostBrightness update timeout=%{public}u, isSuccess=%{public}d", timeoutMs,
         isSuccess);
@@ -990,7 +992,7 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
         isSuccess ? "succ" : "failed", brightness);
     if (isSuccess && updateSetting) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness, settings, value=%{public}u", safeBrightness);
-        FFRTUtils::SubmitTask(std::bind(&BrightnessService::SetSettingBrightness, this, safeBrightness));
+        FFRTUtils::SubmitTask([this, safeBrightness] { this->SetSettingBrightness(safeBrightness); });
     }
     if (isSuccess) {
         ReportBrightnessBigData(brightness);

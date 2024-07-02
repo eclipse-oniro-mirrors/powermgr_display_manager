@@ -94,7 +94,7 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
     }
     mCurrentStep = 0;
     mDimming = true;
-    FFRTTask task = std::bind(&BrightnessDimming::NextStep, this);
+    FFRTTask task = [this] { this->NextStep(); };
     g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, mQueue);
 }
 
@@ -153,7 +153,7 @@ void BrightnessDimming::NextStep()
                 mCurrentBrightness.load(), nextBrightness);
             mCurrentBrightness = nextBrightness;
             mCallback->OnChanged(mCurrentBrightness);
-            FFRTTask task = std::bind(&BrightnessDimming::NextStep, this);
+            FFRTTask task = [this] { this->NextStep(); };
             g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, mUpdateTime, mQueue);
         }
     } else {
