@@ -160,7 +160,7 @@ private:
     static const uint32_t SAMPLING_RATE = 100000000;
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
     static constexpr uint32_t SECOND_DISPLAY_ID = 1;
-    static constexpr uint32_t DEFAULT_BRIGHTNESS = 102;
+    static constexpr uint32_t DEFAULT_BRIGHTNESS = 50;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
     static const uint32_t AMBIENT_LUX_LEVELS[LUX_LEVEL_LENGTH];
