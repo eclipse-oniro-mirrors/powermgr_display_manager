@@ -173,6 +173,7 @@ private:
     virtual ~BrightnessService() = default;
 
     static uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY);
+    bool mIsLuxActiveWithLog{true};
 #ifdef ENABLE_SENSOR_PART
     static void AmbientLightCallback(SensorEvent* event);
     void InitSensors();
