@@ -34,7 +34,6 @@
 #include "display_power_info.h"
 #include "display_manager.h"
 #include "dm_common.h"
-#include "event_runner.h"
 #include "iremote_object.h"
 #include "idisplay_brightness_callback.h"
 #include "light_lux_manager.h"
@@ -211,7 +210,7 @@ private:
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
     DisplayState mState{DisplayState::DISPLAY_UNKNOWN};
-    uint32_t mStateChangeReason{0};
+    [[maybe_unused]] uint32_t mStateChangeReason{0};
     uint32_t mBrightnessLevel{0};
     std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};

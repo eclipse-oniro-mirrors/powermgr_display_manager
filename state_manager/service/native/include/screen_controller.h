@@ -42,7 +42,7 @@ public:
         void OnEnd() override;
         void DiscountBrightness(double discount) override;
     private:
-        const std::shared_ptr<ScreenAction>& action_;
+        [[maybe_unused]] const std::shared_ptr<ScreenAction>& action_;
         std::function<void(uint32_t)> callback_;
         double discount_ {1.0};
     };

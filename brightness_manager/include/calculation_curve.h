@@ -49,7 +49,7 @@ private:
     float GetBrightnessCurveLevel(std::vector<PointXy>& linePointsList, float lux);
 
     Config mCurveConfig{};
-    uint32_t mDisplayId {0};
+    [[maybe_unused]] uint32_t mDisplayId {0};
     float mDefaultBrightness {100.0f};
     float mCurveAmbientLux {0.0f};
     int mCurrentUserId {0};

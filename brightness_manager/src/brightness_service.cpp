@@ -49,7 +49,7 @@ constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_LEVEL = 255;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_LEVEL = 1;
 constexpr uint32_t MAX_MAPPING_BRGIHTNESS_LEVEL = 223;
 constexpr uint32_t MIN_MAPPING_BRGIHTNESS_LEVEL = 1;
-constexpr uint32_t MAX_HBM_BRGIHTNESS_NIT = 1000;
+[[maybe_unused]] constexpr uint32_t MAX_HBM_BRGIHTNESS_NIT = 1000;
 constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_NIT = 600;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_NIT = 2;
 constexpr uint32_t MAX_DEFAULT_HIGH_BRGIHTNESS_LEVEL = 10000;
@@ -747,7 +747,7 @@ uint32_t BrightnessService::GetBrightnessLevel(float lux)
 
 uint32_t BrightnessService::GetBrightnessHighLevel(uint32_t level)
 {
-    uint32_t brightnessHighLevel = level;
+    [[maybe_unused]] uint32_t brightnessHighLevel = level;
     return level;
 }
 

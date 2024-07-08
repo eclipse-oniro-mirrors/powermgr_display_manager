@@ -18,7 +18,10 @@ config("displaymgr_private_config") {
 }
 
 config("displaymgr_public_config") {
-  include_dirs = [ "native/include" ]
+  include_dirs = [ 
+    "native/include", 
+    "${displaymgr_utils_path}/native/include",
+   ]
 }
 
 ohos_shared_library("displaymgr") {
@@ -35,7 +38,6 @@ ohos_shared_library("displaymgr") {
   ]
 
   public_configs = [
-    "${displaymgr_utils_path}:utils_config",
     ":displaymgr_public_config",
   ]
 

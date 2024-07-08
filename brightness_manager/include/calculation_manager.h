@@ -69,11 +69,11 @@ private:
     void ResetDefaultBrightnessOffset();
 
     BrightnessCalculationCurve mBrightnessCalculationCurve{};
-    uint32_t mDisplayId{0};
+    [[maybe_unused]] uint32_t mDisplayId {0};
     int mCurrentUserId{0};
     bool mIsCameraCurveEnable{false};
     bool mIsGameCurveEnable{false};
-    float mDefaultBrightness{false};
+    [[maybe_unused]] float mDefaultBrightness{false};
     float mDelta{0.0f};
     float mOffsetLux{0.0f};
     float mPosBrightness{0.0f};
