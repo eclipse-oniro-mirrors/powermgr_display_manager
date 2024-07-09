@@ -210,7 +210,6 @@ private:
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
     DisplayState mState{DisplayState::DISPLAY_UNKNOWN};
-    [[maybe_unused]] uint32_t mStateChangeReason{0};
     uint32_t mBrightnessLevel{0};
     std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};

@@ -24,9 +24,7 @@ namespace DisplayPowerMgr {
 namespace {
 const int LIGHT_LUX_BUFFER_RANGE = 10000;
 const int LIGHT_MAX_LUX = 40000;
-[[maybe_unused]] const int AMBIENT_THRESHOLD_LOWLIGHT = 20;
 const int LIGHT_LUX_BUFFER_MIN = 5;
-[[maybe_unused]] const int LIGHT_LUX_MAX_COLORTEMP = 2000;
 const int INVALID_VALUE = -1;
 const int LOG_INTERVAL_MS = 2000;
 const int LUX_BUFFER_NUM_FOR_LOG = 6;
