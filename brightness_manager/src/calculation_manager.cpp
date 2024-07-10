@@ -33,14 +33,12 @@ constexpr float DEFAULT_OFFSET_DELTA = 0.0f;
 constexpr float SMALL_VALUE = 1e-6f;
 constexpr float DEFAULT_OFFSET_RATIO = 1.0f;
 constexpr float MIN_OFFSET_RATIO = 0.0f;
-constexpr float DEFAULT_MIN_DELTA = 1.0f;
 constexpr float MIN_DEFAULT_BRIGHTNESS = 4.0f;
 constexpr float MAX_DEFAULT_BRIGHTNESS = 255.0f;
 
 constexpr float AMBIENT_VALID_MAX_LUX = 40000;
 constexpr float AMBIENT_VALID_MIN_LUX = 0.0f;
-constexpr float DEFAULT_BRIGHTNESS = 100.0f;
-}
+} // namespace
 
 void BrightnessCalculationManager::InitParameters()
 {
