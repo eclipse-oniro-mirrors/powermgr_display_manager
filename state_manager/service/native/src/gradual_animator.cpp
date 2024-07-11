@@ -67,7 +67,7 @@ void GradualAnimator::StartAnimation(uint32_t from, uint32_t to, uint32_t durati
     }
     currentStep_ = 0;
     animating_ = true;
-    FFRTTask task = std::bind(&GradualAnimator::NextStep, this);
+    FFRTTask task = [this] { this->NextStep(); };
     g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, updateTime_, g_animatorQueue);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animation started");
 }
@@ -120,7 +120,7 @@ void GradualAnimator::NextStep()
         } else {
             currentBrightness_ = nextBrightness;
             callback_->OnChanged(currentBrightness_);
-            FFRTTask task = std::bind(&GradualAnimator::NextStep, this);
+            FFRTTask task = [this] { this->NextStep(); };
             g_animatorTaskHandle = FFRTUtils::SubmitDelayTask(task, updateTime_, g_animatorQueue);
         }
     } else {
