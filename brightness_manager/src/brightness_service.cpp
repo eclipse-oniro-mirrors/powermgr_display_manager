@@ -49,7 +49,6 @@ constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_LEVEL = 255;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_LEVEL = 1;
 constexpr uint32_t MAX_MAPPING_BRGIHTNESS_LEVEL = 223;
 constexpr uint32_t MIN_MAPPING_BRGIHTNESS_LEVEL = 1;
-constexpr uint32_t MAX_HBM_BRGIHTNESS_NIT = 1000;
 constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_NIT = 600;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_NIT = 2;
 constexpr uint32_t MAX_DEFAULT_HIGH_BRGIHTNESS_LEVEL = 10000;
@@ -323,23 +322,23 @@ void BrightnessService::DimmingCallbackImpl::OnStart()
 void BrightnessService::DimmingCallbackImpl::OnChanged(uint32_t currentValue)
 {
     if (!BrightnessService::Get().IsDimming()) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d already stopDimming, return",
-            currentValue);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d already stopDimming, return", currentValue);
         return;
     }
-    auto brightness = GetMappingBrightnessLevel(currentValue);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged currentValue=%{public}d, mapBrightness=%{public}d",
-        currentValue, brightness);
-    bool isSuccess = mAction->SetBrightness(brightness);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged brightness,mapBrightness=%{public}d", currentValue);
+    bool isSuccess = mAction->SetBrightness(currentValue);
     if (isSuccess) {
-        BrightnessService::Get().ReportBrightnessBigData(brightness);
+        BrightnessService::Get().ReportBrightnessBigData(currentValue);
     }
     if (isSuccess && !BrightnessService::Get().IsSleepStatus()) {
         if (!BrightnessService::Get().IsDimming()) {
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnChanged already stopDimming , not update setting brightness");
             return;
         }
-        FFRTTask task = [this, currentValue] { this->mCallback(currentValue); };
+        FFRTTask task = [this, currentValue] {
+            auto tmpVal = BrightnessService::Get().GetOrigBrightnessLevel(currentValue);
+            this->mCallback(tmpVal);
+        };
         FFRTUtils::SubmitTask(task);
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Update OnChanged,Setting brightness=%{public}d", currentValue);
     } else {
@@ -670,8 +669,15 @@ void BrightnessService::ProcessLightLux(float lux)
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "ProcessLightLux, lux=%{public}f, mLightLux=%{public}f",
         lux, mLightLuxManager.GetSmoothedLux());
     if (!CanSetBrightness()) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "ProcessLightLux , ignore the change");
+        if (mIsLuxActiveWithLog) {
+            mIsLuxActiveWithLog = false;
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ProcessLightLux:mIsLuxActiveWithLog=false");
+        }
         return;
+    }
+    if (!mIsLuxActiveWithLog) {
+        mIsLuxActiveWithLog = true;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ProcessLightLux:mIsLuxActiveWithLog=true");
     }
     NotifyLightChangeToAps(AMBIENT_LIGHT_TYPE, lux);
     if (mLightLuxManager.IsNeedUpdateBrightness(lux)) {
@@ -742,7 +748,6 @@ uint32_t BrightnessService::GetBrightnessLevel(float lux)
 
 uint32_t BrightnessService::GetBrightnessHighLevel(uint32_t level)
 {
-    uint32_t brightnessHighLevel = level;
     return level;
 }
 
@@ -877,12 +882,13 @@ bool BrightnessService::OverrideBrightness(uint32_t value, uint32_t gradualDurat
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot override brightness, ignore the change");
         return false;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness, value=%{public}u", value);
     if (!mIsBrightnessOverridden) {
         mIsBrightnessOverridden = true;
     }
     mOverriddenBrightness = value;
     mBeforeOverriddenBrightness = GetSettingBrightness();
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Override brightness, value=%{public}u, mBeforeOverriddenBrightness=%{public}d",
+        value, mBeforeOverriddenBrightness);
     return UpdateBrightness(value, gradualDuration);
 }
 
@@ -892,6 +898,7 @@ bool BrightnessService::RestoreBrightness(uint32_t gradualDuration)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not override, no need to restore");
         return false;
     }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "restore brightness=%{public}d", mBeforeOverriddenBrightness);
     mIsBrightnessOverridden = false;
     return UpdateBrightness(mBeforeOverriddenBrightness, gradualDuration, true);
 }
@@ -981,12 +988,12 @@ bool BrightnessService::UpdateBrightness(uint32_t value, uint32_t gradualDuratio
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateBrightness StopDimming");
         mDimming->StopDimming();
     }
-    if (gradualDuration > 0) {
-        mDimming->StartDimming(GetSettingBrightness(), safeBrightness, gradualDuration);
-        return true;
-    }
     auto brightness = static_cast<uint32_t>(safeBrightness * mDiscount);
     brightness = GetMappingBrightnessLevel(brightness);
+    if (gradualDuration > 0) {
+        mDimming->StartDimming(GetSettingBrightness(), brightness, gradualDuration);
+        return true;
+    }
     bool isSuccess = mAction->SetBrightness(brightness);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "UpdateBrightness is %{public}s, brightness: %{public}u",
         isSuccess ? "succ" : "failed", brightness);

@@ -26,7 +26,6 @@
 #include <sys/types.h>
 #include "delayed_sp_singleton.h"
 #include "refbase.h"
-#include "event_runner.h"
 #include "iremote_object.h"
 #ifdef ENABLE_SENSOR_PART
 #include "sensor_agent_type.h"

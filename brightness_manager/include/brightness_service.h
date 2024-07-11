@@ -34,7 +34,6 @@
 #include "display_power_info.h"
 #include "display_manager.h"
 #include "dm_common.h"
-#include "event_runner.h"
 #include "iremote_object.h"
 #include "idisplay_brightness_callback.h"
 #include "light_lux_manager.h"
@@ -160,7 +159,7 @@ private:
     static const uint32_t SAMPLING_RATE = 100000000;
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
     static constexpr uint32_t SECOND_DISPLAY_ID = 1;
-    static constexpr uint32_t DEFAULT_BRIGHTNESS = 102;
+    static constexpr uint32_t DEFAULT_BRIGHTNESS = 50;
     static constexpr const double DISCOUNT_MIN = 0.01;
     static constexpr const double DISCOUNT_MAX = 1.00;
     static const uint32_t AMBIENT_LUX_LEVELS[LUX_LEVEL_LENGTH];
@@ -173,6 +172,7 @@ private:
     virtual ~BrightnessService() = default;
 
     static uint32_t GetSettingBrightness(const std::string& key = SETTING_BRIGHTNESS_KEY);
+    bool mIsLuxActiveWithLog{true};
 #ifdef ENABLE_SENSOR_PART
     static void AmbientLightCallback(SensorEvent* event);
     void InitSensors();
@@ -210,7 +210,6 @@ private:
     bool mIsFoldDevice{false};
     bool mIsAutoBrightnessEnabled{false};
     DisplayState mState{DisplayState::DISPLAY_UNKNOWN};
-    uint32_t mStateChangeReason{0};
     uint32_t mBrightnessLevel{0};
     std::atomic<uint32_t> mBrightnessTarget{0};
     uint32_t mDisplayId{0};

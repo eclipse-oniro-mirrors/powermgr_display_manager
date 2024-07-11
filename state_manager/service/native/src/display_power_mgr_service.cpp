@@ -46,6 +46,8 @@ const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
+const uint32_t DEFAULT_BRIGHTNESS = 50;
+const uint32_t DEFAULT_DIMMING_TIME = 500;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -117,6 +119,7 @@ void DisplayPowerMgrService::Reset()
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()
 {
+    DisplaySettingHelper::SetSettingBrightness(DEFAULT_BRIGHTNESS);
     uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
     uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
     uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId(mainDisplayId);
@@ -332,12 +335,13 @@ bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t display
         return false;
     }
     auto brightness = GetSafeBrightness(value);
-    DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u", displayId, brightness);
+    DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u, duration=%{public}d",
+        displayId, brightness, DEFAULT_DIMMING_TIME);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return BrightnessManager::Get().OverrideBrightness(brightness);
+    return BrightnessManager::Get().OverrideBrightness(brightness, DEFAULT_DIMMING_TIME);
 }
 
 bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
@@ -361,12 +365,13 @@ bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
     if (!Permission::IsSystem()) {
         return false;
     }
-    DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u", displayId);
+    DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u, duration=%{public}d",
+        displayId, DEFAULT_DIMMING_TIME);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    bool ret = BrightnessManager::Get().RestoreBrightness();
+    bool ret = BrightnessManager::Get().RestoreBrightness(DEFAULT_DIMMING_TIME);
     if (ret) {
         return true;
     }
