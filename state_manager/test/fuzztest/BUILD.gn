@@ -32,5 +32,7 @@ group("fuzztest") {
     "registercallback_fuzzer:RegisterCallbackFuzzTest",
     "setbrightness_fuzzer:SetBrightnessFuzzTest",
     "setcoordinated_fuzzer:SetCoordinatedFuzzTest",
+    "setlightbrightnessthreshold_fuzzer:SetLightBrightnessThresholdFuzzTest",
+    "setmaxbrightness_fuzzer:SetMaxBrightnessFuzzTest",
   ]
 }
