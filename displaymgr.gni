@@ -21,7 +21,7 @@ declare_args() {
   } else {
     has_sensors_sensor_part = false
   }
-  input_feature_brightnessmanagerext = ""
+  display_manager_feature_brightnessext = ""
 }
 
 displaymgr_part_name = "display_manager"
