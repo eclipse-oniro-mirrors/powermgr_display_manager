@@ -82,7 +82,7 @@ ohos_static_library("brightness_manager") {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
   }
-  if (input_feature_brightnessmanagerext != "") {
+  if (display_manager_feature_brightnessext != "") {
     defines += [ "OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER" ]
   }
 
