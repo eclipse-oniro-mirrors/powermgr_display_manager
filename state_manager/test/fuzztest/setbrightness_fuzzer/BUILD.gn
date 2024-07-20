@@ -61,7 +61,6 @@ ohos_fuzztest("SetBrightnessFuzzTest") {
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
-    "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "display_manager:displaymgr",
@@ -77,8 +76,15 @@ ohos_fuzztest("SetBrightnessFuzzTest") {
     "power_manager:power_sysparam",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
-    "window_manager:libdm",
   ]
+
+  defines = []
+  if (window_manager_use_sceneboard) {
+    defines += [ "SCENE_BOARD_ENABLED" ]
+    external_deps += [ "window_manager:libdm_lite" ]
+  } else {
+    external_deps += [ "window_manager:libdm" ]
+  }
 
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]

@@ -23,7 +23,11 @@
 #include <vector>
 
 #include "dm_common.h"
+#ifdef SCENE_BOARD_ENABLED
+#include "display_manager_lite.h"
+#else
 #include "display_manager.h"
+#endif
 #include "display_power_info.h"
 
 namespace OHOS {

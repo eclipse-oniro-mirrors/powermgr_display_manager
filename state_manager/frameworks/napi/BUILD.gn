@@ -31,7 +31,6 @@ ohos_shared_library("brightness") {
 
   external_deps = [
     "c_utils:utils",
-    "ets_runtime:libark_jsruntime",
     "hilog:libhilog",
     "hiview:libxpower_event_js",
     "ipc:ipc_core",
