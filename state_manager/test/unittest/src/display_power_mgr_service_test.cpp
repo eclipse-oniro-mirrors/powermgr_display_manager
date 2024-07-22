@@ -344,10 +344,10 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
     sleep(sleepTime);
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
-        DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
+        DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
     EXPECT_TRUE(ret);
     ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
-        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT);
+        DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
     EXPECT_TRUE(ret);
 }
 
