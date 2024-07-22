@@ -295,7 +295,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
     DisplayState delayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(delayState == DisplayState::DISPLAY_DELAY_OFF);
     //Callback for waiting window
-    int sleepTime = 2; // sleep time is 2s
+    int sleepTime = 3; // sleep time is 3s
     sleep(sleepTime);
     DisplayState offState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
     EXPECT_TRUE(offState == DisplayState::DISPLAY_OFF);
