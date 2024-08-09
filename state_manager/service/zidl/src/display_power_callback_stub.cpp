@@ -44,7 +44,7 @@ int32_t DisplayPowerCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
 
     const int DFX_DELAY_S = 10;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerCallbackStub", DFX_DELAY_S, nullptr, nullptr,
-        HiviewDFX::XCOLLIE_FLAG_NOOP);
+        HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t ret = ERR_OK;
     if (code == static_cast<uint32_t>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED)) {
         ret = OnDisplayStateChangedStub(data, reply);
