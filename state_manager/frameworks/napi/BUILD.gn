@@ -32,10 +32,14 @@ ohos_shared_library("brightness") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hiview:libxpower_event_js",
     "napi:ace_napi",
     "power_manager:powermgr_client",
   ]
+
+  if (has_dfx_hiview_part) {
+    external_deps += [ "hiview:libxpower_event_js" ]
+    defines = [ "HAS_DFX_HIVIEW_PART" ]
+  }
 
   relative_install_dir = "module"
 
