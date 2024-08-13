@@ -25,8 +25,8 @@ ohos_shared_library("brightness") {
   ]
 
   deps = [
-    "${displaymgr_inner_api}:displaymgr",
     "${brightnessmgr_root_path}:brightness_manager",
+    "${displaymgr_inner_api}:displaymgr",
   ]
 
   external_deps = [
