@@ -62,7 +62,11 @@ private:
     bool LoadBrightnessControl();
     bool LoadBrightnessStatus();
 
+#ifndef BRIGHTNESS_DT_ENABLE
 private:
+#else
+public:
+#endif
     bool mBrightnessManagerExtEnable = false;
     void* mBrightnessManagerExtHandle = nullptr;
     void* mBrightnessManagerInitFunc = nullptr;
