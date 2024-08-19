@@ -29,12 +29,22 @@ void DisplaySystemAbility::OnStart()
 {
     DISPLAY_HILOGI(COMP_SVC, "DisplayPowerService On Start.");
     AddSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    // we need to listen data service completed when create dpms service
+    AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 }
 
 void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
-        DISPLAY_HILOGI(COMP_SVC, "Start service");
+        DISPLAY_HILOGI(COMP_SVC, "DISPLAY_MANAGER_SERVICE_SA_ID loaded");
+        isDpmsLoaded = true;
+    }
+    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        DISPLAY_HILOGI(COMP_SVC, "DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID loaded");
+        isDataLoaded = true;
+    }
+    if (isDpmsLoaded && isDataLoaded) { // dpms service and data service both ready
+        DISPLAY_HILOGI(COMP_SVC, "Start DisplayPowerMgrService");
         auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
         service->Init();
         if (!Publish(service)) {
