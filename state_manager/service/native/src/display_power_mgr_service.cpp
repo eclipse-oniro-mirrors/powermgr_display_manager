@@ -46,7 +46,6 @@ const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
-const uint32_t DEFAULT_BRIGHTNESS = 50;
 const uint32_t DEFAULT_DIMMING_TIME = 500;
 }
 
@@ -86,14 +85,14 @@ void DisplayPowerMgrService::Init()
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
+    SetBootCompletedBrightness();
+    SetBootCompletedAutoBrightness();
+    RegisterSettingObservers();
     RegisterBootCompletedCallback();
 }
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
 {
     g_bootCompletedCallback = []() {
-        SetBootCompletedBrightness();
-        SetBootCompletedAutoBrightness();
-        RegisterSettingObservers();
         isBootCompleted_ = true;
     };
     DisplayParamHelper::RegisterBootCompletedCallback(g_bootCompletedCallback);
@@ -119,7 +118,6 @@ void DisplayPowerMgrService::Reset()
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()
 {
-    DisplaySettingHelper::SetSettingBrightness(DEFAULT_BRIGHTNESS);
     uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
     uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
     uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId(mainDisplayId);
