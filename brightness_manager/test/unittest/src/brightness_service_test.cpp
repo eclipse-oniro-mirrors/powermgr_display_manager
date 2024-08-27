@@ -47,7 +47,8 @@ namespace {
 HWTEST_F(BrightnessServiceTest, BrightnessServiceGet001, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is start");
-    BrightnessService::Get();
+    auto& brightnessService = BrightnessService::Get();
+    EXPECT_NE(&brightnessService, nullptr);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is end");
 }
 } // namespace
