@@ -47,7 +47,8 @@ namespace {
 HWTEST_F(BrightnessManagerTest, BrightnessManagerGet001, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is start");
-    BrightnessManager::Get();
+    auto& brightnessManager = BrightnessManager::Get();
+    EXPECT_NE(&brightnessManager, nullptr);
     const int sleepTime = 100000;
     usleep(sleepTime);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is end");
