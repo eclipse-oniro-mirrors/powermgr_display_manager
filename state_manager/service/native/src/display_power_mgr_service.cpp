@@ -47,6 +47,7 @@ const uint32_t DEFALUT_DISPLAY_ID = 0;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
 const uint32_t DEFAULT_DIMMING_TIME = 500;
+const uint32_t BOOTED_COMPLETE_DELAY_TIME = 2000;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -85,9 +86,13 @@ void DisplayPowerMgrService::Init()
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
-    SetBootCompletedBrightness();
-    SetBootCompletedAutoBrightness();
-    RegisterSettingObservers();
+    FFRTTask task = [this]() {
+        DISPLAY_HILOGI(COMP_SVC, "Boot completed delayed");
+        SetBootCompletedBrightness();
+        SetBootCompletedAutoBrightness();
+        RegisterSettingObservers();
+    };
+    g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, BOOTED_COMPLETE_DELAY_TIME, queue_);
     RegisterBootCompletedCallback();
 }
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
