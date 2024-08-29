@@ -32,7 +32,11 @@
 #include "calculation_manager.h"
 #include "display_common.h"
 #include "display_power_info.h"
+#ifdef SCENE_BOARD_ENABLED
+#include "display_manager_lite.h"
+#else
 #include "display_manager.h"
+#endif
 #include "dm_common.h"
 #include "iremote_object.h"
 #include "idisplay_brightness_callback.h"
@@ -70,7 +74,11 @@ public:
         double mDiscount{1.0};
     };
 
+#ifdef SCENE_BOARD_ENABLED
+    class FoldStatusLisener : public Rosen::DisplayManagerLite::IFoldStatusListener {
+#else
     class FoldStatusLisener : public Rosen::DisplayManager::IFoldStatusListener {
+#endif
     public:
         FoldStatusLisener() = default;
         virtual ~FoldStatusLisener() = default;
@@ -226,7 +234,11 @@ private:
     std::shared_ptr<BrightnessDimming> mDimming;
     LightLuxManager mLightLuxManager{};
     BrightnessCalculationManager mBrightnessCalculationManager{};
+#ifdef SCENE_BOARD_ENABLED
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> mFoldStatusistener;
+#else
     sptr<Rosen::DisplayManager::IFoldStatusListener> mFoldStatusistener;
+#endif
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool mIsUserMode{false};
     std::atomic<bool> mIsSleepStatus{false};

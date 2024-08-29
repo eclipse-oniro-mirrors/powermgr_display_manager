@@ -33,7 +33,6 @@ config("module_private_config") {
 deps_ex = [
   "ability_base:want",
   "ability_base:zuri",
-  "ability_runtime:ability_manager",
   "c_utils:utils",
   "hilog:libhilog",
   "ipc:ipc_core",
@@ -66,7 +65,6 @@ ohos_unittest("unittest_display_mgr_service") {
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "hilog:libhilog",
