@@ -43,8 +43,12 @@ int32_t DisplayBrightnessCallbackStub::OnRemoteRequest(
     }
 
     const int DFX_DELAY_S = 10;
+    const int INVALID_ID = 0;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer(
         "DisplayBrightnessCallbackStub", DFX_DELAY_S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
+    if (id <= INVALID_ID) {
+        DISPLAY_HILOGE(COMP_SVC, "SetTimer failed");
+    }
     int32_t ret = ERR_OK;
     if (code ==
         static_cast<uint32_t>(
