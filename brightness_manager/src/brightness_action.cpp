@@ -19,14 +19,9 @@
 #include <ipc_skeleton.h>
 
 #include "display_log.h"
-#include "dm_common.h"
-#ifdef SCENE_BOARD_ENABLED
-#include "display_manager_lite.h"
-#include "screen_manager_lite.h"
-#else
 #include "display_manager.h"
+#include "dm_common.h"
 #include "screen_manager.h"
-#endif
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -46,11 +41,7 @@ void BrightnessAction::SetDisplayId(uint32_t displayId)
 DisplayState BrightnessAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-#ifdef SCENE_BOARD_ENABLED
-    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(mDisplayId);
-#else
     Rosen::ScreenPowerState powerState = Rosen::ScreenManager::GetInstance().GetScreenPower(mDisplayId);
-#endif
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
@@ -76,11 +67,7 @@ uint32_t BrightnessAction::GetBrightness()
 {
     std::lock_guard lock(mMutexBrightness);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    mBrightness = Rosen::DisplayManagerLite::GetInstance().GetScreenBrightness(mDisplayId);
-#else
     mBrightness = Rosen::DisplayManager::GetInstance().GetScreenBrightness(mDisplayId);
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", mDisplayId, mBrightness);
     return mBrightness;
@@ -97,11 +84,7 @@ bool BrightnessAction::SetBrightness(uint32_t displayId, uint32_t value)
         mDisplayId, displayId, value);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId, value);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    bool isSucc = Rosen::DisplayManagerLite::GetInstance().SetScreenBrightness(displayId, value);
-#else
     bool isSucc = Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId, value);
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     std::lock_guard lock(mMutexBrightness);
     mBrightness = isSucc ? value : mBrightness;

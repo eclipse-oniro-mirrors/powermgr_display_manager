@@ -20,11 +20,7 @@
 
 #include "display_log.h"
 #include "power_state_machine_info.h"
-#ifdef SCENE_BOARD_ENABLED
-#include "screen_manager_lite.h"
-#else
 #include "screen_manager.h"
-#endif
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -34,11 +30,7 @@ ScreenAction::ScreenAction(uint32_t displayId) : displayId_(displayId)
 uint32_t ScreenAction::GetDefaultDisplayId()
 {
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    uint64_t defaultId = Rosen::DisplayManagerLite::GetInstance().GetDefaultDisplayId();
-#else
     uint64_t defaultId = Rosen::DisplayManager::GetInstance().GetDefaultDisplayId();
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     return static_cast<uint32_t>(defaultId);
 }
@@ -46,11 +38,7 @@ uint32_t ScreenAction::GetDefaultDisplayId()
 std::vector<uint32_t> ScreenAction::GetAllDisplayId()
 {
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    std::vector<uint64_t> allIds = Rosen::DisplayManagerLite::GetInstance().GetAllDisplayIds();
-#else
     std::vector<uint64_t> allIds = Rosen::DisplayManager::GetInstance().GetAllDisplayIds();
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     std::vector<uint32_t> displayIds;
     std::transform(allIds.begin(), allIds.end(), back_inserter(displayIds), [](uint64_t id) {
@@ -67,11 +55,7 @@ uint32_t ScreenAction::GetDisplayId()
 DisplayState ScreenAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-#ifdef SCENE_BOARD_ENABLED
-    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
-#else
     Rosen::ScreenPowerState powerState = Rosen::ScreenManager::GetInstance().GetScreenPower(displayId_);
-#endif
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
@@ -117,13 +101,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
             break;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    auto& dmClient = Rosen::DisplayManagerLite::GetInstance();
-#else
-    auto& dmClient = Rosen::DisplayManager::GetInstance();
-#endif
-    bool ret = dmClient.SetDisplayState(rds,
-        [callback](Rosen::DisplayState rosenState) {
+    bool ret = Rosen::DisplayManager::GetInstance().SetDisplayState(rds, [callback](Rosen::DisplayState rosenState) {
         DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState Callback:%{public}d", static_cast<uint32_t>(rosenState));
         DisplayState state;
         switch (rosenState) {
@@ -203,19 +181,10 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     bool ret = false;
     auto changeReason = ParseSpecialReason(reason);
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
-#ifdef SCENE_BOARD_ENABLED
-        ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(
-            displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
-#else
         ret = Rosen::ScreenManager::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
-#endif
     } else {
-#ifdef SCENE_BOARD_ENABLED
-        ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
-#else
         ret = Rosen::ScreenManager::GetInstance().SetScreenPowerForAll(status, changeReason);
-#endif
     }
     DISPLAY_HILOGI(FEAT_STATE,
         "[UL_POWER] SetDisplayPower state=%{public}u, reason=%{public}u, ret=%{public}d, coordinated=%{public}d",
@@ -227,11 +196,7 @@ uint32_t ScreenAction::GetBrightness()
 {
     std::lock_guard lock(mutexBrightness_);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    brightness_ = Rosen::DisplayManagerLite::GetInstance().GetScreenBrightness(displayId_);
-#else
     brightness_ = Rosen::DisplayManager::GetInstance().GetScreenBrightness(displayId_);
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, brightness_);
     return brightness_;
@@ -241,11 +206,7 @@ bool ScreenAction::SetBrightness(uint32_t value)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "displayId=%{public}u, brightness=%{public}u", displayId_, value);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-#ifdef SCENE_BOARD_ENABLED
-    bool isSucc = Rosen::DisplayManagerLite::GetInstance().SetScreenBrightness(displayId_, value);
-#else
     bool isSucc = Rosen::DisplayManager::GetInstance().SetScreenBrightness(displayId_, value);
-#endif
     IPCSkeleton::SetCallingIdentity(identity);
     std::lock_guard lock(mutexBrightness_);
     brightness_ = isSucc ? value : brightness_;
