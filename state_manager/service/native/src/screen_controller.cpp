@@ -45,14 +45,16 @@ ScreenController::ScreenController(uint32_t displayId)
 
     string name = "BrightnessController_" + to_string(displayId);
     if (animateCallback_ == nullptr) {
-        animateCallback_ = make_shared<AnimateCallbackImpl>([this](uint32_t brightness) {
+        animateCallback_ = make_shared<AnimateCallbackImpl>(action_, [this](uint32_t brightness) {
             SetSettingBrightness(brightness);
         });
     }
     animator_ = make_shared<GradualAnimator>(name, animateCallback_);
 }
 
-ScreenController::AnimateCallbackImpl::AnimateCallbackImpl(std::function<void(uint32_t)> callback) : callback_(callback)
+ScreenController::AnimateCallbackImpl::AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
+    std::function<void(uint32_t)> callback)
+    : action_(action), callback_(callback)
 {
 }
 
