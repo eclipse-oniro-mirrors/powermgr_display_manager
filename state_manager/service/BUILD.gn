@@ -61,10 +61,13 @@ ohos_shared_library("displaymgrservice") {
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "graphic_2d:librender_service_base",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -76,19 +79,14 @@ ohos_shared_library("displaymgrservice") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "skia:skia_canvaskit",
+    "window_manager:libdm",
   ]
 
   defines = []
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
-  }
-
-  if (window_manager_use_sceneboard) {
-    defines += [ "SCENE_BOARD_ENABLED" ]
-    external_deps += [ "window_manager:libdm_lite" ]
-  } else {
-    external_deps += [ "window_manager:libdm" ]
   }
 
   shlib_type = "sa"

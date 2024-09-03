@@ -41,6 +41,7 @@ set_defaults("ohos_unittest") {
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
@@ -54,15 +55,8 @@ set_defaults("ohos_unittest") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "window_manager:libdm",
   ]
-
-  defines = []
-  if (window_manager_use_sceneboard) {
-    defines += [ "SCENE_BOARD_ENABLED" ]
-    external_deps += [ "window_manager:libdm_lite" ]
-  } else {
-    external_deps += [ "window_manager:libdm" ]
-  }
 }
 
 ohos_unittest("brightness_manager_ext_test") {
