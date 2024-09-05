@@ -61,13 +61,10 @@ ohos_shared_library("displaymgrservice") {
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
-    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
-    "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "graphic_2d:librender_service_base",
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -78,8 +75,6 @@ ohos_shared_library("displaymgrservice") {
     "power_manager:power_sysparam",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
-    "skia:skia_canvaskit",
     "window_manager:libdm",
   ]
 

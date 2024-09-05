@@ -34,13 +34,15 @@ public:
 
     class AnimateCallbackImpl : public AnimateCallback {
     public:
-        explicit AnimateCallbackImpl(std::function<void(uint32_t)> callback);
+        explicit AnimateCallbackImpl(const std::shared_ptr<ScreenAction>& action,
+            std::function<void(uint32_t)> callback);
         ~AnimateCallbackImpl() override = default;
         void OnStart() override;
         void OnChanged(uint32_t currentValue) override;
         void OnEnd() override;
         void DiscountBrightness(double discount) override;
     private:
+        const std::shared_ptr<ScreenAction>& action_;
         std::function<void(uint32_t)> callback_;
         double discount_ {1.0};
     };

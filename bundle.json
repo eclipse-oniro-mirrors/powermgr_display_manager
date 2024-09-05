@@ -28,14 +28,11 @@
     ],
     "deps": {
       "components": [
-        "ability_base",
         "ability_runtime",
         "c_utils",
         "data_share",
-        "ets_runtime",
         "eventhandler",
         "ffrt",
-        "graphic_2d",
         "hicollie",
         "hisysevent",
         "hiview",
@@ -48,7 +45,6 @@
         "safwk",
         "samgr",
         "sensor",
-        "skia",
         "window_manager"
       ]
     },
@@ -69,7 +65,14 @@
       },
       "inner_api": [
         {
-          "name": "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr"
+          "name": "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr",
+          "header": {
+            "header_files": [
+              "display_power_info.h",
+              "display_power_mgr_client.h"
+            ],
+            "header_base": "//base/powermgr/display_manager/state_manager/interfaces/inner_api/native/include"
+          }
         }
       ],
       "test": [

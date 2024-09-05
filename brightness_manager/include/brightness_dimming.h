@@ -18,12 +18,15 @@
 
 #include <atomic>
 #include <cstdint>
+#include <event_handler.h>
+#include <event_runner.h>
 #include "ffrt_utils.h"
 #include <iosfwd>
 #include <memory>
 #include <string>
 
 #include "brightness_dimming_callback.h"
+#include "inner_event.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
