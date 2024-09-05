@@ -14,8 +14,9 @@
  */
 
 #include "screen_action.h"
-
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 #include <ipc_skeleton.h>
 
 #include "display_log.h"
@@ -121,8 +122,10 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     });
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
+#endif
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d",
         displayId_, static_cast<uint32_t>(state), ret);
     return ret;

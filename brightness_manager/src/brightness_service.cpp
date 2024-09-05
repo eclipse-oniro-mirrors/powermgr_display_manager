@@ -16,7 +16,9 @@
 #include "brightness_service.h"
 
 #include <file_ex.h>
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 #include <ipc_skeleton.h>
 #include <securec.h>
 

@@ -14,8 +14,9 @@
  */
 
 #include "brightness_action.h"
-
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 #include <ipc_skeleton.h>
 
 #include "display_log.h"
