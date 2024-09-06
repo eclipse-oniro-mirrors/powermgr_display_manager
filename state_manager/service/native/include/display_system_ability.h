@@ -38,6 +38,8 @@ public:
 
 private:
     sptr<DisplayPowerMgrService> service_;
+    bool isDpmsLoaded{false};
+    bool isDataLoaded{false};
 };
 }
 }
