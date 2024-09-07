@@ -46,8 +46,8 @@ const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
-const uint32_t DEFAULT_BRIGHTNESS = 50;
 const uint32_t DEFAULT_DIMMING_TIME = 500;
+const uint32_t BOOTED_COMPLETE_DELAY_TIME = 2000;
 }
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
@@ -86,14 +86,18 @@ void DisplayPowerMgrService::Init()
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
+    FFRTTask task = [this]() {
+        DISPLAY_HILOGI(COMP_SVC, "Boot completed delayed");
+        SetBootCompletedBrightness();
+        SetBootCompletedAutoBrightness();
+        RegisterSettingObservers();
+    };
+    g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, BOOTED_COMPLETE_DELAY_TIME, queue_);
     RegisterBootCompletedCallback();
 }
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
 {
     g_bootCompletedCallback = []() {
-        SetBootCompletedBrightness();
-        SetBootCompletedAutoBrightness();
-        RegisterSettingObservers();
         isBootCompleted_ = true;
     };
     DisplayParamHelper::RegisterBootCompletedCallback(g_bootCompletedCallback);
@@ -119,7 +123,6 @@ void DisplayPowerMgrService::Reset()
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()
 {
-    DisplaySettingHelper::SetSettingBrightness(DEFAULT_BRIGHTNESS);
     uint32_t mainDisplayId = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetMainDisplayId();
     uint32_t brightness = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetBrightness(mainDisplayId);
     uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId(mainDisplayId);
