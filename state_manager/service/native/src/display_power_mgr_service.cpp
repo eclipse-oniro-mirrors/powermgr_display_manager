@@ -243,7 +243,12 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
     if (state == DisplayState::DISPLAY_OFF) {
         if (!isDisplayDelayOff_) {
             DISPLAY_HILOGI(COMP_SVC, "screen off immediately");
-            return iterator->second->UpdateState(state, reason);
+            bool ret = iterator->second->UpdateState(state, reason);
+            if (!ret) {
+                DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]undo brightness SetDisplayState");
+                BrightnessManager::Get().SetDisplayState(id, iterator->second->GetState());
+            }
+            return ret;
         }
         displayId_ = id;
         displayState_ = state;
