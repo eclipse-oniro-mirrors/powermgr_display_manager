@@ -19,12 +19,16 @@
 #include "display_power_mgr_client.h"
 #include "ipc_object_stub.h"
 #include "power_state_machine_info.h"
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 #include <memory>
 #include <unistd.h>
 
 using namespace testing::ext;
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 using namespace OHOS::HiviewDFX;
+#endif
 using namespace OHOS::PowerMgr;
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS;

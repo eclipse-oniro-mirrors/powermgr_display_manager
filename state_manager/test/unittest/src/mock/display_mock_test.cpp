@@ -22,10 +22,14 @@
 #include "ipc_object_stub.h"
 #include "mock_display_remote_object.h"
 #include "power_state_machine_info.h"
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 
 using namespace testing::ext;
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 using namespace OHOS::HiviewDFX;
+#endif
 using namespace OHOS::PowerMgr;
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS;

@@ -14,6 +14,7 @@
 import("//build/ohos.gni")
 
 declare_args() {
+  defines = []
   has_sensors_sensor_part = true
   if (!defined(global_parts_info) ||
       defined(global_parts_info.sensors_sensor)) {
@@ -22,6 +23,14 @@ declare_args() {
     has_sensors_sensor_part = false
   }
   display_manager_feature_brightnessext = ""
+
+  if (!defined(global_parts_info) ||
+      defined(global_parts_info.hiviewdfx_hisysevent)) {
+    has_hiviewdfx_hisysevent_part = true
+    defines += [ "HAS_HIVIEWDFX_HISYSEVENT_PART" ]
+  } else {
+    has_hiviewdfx_hisysevent_part = false
+  }
 }
 
 displaymgr_part_name = "display_manager"

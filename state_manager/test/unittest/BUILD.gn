@@ -90,7 +90,7 @@ ohos_unittest("display_service_death_test") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
-  defines = [ "DISPLAY_SERVICE_DEATH_UT" ]
+  defines += [ "DISPLAY_SERVICE_DEATH_UT" ]
 
   deps = [
     "${displaymgr_inner_api}:displaymgr",
@@ -141,7 +141,7 @@ ohos_unittest("display_mock_test") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
-  defines = [
+  defines += [
     "MOCK_READSTRING_DESCRIPTIR",
     "MOCK_WRITE_INTERFACE_TOKEN_RETURN_TRUE",
   ]

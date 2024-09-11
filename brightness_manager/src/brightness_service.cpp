@@ -16,7 +16,9 @@
 #include "brightness_service.h"
 
 #include <file_ex.h>
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
+#endif
 #include <ipc_skeleton.h>
 #include <securec.h>
 
@@ -692,8 +694,10 @@ void BrightnessService::ProcessLightLux(float lux)
                 mLuxLevel = index;
                 // Notify ambient lux change event to battery statistics
                 // type:0 auto brightness, 1 manual brightness, 2 window brightness, 3 others
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
                 HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", mLuxLevel, "TYPE", 0);
+#endif
             }
             break;
         }
@@ -1182,8 +1186,10 @@ void BrightnessService::ReportBrightnessBigData(uint32_t brightness)
     std::string reason = GetReason();
     uint32_t nit = GetMappingBrightnessNit(brightness);
     // Notify screen brightness change event to battery statistics
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BRIGHTNESS_NIT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", brightness, "REASON", reason, "NIT", nit);
+#endif
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BigData brightness=%{public}d,reason=%{public}s,nit=%{public}d",
         brightness, reason.c_str(), nit);
 }
