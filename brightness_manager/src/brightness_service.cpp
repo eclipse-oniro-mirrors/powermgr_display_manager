@@ -28,7 +28,7 @@
 #include "delayed_sp_singleton.h"
 #include "display_common.h"
 #include "display_log.h"
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "dm_common.h"
 #include "errors.h"
 #include "ffrt_utils.h"
@@ -36,7 +36,7 @@
 #include "new"
 #include "permission.h"
 #include "refbase.h"
-#include "screen_manager.h"
+#include "screen_manager_lite.h"
 #include "setting_provider.h"
 #include "system_ability_definition.h"
 
@@ -112,14 +112,14 @@ void BrightnessService::Init(uint32_t defaultMax, uint32_t defaultMin)
     }
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
-    mIsFoldDevice = Rosen::DisplayManager::GetInstance().IsFoldable();
+    mIsFoldDevice = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Init mIsFoldDevice=%{public}d", mIsFoldDevice);
 #endif
     ConfigParse::Get().Initialize();
     mLightLuxManager.InitParameters();
     mBrightnessCalculationManager.InitParameters();
 
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     brightnessValueMax = defaultMax;
     brightnessValueMin = defaultMin;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d, max=%{public}u, min=%{public}u",
@@ -131,7 +131,7 @@ void BrightnessService::Init(uint32_t defaultMax, uint32_t defaultMin)
 
 void BrightnessService::DeInit()
 {
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d", isFoldable);
     if (isFoldable) {
         UnRegisterFoldStatusListener();
@@ -197,9 +197,9 @@ void BrightnessService::RegisterFoldStatusListener()
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::RegisterDisplayModeListener newListener failed");
         return;
     }
-    auto ret = Rosen::DisplayManager::GetInstance().RegisterFoldStatusListener(mFoldStatusistener);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterFoldStatusListener(mFoldStatusistener);
     if (ret != Rosen::DMError::DM_OK) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Rosen::DisplayManager::RegisterDisplayModeListener failed");
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Rosen::DisplayManagerLite::RegisterDisplayModeListener failed");
         mFoldStatusistener = nullptr;
     } else {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::RegisterDisplayModeListener success");
@@ -212,7 +212,7 @@ void BrightnessService::UnRegisterFoldStatusListener()
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::UnRegistermFoldStatusistener listener is null");
         return;
     }
-    auto ret = Rosen::DisplayManager::GetInstance().UnregisterFoldStatusListener(mFoldStatusistener);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterFoldStatusListener(mFoldStatusistener);
     if (ret != Rosen::DMError::DM_OK) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::UnRegisterDisplayModeListener  failed");
     }
@@ -277,13 +277,13 @@ void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
 uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
 {
     uint32_t currentId = defaultId;
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
         DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId not fold phone return default id=%{public}d", defaultId);
         return currentId;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    auto foldMode = Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode();
     currentId = static_cast<uint32_t>(GetDisplayIdWithDisplayMode(foldMode));
     DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId foldMode=%{public}u", foldMode);
     IPCSkeleton::SetCallingIdentity(identity);
@@ -609,13 +609,13 @@ void BrightnessService::DeactivateAmbientSensor1()
 void BrightnessService::ActivateValidAmbientSensor()
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateValidAmbientSensor");
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
         ActivateAmbientSensor();
         return;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    auto foldMode = Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode();
     int sensorId = GetSensorIdWithDisplayMode(foldMode);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ActivateValidAmbientSensor sensorId=%{public}d, mode=%{public}d",
         sensorId, foldMode);
@@ -630,13 +630,13 @@ void BrightnessService::ActivateValidAmbientSensor()
 void BrightnessService::DeactivateValidAmbientSensor()
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateValidAmbientSensor");
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
         DeactivateAmbientSensor();
         return;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    auto foldMode = Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode();
     int sensorId = GetSensorIdWithDisplayMode(foldMode);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateValidAmbientSensor sensorId=%{public}d, mode=%{public}d",
         sensorId, foldMode);
@@ -651,7 +651,7 @@ void BrightnessService::DeactivateValidAmbientSensor()
 void BrightnessService::DeactivateAllAmbientSensor()
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DeactivateAllAmbientSensor");
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
         DeactivateAmbientSensor();
         return;
@@ -1206,13 +1206,13 @@ bool BrightnessService::GetIsSupportLightSensor()
 
 bool BrightnessService::IsCurrentSensorEnable()
 {
-    bool isFoldable = Rosen::DisplayManager::GetInstance().IsFoldable();
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
         return mIsLightSensorEnabled;
     }
     bool result = false;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    auto foldMode = Rosen::DisplayManager::GetInstance().GetFoldDisplayMode();
+    auto foldMode = Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode();
     int sensorId = GetSensorIdWithDisplayMode(foldMode);
     if (sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
         result = mIsLightSensorEnabled;
