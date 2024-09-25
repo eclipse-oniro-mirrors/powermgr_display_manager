@@ -883,6 +883,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness001, Test
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001: fun is start");
     bool ret = DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 3000);
     EXPECT_TRUE(ret);
+    DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 5);
+    usleep(10000);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001: fun is end");
 }
 
@@ -938,6 +940,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, Test
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality001, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001: fun is start");
+    DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 5);
+    usleep(10000);
     uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
