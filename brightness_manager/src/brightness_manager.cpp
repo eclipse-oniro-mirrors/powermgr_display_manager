@@ -41,10 +41,10 @@ void BrightnessManager::DeInit()
 #endif
 }
 
-void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state)
+void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
-    mBrightnessManagerExt.SetDisplayState(id, state);
+    mBrightnessManagerExt.SetDisplayState(id, state, reason);
 #else
     BrightnessService::Get().SetDisplayState(id, state);
 #endif

@@ -129,7 +129,7 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
     uint32_t currentDisplayId = BrightnessManager::Get().GetCurrentDisplayId(mainDisplayId);
     DisplayState state = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->GetDisplayState(mainDisplayId);
     BrightnessManager::Get().SetDisplayId(currentDisplayId);
-    BrightnessManager::Get().SetDisplayState(currentDisplayId, state);
+    BrightnessManager::Get().SetDisplayState(currentDisplayId, state, 0);
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->SetBrightness(brightness, mainDisplayId);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedBrightness currentDisplayId=%{public}d", currentDisplayId);
 }
@@ -239,7 +239,7 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
         }
     }
 
-    BrightnessManager::Get().SetDisplayState(id, state);
+    BrightnessManager::Get().SetDisplayState(id, state, reason);
 
     if (state == DisplayState::DISPLAY_OFF) {
         if (!isDisplayDelayOff_) {
@@ -247,7 +247,7 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             bool ret = iterator->second->UpdateState(state, reason);
             if (!ret) {
                 DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]undo brightness SetDisplayState");
-                BrightnessManager::Get().SetDisplayState(id, iterator->second->GetState());
+                BrightnessManager::Get().SetDisplayState(id, iterator->second->GetState(), reason);
             }
             return ret;
         }

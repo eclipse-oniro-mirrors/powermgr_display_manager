@@ -229,13 +229,14 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mSetMaxBrightnessNitFunc = nullptr;
 }
 
-void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state)
+void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
     if (!mBrightnessManagerExtEnable) {
         return;
     }
-    auto setDisplayStateFunc = reinterpret_cast<void (*)(uint32_t, DisplayState state)>(mSetDisplayStateFunc);
-    setDisplayStateFunc(id, state);
+    auto setDisplayStateFunc = reinterpret_cast<void (*)(uint32_t, DisplayState state, uint32_t reason)>
+        (mSetDisplayStateFunc);
+    setDisplayStateFunc(id, state, reason);
 }
 
 DisplayState BrightnessManagerExt::GetState()

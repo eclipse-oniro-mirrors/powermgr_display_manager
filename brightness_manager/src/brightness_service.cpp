@@ -875,7 +875,7 @@ void BrightnessService::SetSleepBrightness()
         MIN_DEFAULT_BRGIHTNESS_LEVEL);
     uint32_t sleepDarkenTime = BrightnessParamHelper::GetSleepDarkenTime();
     mIsSleepStatus = true;
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetSleepBrightness enterSleepBrightness=%{pulblic}d, sleepDarkenTime=%{public}d",
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetSleepBrightness enterSleepBrightness=%{public}d, sleepDarkenTime=%{public}d",
         enterSleepBrightness, sleepDarkenTime);
     OverrideBrightness(enterSleepBrightness, sleepDarkenTime);
 }

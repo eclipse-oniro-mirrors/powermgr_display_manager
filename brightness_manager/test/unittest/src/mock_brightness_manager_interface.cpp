@@ -54,7 +54,7 @@ void DeInit()
 {
 }
 
-void SetDisplayState(uint32_t id, DisplayState state)
+void SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
 }
 
