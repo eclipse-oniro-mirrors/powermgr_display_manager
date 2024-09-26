@@ -32,7 +32,7 @@ public:
 
     void Init(uint32_t defaultMax, uint32_t defaultMin);
     void DeInit();
-    void SetDisplayState(uint32_t id, DisplayState state);
+    void SetDisplayState(uint32_t id, DisplayState state, uint32_t reason);
     DisplayState GetState();
     bool AutoAdjustBrightness(bool enable);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);

@@ -106,7 +106,7 @@ HWTEST_F(BrightnessManagerExtTest, MockInit001, TestSize.Level0)
     MockInitBrightnessManagerExt(g_BrightnessManagerExt);
     MockClearValues();
 
-    g_BrightnessManagerExt.SetDisplayState(0, DisplayState::DISPLAY_OFF);
+    g_BrightnessManagerExt.SetDisplayState(0, DisplayState::DISPLAY_OFF, 0);
 
     MockSetValue(1.0);
     usleep(DEFAULT_WAITING_TIME);
