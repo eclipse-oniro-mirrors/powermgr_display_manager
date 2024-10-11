@@ -14,8 +14,6 @@
 import("//build/test.gni")
 import("../../../displaymgr.gni")
 
-module_output_path = "${displaymgr_part_name}/brightness_manager/test"
-
 config("module_private_config") {
   visibility = [ ":*" ]
   include_dirs = [
@@ -25,8 +23,8 @@ config("module_private_config") {
   ]
 }
 
-ohos_unittest("brightness_manager_test") {
-  module_out_path = module_output_path
+set_defaults("ohos_unittest") {
+  module_out_path = "${displaymgr_part_name}/brightness_manager/test"
 
   configs = [
     "${brightnessmgr_root_path}:brightness_manager_config",
@@ -36,12 +34,9 @@ ohos_unittest("brightness_manager_test") {
   ]
 
   deps = [
-    "${brightnessmgr_root_path}:brightness_manager",
     "${displaymgr_inner_api}:displaymgr",
     "//third_party/googletest:gtest_main",
   ]
-
-  sources = [ "./src/brightness_manager_test.cpp" ]
 
   external_deps = [
     "ability_base:want",
@@ -64,7 +59,36 @@ ohos_unittest("brightness_manager_test") {
   ]
 }
 
+ohos_unittest("brightness_manager_ext_test") {
+  sources = [
+    "${brightnessmgr_root_path}/src/brightness_manager_ext.cpp",
+    "./src/brightness_manager_ext_test.cpp",
+    "./src/mock_brightness_manager_interface.cpp",
+  ]
+
+  include_dirs = [ "./include/" ]
+
+  defines = [ "BRIGHTNESS_DT_ENABLE" ]
+}
+
+ohos_unittest("brightness_manager_test") {
+  sources = [ "./src/brightness_manager_test.cpp" ]
+
+  deps += [ "${brightnessmgr_root_path}:brightness_manager" ]
+}
+
+ohos_unittest("brightness_service_test") {
+  sources = [ "./src/brightness_service_test.cpp" ]
+
+  deps += [ "${brightnessmgr_root_path}:brightness_manager" ]
+}
+
 group("unittest") {
   testonly = true
   deps = [ ":brightness_manager_test" ]
+  if (display_manager_feature_brightnessext != "") {
+    deps += [ ":brightness_manager_ext_test" ]
+  } else {
+    deps += [ ":brightness_service_test" ]
+  }
 }
