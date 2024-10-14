@@ -42,7 +42,7 @@ int32_t DisplayBrightnessCallbackStub::OnRemoteRequest(
         return E_GET_POWER_SERVICE_FAILED;
     }
 
-    const int DFX_DELAY_S = 10;
+    const int DFX_DELAY_S = 60;
     const int INVALID_ID = 0;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer(
         "DisplayBrightnessCallbackStub", DFX_DELAY_S, nullptr, nullptr, HiviewDFX::XCOLLIE_FLAG_LOG);
