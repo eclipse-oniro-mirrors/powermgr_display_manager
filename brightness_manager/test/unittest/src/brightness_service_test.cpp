@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "display_log.h"
 #include "display_power_mgr_client.h"
-#include "brightness_manager.h"
+#include "brightness_service.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -28,7 +28,7 @@ namespace {
     const double NO_DISCOUNT = 1.00;
 }
 
-class BrightnessManagerTest : public Test {
+class BrightnessServiceTest : public Test {
 public:
     void SetUp()
     {
@@ -44,13 +44,11 @@ public:
 };
 
 namespace {
-HWTEST_F(BrightnessManagerTest, BrightnessManagerGet001, TestSize.Level0)
+HWTEST_F(BrightnessServiceTest, BrightnessServiceGet001, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is start");
-    auto& brightnessManager = BrightnessManager::Get();
-    EXPECT_NE(&brightnessManager, nullptr);
-    const int sleepTime = 100000;
-    usleep(sleepTime);
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is start");
+    auto& brightnessService = BrightnessService::Get();
+    EXPECT_NE(&brightnessService, nullptr);
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is end");
 }
 } // namespace
