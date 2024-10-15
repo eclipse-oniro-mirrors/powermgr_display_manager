@@ -69,7 +69,7 @@ ohos_static_library("brightness_manager") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "skia:skia_canvaskit",
-    "window_manager:libdm",
+    "window_manager:libdm_lite",
   ]
 
   if (use_libfuzzer) {

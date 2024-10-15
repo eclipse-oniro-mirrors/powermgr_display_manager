@@ -79,7 +79,7 @@ ohos_shared_library("displaymgrservice") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
     "skia:skia_canvaskit",
-    "window_manager:libdm",
+    "window_manager:libdm_lite",
   ]
 
   if (has_sensors_sensor_part) {
