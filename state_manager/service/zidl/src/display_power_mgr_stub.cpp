@@ -43,7 +43,7 @@ int32_t DisplayPowerMgrStub::OnRemoteRequest(uint32_t code, MessageParcel &data,
         return E_GET_POWER_SERVICE_FAILED;
     }
 
-    constexpr int dfxDelayS = 10;
+    constexpr int dfxDelayS = 60;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerMgrStub", dfxDelayS, nullptr, nullptr,
         HiviewDFX::XCOLLIE_FLAG_LOG);
 

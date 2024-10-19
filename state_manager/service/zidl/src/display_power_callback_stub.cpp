@@ -42,7 +42,7 @@ int32_t DisplayPowerCallbackStub::OnRemoteRequest(uint32_t code, MessageParcel &
         return E_GET_POWER_SERVICE_FAILED;
     }
 
-    const int DFX_DELAY_S = 10;
+    const int DFX_DELAY_S = 60;
     int id = HiviewDFX::XCollie::GetInstance().SetTimer("DisplayPowerCallbackStub", DFX_DELAY_S, nullptr, nullptr,
         HiviewDFX::XCOLLIE_FLAG_LOG);
     int32_t ret = ERR_OK;
