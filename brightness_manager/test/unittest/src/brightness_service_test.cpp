@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,9 +46,9 @@ public:
 namespace {
 HWTEST_F(BrightnessServiceTest, BrightnessServiceGet001, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is start");
+    DISPLAY_HILOGD(LABEL_TEST, "BrightnessServiceGet001: fun is start");
     auto& brightnessService = BrightnessService::Get();
     EXPECT_NE(&brightnessService, nullptr);
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001: fun is end");
+    DISPLAY_HILOGD(LABEL_TEST, "BrightnessServiceGet001: fun is end");
 }
 } // namespace
