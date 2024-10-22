@@ -30,7 +30,9 @@
 #include "display_common.h"
 #include "display_log.h"
 #include "power_mgr_client.h"
+#ifdef HAS_DFX_HIVIEW_PART
 #include "xpower_event_js.h"
+#endif
 
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS::PowerMgr;
@@ -108,7 +110,9 @@ static napi_value SetValue(napi_env env, napi_callback_info info)
     if (res != nullptr) {
         Brightness brightness(env);
         brightness.SetValue(info);
+#ifdef HAS_DFX_HIVIEW_PART
         OHOS::HiviewDFX::ReportXPowerJsStackSysEvent(env, "Brightness::SetValue");
+#endif
     }
     return nullptr;
 }
