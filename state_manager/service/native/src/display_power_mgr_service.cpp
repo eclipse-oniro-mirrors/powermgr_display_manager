@@ -91,11 +91,11 @@ void DisplayPowerMgrService::Init()
         DISPLAY_HILOGI(COMP_SVC, "Boot completed delayed");
         SetBootCompletedBrightness();
         SetBootCompletedAutoBrightness();
-        RegisterSettingObservers();
     };
     g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, BOOTED_COMPLETE_DELAY_TIME, queue_);
     RegisterBootCompletedCallback();
 }
+
 void DisplayPowerMgrService::RegisterBootCompletedCallback()
 {
     g_bootCompletedCallback = []() {

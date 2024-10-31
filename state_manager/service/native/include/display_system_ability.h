@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include <string>
 #include <system_ability.h>
 #include "refbase.h"
+#include "display_common_event_mgr.h"
 #include "display_power_mgr_service.h"
 
 namespace OHOS {
@@ -40,6 +41,7 @@ private:
     sptr<DisplayPowerMgrService> service_;
     bool isDpmsLoaded{false};
     bool isDataLoaded{false};
+    std::shared_ptr<DisplayCommonEventManager> commonEventManager_ {nullptr};
 };
 }
 }
