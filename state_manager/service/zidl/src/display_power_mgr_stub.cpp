@@ -246,11 +246,13 @@ int32_t DisplayPowerMgrStub::OverrideBrightnessStub(MessageParcel& data, Message
 {
     uint32_t value = 0;
     uint32_t displayId = 0;
+    uint32_t duration = 0;
 
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, value, E_READ_PARCEL_ERROR);
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, duration, E_READ_PARCEL_ERROR);
 
-    bool ret = OverrideBrightness(value, displayId);
+    bool ret = OverrideBrightness(value, displayId, duration);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write OverrideBrightness return value");
         return E_WRITE_PARCEL_ERROR;
@@ -275,10 +277,12 @@ int32_t DisplayPowerMgrStub::OverrideDisplayOffDelayStub(MessageParcel& data, Me
 int32_t DisplayPowerMgrStub::RestoreBrightnessStub(MessageParcel& data, MessageParcel& reply)
 {
     uint32_t displayId = 0;
+    uint32_t duration = 0;
 
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, duration, E_READ_PARCEL_ERROR);
 
-    bool ret = RestoreBrightness(displayId);
+    bool ret = RestoreBrightness(displayId, duration);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write RestoreBrightness return value");
         return E_WRITE_PARCEL_ERROR;
