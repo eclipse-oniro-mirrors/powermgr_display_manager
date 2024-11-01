@@ -131,11 +131,11 @@ bool DisplayPowerMgrClient::DiscountBrightness(double discount, uint32_t display
     return proxy->DiscountBrightness(discount, displayId);
 }
 
-bool DisplayPowerMgrClient::OverrideBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrClient::OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, false);
-    return proxy->OverrideBrightness(value, displayId);
+    return proxy->OverrideBrightness(value, displayId, duration);
 }
 
 bool DisplayPowerMgrClient::OverrideDisplayOffDelay(uint32_t delayMs)
@@ -145,11 +145,11 @@ bool DisplayPowerMgrClient::OverrideDisplayOffDelay(uint32_t delayMs)
     return proxy->OverrideDisplayOffDelay(delayMs);
 }
 
-bool DisplayPowerMgrClient::RestoreBrightness(uint32_t displayId)
+bool DisplayPowerMgrClient::RestoreBrightness(uint32_t displayId, uint32_t duration)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, false);
-    return proxy->RestoreBrightness(displayId);
+    return proxy->RestoreBrightness(displayId, duration);
 }
 
 uint32_t DisplayPowerMgrClient::GetBrightness(uint32_t displayId)

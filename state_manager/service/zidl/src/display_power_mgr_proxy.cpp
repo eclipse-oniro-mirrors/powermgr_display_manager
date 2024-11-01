@@ -311,7 +311,7 @@ bool DisplayPowerMgrProxy::DiscountBrightness(double discount, uint32_t displayI
     return result;
 }
 
-bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration)
 {
     sptr<IRemoteObject> remote = Remote();
     RETURN_IF_WITH_RET(remote == nullptr, false);
@@ -328,6 +328,7 @@ bool DisplayPowerMgrProxy::OverrideBrightness(uint32_t value, uint32_t displayId
 
     RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, value, false);
     RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, duration, false);
 
     int ret = remote->SendRequest(
         static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::OVERRIDE_BRIGHTNESS),
@@ -378,7 +379,7 @@ bool DisplayPowerMgrProxy::OverrideDisplayOffDelay(uint32_t delayMs)
     return result;
 }
 
-bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
+bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId, uint32_t duration)
 {
     sptr<IRemoteObject> remote = Remote();
     uint32_t result = 0;
@@ -395,6 +396,7 @@ bool DisplayPowerMgrProxy::RestoreBrightness(uint32_t displayId)
     }
 
     RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, false);
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, duration, false);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::RESTORE_BRIGHTNESS),
