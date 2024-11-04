@@ -75,7 +75,9 @@ void DisplayPowerMgrService::Init()
             DISPLAY_HILOGE(COMP_SVC, "cannot find any display id after max retry, fill with 0");
         }
     }
+#ifndef FUZZ_COV_TEST
     BrightnessManager::Get().Init(BRIGHTNESS_MAX, BRIGHTNESS_MIN);
+#endif
     for (const auto& id: displayIds) {
         DISPLAY_HILOGI(COMP_SVC, "find display, id=%{public}u", id);
         controllerMap_.emplace(id, std::make_shared<ScreenController>(id));
