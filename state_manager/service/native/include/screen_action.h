@@ -23,7 +23,7 @@
 #include <vector>
 
 #include "dm_common.h"
-#include "display_manager.h"
+#include "display_manager_lite.h"
 #include "display_power_info.h"
 
 namespace OHOS {
