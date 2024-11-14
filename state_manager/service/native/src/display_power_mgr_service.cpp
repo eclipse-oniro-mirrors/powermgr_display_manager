@@ -341,12 +341,11 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
     return iter->second->DiscountBrightness(safeDiscount);
 }
 
-bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration)
+bool DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration)
 {
     if (!Permission::IsSystem()) {
         return false;
     }
-    auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u, duration=%{public}d",
         displayId, brightness, duration);
     auto iter = controllerMap_.find(displayId);
