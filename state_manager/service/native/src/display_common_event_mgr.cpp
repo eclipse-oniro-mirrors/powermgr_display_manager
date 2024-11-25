@@ -79,9 +79,7 @@ bool DisplayCommonEventManager::CheckIfSettingsDataReady()
         }
         isDataShareReady_ = true;
         return true;
-    } else if (ret.first == DataShare::
-
-    E_DATA_SHARE_NOT_READY) {
+    } else if (ret.first == DataShare::E_DATA_SHARE_NOT_READY) {
         DISPLAY_HILOGI(COMP_SVC, "create data_share helper failed");
         isDataShareReady_ = false;
         return false;
