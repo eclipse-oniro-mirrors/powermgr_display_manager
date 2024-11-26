@@ -55,20 +55,23 @@ bool DisplayCommonEventManager::CheckIfSettingsDataReady()
     if (isDataShareReady_) {
         return true;
     }
-    if (remoteObj_ == nullptr) {
-        auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (sam == nullptr) {
-            DISPLAY_HILOGI(COMP_SVC, "sa manager is null");
-            return false;
-        }
-        remoteObj_ = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
-    }
-    if (remoteObj_ == nullptr) {
-        DISPLAY_HILOGI(COMP_SVC, "remote obj is null");
+    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sam == nullptr) {
+        DISPLAY_HILOGE(COMP_SVC, "sa manager is null");
         return false;
     }
+    sptr<IRemoteObject> remoteObj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
+    if (remoteObj == nullptr) {
+        DISPLAY_HILOGE(COMP_SVC, "remote obj is null");
+        return false;
+    }
+    return CreateDataShareHelper(remoteObj);
+}
+
+bool DisplayCommonEventManager::CreateDataShareHelper(sptr<IRemoteObject> remoteObj)
+{
     std::pair<int, std::shared_ptr<DataShare::DataShareHelper>> ret =
-        DataShare::DataShareHelper::Create(remoteObj_, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
+        DataShare::DataShareHelper::Create(remoteObj, SETTING_URI_PROXY, SETTINGS_DATA_EXT_URI);
     DISPLAY_HILOGI(COMP_SVC, "create data_share helper, ret=%{public}d", ret.first);
     if (ret.first == DataShare::E_OK) {
         DISPLAY_HILOGI(COMP_SVC, "create data_share helper success");
@@ -79,13 +82,11 @@ bool DisplayCommonEventManager::CheckIfSettingsDataReady()
         }
         isDataShareReady_ = true;
         return true;
-    } else if (ret.first == DataShare::E_DATA_SHARE_NOT_READY) {
-        DISPLAY_HILOGI(COMP_SVC, "create data_share helper failed");
+    } else {
+        DISPLAY_HILOGE(COMP_SVC, "create data_share helper failed");
         isDataShareReady_ = false;
         return false;
     }
-    DISPLAY_HILOGI(COMP_SVC, "data_share unknown");
-    return true;
 }
 
 bool DisplayCommonEventManager::SetKvDataReady()
