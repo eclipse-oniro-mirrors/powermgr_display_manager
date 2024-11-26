@@ -39,9 +39,9 @@ public:
     void RegisterSettingObservers();
 
 private:
+    bool CreateDataShareHelper(sptr<IRemoteObject> remoteObj);
     bool isDataShareReady_ {false};
     bool isKvDataReady_ {false};
-    sptr<IRemoteObject> remoteObj_;
     std::mutex lock_ {};
 };
 } // namespace DisplayPowerMgr
