@@ -53,13 +53,12 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
     }
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         DISPLAY_HILOGI(COMP_SVC, "DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID loaded");
-        isDataLoaded = true;
         if (commonEventManager_ != nullptr && commonEventManager_->CheckIfSettingsDataReady() &&
             commonEventManager_->SetKvDataReady()) {
             commonEventManager_->RegisterSettingObservers();
         }
     }
-    if (isDpmsLoaded && isDataLoaded) { // dpms service and data service both ready
+    if (isDpmsLoaded) { // dpms service and data service both ready
         DISPLAY_HILOGI(COMP_SVC, "Start DisplayPowerMgrService");
         auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
         service->Init();
