@@ -34,6 +34,7 @@ ohos_shared_library("displaymgrservice") {
 
   sources = [
     "native/src/display_auto_brightness.cpp",
+    "native/src/display_common_event_mgr.cpp",
     "native/src/display_param_helper.cpp",
     "native/src/display_power_mgr_service.cpp",
     "native/src/display_setting_helper.cpp",
