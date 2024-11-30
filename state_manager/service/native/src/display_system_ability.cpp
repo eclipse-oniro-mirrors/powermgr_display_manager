@@ -59,12 +59,17 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
         }
     }
     if (isDpmsLoaded) { // dpms service and data service both ready
+        if (isReady) {
+            DISPLAY_HILOGI(COMP_SVC, "Onstart is ready, nothing to do");
+            return;
+        }
         DISPLAY_HILOGI(COMP_SVC, "Start DisplayPowerMgrService");
         auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
         service->Init();
         if (!Publish(service)) {
             DISPLAY_HILOGE(COMP_SVC, "Failed to publish service");
         }
+        isReady = true;
     }
 }
 
@@ -74,6 +79,7 @@ void DisplaySystemAbility::OnStop()
     auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     service->Deinit();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    isReady = false;
 }
 } // OHOS
 } // DisplayPowerMgr
