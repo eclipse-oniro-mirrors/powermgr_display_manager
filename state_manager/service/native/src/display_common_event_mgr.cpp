@@ -44,8 +44,8 @@ void DisplayCommonEventManager::OnReceiveEvent(const CommonEventData &data)
     std::string action = data.GetWant().GetAction();
     if (action == "usual.event.DATA_SHARE_READY") {
         DISPLAY_HILOGI(COMP_SVC, "on receive data_share ready.");
-        if (SetKvDataReady()) {
-            RegisterSettingObservers();
+        if (GetDpmsRemoteObj() && SetKvDataReady()) {
+            HandleBootBrightness();
         }
     }
 }
@@ -55,17 +55,22 @@ bool DisplayCommonEventManager::CheckIfSettingsDataReady()
     if (isDataShareReady_) {
         return true;
     }
-    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        DISPLAY_HILOGE(COMP_SVC, "sa manager is null");
-        return false;
-    }
-    sptr<IRemoteObject> remoteObj = sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
+    auto remoteObj = GetDpmsRemoteObj();
     if (remoteObj == nullptr) {
         DISPLAY_HILOGE(COMP_SVC, "remote obj is null");
         return false;
     }
     return CreateDataShareHelper(remoteObj);
+}
+
+sptr<IRemoteObject> DisplayCommonEventManager::GetDpmsRemoteObj()
+{
+    auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sam == nullptr) {
+        DISPLAY_HILOGE(COMP_SVC, "sa manager is null");
+        return nullptr;
+    }
+    return sam->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
 }
 
 bool DisplayCommonEventManager::CreateDataShareHelper(sptr<IRemoteObject> remoteObj)
@@ -99,11 +104,11 @@ bool DisplayCommonEventManager::SetKvDataReady()
     return true;
 }
 
-void DisplayCommonEventManager::RegisterSettingObservers()
+void DisplayCommonEventManager::HandleBootBrightness()
 {
-    DISPLAY_HILOGI(COMP_SVC, "Register setting observer");
+    DISPLAY_HILOGI(COMP_SVC, "set boot brightness");
     auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
-    service->RegisterSettingObservers();
+    service->HandleBootBrightness();
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

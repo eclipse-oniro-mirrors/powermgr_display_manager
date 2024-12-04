@@ -38,14 +38,29 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
 {
     if (systemAbilityId == DISPLAY_MANAGER_SERVICE_SA_ID) {
         DISPLAY_HILOGI(COMP_SVC, "DISPLAY_MANAGER_SERVICE_SA_ID loaded");
-        isDpmsLoaded = true;
+        if (isReady) {
+            DISPLAY_HILOGI(COMP_SVC, "Onstart is ready, nothing to do");
+            return;
+        }
+        auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+        service->Init();
+        if (!Publish(service)) {
+            DISPLAY_HILOGE(COMP_SVC, "Failed to publish service");
+        }
+        if (commonEventManager_ != nullptr && commonEventManager_->CheckIfSettingsDataReady()
+            && commonEventManager_->SetKvDataReady()) {
+            commonEventManager_->HandleBootBrightness();
+        }
+        isReady = true;
     }
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID && commonEventManager_ == nullptr) {
         DISPLAY_HILOGI(COMP_SVC, "COMMON_EVENT_SERVICE_ID loaded");
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent("usual.event.DATA_SHARE_READY");
         OHOS::EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
-        commonEventManager_ = std::make_shared<DisplayCommonEventManager>(subscribeInfo);
+        if (commonEventManager_ == nullptr) {
+            commonEventManager_ = std::make_shared<DisplayCommonEventManager>(subscribeInfo);
+        }
         if (commonEventManager_ == nullptr ||
             !OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(commonEventManager_)) {
             DISPLAY_HILOGI(COMP_SVC, "subscribe common event failed");
@@ -55,15 +70,7 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
         DISPLAY_HILOGI(COMP_SVC, "DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID loaded");
         if (commonEventManager_ != nullptr && commonEventManager_->CheckIfSettingsDataReady() &&
             commonEventManager_->SetKvDataReady()) {
-            commonEventManager_->RegisterSettingObservers();
-        }
-    }
-    if (isDpmsLoaded) { // dpms service and data service both ready
-        DISPLAY_HILOGI(COMP_SVC, "Start DisplayPowerMgrService");
-        auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
-        service->Init();
-        if (!Publish(service)) {
-            DISPLAY_HILOGE(COMP_SVC, "Failed to publish service");
+            commonEventManager_->HandleBootBrightness();
         }
     }
 }
@@ -74,6 +81,7 @@ void DisplaySystemAbility::OnStop()
     auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     service->Deinit();
     RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
+    isReady = false;
 }
 } // OHOS
 } // DisplayPowerMgr

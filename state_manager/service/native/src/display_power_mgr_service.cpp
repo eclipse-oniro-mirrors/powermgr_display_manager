@@ -88,12 +88,6 @@ void DisplayPowerMgrService::Init()
 #ifdef ENABLE_SENSOR_PART
     InitSensors();
 #endif
-    FFRTTask task = [this]() {
-        DISPLAY_HILOGI(COMP_SVC, "Boot completed delayed");
-        SetBootCompletedBrightness();
-        SetBootCompletedAutoBrightness();
-    };
-    g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, BOOTED_COMPLETE_DELAY_TIME, queue_);
     RegisterBootCompletedCallback();
 }
 
@@ -121,6 +115,16 @@ void DisplayPowerMgrService::Reset()
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "destruct display_power_queue");
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "reset end");
+}
+
+void DisplayPowerMgrService::HandleBootBrightness()
+{
+    BrightnessManager::Get().Init(BRIGHTNESS_MAX, BRIGHTNESS_MIN);
+    std::call_once(initFlag_, [] {
+        SetBootCompletedBrightness();
+        SetBootCompletedAutoBrightness();
+    });
+    RegisterSettingObservers();
 }
 
 void DisplayPowerMgrService::SetBootCompletedBrightness()

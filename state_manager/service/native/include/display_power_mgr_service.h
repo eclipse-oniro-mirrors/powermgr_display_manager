@@ -76,9 +76,9 @@ public:
     void Reset();
     void ClearOffset();
     void SetScreenOnBrightness();
+    void HandleBootBrightness();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);
-    static void RegisterSettingObservers();
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -127,6 +127,7 @@ private:
     static void RegisterBootCompletedCallback();
     static void SetBootCompletedBrightness();
     static void SetBootCompletedAutoBrightness();
+    static void RegisterSettingObservers();
     static void UnregisterSettingObservers();
     static void RegisterSettingAutoBrightnessObserver();
     static void UnregisterSettingAutoBrightnessObserver();
@@ -156,6 +157,7 @@ private:
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool isInTestMode_ {false};
+    std::once_flag initFlag_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

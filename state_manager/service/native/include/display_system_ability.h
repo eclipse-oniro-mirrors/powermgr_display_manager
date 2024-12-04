@@ -39,8 +39,8 @@ public:
 
 private:
     sptr<DisplayPowerMgrService> service_;
-    bool isDpmsLoaded{false};
     std::shared_ptr<DisplayCommonEventManager> commonEventManager_ {nullptr};
+    bool isReady{false};
 };
 }
 }
