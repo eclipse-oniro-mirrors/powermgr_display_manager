@@ -157,6 +157,7 @@ private:
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool isInTestMode_ {false};
+    bool isDozeEnabled_ {false};
     std::once_flag initFlag_;
 };
 } // namespace DisplayPowerMgr

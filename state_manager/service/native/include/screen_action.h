@@ -52,6 +52,7 @@ private:
     uint32_t displayId_ {DEFAULT_DISPLAY_ID};
     bool coordinated_ {false};
     Rosen::PowerStateChangeReason ParseSpecialReason(uint32_t reason);
+    Rosen::DisplayState ParseDisplayState(DisplayState state);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
