@@ -52,9 +52,9 @@ public:
     virtual bool SetMaxBrightness(double value, uint32_t mode) override;
     virtual bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode) override;
     virtual bool DiscountBrightness(double discount, uint32_t displayId) override;
-    virtual bool OverrideBrightness(uint32_t value, uint32_t displayId) override;
+    virtual bool OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration = 500) override;
     virtual bool OverrideDisplayOffDelay(uint32_t delayMs) override;
-    virtual bool RestoreBrightness(uint32_t displayId) override;
+    virtual bool RestoreBrightness(uint32_t displayId, uint32_t duration = 500) override;
     virtual uint32_t GetBrightness(uint32_t displayId) override;
     virtual uint32_t GetDefaultBrightness() override;
     virtual uint32_t GetMaxBrightness() override;

@@ -811,6 +811,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust,
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust: fun is start");
     const uint32_t SET_BRIGHTNESS = 107;
     const uint32_t BOOST_BRIGHTNESS_TIME = 10000;
+    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    usleep(DEFAULT_WAITING_TIME);
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
     EXPECT_TRUE(isBoost);
     bool isSet = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);

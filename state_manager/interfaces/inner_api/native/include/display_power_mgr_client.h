@@ -41,9 +41,9 @@ public:
     bool SetMaxBrightness(double value, uint32_t enterTestMode = 0);
     bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode = 0);
     bool DiscountBrightness(double discount, uint32_t displayId = 0);
-    bool OverrideBrightness(uint32_t value, uint32_t displayId = 0);
+    bool OverrideBrightness(uint32_t value, uint32_t displayId = 0, uint32_t duration = 500);
     bool OverrideDisplayOffDelay(uint32_t delayMs);
-    bool RestoreBrightness(uint32_t displayId = 0);
+    bool RestoreBrightness(uint32_t displayId = 0, uint32_t duration = 500);
     uint32_t GetBrightness(uint32_t displayId = 0);
     uint32_t GetDefaultBrightness();
     uint32_t GetMaxBrightness();
