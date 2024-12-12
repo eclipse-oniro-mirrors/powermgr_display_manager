@@ -53,7 +53,7 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
         }
         isReady = true;
     }
-    if (systemAbilityId == COMMON_EVENT_SERVICE_ID && commonEventManager_ == nullptr) {
+    if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DISPLAY_HILOGI(COMP_SVC, "COMMON_EVENT_SERVICE_ID loaded");
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent("usual.event.DATA_SHARE_READY");
