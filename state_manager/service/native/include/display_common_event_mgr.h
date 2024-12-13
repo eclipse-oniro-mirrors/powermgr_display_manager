@@ -36,9 +36,10 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
     bool CheckIfSettingsDataReady();
     bool SetKvDataReady();
-    void RegisterSettingObservers();
+    void HandleBootBrightness();
 
 private:
+    sptr<IRemoteObject> GetDpmsRemoteObj();
     bool CreateDataShareHelper(sptr<IRemoteObject> remoteObj);
     bool isDataShareReady_ {false};
     bool isKvDataReady_ {false};
