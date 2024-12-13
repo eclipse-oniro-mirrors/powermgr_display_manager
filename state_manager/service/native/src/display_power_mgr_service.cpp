@@ -46,7 +46,6 @@ const uint32_t GET_DISPLAY_ID_RETRY_COUNT = 3;
 const uint32_t DEFALUT_DISPLAY_ID = 0;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
-const uint32_t DEFAULT_DIMMING_TIME = 500;
 const uint32_t BOOTED_COMPLETE_DELAY_TIME = 2000;
 }
 
@@ -337,19 +336,18 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
     return iter->second->DiscountBrightness(safeDiscount);
 }
 
-bool DisplayPowerMgrService::OverrideBrightness(uint32_t value, uint32_t displayId)
+bool DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration)
 {
     if (!Permission::IsSystem()) {
         return false;
     }
-    auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u, duration=%{public}d",
-        displayId, brightness, DEFAULT_DIMMING_TIME);
+        displayId, brightness, duration);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    return BrightnessManager::Get().OverrideBrightness(brightness, DEFAULT_DIMMING_TIME);
+    return BrightnessManager::Get().OverrideBrightness(brightness, duration);
 }
 
 bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
@@ -368,18 +366,18 @@ bool DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs)
     return isDisplayDelayOff_;
 }
 
-bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId)
+bool DisplayPowerMgrService::RestoreBrightness(uint32_t displayId, uint32_t duration)
 {
     if (!Permission::IsSystem()) {
         return false;
     }
     DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u, duration=%{public}d",
-        displayId, DEFAULT_DIMMING_TIME);
+        displayId, duration);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
     }
-    bool ret = BrightnessManager::Get().RestoreBrightness(DEFAULT_DIMMING_TIME);
+    bool ret = BrightnessManager::Get().RestoreBrightness(duration);
     if (ret) {
         return true;
     }
