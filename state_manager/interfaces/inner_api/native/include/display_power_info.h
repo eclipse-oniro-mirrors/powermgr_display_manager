@@ -27,7 +27,9 @@ enum class DisplayState : uint32_t {
     DISPLAY_ON = 2,
     DISPLAY_SUSPEND = 3,
     DISPLAY_DELAY_OFF = 4,
-    DISPLAY_UNKNOWN = 5,
+    DISPLAY_DOZE,
+    DISPLAY_DOZE_SUSPEND,
+    DISPLAY_UNKNOWN
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

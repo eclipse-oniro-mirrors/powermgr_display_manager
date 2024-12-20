@@ -113,6 +113,8 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                 break;
             }
             [[fallthrough]];
+        case DisplayState::DISPLAY_DOZE_SUSPEND:
+        case DisplayState::DISPLAY_DOZE:
         case DisplayState::DISPLAY_OFF: {
             if (action_->EnableSkipSetDisplayState(reason)) {
                 OnStateChanged(state, reason);
@@ -286,18 +288,28 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "No need to set brightness, reason=%{public}d", reason);
         return;
     }
+    if (SkipNotify(state)) {
+        return;
+    }
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness();
         // Restore the brightness before screen off
         uint32_t screenOnBrightness = GetScreenOnBrightness();
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
     }
-    if (state == DisplayState::DISPLAY_SUSPEND) {
+    if (state == DisplayState::DISPLAY_SUSPEND || state == DisplayState::DISPLAY_DOZE) {
         state = DisplayState::DISPLAY_OFF;
     }
     if (ret) {
         pms->NotifyStateChangeCallback(action_->GetDisplayId(), state, reason);
     }
+}
+
+bool ScreenController::SkipNotify(DisplayState targetState)
+{
+    bool isScreenOn = state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM;
+    bool isTargetStateOn = targetState == DisplayState::DISPLAY_ON || targetState == DisplayState::DISPLAY_DIM;
+    return isScreenOn == isTargetStateOn;
 }
 
 bool ScreenController::CanSetBrightness()

@@ -86,21 +86,35 @@ bool ScreenAction::EnableSkipSetDisplayState(uint32_t reason)
     return false;
 }
 
+Rosen::DisplayState ScreenAction::ParseDisplayState(DisplayState state)
+{
+    Rosen::DisplayState ret = Rosen::DisplayState::UNKNOWN;
+    switch (state) {
+        case DisplayState::DISPLAY_ON:
+            ret = Rosen::DisplayState::ON;
+            break;
+        case DisplayState::DISPLAY_OFF:
+            ret = Rosen::DisplayState::OFF;
+            break;
+        case DisplayState::DISPLAY_DOZE:
+            ret = Rosen::DisplayState::DOZE;
+            break;
+        case DisplayState::DISPLAY_DOZE_SUSPEND:
+            ret = Rosen::DisplayState::DOZE_SUSPEND;
+            break;
+        default:
+            ret = Rosen::DisplayState::UNKNOWN;
+            break;
+    }
+    return ret;
+}
+
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
         static_cast<uint32_t>(state));
-    Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
-    switch (state) {
-        case DisplayState::DISPLAY_ON:
-            rds = Rosen::DisplayState::ON;
-            break;
-        case DisplayState::DISPLAY_OFF:
-            rds = Rosen::DisplayState::OFF;
-            break;
-        default:
-            break;
-    }
+    Rosen::DisplayState rds = ParseDisplayState(state);
+
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::DisplayManagerLite::GetInstance().SetDisplayState(rds,
         [callback](Rosen::DisplayState rosenState) {
@@ -115,6 +129,12 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
                 break;
             case Rosen::DisplayState::ON_SUSPEND:
                 state = DisplayState::DISPLAY_SUSPEND;
+                break;
+            case Rosen::DisplayState::DOZE:
+                state = DisplayState::DISPLAY_DOZE;
+                break;
+            case Rosen::DisplayState::DOZE_SUSPEND:
+                state = DisplayState::DISPLAY_DOZE_SUSPEND;
                 break;
             default:
                 return;
@@ -177,6 +197,12 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
             break;
         case DisplayState::DISPLAY_OFF:
             status = Rosen::ScreenPowerState::POWER_OFF;
+            break;
+        case DisplayState::DISPLAY_DOZE:
+            status = Rosen::ScreenPowerState::POWER_DOZE;
+            break;
+        case DisplayState::DISPLAY_DOZE_SUSPEND:
+            status = Rosen::ScreenPowerState::POWER_DOZE_SUSPEND;
             break;
         default:
             break;

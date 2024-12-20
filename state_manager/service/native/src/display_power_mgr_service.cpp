@@ -32,6 +32,7 @@
 #include "display_setting_helper.h"
 #include "display_param_helper.h"
 #include "permission.h"
+#include "power_state_machine_info.h"
 #include "setting_provider.h"
 #include "ffrt_utils.h"
 
@@ -243,10 +244,12 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             return false;
         }
     }
-
+    if (reason == static_cast<uint32_t>(StateChangeReason::STATE_CHANGE_REASON_SWITCHING_DOZE_MODE)) {
+        return iterator->second->UpdateState(state, reason);
+    }
     BrightnessManager::Get().SetDisplayState(id, state, reason);
 
-    if (state == DisplayState::DISPLAY_OFF) {
+    if (state == DisplayState::DISPLAY_OFF || state == DisplayState::DISPLAY_DOZE) {
         if (!isDisplayDelayOff_) {
             DISPLAY_HILOGI(COMP_SVC, "screen off immediately");
             bool ret = iterator->second->UpdateState(state, reason);
