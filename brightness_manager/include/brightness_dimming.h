@@ -18,12 +18,12 @@
 
 #include <atomic>
 #include <cstdint>
-#include "ffrt_utils.h"
 #include <iosfwd>
 #include <memory>
 #include <string>
 
 #include "brightness_dimming_callback.h"
+#include "brightness_ffrt.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -60,6 +60,7 @@ private:
     std::atomic_uint32_t mCurrentBrightness{};
     std::atomic_uint32_t mCurrentStep{};
     std::shared_ptr<PowerMgr::FFRTQueue> mQueue;
+    std::mutex mAnimatorHandleLock{};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
