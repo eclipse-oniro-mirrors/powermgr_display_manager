@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@
 #include "idisplay_brightness_callback.h"
 #include "light_lux_manager.h"
 #include "refbase.h"
-#include "ffrt_utils.h"
+#include "brightness_ffrt.h"
 #ifdef ENABLE_SENSOR_PART
 #include "sensor_agent_type.h"
 #endif
@@ -240,6 +240,9 @@ private:
     std::atomic<bool> mIsDisplayOnWhenFirstLuxReport{false};
     std::atomic<bool> mWaitForFirstLux{false};
     std::atomic<uint32_t> mCurrentBrightness{DEFAULT_BRIGHTNESS};
+    std::once_flag mInitCallFlag;
+    std::mutex mBoostHandleLock{};
+    std::mutex mFirstLuxHandleLock{};
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
