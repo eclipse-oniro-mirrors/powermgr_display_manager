@@ -224,6 +224,8 @@ HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level0)
     MockClearValues();
     g_BrightnessManagerExt.Init(MIN_DEFAULT_BRIGHTNESS_LEVEL, MAX_DEFAULT_BRIGHTNESS_LEVEL);
     usleep(INIT_WAITING_TIME);
+    double discount = g_BrightnessManagerExt.GetDiscount();
+    EXPECT_EQ(1.0, discount);
     DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerExtInit001: fun is end");
 }
 
