@@ -61,8 +61,6 @@ constexpr uint32_t DEFAULT_DARKEN_DURATION = 5000;
 constexpr uint32_t DEFAULT_MAX_BRIGHTNESS_DURATION = 3000;
 constexpr uint32_t BRIGHTNESS_TYPE = 0;
 constexpr uint32_t AMBIENT_LIGHT_TYPE = 1;
-constexpr uint32_t APS_LISTEN_PARAMS_LENGHT = 3;
-constexpr time_t CALL_APS_INTERVAL = 2;
 
 FFRTHandle g_cancelBoostTaskHandle{};
 FFRTHandle g_waitForFirstLuxTaskHandle{};
@@ -225,53 +223,6 @@ uint32_t BrightnessService::GetDisplayId()
 
 void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
 {
-    // Check whether APS callback interface exists
-    if (!mApsListenLightChangeCallback) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BrightnessService::NotifyLightChangeToAps function is null");
-        return;
-    }
-
-    // Check Whether APS is initialized
-    if (mLightBrightnessThreshold.size() != APS_LISTEN_PARAMS_LENGHT) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BrightnessService::NotifyLightChangeToAps not init yet");
-        return;
-    }
-
-    // brightness
-    if (type == BRIGHTNESS_TYPE) {
-        int32_t nitValue = static_cast<int32_t>(GetMappingBrightnessNit(static_cast<uint32_t>(value)));
-        int32_t brightness = mLightBrightnessThreshold[0];
-        if (!mIsBrightnessValidate && nitValue >= brightness) {
-            mIsBrightnessValidate = true;
-            mApsListenLightChangeCallback->OnNotifyApsLightBrightnessChange(type, mIsBrightnessValidate);
-        } else if (mIsBrightnessValidate && nitValue < brightness) {
-            mIsBrightnessValidate = false;
-            mApsListenLightChangeCallback->OnNotifyApsLightBrightnessChange(type, mIsBrightnessValidate);
-        }
-        return;
-    }
-
-    // amlient light
-    if (type == AMBIENT_LIGHT_TYPE) {
-        // Check the interval for invoking the APS interface
-        time_t currentTime = time(0);
-        if (currentTime - mLastCallApsTime < CALL_APS_INTERVAL) {
-            DISPLAY_HILOGD(
-                FEAT_BRIGHTNESS, "BrightnessService::NotifyLightChangeToAps interface is invoked frequently");
-            return;
-        }
-        mLastCallApsTime = currentTime;
-
-        int32_t light = mLightBrightnessThreshold[1];
-        int32_t range = mLightBrightnessThreshold[2];
-        if (!mIsLightValidate && value >= light) {
-            mIsLightValidate = true;
-            mApsListenLightChangeCallback->OnNotifyApsLightBrightnessChange(type, mIsLightValidate);
-        } else if (mIsLightValidate && value < (light - range)) {
-            mIsLightValidate = false;
-            mApsListenLightChangeCallback->OnNotifyApsLightBrightnessChange(type, mIsLightValidate);
-        }
-    }
 }
 
 uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
@@ -420,12 +371,12 @@ uint32_t BrightnessService::SetLightBrightnessThreshold(
     std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {
     uint32_t result = 0;
-    if (threshold.size() != APS_LISTEN_PARAMS_LENGHT || !callback) {
+    if (threshold.empty() || !callback) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "BrightnessService::SetLightBrightnessThreshold params verify faild.");
         return result;
     }
     result = 1;
-    mLightBrightnessThreshold = threshold;
+    // add the disposition code for the parameter:threshold here
     mApsListenLightChangeCallback = callback;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::SetLightBrightnessThreshold set listener success");
     return result;

@@ -230,11 +230,7 @@ private:
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool mIsUserMode{false};
     std::atomic<bool> mIsSleepStatus{false};
-    std::vector<int32_t> mLightBrightnessThreshold;
     sptr<IDisplayBrightnessCallback> mApsListenLightChangeCallback = nullptr;
-    bool mIsBrightnessValidate = false;
-    bool mIsLightValidate = false;
-    time_t mLastCallApsTime {0};
     std::atomic<bool> mIsDisplayOnWhenFirstLuxReport{false};
     std::atomic<bool> mWaitForFirstLux{false};
     std::atomic<uint32_t> mCurrentBrightness{DEFAULT_BRIGHTNESS};

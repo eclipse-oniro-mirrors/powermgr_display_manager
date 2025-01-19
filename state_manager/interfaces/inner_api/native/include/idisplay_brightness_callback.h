@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class IDisplayBrightnessCallback : public IRemoteBroker {
 public:
-    virtual void OnNotifyApsLightBrightnessChange(uint32_t type, bool state) = 0;
+    virtual void OnNotifyApsLightBrightnessChange(uint32_t type, int32_t state) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.powermgr.IDisplayBrightnessCallback");
 };

@@ -32,7 +32,7 @@ public:
     explicit DisplayBrightnessCallbackProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<IDisplayBrightnessCallback>(impl) {}
     ~DisplayBrightnessCallbackProxy() override = default;
-    virtual void OnNotifyApsLightBrightnessChange(uint32_t type, bool state) override;
+    virtual void OnNotifyApsLightBrightnessChange(uint32_t type, int32_t state) override;
 private:
     static inline BrokerDelegator<DisplayBrightnessCallbackProxy> delegator_;
 };
