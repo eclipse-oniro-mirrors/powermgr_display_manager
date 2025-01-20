@@ -219,10 +219,6 @@ uint32_t BrightnessService::GetDisplayId()
     return mDisplayId;
 }
 
-void BrightnessService::NotifyLightChangeToAps(uint32_t type, float value)
-{
-}
-
 uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
 {
     uint32_t currentId = defaultId;
