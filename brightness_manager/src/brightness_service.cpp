@@ -59,8 +59,6 @@ constexpr uint32_t DEFAULT_ANIMATING_DURATION = 500;
 constexpr uint32_t DEFAULT_BRIGHTEN_DURATION = 2000;
 constexpr uint32_t DEFAULT_DARKEN_DURATION = 5000;
 constexpr uint32_t DEFAULT_MAX_BRIGHTNESS_DURATION = 3000;
-constexpr uint32_t BRIGHTNESS_TYPE = 0;
-constexpr uint32_t AMBIENT_LIGHT_TYPE = 1;
 
 FFRTHandle g_cancelBoostTaskHandle{};
 FFRTHandle g_waitForFirstLuxTaskHandle{};
@@ -376,8 +374,6 @@ uint32_t BrightnessService::SetLightBrightnessThreshold(
         return result;
     }
     result = 1;
-    // add the disposition code for the parameter:threshold here
-    mApsListenLightChangeCallback = callback;
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::SetLightBrightnessThreshold set listener success");
     return result;
 }
@@ -632,7 +628,6 @@ void BrightnessService::ProcessLightLux(float lux)
         mIsLuxActiveWithLog = true;
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ProcessLightLux:mIsLuxActiveWithLog=true");
     }
-    NotifyLightChangeToAps(AMBIENT_LIGHT_TYPE, lux);
     if (mLightLuxManager.IsNeedUpdateBrightness(lux)) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateLightLux, lux=%{public}f, mLightLux=%{public}f, isFirst=%{public}d",
             lux, mLightLuxManager.GetSmoothedLux(), mLightLuxManager.GetIsFirstLux());
@@ -725,7 +720,6 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
     }
     mBrightnessTarget.store(value);
     mCurrentBrightness.store(value);
-    NotifyLightChangeToAps(BRIGHTNESS_TYPE, static_cast<float>(value));
     bool isSuccess = UpdateBrightness(value, gradualDuration, !continuous);
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}d, isSuccess=%{public}d", value, isSuccess);
     mIsUserMode = false;
