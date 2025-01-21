@@ -14,7 +14,7 @@
  */
 
 #include "screen_action.h"
-
+#include <datetime_ex.h>
 #include <hisysevent.h>
 #include <ipc_skeleton.h>
 
@@ -85,8 +85,31 @@ bool ScreenAction::EnableSkipSetDisplayState(uint32_t reason)
     return false;
 }
 
+void ScreenAction::WriteHiSysEvent(DisplayState state, int64_t beginTimeMs)
+{
+    constexpr int64_t DMS_WAIT_LOCKSCREENON_TIMEOUT = 300;
+    constexpr int64_t DMS_WAIT_LOCKSCREENOFF_TIMEOUT = 2000;
+    int64_t endTimeMs = GetTickCount();
+    if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENON_TIMEOUT) && state == DisplayState::DISPLAY_ON) {
+        std::string msg = "Dms Wait Lockscreenon Time Consuming Over 300MS";
+        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenon timeout=%{public}lld", (endTimeMs - beginTimeMs));
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREENON_TIMEOUT",
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PACKAGE_NAME", "powermgr", "PROCESS_NAME",
+            "ScreenAction", "MSG", msg);
+    } else if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENOFF_TIMEOUT) && state == DisplayState::DISPLAY_OFF) {
+        std::string msg = "Dms Wait Lockscreenoff Time Consuming Over 2000MS";
+        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenoff timeout=%{public}lld", (endTimeMs - beginTimeMs));
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREENOFF_TIMEOUT",
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PACKAGE_NAME", "powermgr", "PROCESS_NAME",
+            "ScreenAction", "MSG", msg);
+    }
+}
+
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+    int64_t beginTimeMs = GetTickCount();
+#endif
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
         static_cast<uint32_t>(state));
     Rosen::DisplayState rds = Rosen::DisplayState::UNKNOWN;
@@ -120,6 +143,9 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
         }
         callback(state);
     });
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+    WriteHiSysEvent(state, beginTimeMs);
+#endif
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
