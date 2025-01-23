@@ -64,16 +64,16 @@ int32_t DisplayBrightnessCallbackStub::OnRemoteRequest(
 int32_t DisplayBrightnessCallbackStub::OnNotifyApsLightBrightnessChangeStub(MessageParcel& data, MessageParcel& reply)
 {
     uint32_t type = 0;
-    bool state = false;
+    int32_t state = 0;
 
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, type, E_READ_PARCEL_ERROR);
-    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Bool, state, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Int32, state, E_READ_PARCEL_ERROR);
 
     OnNotifyApsLightBrightnessChange(type, state);
     return ERR_OK;
 }
 
-void DisplayBrightnessCallbackStub::OnNotifyApsLightBrightnessChange(uint32_t type, bool state) {}
+void DisplayBrightnessCallbackStub::OnNotifyApsLightBrightnessChange(uint32_t type, int32_t state) {}
 
 } // namespace DisplayPowerMgr
 } // namespace OHOS

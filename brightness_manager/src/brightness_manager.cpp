@@ -186,6 +186,7 @@ uint32_t BrightnessManager::SetLightBrightnessThreshold(
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
     return mBrightnessManagerExt.SetLightBrightnessThreshold(threshold, callback);
 #else
+    DISPLAY_HILOGW(FEAT_BRIGHTNESS, "BrightnessManager::SetLightBrightnessThreshold not support");
     return BrightnessService::Get().SetLightBrightnessThreshold(threshold, callback);
 #endif
 }

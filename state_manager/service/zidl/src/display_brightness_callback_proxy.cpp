@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-void DisplayBrightnessCallbackProxy::OnNotifyApsLightBrightnessChange(uint32_t type, bool state)
+void DisplayBrightnessCallbackProxy::OnNotifyApsLightBrightnessChange(uint32_t type, int32_t state)
 {
     sptr<IRemoteObject> remote = Remote();
     RETURN_IF(remote == nullptr);
@@ -39,7 +39,7 @@ void DisplayBrightnessCallbackProxy::OnNotifyApsLightBrightnessChange(uint32_t t
     }
 
     RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, type);
-    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Bool, state);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Int32, state);
 
     int ret = remote->SendRequest(
         static_cast<int>(PowerMgr::DisplayBrightnessCallbackInterfaceCode::ON_NOTIFY_APS_LIGHT_BRIGHTNESS_CHANGE), data,

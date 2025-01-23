@@ -26,7 +26,7 @@ class DisplayBrightnessCallbackStub : public IRemoteStub<IDisplayBrightnessCallb
 public:
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option) override;
 
-    void OnNotifyApsLightBrightnessChange(uint32_t type, bool state) override;
+    void OnNotifyApsLightBrightnessChange(uint32_t type, int32_t state) override;
 
 private:
     int32_t OnNotifyApsLightBrightnessChangeStub(MessageParcel& data, MessageParcel& reply);

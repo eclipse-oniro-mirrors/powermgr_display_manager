@@ -988,7 +988,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001: fun is start");
     std::vector<int32_t> threshold = {200, 200, 20};
     uint32_t type = 1;
-    bool state = false;
+    int32_t state = 0;
     const uint32_t SUCCESS_RESULT = 1;
     sptr<DisplayBrightnessCallbackStub> callback = new DisplayBrightnessCallbackStub();
     callback->OnNotifyApsLightBrightnessChange(type, state);
@@ -1008,7 +1008,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is start");
     std::vector<int32_t> threshold = {};
     uint32_t type = 1;
-    bool state = false;
+    int32_t state = 0;
     const uint32_t FAILD_RESULT = 0;
     sptr<DisplayBrightnessCallbackStub> callback = new DisplayBrightnessCallbackStub();
     callback->OnNotifyApsLightBrightnessChange(type, state);
