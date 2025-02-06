@@ -38,7 +38,7 @@ public:
 
     uint32_t GetDisplayId();
     DisplayState GetDisplayState();
-    void WriteHiSysEvent(DisplayState state, int64_t beginTimeMs);
+    void WriteHiSysEvent(DisplayState state, int32_t beginTimeMs);
     bool SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback);
     bool SetDisplayPower(DisplayState state, uint32_t reason);
     uint32_t GetBrightness();
