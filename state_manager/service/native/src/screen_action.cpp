@@ -110,24 +110,22 @@ Rosen::DisplayState ScreenAction::ParseDisplayState(DisplayState state)
     return ret;
 }
 
-void ScreenAction::WriteHiSysEvent(DisplayState state, int64_t beginTimeMs)
+void ScreenAction::WriteHiSysEvent(DisplayState state, int32_t beginTimeMs)
 {
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
-    constexpr int64_t DMS_WAIT_LOCKSCREENON_TIMEOUT = 300;
-    constexpr int64_t DMS_WAIT_LOCKSCREENOFF_TIMEOUT = 2000;
-    int64_t endTimeMs = GetTickCount();
+    constexpr int32_t DMS_WAIT_LOCKSCREENON_TIMEOUT = 300;
+    constexpr int32_t DMS_WAIT_LOCKSCREENOFF_TIMEOUT = 2000;
+    constexpr int32_t DMS_WAIT_LOCKSCREENON_TYPE = 0;
+    constexpr int32_t DMS_WAIT_LOCKSCREENOFF_TYPE = 1;
+    int32_t endTimeMs = GetTickCount();
     if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENON_TIMEOUT) && state == DisplayState::DISPLAY_ON) {
-        std::string msg = "Dms Wait Lockscreenon Time Consuming Over 300MS";
-        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenon timeout=%{public}lld", (endTimeMs - beginTimeMs));
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREENON_TIMEOUT",
-            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PACKAGE_NAME", "powermgr", "PROCESS_NAME",
-            "ScreenAction", "MSG", msg);
+        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenon timeout=%{public}d", (endTimeMs - beginTimeMs));
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREEN_TIMEOUT",
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENON_TYPE);
     } else if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENOFF_TIMEOUT) && state == DisplayState::DISPLAY_OFF) {
-        std::string msg = "Dms Wait Lockscreenoff Time Consuming Over 2000MS";
-        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenoff timeout=%{public}lld", (endTimeMs - beginTimeMs));
-        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREENOFF_TIMEOUT",
-            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "PACKAGE_NAME", "powermgr", "PROCESS_NAME",
-            "ScreenAction", "MSG", msg);
+        DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenoff timeout=%{public}d", (endTimeMs - beginTimeMs));
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREEN_TIMEOUT",
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENOFF_TYPE);
     }
 #endif
 }
@@ -135,7 +133,7 @@ void ScreenAction::WriteHiSysEvent(DisplayState state, int64_t beginTimeMs)
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
-    int64_t beginTimeMs = GetTickCount();
+    int32_t beginTimeMs = GetTickCount();
 #endif
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
         static_cast<uint32_t>(state));
