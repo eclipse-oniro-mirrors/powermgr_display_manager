@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../displaymgr.gni")
 
-module_output_path = "${displaymgr_part_name}/displaymgr"
+module_output_path = "display_manager/display_manager"
 
 ###############################################################################
 config("module_private_config") {
