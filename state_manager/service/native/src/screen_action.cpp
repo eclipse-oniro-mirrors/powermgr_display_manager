@@ -95,11 +95,13 @@ void ScreenAction::WriteHiSysEvent(DisplayState state, int32_t beginTimeMs)
     if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENON_TIMEOUT) && state == DisplayState::DISPLAY_ON) {
         DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenon timeout=%{public}d", (endTimeMs - beginTimeMs));
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREEN_TIMEOUT",
-            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENON_TYPE);
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENON_TYPE,
+            "TIME", (endTimeMs - beginTimeMs));
     } else if ((endTimeMs - beginTimeMs > DMS_WAIT_LOCKSCREENOFF_TIMEOUT) && state == DisplayState::DISPLAY_OFF) {
         DISPLAY_HILOGI(FEAT_STATE, "dms wait lockscreenoff timeout=%{public}d", (endTimeMs - beginTimeMs));
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "DMS_WAIT_LOCKSCREEN_TIMEOUT",
-            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENOFF_TYPE);
+            HiviewDFX::HiSysEvent::EventType::BEHAVIOR, "TYPE", DMS_WAIT_LOCKSCREENOFF_TYPE,
+            "TIME", (endTimeMs - beginTimeMs));
     }
 }
 
