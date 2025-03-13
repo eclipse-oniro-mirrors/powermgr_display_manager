@@ -35,3 +35,4 @@ AMBIENT_LIGHT:
 DMS_WAIT_LOCKSCREEN_TIMEOUT:
   __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dms wait lockscreen timeout information}
   TYPE: {type: INT32, desc: screen on or off type}
+  TIME: {type: INT32, desc: interface time consuming}
