@@ -397,7 +397,7 @@ void ScreenController::BrightnessSettingUpdateFunc(const string& key)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "no need to set setting brightness");
         return;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "noset setting brightness updated, brightness %{public}u -> %{public}u",
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "noset setting brightness updated, brightness %{public}u -> %{public}u",
                    cachedSettingBrightness_.load(), settingBrightness);
     cachedSettingBrightness_ = settingBrightness;
 }
