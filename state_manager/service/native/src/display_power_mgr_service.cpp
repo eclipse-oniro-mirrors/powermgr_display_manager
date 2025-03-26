@@ -244,9 +244,6 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
             return false;
         }
     }
-    if (reason == static_cast<uint32_t>(StateChangeReason::STATE_CHANGE_REASON_SWITCHING_DOZE_MODE)) {
-        return iterator->second->UpdateState(state, reason);
-    }
     BrightnessManager::Get().SetDisplayState(id, state, reason);
 
     if (state == DisplayState::DISPLAY_OFF || state == DisplayState::DISPLAY_DOZE) {
