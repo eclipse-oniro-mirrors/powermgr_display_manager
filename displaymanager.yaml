@@ -32,14 +32,6 @@ AMBIENT_LIGHT:
   TYPE: {type: INT32, desc: ambient light type}
   LEVEL: {type: INT32, desc: ambient light adjusts screen brightness}
 
-DMS_WAIT_LOCKSCREENON_TIMEOUT:
-  __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dms wait lockscreenon timeout information}
-  PACKAGE_NAME: {type: STRING, desc: call package name}
-  PROCESS_NAME: {type: STRING, desc: call process name}
-  MSG: {type: STRING, desc: dms wait lockscreenon timeout message}
-
-DMS_WAIT_LOCKSCREENOFF_TIMEOUT:
-  __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dms wait lockscreenoff timeout information}
-  PACKAGE_NAME: {type: STRING, desc: call package name}
-  PROCESS_NAME: {type: STRING, desc: call process name}
-  MSG: {type: STRING, desc: dms wait lockscreenoff timeout message}
+DMS_WAIT_LOCKSCREEN_TIMEOUT:
+  __BASE: {type: BEHAVIOR, level: CRITICAL, desc: dms wait lockscreen timeout information}
+  TYPE: {type: INT32, desc: screen on or off type}
