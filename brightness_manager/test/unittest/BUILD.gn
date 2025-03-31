@@ -24,7 +24,7 @@ config("module_private_config") {
 }
 
 set_defaults("ohos_unittest") {
-  module_out_path = "display_manager/brightness_manager"
+  module_out_path = "display_manager/display_brightness_manager"
 
   configs = [
     "${brightnessmgr_root_path}:brightness_manager_config",
