@@ -45,6 +45,7 @@ set_defaults("ohos_unittest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hilog:libhilog",
