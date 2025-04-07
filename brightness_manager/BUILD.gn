@@ -56,6 +56,7 @@ ohos_static_library("brightness_manager") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "graphic_2d:librender_service_base",
     "hicollie:libhicollie",
