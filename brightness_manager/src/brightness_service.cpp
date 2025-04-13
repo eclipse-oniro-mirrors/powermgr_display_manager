@@ -1196,18 +1196,18 @@ int BrightnessService::GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode)
 
 bool BrightnessService::SetMaxBrightness(double value)
 {
-    int32_t intMaxValue = round(value * MAX_DEFAULT_BRGIHTNESS_LEVEL);
-    if (intMaxValue <= 0) {
-        intMaxValue = brightnessValueMin;
+    uint32_t maxValue = static_cast<uint32_t>(value * MAX_DEFAULT_BRGIHTNESS_LEVEL);
+    if (maxValue == 0 || value < 0) {
+        maxValue = brightnessValueMin;
     }
-    if (intMaxValue == brightnessValueMax) {
+    if (maxValue == brightnessValueMax) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=oldMax");
         return true;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness value=%{public}u, oldMax=%{public}u",
-        intMaxValue, brightnessValueMax);
+        maxValue, brightnessValueMax);
     brightnessValueMax =
-        (intMaxValue > MAX_DEFAULT_BRGIHTNESS_LEVEL ? MAX_DEFAULT_BRGIHTNESS_LEVEL : intMaxValue);
+        (maxValue > MAX_DEFAULT_BRGIHTNESS_LEVEL ? MAX_DEFAULT_BRGIHTNESS_LEVEL : maxValue);
     uint32_t currentBrightness = GetSettingBrightness();
     if (brightnessValueMax < currentBrightness) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetMaxBrightness currentBrightness=%{public}u", currentBrightness);
