@@ -274,5 +274,14 @@ bool DisplayPowerMgrClient::SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterT
     RETURN_IF_WITH_RET(proxy == nullptr, false);
     return proxy->SetMaxBrightnessNit(maxNit, enterTestMode);
 }
+
+int DisplayPowerMgrClient::NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, -1); // -1 means failed
+    int ret = proxy->NotifyScreenPowerStatus(displayId, status);
+    return ret;
+}
+
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

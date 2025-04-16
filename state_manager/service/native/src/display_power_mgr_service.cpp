@@ -914,5 +914,17 @@ bool DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode)
     }
     return BrightnessManager::Get().SetMaxBrightnessNit(maxNit);
 }
+
+int DisplayPowerMgrService::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus)
+{
+    if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        return -1; // -1 means failed
+    }
+    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]NotifyScreenPowerStatus displayId=%{public}u, Status=%{public}u", displayId,
+        displayPowerStatus);
+    return BrightnessManager::Get().NotifyScreenPowerStatus(displayId, displayPowerStatus);
+}
+
 } // namespace DisplayPowerMgr
 } // namespace OHOS

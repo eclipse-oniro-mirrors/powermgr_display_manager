@@ -193,6 +193,11 @@ bool BrightnessManagerExt::LoadBrightnessControl()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym ClearOffset func failed!");
         return false;
     }
+    mNotifyScreenPowerStatusFunc = dlsym(mBrightnessManagerExtHandle, "NotifyScreenPowerStatus");
+    if (!mNotifyScreenPowerStatusFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym mNotifyScreenPowerStatusFunc func failed!");
+        return false;
+    }
     return true;
 }
 
@@ -227,6 +232,7 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mSetDisplayIdFunc = nullptr;
     mSetMaxBrightnessFunc = nullptr;
     mSetMaxBrightnessNitFunc = nullptr;
+    mNotifyScreenPowerStatusFunc = nullptr;
 }
 
 void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
@@ -433,6 +439,16 @@ bool BrightnessManagerExt::SetMaxBrightnessNit(uint32_t nit)
     }
     auto setMaxBrightnessNitFunc = reinterpret_cast<bool (*)(uint32_t)>(mSetMaxBrightnessNitFunc);
     return setMaxBrightnessNitFunc(nit);
+}
+
+int BrightnessManagerExt::NotifyScreenPowerStatus(uint32_t displayId, uint32_t status)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return -1; // -1 means return failed
+    }
+    auto NotifyScreenPowerStatusFunc =
+        reinterpret_cast<int (*)(uint32_t, uint32_t)>(mNotifyScreenPowerStatusFunc);
+    return NotifyScreenPowerStatusFunc(displayId, status);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

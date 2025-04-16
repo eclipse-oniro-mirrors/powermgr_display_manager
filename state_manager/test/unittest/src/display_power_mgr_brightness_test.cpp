@@ -1118,4 +1118,40 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, Test
     DisplayPowerMgrClient::GetInstance().SetMaxBrightness(SET_BRIGHTNESS, 1);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002: fun is end");
 }
+
+/**
+*@tc.name: NotifyBrightnessManagerScreenPowerStatus001
+*@tc.desc: Test if NotifyBrightnessManagerScreenPowerStatus is work when dms notify
+*          brightness manager POWER_STATUS_ON
+*@tc.type: FUNC
+*/
+HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus001, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001: fun is start");
+    uint32_t displayId = 0;
+    uint32_t screenPowerStatus = 0; // 0 represent the POWER_STATUS_ON
+    uint32_t result = DisplayPowerMgrClient::GetInstance().NotifyBrightnessManagerScreenPowerStatus(displayId,
+        screenPowerStatus);
+    const uint32_t FAILED_RESULT = 0;
+    EXPECT_EQ(result, FAILED_RESULT);
+    DISPLAY_HILOGD(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001: fun is end");
+}
+
+/**
+*@tc.name: NotifyBrightnessManagerScreenPowerStatus002
+*@tc.desc: Test if NotifyBrightnessManagerScreenPowerStatus is work when dms notify
+*          brightness manager POWER_STATUS_OFF
+*@tc.type: FUNC
+*/
+HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus002, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002: fun is start");
+    uint32_t displayId = 0;
+    uint32_t screenPowerStatus = 3; // 3 represent the POWER_STATUS_OFF
+    uint32_t result = DisplayPowerMgrClient::GetInstance().NotifyBrightnessManagerScreenPowerStatus(displayId,
+        screenPowerStatus);
+    const uint32_t FAILED_RESULT = 0;
+    EXPECT_EQ(result, FAILED_RESULT);
+    DISPLAY_HILOGD(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002: fun is end");
+}
 } // namespace

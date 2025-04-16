@@ -244,5 +244,16 @@ bool BrightnessManager::SetMaxBrightnessNit(uint32_t nit)
     return BrightnessService::Get().SetMaxBrightnessNit(nit);
 #endif
 }
+
+int BrightnessManager::NotifyScreenPowerStatus(uint32_t displayId, uint32_t status)
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS,
+        "BrightnessManager::NotifyScreenPowerStatus displayId:%{public}u, status:%{public}u", displayId, status);
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.NotifyScreenPowerStatus(displayId, status);
+#else
+    return BrightnessService::Get().NotifyScreenPowerStatus(displayId, status);
+#endif
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -62,6 +62,7 @@ public:
     virtual uint32_t SetLightBrightnessThreshold(
         std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) override;
     virtual DisplayErrors GetError() override;
+    virtual int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status) override;
 
 private:
     static inline BrokerDelegator<DisplayPowerMgrProxy> delegator_;

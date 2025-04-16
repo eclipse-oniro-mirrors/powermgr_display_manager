@@ -56,6 +56,7 @@ private:
     int32_t SetCoordinatedStub(MessageParcel& data, MessageParcel& reply);
     int32_t SetLightBrightnessThresholdStub(MessageParcel& data, MessageParcel& reply);
     int32_t ProcessMessage(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    int32_t NotifyScreenPowerStatusStub(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

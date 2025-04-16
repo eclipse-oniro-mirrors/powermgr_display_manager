@@ -58,6 +58,7 @@ public:
     bool SetCoordinated(bool coordinated, uint32_t displayId = 0);
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     DisplayErrors GetError();
+    int NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status);
 
 #ifndef DISPLAY_SERVICE_DEATH_UT
 private:

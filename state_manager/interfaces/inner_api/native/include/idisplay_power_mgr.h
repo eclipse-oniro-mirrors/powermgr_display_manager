@@ -54,6 +54,7 @@ public:
     virtual uint32_t SetLightBrightnessThreshold(
         std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) = 0;
     virtual DisplayErrors GetError() = 0;
+    virtual int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.displaypowermgr.IDisplayPowerMgr");
 };

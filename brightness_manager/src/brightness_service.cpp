@@ -1243,6 +1243,12 @@ bool BrightnessService::SetMaxBrightnessNit(uint32_t maxNit)
     return UpdateBrightness(mCurrentBrightness.load(), DEFAULT_MAX_BRIGHTNESS_DURATION, true);
 }
 
+int BrightnessService::NotifyScreenPowerStatus([[maybe_unused]] uint32_t displayId, [[maybe_unused]] uint32_t status)
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "NotifyScreenPowerStatusify");
+    return 0;
+}
+
 uint32_t BrightnessService::GetSafeBrightness(uint32_t value)
 {
     auto brightnessValue = value;

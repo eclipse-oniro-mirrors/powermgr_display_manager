@@ -43,7 +43,8 @@ enum class DisplayPowerMgrInterfaceCode {
     SET_COORDINATED,
     SET_APS_LIGHT_AND_BRIGHTNESS_THRESOLD = 21,
     SET_MAX_BRIGHTNESS,
-    SET_MAX_BRIGHTNESS_NIT
+    SET_MAX_BRIGHTNESS_NIT,
+    NOTIFY_DISPLAY_POWER_STATUS,
 };
 } // space PowerMgr
 } // namespace OHOS
