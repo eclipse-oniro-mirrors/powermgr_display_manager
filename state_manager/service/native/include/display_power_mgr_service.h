@@ -79,6 +79,7 @@ public:
     void HandleBootBrightness();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);
+    virtual int NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus) override;
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {

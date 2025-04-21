@@ -90,6 +90,9 @@ int32_t DisplayPowerMgrStub::ProcessMessage(uint32_t code, MessageParcel &data, 
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_MAX_BRIGHTNESS_NIT):
             ret = SetMaxBrightnessNitStub(data, reply);
             break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::NOTIFY_DISPLAY_POWER_STATUS):
+            ret = NotifyScreenPowerStatusStub(data, reply);
+            break;
         default:
             ret = RemoteRequest(code, data, reply, option);
             break;
@@ -491,6 +494,24 @@ int32_t DisplayPowerMgrStub::SetMaxBrightnessNitStub(MessageParcel& data, Messag
     bool ret = SetMaxBrightnessNit(value, enterTestMode);
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write SetMaxBrightness return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    int32_t error = static_cast<int32_t>(GetError());
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(reply, Int32, error, E_WRITE_PARCEL_ERROR);
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::NotifyScreenPowerStatusStub(MessageParcel& data, MessageParcel& reply)
+{
+    uint32_t displayId = 0;
+    uint32_t displayPowerStatus = 0;
+
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, displayPowerStatus, E_READ_PARCEL_ERROR);
+
+    int ret = NotifyScreenPowerStatus(displayId, displayPowerStatus);
+    if (!reply.WriteInt32(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write NotifyScreenPowerStatus return value");
         return E_WRITE_PARCEL_ERROR;
     }
     int32_t error = static_cast<int32_t>(GetError());

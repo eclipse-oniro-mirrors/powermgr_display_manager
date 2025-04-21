@@ -54,6 +54,7 @@ public:
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     bool SetMaxBrightness(double value);
     bool SetMaxBrightnessNit(uint32_t maxNit);
+    int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
 
 private:
     bool LoadBrightnessExtLibrary();
@@ -93,6 +94,7 @@ public:
     void* mSetLightBrightnessThresholdFunc = nullptr;
     void* mSetMaxBrightnessFunc = nullptr;
     void* mSetMaxBrightnessNitFunc = nullptr;
+    void* mNotifyScreenPowerStatusFunc = nullptr;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

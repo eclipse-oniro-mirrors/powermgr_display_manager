@@ -150,6 +150,7 @@ public:
     int GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode);
     uint32_t GetCurrentSensorId();
     void SetCurrentSensorId(uint32_t sensorId);
+    int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
 
     static uint32_t GetSafeBrightness(uint32_t value);
     bool SetMaxBrightness(double value);

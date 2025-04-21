@@ -54,6 +54,7 @@ public:
     void SetDisplayId(uint32_t id = 0);
     bool SetMaxBrightness(double value);
     bool SetMaxBrightnessNit(uint32_t nit);
+    int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
 
 private:
     BrightnessManager() = default;

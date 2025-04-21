@@ -848,5 +848,39 @@ DisplayErrors DisplayPowerMgrProxy::GetError()
 {
     return lastError_;
 }
+
+int DisplayPowerMgrProxy::NotifyScreenPowerStatus(uint32_t displayId, uint32_t status)
+{
+    sptr<IRemoteObject> remote = Remote();
+    int result = -1;
+    RETURN_IF_WITH_RET(remote == nullptr, result);
+
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return -1; // -1 means failed
+    }
+
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, displayId, -1); // -1 means failed
+    RETURN_IF_WRITE_PARCEL_FAILED_WITH_RET(data, Uint32, status, -1); // -1 means failed
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::NOTIFY_DISPLAY_POWER_STATUS), data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return ret;
+    }
+
+    if (!reply.ReadInt32(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+    int32_t error;
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(reply, Int32, error, result);
+    lastError_ = static_cast<DisplayErrors>(error);
+    return result;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
