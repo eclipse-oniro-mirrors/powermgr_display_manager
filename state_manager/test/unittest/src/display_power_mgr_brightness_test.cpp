@@ -410,6 +410,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness001, Te
     EXPECT_TRUE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, OVERRIDE_BRIGHTNESS);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    usleep(DEFAULT_WAITING_TIME);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness001: fun is end");
 }
 
@@ -458,6 +460,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, Te
     EXPECT_FALSE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, OVERRIDE_BRIGHTNESS);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    usleep(DEFAULT_WAITING_TIME);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness003: fun is end");
 }
 
@@ -530,6 +534,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, Te
     usleep(DEFAULT_WAITING_TIME);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(brightnessMin, deviceBrightness);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    usleep(DEFAULT_WAITING_TIME);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007: fun is end");
 }
 
@@ -548,6 +554,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
     usleep(DEFAULT_WAITING_TIME);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(brightnessMax, deviceBrightness);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    usleep(DEFAULT_WAITING_TIME);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness008: fun is end");
 }
 
@@ -709,6 +717,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive2, Test
     EXPECT_FALSE(isBoost);
     bool isCancel = DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
     EXPECT_FALSE(isCancel);
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    usleep(DEFAULT_WAITING_TIME);
     DISPLAY_HILOGD(LABEL_TEST, "BoostAndOverrideMutuallyExclusive2: fun is end");
 }
 
