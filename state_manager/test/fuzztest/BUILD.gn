@@ -24,7 +24,6 @@ group("fuzztest") {
     "autoadjustbrightness_fuzzer:AutoAdjustBrightnessFuzzTest",
     "boostbrightness_fuzzer:BoostBrightnessFuzzTest",
     "discountbrightness_fuzzer:DiscountBrightnessFuzzTest",
-    "displaycoverage_fuzzer:DisplayCoverageFuzzTest",
     "displaystate_fuzzer:DisplayStateFuzzTest",
     "getbrightness_fuzzer:GetBrightnessFuzzTest",
     "getdisplayid_fuzzer:GetDisplayIdFuzzTest",

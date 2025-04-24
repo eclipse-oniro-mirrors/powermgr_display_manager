@@ -25,14 +25,6 @@ declare_args() {
   display_manager_feature_brightnessext = ""
 
   if (!defined(global_parts_info) ||
-      defined(global_parts_info.hiviewdfx_hisysevent)) {
-    has_hiviewdfx_hisysevent_part = true
-    defines += [ "HAS_HIVIEWDFX_HISYSEVENT_PART" ]
-  } else {
-    has_hiviewdfx_hisysevent_part = false
-  }
-
-  if (!defined(global_parts_info) ||
       defined(global_parts_info.hiviewdfx_hiview)) {
     has_dfx_hiview_part = true
     defines += [ "HAS_DFX_HIVIEW_PART" ]

@@ -74,6 +74,7 @@ ohos_fuzztest("GetBrightnessFuzzTest") {
     "ffrt:libffrt",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "ipc:ipc_core",
     "power_manager:power_ffrt",
@@ -89,9 +90,6 @@ ohos_fuzztest("GetBrightnessFuzzTest") {
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
-  }
-  if (has_hiviewdfx_hisysevent_part) {
-    external_deps += [ "hisysevent:libhisysevent" ]
   }
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]

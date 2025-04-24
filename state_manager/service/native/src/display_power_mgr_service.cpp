@@ -14,9 +14,8 @@
  */
 
 #include "display_power_mgr_service.h"
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+
 #include <hisysevent.h>
-#endif
 #include <file_ex.h>
 #include <securec.h>
 #include <system_ability_definition.h>
@@ -338,10 +337,8 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
     auto safeDiscount = GetSafeDiscount(discount, brightness);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
                    displayId, safeDiscount);
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BACKLIGHT_DISCOUNT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "RATIO", safeDiscount);
-#endif
     return iter->second->DiscountBrightness(safeDiscount);
 }
 

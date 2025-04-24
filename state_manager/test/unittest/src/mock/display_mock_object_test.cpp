@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ static constexpr double DISCOUNT_VALUE = 0.30;
 void DisplayMockObjectTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
     uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }
 
 namespace {
