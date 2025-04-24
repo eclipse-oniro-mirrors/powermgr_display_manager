@@ -52,14 +52,13 @@ ohos_static_library("brightness_manager") {
   ]
 
   external_deps = [
-    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "ffrt:libffrt",
-    "graphic_2d:librender_service_base",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "ipc:ipc_core",
     "jsoncpp:jsoncpp",
@@ -72,6 +71,7 @@ ohos_static_library("brightness_manager") {
     "window_manager:libdm_lite",
   ]
 
+  defines = []
   if (use_libfuzzer) {
     defines += [ "FUZZ_TEST" ]
   }
@@ -83,9 +83,7 @@ ohos_static_library("brightness_manager") {
   if (display_manager_feature_brightnessext != "") {
     defines += [ "OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER" ]
   }
-  if (has_hiviewdfx_hisysevent_part) {
-    external_deps += [ "hisysevent:libhisysevent" ]
-  }
+
   subsystem_name = "powermgr"
   part_name = "${displaymgr_part_name}"
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ class BrightnessManagerExtTest : public Test {};
 namespace {
 HWTEST_F(BrightnessManagerExtTest, NoInit, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerNoInit001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerNoInit001: fun is start");
     bool retBool = g_BrightnessManagerExt.AutoAdjustBrightness(true);
     EXPECT_FALSE(retBool);
 
@@ -96,12 +96,12 @@ HWTEST_F(BrightnessManagerExtTest, NoInit, TestSize.Level0)
 
     retBool = g_BrightnessManagerExt.SetMaxBrightnessNit(100);
     EXPECT_FALSE(retBool);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerNoInit001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerNoInit001: fun is end");
 }
 
 HWTEST_F(BrightnessManagerExtTest, MockInit001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerMockInit001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerMockInit001: fun is start");
     // 打桩
     MockInitBrightnessManagerExt(g_BrightnessManagerExt);
     MockClearValues();
@@ -153,12 +153,12 @@ HWTEST_F(BrightnessManagerExtTest, MockInit001, TestSize.Level0)
     retBool = g_BrightnessManagerExt.RestoreBrightness(0);
     MockClearValues();
     EXPECT_TRUE(retBool);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerMockInit001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerMockInit001: fun is end");
 }
 
 HWTEST_F(BrightnessManagerExtTest, MockInit002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerMockInit002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerMockInit002: fun is start");
     MockSetValue(8.0);
     usleep(DEFAULT_WAITING_TIME);
     bool retBool = g_BrightnessManagerExt.BoostBrightness(0, 0);
@@ -214,19 +214,19 @@ HWTEST_F(BrightnessManagerExtTest, MockInit002, TestSize.Level0)
     retBool = g_BrightnessManagerExt.SetMaxBrightnessNit(1.0);
     MockClearValues();
     EXPECT_TRUE(retBool);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerMockInit002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerMockInit002: fun is end");
 }
 
 HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerExtInit001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerExtInit001: fun is start");
     MockDeInitBrightnessManagerExt(g_BrightnessManagerExt);
     MockClearValues();
     g_BrightnessManagerExt.Init(MIN_DEFAULT_BRIGHTNESS_LEVEL, MAX_DEFAULT_BRIGHTNESS_LEVEL);
     usleep(INIT_WAITING_TIME);
     double discount = g_BrightnessManagerExt.GetDiscount();
     EXPECT_EQ(1.0, discount);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerExtInit001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerExtInit001: fun is end");
 }
 
 } // namespace

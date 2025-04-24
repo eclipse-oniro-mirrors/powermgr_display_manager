@@ -15,9 +15,8 @@
 
 #include "screen_action.h"
 #include <datetime_ex.h>
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+
 #include <hisysevent.h>
-#endif
 #include <ipc_skeleton.h>
 
 #include "display_log.h"
@@ -57,7 +56,7 @@ uint32_t ScreenAction::GetDisplayId()
 DisplayState ScreenAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
+    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower();
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
@@ -140,6 +139,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
         static_cast<uint32_t>(state));
     Rosen::DisplayState rds = ParseDisplayState(state);
+
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::DisplayManagerLite::GetInstance().SetDisplayState(rds,
         [callback](Rosen::DisplayState rosenState) {
@@ -169,10 +169,8 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     WriteHiSysEvent(state, beginTimeMs);
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
-#endif
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d",
         displayId_, static_cast<uint32_t>(state), ret);
     return ret;

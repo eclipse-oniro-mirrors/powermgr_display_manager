@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,9 +16,7 @@
 #include "brightness_service.h"
 
 #include <file_ex.h>
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
-#endif
 #include <ipc_skeleton.h>
 #include <securec.h>
 
@@ -51,6 +49,7 @@ constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_LEVEL = 255;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_LEVEL = 1;
 constexpr uint32_t MAX_MAPPING_BRGIHTNESS_LEVEL = 223;
 constexpr uint32_t MIN_MAPPING_BRGIHTNESS_LEVEL = 1;
+constexpr uint32_t MAX_HBM_BRGIHTNESS_NIT = 1000;
 constexpr uint32_t MAX_DEFAULT_BRGIHTNESS_NIT = 600;
 constexpr uint32_t MIN_DEFAULT_BRGIHTNESS_NIT = 2;
 constexpr uint32_t MAX_DEFAULT_HIGH_BRGIHTNESS_LEVEL = 10000;
@@ -99,32 +98,30 @@ BrightnessService& BrightnessService::Get()
 
 void BrightnessService::Init(uint32_t defaultMax, uint32_t defaultMin)
 {
-    std::call_once(mInitCallFlag, [defaultMax, defaultMin, this] {
-        queue_ = std::make_shared<FFRTQueue> ("brightness_manager");
-        if (queue_ == nullptr) {
-            return;
-        }
-        if (!mDimming->Init()) {
-            return;
-        }
+    queue_ = std::make_shared<FFRTQueue> ("brightness_manager");
+    if (queue_ == nullptr) {
+        return;
+    }
+    if (!mDimming->Init()) {
+        return;
+    }
 #ifdef ENABLE_SENSOR_PART
-        InitSensors();
-        mIsFoldDevice = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Init mIsFoldDevice=%{public}d", mIsFoldDevice);
+    InitSensors();
+    mIsFoldDevice = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Init mIsFoldDevice=%{public}d", mIsFoldDevice);
 #endif
-        ConfigParse::Get().Initialize();
-        mLightLuxManager.InitParameters();
-        mBrightnessCalculationManager.InitParameters();
+    ConfigParse::Get().Initialize();
+    mLightLuxManager.InitParameters();
+    mBrightnessCalculationManager.InitParameters();
 
-        bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
-        brightnessValueMax = defaultMax;
-        brightnessValueMin = defaultMin;
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d, max=%{public}u, min=%{public}u",
-            isFoldable, brightnessValueMax, brightnessValueMin);
-        if (isFoldable) {
-            RegisterFoldStatusListener();
-        }
-    });
+    bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
+    brightnessValueMax = defaultMax;
+    brightnessValueMin = defaultMin;
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d, max=%{public}u, min=%{public}u",
+        isFoldable, brightnessValueMax, brightnessValueMin);
+    if (isFoldable) {
+        RegisterFoldStatusListener();
+    }
 }
 
 void BrightnessService::DeInit()
@@ -638,10 +635,8 @@ void BrightnessService::ProcessLightLux(float lux)
                 mLuxLevel = index;
                 // Notify ambient lux change event to battery statistics
                 // type:0 auto brightness, 1 manual brightness, 2 window brightness, 3 others
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
                 HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "AMBIENT_LIGHT",
                     HiviewDFX::HiSysEvent::EventType::STATISTIC, "LEVEL", mLuxLevel, "TYPE", 0);
-#endif
             }
             break;
         }
@@ -668,8 +663,7 @@ void BrightnessService::UpdateCurrentBrightnessLevel(float lux, bool isFastDurat
         mBrightnessLevel = brightnessLevel;
         mCurrentBrightness.store(brightnessLevel);
         if (mWaitForFirstLux) {
-            std::lock_guard<std::mutex> lock(mFirstLuxHandleLock);
-            FFRT_CANCEL(g_waitForFirstLuxTaskHandle, queue_);
+            FFRTUtils::CancelTask(g_waitForFirstLuxTaskHandle, queue_);
             mWaitForFirstLux = false;
             DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UpdateCurrentBrightnessLevel CancelScreenOn waitforFisrtLux Task");
         }
@@ -697,6 +691,7 @@ uint32_t BrightnessService::GetBrightnessLevel(float lux)
 
 uint32_t BrightnessService::GetBrightnessHighLevel(uint32_t level)
 {
+    uint32_t brightnessHighLevel = level;
     return level;
 }
 
@@ -729,21 +724,16 @@ void BrightnessService::SetScreenOnBrightness()
 {
     uint32_t screenOnBrightness = GetScreenOnBrightness(true);
     if (mWaitForFirstLux) {
-        std::lock_guard<std::mutex> lock(mFirstLuxHandleLock);
-        if (queue_ == nullptr) {
-            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "SetScreenOnBrightness, queue is null");
-        } else {
-            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux");
-            FFRT_CANCEL(g_waitForFirstLuxTaskHandle, queue_);
-            screenOnBrightness = mCachedSettingBrightness;
-            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux,GetSettingBrightness=%{public}d",
-                screenOnBrightness);
-            FFRTTask setBrightnessTask = [this, screenOnBrightness] {
-                this->UpdateBrightness(screenOnBrightness, 0, true);
-            };
-            g_waitForFirstLuxTaskHandle = FFRTUtils::SubmitDelayTask(setBrightnessTask, WAIT_FOR_FIRST_LUX_MAX_TIME,
-                queue_);
-        }
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux");
+        FFRTUtils::CancelTask(g_waitForFirstLuxTaskHandle, queue_);
+        screenOnBrightness = mCachedSettingBrightness;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness waitForFirstLux,GetSettingBrightness=%{public}d",
+            screenOnBrightness);
+        FFRTTask setBrightnessTask = [this, screenOnBrightness] {
+            this->UpdateBrightness(screenOnBrightness, 0, true);
+        };
+        g_waitForFirstLuxTaskHandle = FFRTUtils::SubmitDelayTask(setBrightnessTask, WAIT_FOR_FIRST_LUX_MAX_TIME,
+            queue_);
         return;
     }
     bool needUpdateBrightness = true;
@@ -876,7 +866,7 @@ bool BrightnessService::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDura
     }
 
     // If boost multi-times, we will resend the cancel boost event.
-    FFRT_CANCEL(g_cancelBoostTaskHandle, queue_);
+    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, queue_);
     FFRTTask task = [this, gradualDuration] { this->CancelBoostBrightness(gradualDuration); };
     g_cancelBoostTaskHandle = FFRTUtils::SubmitDelayTask(task, timeoutMs, queue_);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BoostBrightness update timeout=%{public}u, isSuccess=%{public}d", timeoutMs,
@@ -891,9 +881,7 @@ bool BrightnessService::CancelBoostBrightness(uint32_t gradualDuration)
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not boost, no need to restore");
         return false;
     }
-    mBoostHandleLock.lock();
-    FFRT_CANCEL(g_cancelBoostTaskHandle, queue_);
-    mBoostHandleLock.unlock();
+    FFRTUtils::CancelTask(g_cancelBoostTaskHandle, queue_);
     mIsBrightnessBoosted = false;
     return UpdateBrightness(mCachedSettingBrightness, gradualDuration, true);
 }
@@ -1137,10 +1125,8 @@ void BrightnessService::ReportBrightnessBigData(uint32_t brightness)
     std::string reason = GetReason();
     uint32_t nit = GetMappingBrightnessNit(brightness);
     // Notify screen brightness change event to battery statistics
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BRIGHTNESS_NIT",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "BRIGHTNESS", brightness, "REASON", reason, "NIT", nit);
-#endif
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BigData brightness=%{public}d,reason=%{public}s,nit=%{public}d",
         brightness, reason.c_str(), nit);
 }

@@ -52,6 +52,7 @@ private:
     uint32_t brightness_ {102};
     uint32_t displayId_ {DEFAULT_DISPLAY_ID};
     bool coordinated_ {false};
+    bool skipSetDisplayState_ {false};
     Rosen::PowerStateChangeReason ParseSpecialReason(uint32_t reason);
     Rosen::DisplayState ParseDisplayState(DisplayState state);
 };

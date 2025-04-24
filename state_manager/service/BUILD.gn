@@ -62,15 +62,13 @@ ohos_shared_library("displaymgrservice") {
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
-    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
-    "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "graphic_2d:librender_service_base",
     "hicollie:libhicollie",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "image_framework:image_native",
     "ipc:ipc_core",
     "power_manager:power_ffrt",
@@ -79,7 +77,6 @@ ohos_shared_library("displaymgrservice") {
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "skia:skia_canvaskit",
     "window_manager:libdm_lite",
   ]
 
@@ -87,9 +84,6 @@ ohos_shared_library("displaymgrservice") {
   if (has_sensors_sensor_part) {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
-  }
-  if (has_hiviewdfx_hisysevent_part) {
-    external_deps += [ "hisysevent:libhisysevent" ]
   }
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]

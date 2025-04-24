@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,11 +46,11 @@ public:
 namespace {
 HWTEST_F(BrightnessManagerTest, BrightnessManagerGet001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerGet001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is start");
     auto& brightnessManager = BrightnessManager::Get();
     EXPECT_NE(&brightnessManager, nullptr);
     const int sleepTime = 100000;
     usleep(sleepTime);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerGet001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001: fun is end");
 }
 } // namespace
