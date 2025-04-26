@@ -642,6 +642,37 @@ bool DisplayPowerMgrProxy::IsAutoAdjustBrightness()
     return result;
 }
 
+bool DisplayPowerMgrProxy::SetScreenOnBrightness()
+{
+    sptr<IRemoteObject> remote = Remote();
+    RETURN_IF_WITH_RET(remote == nullptr, false);
+
+    bool result = false;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+
+    if (!data.WriteInterfaceToken(DisplayPowerMgrProxy::GetDescriptor())) {
+        DISPLAY_HILOGE(COMP_FWK, "write descriptor failed!");
+        return result;
+    }
+
+    int ret = remote->SendRequest(
+        static_cast<int>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_SCREEN_ON_BRIGHTNESS),
+        data, reply, option);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SendRequest is failed, error code: %d", ret);
+        return result;
+    }
+
+    if (!reply.ReadBool(result)) {
+        DISPLAY_HILOGE(COMP_FWK, "Readback fail!");
+        return result;
+    }
+
+    return result;
+}
+
 bool DisplayPowerMgrProxy::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     sptr<IRemoteObject> remote = Remote();

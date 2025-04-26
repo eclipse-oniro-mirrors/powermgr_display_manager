@@ -46,6 +46,7 @@ public:
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) = 0;
     virtual bool AutoAdjustBrightness(bool enable) = 0;
     virtual bool IsAutoAdjustBrightness() = 0;
+    virtual bool SetScreenOnBrightness() = 0;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) = 0;
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) = 0;
     virtual bool CancelBoostBrightness(uint32_t displayId) = 0;

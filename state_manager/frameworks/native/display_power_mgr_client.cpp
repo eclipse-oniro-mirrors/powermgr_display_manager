@@ -201,6 +201,13 @@ bool DisplayPowerMgrClient::IsAutoAdjustBrightness()
     return proxy->IsAutoAdjustBrightness();
 }
 
+bool DisplayPowerMgrClient::SetScreenOnBrightness()
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    return proxy->SetScreenOnBrightness();
+}
+
 bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     if (callback == nullptr) {
