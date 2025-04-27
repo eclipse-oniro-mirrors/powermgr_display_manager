@@ -61,6 +61,7 @@ public:
     virtual bool AdjustBrightness(uint32_t id, int32_t value, uint32_t duration) override;
     virtual bool AutoAdjustBrightness(bool enable) override;
     virtual bool IsAutoAdjustBrightness() override;
+    virtual bool SetScreenOnBrightness() override;
     virtual bool RegisterCallback(sptr<IDisplayPowerCallback> callback) override;
     virtual bool BoostBrightness(int32_t timeoutMs, uint32_t displayId) override;
     virtual bool CancelBoostBrightness(uint32_t displayId) override;
@@ -75,7 +76,6 @@ public:
     void Deinit();
     void Reset();
     void ClearOffset();
-    void SetScreenOnBrightness();
     void HandleBootBrightness();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);

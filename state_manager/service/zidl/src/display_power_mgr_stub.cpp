@@ -144,6 +144,9 @@ int32_t DisplayPowerMgrStub::RemoteRequest(uint32_t code, MessageParcel &data, M
         case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_COORDINATED):
             ret = SetCoordinatedStub(data, reply);
             break;
+        case static_cast<int32_t>(PowerMgr::DisplayPowerMgrInterfaceCode::SET_SCREEN_ON_BRIGHTNESS):
+            ret = SetScreenOnBrightnessStub(data, reply);
+            break;
         default:
             ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
             break;
@@ -374,6 +377,16 @@ int32_t DisplayPowerMgrStub::IsAutoAdjustBrightnessStub(MessageParcel& data, Mes
     bool ret = IsAutoAdjustBrightness();
     if (!reply.WriteBool(ret)) {
         DISPLAY_HILOGE(COMP_SVC, "Failed to write IsAutoAdjustBrightnessStub return value");
+        return E_WRITE_PARCEL_ERROR;
+    }
+    return ERR_OK;
+}
+
+int32_t DisplayPowerMgrStub::SetScreenOnBrightnessStub(MessageParcel& data, MessageParcel& reply)
+{
+    bool ret = SetScreenOnBrightness();
+    if (!reply.WriteBool(ret)) {
+        DISPLAY_HILOGE(COMP_SVC, "Failed to write SetScreenOnBrightnessStub return value");
         return E_WRITE_PARCEL_ERROR;
     }
     return ERR_OK;

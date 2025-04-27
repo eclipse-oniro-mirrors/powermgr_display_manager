@@ -45,6 +45,7 @@ enum class DisplayPowerMgrInterfaceCode {
     SET_MAX_BRIGHTNESS,
     SET_MAX_BRIGHTNESS_NIT,
     NOTIFY_DISPLAY_POWER_STATUS,
+    SET_SCREEN_ON_BRIGHTNESS,
 };
 } // space PowerMgr
 } // namespace OHOS
