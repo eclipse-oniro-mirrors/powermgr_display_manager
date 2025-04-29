@@ -69,6 +69,7 @@ public:
     virtual bool SetCoordinated(bool coordinated, uint32_t displayId) override;
     virtual uint32_t SetLightBrightnessThreshold(
         std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback) override;
+    virtual int NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus) override;
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     virtual DisplayErrors GetError() override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
@@ -79,7 +80,6 @@ public:
     void HandleBootBrightness();
     static uint32_t GetSafeBrightness(uint32_t value);
     static double GetSafeDiscount(double discount, uint32_t brightness);
-    virtual int NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus) override;
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -91,25 +91,6 @@ private:
         std::mutex callbackMutex_;
     };
 
-#ifdef ENABLE_SENSOR_PART
-    static void AmbientLightCallback(SensorEvent* event);
-    void InitSensors();
-    void ActivateAmbientSensor();
-    void DeactivateAmbientSensor();
-    bool ambientSensorEnabled_ {false};
-    SensorUser sensorUser_ {};
-#endif
-    bool supportLightSensor_ {false};
-
-    static const uint32_t AUTO_ADJUST_BRIGHTNESS_STRIDE = 1;
-    static const uint32_t SAMPLING_RATE = 100000000;
-    static const int32_t BRIGHTNESS_CHANGE_MIN = 2;
-    static const int32_t LUX_TO_NIT_SQRT_RADIO = 5;
-    static const time_t LUX_STABLE_TIME = 1;
-    static constexpr float LUX_CHANGE_RATE_THRESHOLD = 2;
-    static constexpr float LUX_CHANGE_STABLE_MIN = 10.0;
-    static const int32_t NIT_MIN = 2;
-    static const int32_t NIT_MAX = 450;
     static const uint32_t BRIGHTNESS_OFF = 0;
     static const uint32_t BRIGHTNESS_MIN;
     static const uint32_t BRIGHTNESS_DEFAULT;
@@ -121,9 +102,6 @@ private:
     friend DelayedSpSingleton<DisplayPowerMgrService>;
 
     DisplayPowerMgrService();
-    bool IsChangedLux(float scalar);
-    bool CalculateBrightness(float scalar, int32_t& brightness, int32_t& change);
-    int32_t GetBrightnessFromLightScalar(float scalar);
     void DumpDisplayInfo(std::string& result);
     static void RegisterBootCompletedCallback();
     static void SetBootCompletedBrightness();
@@ -133,32 +111,25 @@ private:
     static void RegisterSettingAutoBrightnessObserver();
     static void UnregisterSettingAutoBrightnessObserver();
     static void AutoBrightnessSettingUpdateFunc(const std::string& key);
-    static void SetSettingAutoBrightness(bool enable);
     static bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
     void ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason);
+    bool IsSupportLightSensor(void);
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
-    bool autoBrightness_ {false};
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
 
     DisplayErrors lastError_ {DisplayErrors::ERR_OK};
-    time_t lastLuxTime_ {0};
-    float lastLux_ {0};
-    bool luxChanged_ {false};
     std::mutex mutex_;
     static std::atomic_bool isBootCompleted_;
     uint32_t displayOffDelayMs_ {0};
     bool isDisplayDelayOff_ = false;
-    bool setDisplayStateRet_ = true;
     uint32_t displayId_ {0};
     DisplayState displayState_ {DisplayState::DISPLAY_UNKNOWN};
-    DisplayState tempState_ {DisplayState::DISPLAY_UNKNOWN};
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool isInTestMode_ {false};
-    bool isDozeEnabled_ {false};
     std::once_flag initFlag_;
 };
 } // namespace DisplayPowerMgr

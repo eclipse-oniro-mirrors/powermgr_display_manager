@@ -54,7 +54,7 @@ bool BrightnessManagerExt::LoadBrightnessExtLibrary()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlopen libbrightness_wrapper.z.so failed!");
         return false;
     }
-    if (LoadBrightnessOps() && LoadBrightnessStatus() && LoadBrightnessControl()) {
+    if (LoadBrightnessOps() && LoadBrightnessOpsEx1() && LoadBrightnessStatus() && LoadBrightnessControl()) {
         mBrightnessManagerExtEnable = true;
     } else {
         mBrightnessManagerExtEnable = false;
@@ -96,6 +96,21 @@ bool BrightnessManagerExt::LoadBrightnessOps()
     mSetMaxBrightnessNitFunc = dlsym(mBrightnessManagerExtHandle, "SetMaxBrightnessNit");
     if (!mSetMaxBrightnessNitFunc) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetMaxBrightnessNit func failed!");
+        return false;
+    }
+    return true;
+}
+
+bool BrightnessManagerExt::LoadBrightnessOpsEx1()
+{
+    mIsSupportLightSensorFunc = dlsym(mBrightnessManagerExtHandle, "IsSupportLightSensor");
+    if (!mIsSupportLightSensorFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym IsSupportLightSensor func failed!");
+        return false;
+    }
+    mIsAutoAdjustBrightnessFunc = dlsym(mBrightnessManagerExtHandle, "IsAutoAdjustBrightness");
+    if (!mIsAutoAdjustBrightnessFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym IsAutoAdjustBrightness func failed!");
         return false;
     }
     return true;
@@ -213,6 +228,8 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mBrightnessManagerDeInitFunc = nullptr;
     mSetDisplayStateFunc = nullptr;
     mGetDisplayStateFunc = nullptr;
+    mIsSupportLightSensorFunc = nullptr;
+    mIsAutoAdjustBrightnessFunc = nullptr;
     mAutoAdjustBrightnessFunc = nullptr;
     mSetBrightnessFunc = nullptr;
     mDiscountBrightnessFunc = nullptr;
@@ -252,6 +269,24 @@ DisplayState BrightnessManagerExt::GetState()
     }
     auto getDisplayStateFunc = reinterpret_cast<DisplayState (*)()>(mGetDisplayStateFunc);
     return getDisplayStateFunc();
+}
+
+bool BrightnessManagerExt::IsSupportLightSensor(void)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto isSupportLightSensorFunc = reinterpret_cast<bool (*)()>(mIsSupportLightSensorFunc);
+    return isSupportLightSensorFunc();
+}
+
+bool BrightnessManagerExt::IsAutoAdjustBrightness(void)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto isAutoAdjustBrightnessFunc = reinterpret_cast<bool (*)()>(mIsAutoAdjustBrightnessFunc);
+    return isAutoAdjustBrightnessFunc();
 }
 
 bool BrightnessManagerExt::AutoAdjustBrightness(bool enable)

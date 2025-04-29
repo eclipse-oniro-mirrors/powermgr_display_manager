@@ -59,6 +59,24 @@ DisplayState BrightnessManager::GetState()
 #endif
 }
 
+bool BrightnessManager::IsSupportLightSensor(void)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.IsSupportLightSensor();
+#else
+    return BrightnessService::Get().IsSupportLightSensor();
+#endif
+}
+
+bool BrightnessManager::IsAutoAdjustBrightness(void)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.IsAutoAdjustBrightness();
+#else
+    return BrightnessService::Get().IsAutoAdjustBrightness();
+#endif
+}
+
 bool BrightnessManager::AutoAdjustBrightness(bool enable)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
