@@ -793,14 +793,14 @@ bool BrightnessService::DiscountBrightness(double discount, uint32_t gradualDura
     }
     auto safeDiscount = discount;
     if (safeDiscount > DISCOUNT_MAX) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "discount value is greater than max, discount=%{public}lf", discount);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "discount value is greater than max, discount=%{public}f", discount);
         safeDiscount = DISCOUNT_MAX;
     }
     if (safeDiscount < DISCOUNT_MIN) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "discount value is less than min, discount=%{public}lf", discount);
+        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "discount value is less than min, discount=%{public}f", discount);
         safeDiscount = DISCOUNT_MIN;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Discount brightness, safeDiscount=%{public}lf", safeDiscount);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Discount brightness, safeDiscount=%{public}f", safeDiscount);
     mDiscount = safeDiscount;
     if (mDimmingCallback) {
         mDimmingCallback->DiscountBrightness(safeDiscount);

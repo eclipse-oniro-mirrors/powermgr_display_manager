@@ -331,19 +331,7 @@ bool DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displa
     if (iter == controllerMap_.end()) {
         return false;
     }
-    bool ret = BrightnessManager::Get().DiscountBrightness(discount);
-    if (ret) {
-        return true;
-    }
-    auto brightness = iter->second->GetBrightness();
-    auto safeDiscount = GetSafeDiscount(discount, brightness);
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "DiscountBrightness displayId=%{public}u, discount-%{public}lf",
-                   displayId, safeDiscount);
-#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
-    HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "BACKLIGHT_DISCOUNT",
-        HiviewDFX::HiSysEvent::EventType::STATISTIC, "RATIO", safeDiscount);
-#endif
-    return iter->second->DiscountBrightness(safeDiscount);
+    return BrightnessManager::Get().DiscountBrightness(discount);
 }
 
 bool DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration)
