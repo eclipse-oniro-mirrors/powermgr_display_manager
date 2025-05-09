@@ -187,7 +187,7 @@ bool ScreenController::DiscountBrightness(double discount, uint32_t gradualDurat
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot discount brightness, ignore the change");
         return false;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Discount brightness, discount=%{public}lf", discount);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Discount brightness, discount=%{public}f", discount);
     discount_ = discount;
     if (animateCallback_) {
         animateCallback_->DiscountBrightness(discount);
