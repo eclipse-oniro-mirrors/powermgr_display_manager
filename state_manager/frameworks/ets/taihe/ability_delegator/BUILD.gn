@@ -71,6 +71,13 @@ generate_static_abc("brightness_abc") {
   dependencies = [ ":run_taihe" ]
 }
 
+generate_static_abc("brightness_test_abc") {
+  base_url = "$displaymgr_framework_path/ets/taihe/ability_delegator/test"
+  files = [ "$displaymgr_framework_path/ets/taihe/ability_delegator/test/test_main.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/brightness_test_abc.abc"
+}
+
 ohos_prebuilt_etc("brightness_etc") {
   source = "$target_out_dir/brightness_abc.abc"
   module_install_dir = "framework"
