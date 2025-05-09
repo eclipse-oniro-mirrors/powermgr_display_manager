@@ -75,6 +75,8 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrService003 is start");
     auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     EXPECT_TRUE(ret);
+    auto temp = DisplayPowerMgrClient::GetInstance().SetScreenOnBrightness();
+    EXPECT_TRUE(temp);
     DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrService003 is end");
 }
 
