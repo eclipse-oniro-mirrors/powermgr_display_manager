@@ -59,10 +59,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
-  deps = [
-    "${displaymgr_inner_api}:displaymgr",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
   external_deps = [
     "ability_base:want",
@@ -70,6 +67,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "data_share:datashare_consumer",
+    "googletest:gtest_main",
     "hilog:libhilog",
     "ipc:ipc_core",
     "power_manager:power_setting",
@@ -93,12 +91,10 @@ ohos_unittest("display_service_death_test") {
 
   defines += [ "DISPLAY_SERVICE_DEATH_UT" ]
 
-  deps = [
-    "${displaymgr_inner_api}:displaymgr",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
-  external_deps = deps_ex
+  external_deps = [ "googletest:gtest_main" ]
+  external_deps += deps_ex
 }
 
 ############################display_mock_parcel_test#############################
@@ -117,12 +113,9 @@ ohos_unittest("display_mock_parcel_test") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
-  deps = [
-    "${displaymgr_inner_api}:displaymgr",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = deps_ex
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
+  external_deps = [ "googletest:gtest_main" ]
+  external_deps += deps_ex
 }
 
 ############################display_mock_test#############################
@@ -147,12 +140,10 @@ ohos_unittest("display_mock_test") {
     "MOCK_WRITE_INTERFACE_TOKEN_RETURN_TRUE",
   ]
 
-  deps = [
-    "${displaymgr_inner_api}:displaymgr",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
-  external_deps = deps_ex
+  external_deps = [ "googletest:gtest_main" ]
+  external_deps += deps_ex
 }
 
 ############################display_mock_object_test#############################
@@ -170,12 +161,10 @@ ohos_unittest("display_mock_object_test") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
-  deps = [
-    "${displaymgr_inner_api}:displaymgr",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "${displaymgr_inner_api}:displaymgr" ]
 
-  external_deps = deps_ex
+  external_deps = [ "googletest:gtest_main" ]
+  external_deps += deps_ex
 }
 
 group("unittest") {
