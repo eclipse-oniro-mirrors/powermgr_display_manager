@@ -43,6 +43,7 @@ public:
     void SetMode();
     void SetKeepScreenOn();
     napi_value GetCallbackInfo(napi_callback_info& info, uint32_t index, napi_valuetype checkType);
+    napi_value GetCallbackInfoWithThrow(napi_callback_info& info, uint32_t index, napi_valuetype checkType);
     bool CreateCallbackRef(napi_value& options);
     void CreateValueRef(napi_value& options, const std::string& valName, napi_valuetype checkType);
 

@@ -99,7 +99,7 @@ void Brightness::SetValue(napi_callback_info& info)
             return;
         }
     }
-    napi_value napiContinuous = GetCallbackInfo(info, ARGV_CONTINUOUS_INDEX, napi_boolean);
+    napi_value napiContinuous = GetCallbackInfoWithThrow(info, ARGV_CONTINUOUS_INDEX, napi_boolean);
     if (napiContinuous != nullptr) {
         napi_get_value_bool(env_, napiContinuous, &continuous);
     }
@@ -110,6 +110,29 @@ void Brightness::SetValue(napi_callback_info& info)
             result_.ThrowError(env_, error);
         }
     }
+}
+
+napi_value Brightness::GetCallbackInfoWithThrow(napi_callback_info& info, uint32_t index, napi_valuetype checkType)
+{
+    size_t argc = MAX_ARGC;
+    napi_value argv[argc];
+    napi_value thisVar = nullptr;
+    void* data = nullptr;
+    if (napi_ok != napi_get_cb_info(env_, info, &argc, argv, &thisVar, &data)) {
+        DISPLAY_HILOGW(COMP_FWK, "Failed to get the input parameter");
+        return nullptr;
+    }
+
+    if (argc > MAX_ARGC || index >= argc) {
+        DISPLAY_HILOGW(COMP_FWK, "parameter %{public}u is invalid", index);
+        return nullptr;
+    }
+
+    napi_value options = argv[index];
+    if (!CheckValueType(options, checkType)) {
+        return result_.ThrowError(env_, DisplayErrors::ERR_PARAM_INVALID);
+    }
+    return options;
 }
 
 void Brightness::SystemSetValue()
