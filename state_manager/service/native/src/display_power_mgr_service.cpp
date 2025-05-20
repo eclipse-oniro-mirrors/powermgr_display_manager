@@ -194,6 +194,9 @@ void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& 
 
 bool DisplayPowerMgrService::SetScreenOnBrightness()
 {
+    if (!Permission::IsSystem()) {
+        return false;
+    }
     BrightnessManager::Get().SetScreenOnBrightness();
     return true;
 }
