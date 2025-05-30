@@ -42,7 +42,7 @@ static constexpr double DISCOUNT_VALUE = 0.30;
 void DisplayMockObjectTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
     uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }
 
 namespace {
@@ -54,6 +54,7 @@ namespace {
  */
 HWTEST_F(DisplayMockObjectTest, DisplayMockObjectTest_001, TestSize.Level0)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockObjectTest_001 function start!");
     sptr<MockDisplayRemoteObject> sptrRemoteObj = new MockDisplayRemoteObject();
     auto sptrDisplayProxy = std::make_shared<DisplayPowerMgr::DisplayPowerMgrProxy>(sptrRemoteObj);
     EXPECT_FALSE(sptrDisplayProxy->SetDisplayState(DISPLAY_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON, REASON));
@@ -77,5 +78,6 @@ HWTEST_F(DisplayMockObjectTest, DisplayMockObjectTest_001, TestSize.Level0)
     EXPECT_FALSE(sptrDisplayProxy->IsAutoAdjustBrightness());
     EXPECT_FALSE(sptrDisplayProxy->BoostBrightness(TIMEOUT_MS, DISPLAY_ID));
     EXPECT_FALSE(sptrDisplayProxy->CancelBoostBrightness(DISPLAY_ID));
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockObjectTest_001 function end!");
 }
 } //namespace
