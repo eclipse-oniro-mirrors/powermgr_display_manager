@@ -52,7 +52,7 @@ static constexpr double DISCOUNT_VALUE = 0.30;
 void DisplayMockTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
     uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }
 
 namespace {
@@ -64,13 +64,13 @@ namespace {
  */
 HWTEST_F(DisplayMockTest, DisplayMockTest_001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_001 function start!");
     sptr<DisplayPowerCallbackStub> callbackPtr = new DisplayMockTest::DisplayPowerMgrTestCallback();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     EXPECT_NE(ERR_OK, callbackPtr->OnRemoteRequest(CODE_VALUE, data, reply, option));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_001 function end!");
 }
 
 /**
@@ -81,14 +81,14 @@ HWTEST_F(DisplayMockTest, DisplayMockTest_001, TestSize.Level0)
  */
 HWTEST_F(DisplayMockTest, DisplayMockTest_002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_002 function start!");
     sptr<DisplayPowerCallbackStub> callbackPtr = new DisplayMockTest::DisplayPowerMgrTestCallback();
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     uint32_t code = static_cast<int32_t>(PowerMgr::DisplayPowerCallbackInterfaceCode::ON_DISPLAY_STATE_CHANGED);
     EXPECT_NE(ERR_OK, callbackPtr->OnRemoteRequest(code, data, reply, option));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_002 function end!");
 }
 
 /**
@@ -99,7 +99,7 @@ HWTEST_F(DisplayMockTest, DisplayMockTest_002, TestSize.Level0)
  */
 HWTEST_F(DisplayMockTest, DisplayMockTest_003, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_003: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_003 function start!");
     sptr<MockDisplayRemoteObject> sptrRemoteObj = new MockDisplayRemoteObject();
     auto sptrDisplayProxy = std::make_shared<DisplayPowerMgr::DisplayPowerMgrProxy>(sptrRemoteObj);
     EXPECT_FALSE(sptrDisplayProxy->SetDisplayState(DISPLAY_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON, REASON));
@@ -123,6 +123,6 @@ HWTEST_F(DisplayMockTest, DisplayMockTest_003, TestSize.Level0)
     EXPECT_FALSE(sptrDisplayProxy->IsAutoAdjustBrightness());
     EXPECT_FALSE(sptrDisplayProxy->BoostBrightness(TIMEOUT_MS, DISPLAY_ID));
     EXPECT_FALSE(sptrDisplayProxy->CancelBoostBrightness(DISPLAY_ID));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayMockTest_003: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockTest_003 function end!");
 }
 } // namespace

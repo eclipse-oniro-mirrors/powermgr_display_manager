@@ -71,7 +71,7 @@ namespace {
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetBrightness001 function start!");
     const uint32_t SET_BRIGHTNESS = 90;
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     EXPECT_TRUE(ret);
@@ -79,7 +79,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetBrightness001, TestSiz
     usleep(sleepTime);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(deviceBrightness, SET_BRIGHTNESS);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetBrightness001 function end!");
 }
 
 /**
@@ -89,7 +89,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetBrightness001, TestSiz
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSettingBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness001 function start!");
     const uint32_t SET_BRIGHTNESS_VALUE = 223;
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS_VALUE);
     EXPECT_TRUE(ret);
@@ -97,7 +97,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
     usleep(sleepTime); // sleep 100ms, wait for setting update
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(brightness, SET_BRIGHTNESS_VALUE);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSettingBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSettingBrightness001 function end!");
 }
 
 /**
@@ -108,7 +108,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSettingBrightness001, Tes
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessNormal, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessNormal: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessNormal function start!");
     const uint32_t SET_BRIGHTNESS = 91;
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -119,7 +119,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessNormal,
 
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(SET_BRIGHTNESS * DISCOUNT_NORMAL));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessNormal: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessNormal function end!");
 }
 
 /**
@@ -130,12 +130,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessNormal,
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessScreenOff, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessScreenOff: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessScreenOff function start!");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     const double DISCOUNT_VALUE = 0.7;
     bool ret = DisplayPowerMgrClient::GetInstance().DiscountBrightness(DISCOUNT_VALUE);
     EXPECT_FALSE(ret);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessScreenOff: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessScreenOff function end!");
 }
 
 /**
@@ -146,7 +146,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessScreenO
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundary001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary001 function start!");
     const uint32_t SET_BRIGHTNESS = 92;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -157,7 +157,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     uint32_t minBrightness = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_EQ(value, minBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary001 function end!");
 }
 
 /**
@@ -168,7 +168,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundary002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary002 function start!");
     const uint32_t SET_BRIGHTNESS = 93;
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -179,7 +179,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
 
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(SET_BRIGHTNESS * DISCOUNT_UPPER_BOUNDARY));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessBoundary002 function end!");
 }
 
 /**
@@ -190,7 +190,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessBoundar
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal001 function start!");
     const uint32_t SET_BRIGHTNESS = 94;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -201,7 +201,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     uint32_t minBrightness = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_EQ(value, minBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal001 function end!");
 }
 
 /**
@@ -212,7 +212,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal002 function start!");
     const uint32_t SET_BRIGHTNESS = 95;
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -224,7 +224,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     const double DISCOUNT_MAX_VALUE = 1.0;
     EXPECT_EQ(value, static_cast<uint32_t>(SET_BRIGHTNESS * DISCOUNT_MAX_VALUE));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal002 function end!");
 }
 
 /**
@@ -235,7 +235,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnormal003, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal003: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal003 function start!");
     const uint32_t SET_BRIGHTNESS = 96;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -246,7 +246,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     uint32_t minBrightness = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_EQ(value, minBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal003: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightnessAbnormal003 function end!");
 }
 
 /**
@@ -257,7 +257,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightnessAbnorma
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness001 function start!");
     const uint32_t SET_BRIGHTNESS = 97;
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -279,7 +279,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, Te
     usleep(DEFAULT_WAITING_TIME);
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_BRIGHTNESS));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness001 function end!");
 }
 
 /**
@@ -290,7 +290,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness001, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002 function start!");
     const uint32_t SET_BRIGHTNESS = 150;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -310,7 +310,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
 
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_BRIGHTNESS));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness002 function end!");
 }
 
 /**
@@ -321,7 +321,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness003: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness003 function start!");
     const uint32_t SET_BRIGHTNESS = 99;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -341,7 +341,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, Te
 
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_BRIGHTNESS));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness003: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness003 function end!");
 }
 
 /**
@@ -352,7 +352,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness003, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness004: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness004 function start!");
     const uint32_t SET_BRIGHTNESS = 100;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -371,7 +371,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, Te
 
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_BRIGHTNESS));
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness004: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness004 function end!");
 }
 
 /**
@@ -382,7 +382,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness004, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness005, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness005: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness005 function start!");
     const uint32_t SET_BRIGHTNESS = 103;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -393,7 +393,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness005, Te
     usleep(sleepTime); // sleep 100ms, wait for setting update
     uint32_t beforeBrightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, beforeBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDiscountBrightness005: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDiscountBrightness005 function end!");
 }
 
 /**
@@ -403,7 +403,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness005, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness001 function start!");
     const uint32_t OVERRIDE_BRIGHTNESS = 255;
     bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -412,7 +412,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness001, Te
     EXPECT_EQ(value, OVERRIDE_BRIGHTNESS);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness001 function end!");
 }
 
 /**
@@ -422,7 +422,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness001, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness002 function start!");
     const uint32_t SET_BRIGHTNESS = 104;
     const uint32_t OVERRIDE_BRIGHTNESS = 255;
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -439,7 +439,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness002, Te
     EXPECT_TRUE(ret);
     value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, SET_BRIGHTNESS);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness002 function end!");
 }
 
 /**
@@ -449,7 +449,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness002, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness003: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness003 function start!");
     const uint32_t SET_BRIGHTNESS = 105;
     const uint32_t OVERRIDE_BRIGHTNESS = 255;
     bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
@@ -462,7 +462,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, Te
     EXPECT_EQ(value, OVERRIDE_BRIGHTNESS);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness003: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness003 function end!");
 }
 
 /**
@@ -472,7 +472,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness004, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness004: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness004 function start!");
     const uint32_t SET_BRIGHTNESS = 106;
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     usleep(DEFAULT_WAITING_TIME);
@@ -481,7 +481,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness004, Te
     EXPECT_FALSE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, SET_BRIGHTNESS);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness004: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness004 function end!");
 }
 
 /**
@@ -491,14 +491,14 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness004, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness005, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness005: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness005 function start!");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     const uint32_t OVERRIDE_BRIGHTNESS = 100;
     bool isBoost = DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
     EXPECT_FALSE(isBoost);
     bool isRestore = DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     EXPECT_FALSE(isRestore);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness005: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness005 function end!");
 }
 
 /**
@@ -509,14 +509,14 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness005, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness006, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness006: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness006 function start!");
     uint32_t overrideValue = 256;
     uint32_t brightnessMax = 255;
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue);
     usleep(DEFAULT_WAITING_TIME);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(brightnessMax, deviceBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness006: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness006 function end!");
 }
 
 /**
@@ -527,7 +527,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness006, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007 function start!");
     uint32_t overrideValue = 0;
     uint32_t brightnessMin = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
@@ -536,7 +536,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, Te
     EXPECT_EQ(brightnessMin, deviceBrightness);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness007 function end!");
 }
 
 /**
@@ -547,7 +547,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness008: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness008 function start!");
     uint32_t overrideValue = -1;
     uint32_t brightnessMax = 255;
     EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
@@ -556,7 +556,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
     EXPECT_EQ(brightnessMax, deviceBrightness);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness008: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness008 function end!");
 }
 
 /**
@@ -568,7 +568,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009 function start!");
     const uint32_t OVERRIDE_BRIGHTNESS = 156;
     const uint32_t SET_BRIGHTNESS = 66;
     auto currentBrightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
@@ -584,7 +584,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, Te
     usleep(DEFAULT_WAITING_TIME);
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(currentBrightness, deviceBrightness);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrOverrideBrightness009 function end!");
 }
 
 /**
@@ -594,7 +594,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMaxBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrMaxBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMaxBrightness001 function start!");
     uint32_t max = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
     EXPECT_LE(max, 255);
     bool ret = DisplayPowerMgrClient::GetInstance().SetBrightness(max + 100);
@@ -602,7 +602,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMaxBrightness001, TestSiz
     EXPECT_TRUE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, max);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrMaxBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMaxBrightness001 function end!");
 }
 
 /**
@@ -612,7 +612,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMaxBrightness001, TestSiz
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMinBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrMinBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMinBrightness001 function start!");
     const uint32_t SET_BRIGHTNESS_VALUE = 0;
     uint32_t min = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
     EXPECT_GE(min, 0);
@@ -621,7 +621,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMinBrightness001, TestSiz
     EXPECT_TRUE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, min);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrMinBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrMinBrightness001 function end!");
 }
 
 /**
@@ -631,11 +631,11 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrMinBrightness001, TestSiz
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDefaultBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001 function start!");
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDefaultBrightness();
     EXPECT_GE(value, 0);
     EXPECT_LE(value, 255);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrDefaultBrightness001 function end!");
 }
 
 /**
@@ -645,11 +645,11 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDefaultBrightness001, Tes
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNormal, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNormal: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNormal function start!");
     const uint32_t BOOST_TIME = 100; // keep BoostBrightness 100ms
     bool isSucc = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_TIME);
     EXPECT_TRUE(isSucc);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNormal: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNormal function end!");
 }
 
 /**
@@ -659,11 +659,11 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNormal, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessAbnormal, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessAbnormal: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessAbnormal function start!");
     const uint32_t BOOST_TIME = -1;
     bool isSucc = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_TIME);
     EXPECT_FALSE(isSucc);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessAbnormal: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessAbnormal function end!");
 }
 
 /**
@@ -673,13 +673,13 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessAbnormal, 
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrCancelBoostBrightnessNormal, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrCancelBoostBrightnessNormal: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrCancelBoostBrightnessNormal function start!");
     const uint32_t BOOST_TIME = 50000;
     bool isSucc = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_TIME);
     EXPECT_TRUE(isSucc);
     bool isCancel = DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
     EXPECT_TRUE(isCancel);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrCancelBoostBrightnessNormal: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrCancelBoostBrightnessNormal function end!");
 }
 
 /**
@@ -689,7 +689,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrCancelBoostBrightnessNorm
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive1, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BoostAndOverrideMutuallyExclusive: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BoostAndOverrideMutuallyExclusive function start!");
     const uint32_t BOOST_TIME = 50000;
     const uint32_t OVERRIDE_BIRGHTNESS = 100;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_TIME);
@@ -698,7 +698,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive1, Test
     EXPECT_FALSE(isOverride);
     bool isRestore = DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     EXPECT_FALSE(isRestore);
-    DISPLAY_HILOGD(LABEL_TEST, "BoostAndOverrideMutuallyExclusive: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BoostAndOverrideMutuallyExclusive function end!");
 }
 
 /**
@@ -708,7 +708,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive1, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive2, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BoostAndOverrideMutuallyExclusive2: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BoostAndOverrideMutuallyExclusive2 function start!");
     const uint32_t BOOST_TIME = 50000;
     const uint32_t OVERRIDE_BIRGHTNESS = 255;
     bool isOverride = DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BIRGHTNESS);
@@ -719,7 +719,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive2, Test
     EXPECT_FALSE(isCancel);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "BoostAndOverrideMutuallyExclusive2: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BoostAndOverrideMutuallyExclusive2 function end!");
 }
 
 /**
@@ -729,7 +729,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, BoostAndOverrideMutuallyExclusive2, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout1, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout1: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout1 function start!");
     uint32_t beforeValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     const uint32_t BOOST_BRIGHTNESS_TIME = 100;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
@@ -738,7 +738,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout1, 
     usleep(sleepTime); // sleep 200ms, wait for setting update
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(beforeValue, currentValue);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout1: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout1 function end!");
 }
 
 /**
@@ -748,7 +748,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout1, 
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout2, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout2: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout2 function start!");
     const uint32_t SET_BRIGHTNESS = 106;
     const uint32_t BOOST_BRIGHTNESS_TIME = 100;
     const int sleepTime = (BOOST_BRIGHTNESS_TIME + 50) * 1000; // wait for (100 + 50)ms BoostBrightness timeout
@@ -760,7 +760,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout2, 
     EXPECT_TRUE(isSet);
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, currentValue);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout2: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessTimeout2 function end!");
 }
 
 /**
@@ -770,7 +770,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessTimeout2, 
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel1, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel1: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel1 function start!");
     const uint32_t SET_BRIGHTNESS = 106;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SET_SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -784,9 +784,9 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel1, T
     usleep(SLEEP_TIME); // sleep 100ms, wait for cancel BoostBrightness
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, currentValue) << "beforeValue: " << SET_BRIGHTNESS << " currentVal: " << currentValue;
-    DISPLAY_HILOGD(LABEL_TEST, "BoostBrightnessCancel1: beforeValue: %{public}d, currentVal: %{public}d",
+    DISPLAY_HILOGI(LABEL_TEST, "BoostBrightnessCancel1: beforeValue: %{public}d, currentVal: %{public}d",
         SET_BRIGHTNESS, currentValue);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel1: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel1 function end!");
 }
 
 /**
@@ -796,7 +796,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel1, T
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel2, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel2: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel2 function start!");
     const uint32_t BOOST_BRIGHTNESS_TIME = 10000;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
     EXPECT_TRUE(isBoost);
@@ -808,7 +808,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel2, T
     EXPECT_TRUE(isSet);
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(SET_BRIGHTNESS_VALUE, currentValue);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel2: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessCancel2 function end!");
 }
 
 /**
@@ -818,7 +818,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessCancel2, T
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust function start!");
     const uint32_t SET_BRIGHTNESS = 107;
     const uint32_t BOOST_BRIGHTNESS_TIME = 10000;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -831,7 +831,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust,
     DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
     uint32_t currentValue = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, currentValue);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessNotAdjust function end!");
 }
 
 /**
@@ -841,14 +841,14 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessNotAdjust,
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessScreenOff, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessScreenOff: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessScreenOff function start!");
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     const uint32_t BOOST_BRIGHTNESS_TIME = 10000;
     bool isBoost = DisplayPowerMgrClient::GetInstance().BoostBrightness(BOOST_BRIGHTNESS_TIME);
     EXPECT_FALSE(isBoost);
     bool isCancel = DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
     EXPECT_FALSE(isCancel);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessScreenOff: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessScreenOff function end!");
 }
 
 /**
@@ -858,7 +858,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessScreenOff,
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessMultipleCalls, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessMultipleCalls: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessMultipleCalls function start!");
     const uint32_t SET_BRIGHTNESS = 108;
     const uint32_t COUNT = 3;
     const uint32_t TIMEOUT = 100;
@@ -882,7 +882,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessMultipleCa
     EXPECT_TRUE(isSet);
     uint32_t currentVal = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(SET_BRIGHTNESS_VALUE, currentVal);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrBoostBrightnessMultipleCalls: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrBoostBrightnessMultipleCalls function end!");
 }
 
 /**
@@ -892,12 +892,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrBoostBrightnessMultipleCa
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001 function start!");
     bool ret = DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 3000);
     EXPECT_TRUE(ret);
     DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 5);
     usleep(10000);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness001 function end!");
 }
 
 /**
@@ -907,20 +907,21 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness001, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002 function start!");
     bool ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(true);
     //waiting to find correct isSettingEnable value
     usleep(50000);
     if (ret) {
-        DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is supported");
+        DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is supported");
         ret = DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
         //waiting to find correct isSettingEnable value
         usleep(50000);
         EXPECT_TRUE(ret);
     } else {
-        DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is not supported");
+        DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002: is not supported");
         EXPECT_FALSE(ret);
     }
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness002 function end!");
 }
 
 /**
@@ -931,7 +932,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness002, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003 function start!");
     bool ret = DisplayPowerMgrClient::GetInstance().IsAutoAdjustBrightness();
     DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(false);
     //waiting to find correct isSettingEnable value
@@ -940,7 +941,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, Test
     DisplayPowerMgrClient::GetInstance().AutoAdjustBrightness(ret);
     //waiting to find correct isSettingEnable value
     usleep(50000);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrAdjustBrightness003 function end!");
 }
 
 /**
@@ -951,7 +952,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrAdjustBrightness003, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001 function start!");
     DisplayPowerMgrClient::GetInstance().AdjustBrightness(0, 5);
     usleep(10000);
     uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
@@ -965,7 +966,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality0
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     uint32_t deviceBrightness2 = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(deviceBrightness1, deviceBrightness2);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrScreenBrightnessEquality001 function end!");
 }
 
 /**
@@ -976,7 +977,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrScreenBrightnessEquality0
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSleepBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSleepBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSleepBrightness001 function start!");
     uint32_t deviceBrightness1 = DisplayPowerMgrClient::GetInstance().GetBrightness();
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     //waiting to find correct isSettingEnable value
@@ -984,7 +985,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSleepBrightness001, TestS
     uint32_t deviceBrightness2 = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(deviceBrightness1, deviceBrightness2);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSleepBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSleepBrightness001 function end!");
 }
 
 /**
@@ -995,7 +996,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSleepBrightness001, TestS
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThreshold001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001 function start!");
     std::vector<int32_t> threshold = {200, 200, 20};
     uint32_t type = 1;
     int32_t state = 0;
@@ -1004,7 +1005,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     callback->OnNotifyApsLightBrightnessChange(type, state);
     uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
     EXPECT_EQ(result, SUCCESS_RESULT);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold001 function end!");
 }
 
 /**
@@ -1015,7 +1016,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThreshold002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002 function start!");
     std::vector<int32_t> threshold = {};
     uint32_t type = 1;
     int32_t state = 0;
@@ -1024,7 +1025,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
     callback->OnNotifyApsLightBrightnessChange(type, state);
     uint32_t result = DisplayPowerMgrClient::GetInstance().SetLightBrightnessThreshold(threshold, callback);
     EXPECT_EQ(result, FAILD_RESULT);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetLightBrightnessThreshold002 function end!");
 }
 
 /**
@@ -1035,7 +1036,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001 function start!");
     const uint32_t SET_BRIGHTNESS = 150; // mapping nit = 350
     const uint32_t SET_BRIGHTNESS_NIT = 350;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -1051,7 +1052,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit001, T
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_MAX_BRIGHTNESS, brightness);
     DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_BRIGHTNESS_NIT, 1);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit001 function end!");
 }
 
 /**
@@ -1061,7 +1062,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit001, T
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002 function start!");
     const uint32_t SET_BRIGHTNESS = 150; // mapping nit = 350
     const uint32_t SET_BRIGHTNESS_NIT = 350;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
@@ -1076,7 +1077,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit002, T
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, brightness);
     DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_BRIGHTNESS_NIT, 1);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightnessNit002 function end!");
 }
 
 /**
@@ -1087,7 +1088,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit002, T
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001 function start!");
     const uint32_t SET_BRIGHTNESS = 150;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -1102,7 +1103,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, Test
     EXPECT_EQ(SET_MAX_BRIGHTNESS, brightness);
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS, 1);
     usleep(SLEEP_TIME);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness001 function end!");
 }
 
 /**
@@ -1112,7 +1113,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, Test
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002 function start!");
     const uint32_t SET_BRIGHTNESS = 150;
     DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
     const int32_t SLEEP_TIME = DEFAULT_WAITING_TIME;
@@ -1126,7 +1127,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, Test
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, brightness);
     DisplayPowerMgrClient::GetInstance().SetMaxBrightness(SET_BRIGHTNESS, 1);
-    DISPLAY_HILOGD(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrSetMaxBrightness002 function end!");
 }
 
 /**
@@ -1137,14 +1138,14 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, Test
 */
 HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus001, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001 function start!");
     uint32_t displayId = 0;
     uint32_t screenPowerStatus = 0; // 0 represent the POWER_STATUS_ON
     uint32_t result = DisplayPowerMgrClient::GetInstance().NotifyBrightnessManagerScreenPowerStatus(displayId,
         screenPowerStatus);
     const uint32_t FAILED_RESULT = 0;
     EXPECT_EQ(result, FAILED_RESULT);
-    DISPLAY_HILOGD(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus001 function end!");
 }
 
 /**
@@ -1155,13 +1156,13 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus
 */
 HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus002, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002 function start!");
     uint32_t displayId = 0;
     uint32_t screenPowerStatus = 3; // 3 represent the POWER_STATUS_OFF
     uint32_t result = DisplayPowerMgrClient::GetInstance().NotifyBrightnessManagerScreenPowerStatus(displayId,
         screenPowerStatus);
     const uint32_t FAILED_RESULT = 0;
     EXPECT_EQ(result, FAILED_RESULT);
-    DISPLAY_HILOGD(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "NotifyBrightnessManagerScreenPowerStatus002 function end!");
 }
 } // namespace

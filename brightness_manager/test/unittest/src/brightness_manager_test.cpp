@@ -46,11 +46,11 @@ public:
 namespace {
 HWTEST_F(BrightnessManagerTest, BrightnessManagerGet001, TestSize.Level0)
 {
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerGet001: fun is start");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001 function start!");
     auto& brightnessManager = BrightnessManager::Get();
     EXPECT_NE(&brightnessManager, nullptr);
     const int sleepTime = 100000;
     usleep(sleepTime);
-    DISPLAY_HILOGD(LABEL_TEST, "BrightnessManagerGet001: fun is end");
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGet001 function end!");
 }
 } // namespace
