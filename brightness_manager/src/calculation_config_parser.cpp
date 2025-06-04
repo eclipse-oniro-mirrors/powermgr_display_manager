@@ -16,7 +16,7 @@
 #include "calculation_config_parser.h"
 
 #include <unistd.h>
-#include <json/json.h>
+#include <cJSON.h>
 
 #include "config_parser_base.h"
 #include "display_log.h"
@@ -32,16 +32,27 @@ using namespace OHOS::DisplayPowerMgr;
 bool CalculationConfigParser::ParseConfig(int displayId, CalculationConfig::Data& data)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig start!", displayId);
-    const Json::Value root = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
-    if (root.isNull()) {
+    const cJSON* root = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    if (!root) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig error!", displayId);
         return false;
     }
-    if (root["defaultBrightness"].isNumeric()) {
-        data.defaultBrightness = root["defaultBrightness"].asFloat();
+    if (!cJSON_IsObject(root)) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "root is not an object!");
+        cJSON_Delete(const_cast<cJSON*>(root));
+        return false;
+    }
+
+    const cJSON* defaultBrightnessNode = cJSON_GetObjectItemCaseSensitive(root, "defaultBrightness");
+    if (defaultBrightnessNode && cJSON_IsNumber(defaultBrightnessNode)) {
+        data.defaultBrightness = static_cast<float>(defaultBrightnessNode->valuedouble);
     } else {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "[%{public}d] parse defaultBrightness error!", displayId);
     }
+
     ConfigParserBase::Get().ParsePointXy(root, "defaultPoints", data.defaultPoints);
+
+    cJSON_Delete(const_cast<cJSON*>(root));
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig over!", displayId);
     return true;
 }

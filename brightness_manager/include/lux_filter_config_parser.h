@@ -18,6 +18,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <cJSON.h>
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -39,6 +40,8 @@ public:
     LuxFilterConfigParser(LuxFilterConfigParser&&) = delete;
     LuxFilterConfigParser& operator=(LuxFilterConfigParser&&) = delete;
 
+    static void LuxFilterParseConfigParams(
+        cJSON* item, std::unordered_map<std::string, LuxFilterConfig::Data>& data);
     static bool ParseConfig(
         int displayId, std::unordered_map<std::string, LuxFilterConfig::Data>& data);
     static void PrintConfig(

@@ -16,13 +16,14 @@
 #ifndef CONFIG_PARSER_BASE_H
 #define CONFIG_PARSER_BASE_H
 
-#include <json/json.h>
 #include <mutex>
 #include <optional>
 #include <string>
 
-#include "calculation_config_parser.h"
+#include <cJSON.h>
+
 #include "brightness_config_parser.h"
+#include "calculation_config_parser.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -37,10 +38,10 @@ public:
 
     void Initialize();
     const std::string LoadConfigPath(int displayId, const std::string& configName) const;
-    const Json::Value LoadConfigRoot(int displayId, const std::string& configName) const;
-    void ParsePointXy(const Json::Value& root, const std::string& name, std::vector<PointXy>& data) const;
+    const cJSON* LoadConfigRoot(int displayId, const std::string& configName) const;
+    void ParsePointXy(const cJSON* root, const std::string& name, std::vector<PointXy>& data) const;
     const std::string PointXyToString(const std::string& name, const std::vector<PointXy>& data) const;
-    void ParseScreenData(const Json::Value& root, const std::string& name, std::unordered_map<int, ScreenData>& data,
+    void ParseScreenData(const cJSON* root, const std::string& name, std::unordered_map<int, ScreenData>& data,
        const std::string paramName) const;
     const std::string ScreenDataToString(const std::string& name, const std::unordered_map<int, ScreenData>& data,
        const std::string paramName) const;

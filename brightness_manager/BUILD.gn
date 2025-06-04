@@ -54,6 +54,7 @@ ohos_static_library("brightness_manager") {
   external_deps = [
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
@@ -63,7 +64,6 @@ ohos_static_library("brightness_manager") {
     "hilog:libhilog",
     "image_framework:image_native",
     "ipc:ipc_core",
-    "jsoncpp:jsoncpp",
     "power_manager:power_ffrt",
     "power_manager:power_setting",
     "power_manager:power_sysparam",

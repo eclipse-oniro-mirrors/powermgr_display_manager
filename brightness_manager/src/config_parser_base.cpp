@@ -26,6 +26,8 @@ namespace DisplayPowerMgr {
 namespace {
 constexpr int DISPLAY_ID_MAX = 5;
 constexpr uint16_t POINT_XY_SIZE = 2;
+constexpr int POINT_X_INDEX = 0;
+constexpr int POINT_Y_INDEX = 1;
 const std::string CONFIG_PATH_FOR_ROOT = "/sys_prod/etc/display/";
 const std::string CONFIG_PATH_TYP = ".json";
 const std::string CONFIG_PATHS[DISPLAY_ID_MAX] = {
@@ -124,54 +126,64 @@ const std::string ConfigParserBase::LoadConfigPath(int displayId, const std::str
     return configPath;
 }
 
-const Json::Value ConfigParserBase::LoadConfigRoot(int displayId, const std::string& configName) const
+const cJSON* ConfigParserBase::LoadConfigRoot(int displayId, const std::string& configName) const
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] LoadConfigRoot [%{public}s]!", displayId, configName.c_str());
     const std::string configPath = LoadConfigPath(displayId, configName);
     std::ifstream fileStream(configPath, std::ios::in | std::ios::binary);
     if (!fileStream) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Open file %{public}s failure.", configName.c_str());
-        return Json::Value();
+        return nullptr;
     }
-    Json::Reader reader;
-    Json::Value root;
-    if (reader.parse(fileStream, root)) {
-        fileStream.close();
-        return root;
-    }
+
+    std::string fileContent((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
     fileStream.close();
-    return Json::Value();
+    cJSON* root = cJSON_Parse(fileContent.c_str());
+    if (!root) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", configName.c_str());
+        return nullptr;
+    }
+    return root;
 }
 
 void ConfigParserBase::ParsePointXy(
-    const Json::Value& root, const std::string& name, std::vector<PointXy>& data) const
+    const cJSON* root, const std::string& name, std::vector<PointXy>& data) const
 {
     data.clear();
-    if (!root[name.c_str()].isArray()) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found!", name.c_str());
+    const cJSON* array = cJSON_GetObjectItemCaseSensitive(root, name.c_str());
+    if (!array || !cJSON_IsArray(array)) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found or is not an array!", name.c_str());
         return;
     }
-    Json::Value array = root[name.c_str()];
-    for (auto value : array) {
-        if (!value.isArray()) {
-            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "array <%{public}s> is not found!", name.c_str());
+
+    cJSON* item = nullptr;
+    cJSON_ArrayForEach(item, array) {
+        if (!cJSON_IsArray(item)) {
+            DISPLAY_HILOGW(FEAT_BRIGHTNESS, "array <%{public}s> element is not an array!", name.c_str());
             return;
         }
+
         PointXy pointXy{};
-        if (static_cast<uint32_t>(value.size()) != POINT_XY_SIZE) {
+        uint32_t arraySize = (uint32_t)cJSON_GetArraySize(item);
+        if (arraySize != POINT_XY_SIZE) {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "array <%{public}s> size!=%{public}d!", name.c_str(), POINT_XY_SIZE);
             return;
         }
-        if (value[0].isNumeric()) {
-            pointXy.x = value[0].asFloat();
+
+        const cJSON* xNode = cJSON_GetArrayItem(item, POINT_X_INDEX);
+        if (xNode && cJSON_IsNumber(xNode)) {
+            pointXy.x = static_cast<float>(xNode->valuedouble);
         } else {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "parse [%{public}s] error!", name.c_str());
         }
-        if (value[1].isNumeric()) {
-            pointXy.y = value[1].asFloat();
+
+        const cJSON* yNode = cJSON_GetArrayItem(item, POINT_Y_INDEX);
+        if (yNode && cJSON_IsNumber(yNode)) {
+            pointXy.y = static_cast<float>(yNode->valuedouble);
         } else {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "parse [%{public}s] error!", name.c_str());
         }
+
         data.emplace_back(pointXy);
     }
 }
@@ -188,27 +200,38 @@ const std::string ConfigParserBase::PointXyToString(
 }
 
 
-void ConfigParserBase::ParseScreenData(const Json::Value& root, const std::string& name,
+void ConfigParserBase::ParseScreenData(const cJSON* root, const std::string& name,
     std::unordered_map<int, ScreenData>& data, const std::string paramName) const
 {
     data.clear();
-    if (!root[name.c_str()].isArray()) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found!", name.c_str());
+    const cJSON* array = cJSON_GetObjectItemCaseSensitive(root, name.c_str());
+    if (!array || !cJSON_IsArray(array)) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found or is not an array!", name.c_str());
         return;
     }
-    Json::Value array = root[name.c_str()];
-    for (auto value : array) {
+
+    cJSON* item = nullptr;
+    cJSON_ArrayForEach(item, array) {
+        if (!cJSON_IsObject(item)) {
+            continue;
+        }
         ScreenData screenData{};
         int displayMode = 0;
-        if (value[paramName].isNumeric()) {
-            displayMode = value[paramName].asInt();
+        const cJSON* displayModeNode = cJSON_GetObjectItemCaseSensitive(item, paramName.c_str());
+        if (displayModeNode && cJSON_IsNumber(displayModeNode)) {
+            displayMode = displayModeNode->valueint;
         }
-        if (value["displayId"].isNumeric()) {
-            screenData.displayId = value["displayId"].asInt();
+
+        const cJSON* displayIdNode = cJSON_GetObjectItemCaseSensitive(item, "displayId");
+        if (displayIdNode && cJSON_IsNumber(displayIdNode)) {
+            screenData.displayId = displayIdNode->valueint;
         }
-        if (value["sensorId"].isNumeric()) {
-            screenData.sensorId = value["sensorId"].asInt();
+
+        const cJSON* sensorIdNode = cJSON_GetObjectItemCaseSensitive(item, "sensorId");
+        if (sensorIdNode && cJSON_IsNumber(sensorIdNode)) {
+            screenData.sensorId = sensorIdNode->valueint;
         }
+
         data[displayMode] = screenData;
     }
 }

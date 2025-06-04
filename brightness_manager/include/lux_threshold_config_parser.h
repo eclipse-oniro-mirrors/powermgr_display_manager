@@ -20,6 +20,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cJSON.h>
 #include "calculation_config_parser.h"
 
 namespace OHOS {
@@ -47,6 +48,7 @@ public:
     LuxThresholdConfigParser(LuxThresholdConfigParser&&) = delete;
     LuxThresholdConfigParser& operator=(LuxThresholdConfigParser&&) = delete;
 
+    static void LuxThresholdParseConfigParams(cJSON* item, LuxThresholdConfig::Data& data);
     static bool ParseConfig(int displayId, LuxThresholdConfig::Data& data);
     static void PrintConfig(int displayId, const LuxThresholdConfig::Data& data);
 };

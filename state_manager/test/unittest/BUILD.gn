@@ -65,6 +65,7 @@ ohos_unittest("unittest_display_mgr_service") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "cJSON:cjson",
     "c_utils:utils",
     "data_share:datashare_consumer",
     "googletest:gtest_main",

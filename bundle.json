@@ -30,6 +30,7 @@
       "components": [
         "ability_base",
         "ability_runtime",
+        "cJSON",
         "c_utils",
         "data_share",
         "ets_runtime",
@@ -42,7 +43,6 @@
         "hilog",
         "ipc",
         "image_framework",
-        "jsoncpp",
         "napi",
         "power_manager",
         "safwk",
