@@ -32,13 +32,24 @@ using namespace OHOS::DisplayPowerMgr;
 bool BrightnessConfigParser::ParseConfig(BrightnessConfig::Data& data)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "parse BrightnessConfigParser start!");
-    const cJSON* root = ConfigParserBase::Get().LoadConfigRoot(0, CONFIG_NAME);
-    if (!root) {
+    const std::string fileContent = ConfigParserBase::Get().LoadConfigRoot(0, CONFIG_NAME);
+    if (!ParseConfigJsonRoot(fileContent, data)) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "parse BrightnessConfigParser error!");
         return false;
     }
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "parse BrightnessConfigParser over!");
+    return true;
+}
+
+bool BrightnessConfigParser::ParseConfigJsonRoot(const std::string& fileContent, BrightnessConfig::Data& data)
+{
+    const cJSON* root = cJSON_Parse(fileContent.c_str());
+    if (!root) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", fileContent.c_str());
+        return false;
+    }
     if (!cJSON_IsObject(root)) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "root is not an object!");
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "root is not an object!");
         cJSON_Delete(const_cast<cJSON*>(root));
         return false;
     }
@@ -47,7 +58,6 @@ bool BrightnessConfigParser::ParseConfig(BrightnessConfig::Data& data)
     ConfigParserBase::Get().ParseScreenData(root, "foldStatus", data.foldStatusModeMap, "foldStatus");
 
     cJSON_Delete(const_cast<cJSON*>(root));
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "parse BrightnessConfigParser over!");
     return true;
 }
 

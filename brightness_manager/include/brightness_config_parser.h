@@ -17,6 +17,7 @@
 #define BRIGHTNESS_CONFIG_PARSER_H
 
 #include <unordered_map>
+#include <cJSON.h>
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -50,6 +51,7 @@ public:
     BrightnessConfigParser& operator=(BrightnessConfigParser&&) = delete;
 
     static bool ParseConfig(BrightnessConfig::Data& data);
+    static bool ParseConfigJsonRoot(const std::string& fileContent, BrightnessConfig::Data& data);
     static void PrintConfig(const BrightnessConfig::Data& data);
 };
 } // namespace DisplayPowerMgr

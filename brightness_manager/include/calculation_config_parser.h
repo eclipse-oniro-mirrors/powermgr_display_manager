@@ -17,6 +17,7 @@
 #define CALCULATION_CONFIG_PARSER_H
 
 #include <vector>
+#include <cJSON.h>
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -50,6 +51,7 @@ public:
     CalculationConfigParser& operator=(CalculationConfigParser&&) = delete;
 
     static bool ParseConfig(int displayId, CalculationConfig::Data& data);
+    static bool ParseConfigJsonRoot(int displayId, const std::string& fileContent, CalculationConfig::Data& data);
     static void PrintConfig(int displayId, const CalculationConfig::Data& data);
 };
 } // namespace DisplayPowerMgr

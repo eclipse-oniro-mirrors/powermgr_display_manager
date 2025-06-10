@@ -72,8 +72,7 @@ void LuxThresholdConfigParser::LuxThresholdParseConfigParams(cJSON* item, LuxThr
     std::string name;
 
     const cJSON* modeNameNode = cJSON_GetObjectItemCaseSensitive(item, "modeName");
-    if (modeNameNode && cJSON_IsString(modeNameNode) && modeNameNode->valuestring &&
-        strlen(modeNameNode->valuestring) > 0) {
+    if (DisplayJsonUtils::IsValidJsonStringAndNoEmpty(modeNameNode)) {
         name = modeNameNode->valuestring;
     } else {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "<%{public}s> modeName is not found!", CONFIG_NAME.c_str());
@@ -81,12 +80,12 @@ void LuxThresholdConfigParser::LuxThresholdParseConfigParams(cJSON* item, LuxThr
     }
 
     const cJSON* brightenDebounceTimeNode = cJSON_GetObjectItemCaseSensitive(item, "brightenDebounceTime");
-    if (brightenDebounceTimeNode && cJSON_IsNumber(brightenDebounceTimeNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(brightenDebounceTimeNode)) {
         config.brightenDebounceTime = brightenDebounceTimeNode->valueint;
     }
 
     const cJSON* darkenDebounceTimeNode = cJSON_GetObjectItemCaseSensitive(item, "darkenDebounceTime");
-    if (darkenDebounceTimeNode && cJSON_IsNumber(darkenDebounceTimeNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(darkenDebounceTimeNode)) {
         config.darkenDebounceTime = darkenDebounceTimeNode->valueint;
     }
 
@@ -100,9 +99,22 @@ void LuxThresholdConfigParser::LuxThresholdParseConfigParams(cJSON* item, LuxThr
 bool LuxThresholdConfigParser::ParseConfig(int displayId, LuxThresholdConfig::Data& data)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxThresholdConfigParser start!", displayId);
-    const cJSON* root = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    const std::string fileContent = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    if (!ParseConfigJsonRoot(fileContent, data)) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxThresholdConfigParser error!", displayId);
+        return false;
+    }
+
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxThresholdConfigParser over!", displayId);
+    return true;
+}
+
+bool LuxThresholdConfigParser::ParseConfigJsonRoot(const std::string& fileContent, LuxThresholdConfig::Data& data)
+{
+    const cJSON* root = cJSON_Parse(fileContent.c_str());
     if (!root) {
         SetDefault(data);
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", fileContent.c_str());
         return false;
     }
     if (!cJSON_IsObject(root)) {
@@ -111,7 +123,7 @@ bool LuxThresholdConfigParser::ParseConfig(int displayId, LuxThresholdConfig::Da
         return false;
     }
     const cJSON* isLevelEnableNode = cJSON_GetObjectItemCaseSensitive(root, "isLevelEnable");
-    if (isLevelEnableNode && cJSON_IsBool(isLevelEnableNode)) {
+    if (DisplayJsonUtils::IsValidJsonBool(isLevelEnableNode)) {
         data.isLevelEnable = cJSON_IsTrue(isLevelEnableNode);
     }
 
@@ -121,7 +133,7 @@ bool LuxThresholdConfigParser::ParseConfig(int displayId, LuxThresholdConfig::Da
         root, "darkenPointsForLevel", data.darkenPointsForLevel);
 
     const cJSON* thresholdModeArray = cJSON_GetObjectItemCaseSensitive(root, "thresholdMode");
-    if (!thresholdModeArray || !cJSON_IsArray(thresholdModeArray)) {
+    if (!DisplayJsonUtils::IsValidJsonArray(thresholdModeArray)) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not Array!", CONFIG_NAME.c_str());
         cJSON_Delete(const_cast<cJSON*>(root));
         return false;
@@ -134,9 +146,7 @@ bool LuxThresholdConfigParser::ParseConfig(int displayId, LuxThresholdConfig::Da
         }
         LuxThresholdParseConfigParams(item, data);
     }
-
     cJSON_Delete(const_cast<cJSON*>(root));
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxThresholdConfigParser over!", displayId);
     return true;
 }
 

@@ -39,31 +39,30 @@ void LuxFilterConfigParser::LuxFilterParseConfigParams(
     LuxFilterConfig::Data config{};
     std::string name;
     const cJSON* filterNameNode = cJSON_GetObjectItemCaseSensitive(item, "filterName");
-    if (filterNameNode && cJSON_IsString(filterNameNode) && filterNameNode->valuestring &&
-        strlen(filterNameNode->valuestring) > 0) {
+    if (DisplayJsonUtils::IsValidJsonStringAndNoEmpty(filterNameNode)) {
         name = filterNameNode->valuestring;
     } else {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "<%{public}s> filterName is not found!", CONFIG_NAME.c_str());
         return;
     }
     const cJSON* filterNoFilterNumNode = cJSON_GetObjectItemCaseSensitive(item, "filterNoFilterNum");
-    if (filterNoFilterNumNode && cJSON_IsNumber(filterNoFilterNumNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(filterNoFilterNumNode)) {
         config.filterNoFilterNum = filterNoFilterNumNode->valueint;
     }
     const cJSON* filterNumNode = cJSON_GetObjectItemCaseSensitive(item, "filterNum");
-    if (filterNumNode && cJSON_IsNumber(filterNumNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(filterNumNode)) {
         config.filterNum = filterNumNode->valueint;
     }
     const cJSON* filterMaxFuncLuxNumNode = cJSON_GetObjectItemCaseSensitive(item, "filterMaxFuncLuxNum");
-    if (filterMaxFuncLuxNumNode && cJSON_IsNumber(filterMaxFuncLuxNumNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(filterMaxFuncLuxNumNode)) {
         config.filterMaxFuncLuxNum = filterMaxFuncLuxNumNode->valueint;
     }
     const cJSON* filterAlphaNode = cJSON_GetObjectItemCaseSensitive(item, "filterAlpha");
-    if (filterAlphaNode && cJSON_IsNumber(filterAlphaNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(filterAlphaNode)) {
         config.filterAlpha = static_cast<float>(filterAlphaNode->valuedouble);
     }
     const cJSON* filterLuxThNode = cJSON_GetObjectItemCaseSensitive(item, "filterLuxTh");
-    if (filterLuxThNode && cJSON_IsNumber(filterLuxThNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(filterLuxThNode)) {
         config.filterLuxTh = filterLuxThNode->valueint;
     }
     data.insert(std::make_pair(name, config));
@@ -74,9 +73,23 @@ bool LuxFilterConfigParser::ParseConfig(
     int displayId, std::unordered_map<std::string, LuxFilterConfig::Data>& data)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxFilterConfig start!", displayId);
-    const cJSON* root = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    const std::string fileContent = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    if (!ParseConfigJsonRoot(fileContent, data)) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxFilterConfig error!", displayId);
+        return false;
+    }
+
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxFilterConfig over!", displayId);
+    return true;
+}
+
+bool LuxFilterConfigParser::ParseConfigJsonRoot(
+    const std::string& fileContent, std::unordered_map<std::string, LuxFilterConfig::Data>& data)
+{
+    const cJSON* root = cJSON_Parse(fileContent.c_str());
     if (!root) {
         SetDefault(data);
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", fileContent.c_str());
         return false;
     }
     if (!cJSON_IsArray(root)) {
@@ -93,7 +106,6 @@ bool LuxFilterConfigParser::ParseConfig(
         LuxFilterParseConfigParams(item, data);
     }
     cJSON_Delete(const_cast<cJSON*>(root));
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse LuxFilterConfig over!", displayId);
     return true;
 }
 
