@@ -217,7 +217,7 @@ HWTEST_F(BrightnessManagerExtTest, MockInit002, TestSize.Level0)
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerMockInit002 function end!");
 }
 
-HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level0)
+HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerExtInit001 function start!");
     MockDeInitBrightnessManagerExt(g_BrightnessManagerExt);
