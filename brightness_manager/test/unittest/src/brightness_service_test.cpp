@@ -51,4 +51,11 @@ HWTEST_F(BrightnessServiceTest, BrightnessServiceGet001, TestSize.Level0)
     EXPECT_NE(&brightnessService, nullptr);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGet001 function end!");
 }
+
+HWTEST_F(BrightnessServiceTest, BrightnessServiceGetDiscount001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGetDiscount001 function start!");
+    EXPECT_NE(BrightnessService::Get().GetDiscount(), 0);
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessServiceGetDiscount001 function end!");
+}
 } // namespace
