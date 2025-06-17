@@ -63,6 +63,16 @@ DisplayState GetDisplayState()
     return static_cast<DisplayState>(MockReturnBool());
 }
 
+bool IsSupportLightSensor(void)
+{
+    return MockReturnBool();
+}
+
+bool IsAutoAdjustBrightness(void)
+{
+    return MockReturnBool();
+}
+
 bool AutoAdjustBrightness(bool enable)
 {
     return MockReturnBool();
@@ -167,6 +177,8 @@ void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& e
     ext.mBrightnessManagerDeInitFunc = reinterpret_cast<void*>(DeInit);
     ext.mSetDisplayStateFunc = reinterpret_cast<void*>(SetDisplayState);
     ext.mGetDisplayStateFunc = reinterpret_cast<void*>(GetDisplayState);
+    ext.mIsSupportLightSensorFunc = reinterpret_cast<void*>(IsSupportLightSensor);
+    ext.mIsAutoAdjustBrightnessFunc = reinterpret_cast<void*>(IsAutoAdjustBrightness);
     ext.mAutoAdjustBrightnessFunc = reinterpret_cast<void*>(AutoAdjustBrightness);
     ext.mSetBrightnessFunc = reinterpret_cast<void*>(SetBrightness);
     ext.mDiscountBrightnessFunc = reinterpret_cast<void*>(DiscountBrightness);

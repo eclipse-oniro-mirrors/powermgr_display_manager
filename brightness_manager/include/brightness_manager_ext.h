@@ -34,6 +34,8 @@ public:
     void DeInit();
     void SetDisplayState(uint32_t id, DisplayState state, uint32_t reason);
     DisplayState GetState();
+    bool IsSupportLightSensor(void);
+    bool IsAutoAdjustBrightness(void);
     bool AutoAdjustBrightness(bool enable);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     bool DiscountBrightness(double discount);
@@ -60,6 +62,7 @@ private:
     bool LoadBrightnessExtLibrary();
     void CloseBrightnessExtLibrary();
     bool LoadBrightnessOps();
+    bool LoadBrightnessOpsEx1();
     bool LoadBrightnessControl();
     bool LoadBrightnessStatus();
 
@@ -74,6 +77,8 @@ public:
     void* mBrightnessManagerDeInitFunc = nullptr;
     void* mSetDisplayStateFunc = nullptr;
     void* mGetDisplayStateFunc = nullptr;
+    void* mIsSupportLightSensorFunc = nullptr;
+    void* mIsAutoAdjustBrightnessFunc = nullptr;
     void* mAutoAdjustBrightnessFunc = nullptr;
     void* mSetBrightnessFunc = nullptr;
     void* mDiscountBrightnessFunc = nullptr;

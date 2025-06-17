@@ -86,9 +86,6 @@ void DisplayPowerMgrService::Init()
 
     callback_ = nullptr;
     cbDeathRecipient_ = nullptr;
-#ifdef ENABLE_SENSOR_PART
-    InitSensors();
-#endif
     RegisterBootCompletedCallback();
 }
 
@@ -206,15 +203,11 @@ void DisplayPowerMgrService::ClearOffset()
     BrightnessManager::Get().ClearOffset();
 }
 
-void DisplayPowerMgrService::SetSettingAutoBrightness(bool enable)
-{
-    DisplaySettingHelper::SetSettingAutoBrightness(enable);
-}
-
 bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
 {
     return DisplaySettingHelper::GetSettingAutoBrightness(key);
 }
+
 void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason)
 {
     isDisplayDelayOff_ = false;
@@ -223,7 +216,7 @@ void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uin
     if (iterator == controllerMap_.end()) {
         return;
     }
-    setDisplayStateRet_ = iterator->second->UpdateState(state, reason);
+    iterator->second->UpdateState(state, reason);
 }
 
 void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
@@ -265,14 +258,14 @@ bool DisplayPowerMgrService::SetDisplayState(uint32_t id, DisplayState state, ui
         displayReason_ = reason;
         FFRTTask task = [this]() { ScreenOffDelay(displayId_, displayState_, displayReason_); };
         g_screenOffDelayTaskHandle = FFRTUtils::SubmitDelayTask(task, displayOffDelayMs_, queue_);
-        tempState_ = iterator->second->SetDelayOffState();
+        iterator->second->SetDelayOffState();
         return true;
     } else if (state == DisplayState::DISPLAY_ON) {
         if (isDisplayDelayOff_) {
             DISPLAY_HILOGI(COMP_SVC, "need remove delay task");
             FFRTUtils::CancelTask(g_screenOffDelayTaskHandle, queue_);
             isDisplayDelayOff_ = false;
-            tempState_ = iterator->second->SetOnState();
+            iterator->second->SetOnState();
             return true;
         }
     }
@@ -428,78 +421,23 @@ bool DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32
     return iterator->second->SetBrightness(value, duration);
 }
 
+bool DisplayPowerMgrService::IsSupportLightSensor(void)
+{
+    return BrightnessManager::Get().IsSupportLightSensor();
+}
+
+bool DisplayPowerMgrService::IsAutoAdjustBrightness(void)
+{
+    return BrightnessManager::Get().IsAutoAdjustBrightness();
+}
+
 bool DisplayPowerMgrService::AutoAdjustBrightness(bool enable)
 {
     if (!Permission::IsSystem()) {
         return false;
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
-    if (!supportLightSensor_) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness not support");
-        SetSettingAutoBrightness(false);
-        return false;
-    }
-    if (enable) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness enable");
-        if (autoBrightness_) {
-            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already enabled");
-            return true;
-        }
-        autoBrightness_ = true;
-        BrightnessManager::Get().AutoAdjustBrightness(true);
-    } else {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness disable");
-        if (!autoBrightness_) {
-            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness is already disabled");
-            return true;
-        }
-        autoBrightness_ = false;
-        BrightnessManager::Get().AutoAdjustBrightness(false);
-    }
-    SetSettingAutoBrightness(enable);
-    return true;
-}
-
-#ifdef ENABLE_SENSOR_PART
-void DisplayPowerMgrService::ActivateAmbientSensor()
-{
-    if (!autoBrightness_) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "auto brightness is not enabled");
-        return;
-    }
-    if (ambientSensorEnabled_) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already on");
-        return;
-    }
-    (void) strcpy_s(sensorUser_.name, sizeof(sensorUser_.name), "DisplayPowerMgrService");
-    sensorUser_.userData = nullptr;
-    sensorUser_.callback = &AmbientLightCallback;
-    SubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
-    SetBatch(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_, SAMPLING_RATE, SAMPLING_RATE);
-    ActivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
-    SetMode(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_, SENSOR_ON_CHANGE);
-    ambientSensorEnabled_ = true;
-}
-
-void DisplayPowerMgrService::DeactivateAmbientSensor()
-{
-    if (!autoBrightness_) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "auto brightness is not enabled");
-        return;
-    }
-    if (!ambientSensorEnabled_) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Ambient Sensor is already off");
-        return;
-    }
-    DeactivateSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
-    UnsubscribeSensor(SENSOR_TYPE_ID_AMBIENT_LIGHT, &sensorUser_);
-    ambientSensorEnabled_ = false;
-}
-#endif
-
-bool DisplayPowerMgrService::IsAutoAdjustBrightness()
-{
-    return autoBrightness_;
+    return BrightnessManager::Get().AutoAdjustBrightness(enable);
 }
 
 bool DisplayPowerMgrService::RegisterCallback(sptr<IDisplayPowerCallback> callback)
@@ -626,19 +564,11 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     DumpDisplayInfo(result);
 #ifdef ENABLE_SENSOR_PART
     result.append("Support Ambient Light: ");
-    if (supportLightSensor_) {
-        result.append("TRUE");
-    } else {
-        result.append("FALSE");
-    }
+    result.append(IsSupportLightSensor() ? "TRUE" : "FALSE");
     result.append("\n");
 
     result.append("Auto Adjust Brightness: ");
-    if (autoBrightness_) {
-        result.append("ON");
-    } else {
-        result.append("OFF");
-    }
+    result.append(IsAutoAdjustBrightness() ? "ON" : "OFF");
     result.append("\n");
 #endif
 
@@ -651,110 +581,6 @@ int32_t DisplayPowerMgrService::Dump(int32_t fd, const std::vector<std::u16strin
     }
     return ERR_OK;
 }
-
-#ifdef ENABLE_SENSOR_PART
-void DisplayPowerMgrService::InitSensors()
-{
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "InitSensors start");
-    SensorInfo* sensorInfo = nullptr;
-    int32_t count;
-    int ret = GetAllSensors(&sensorInfo, &count);
-    if (ret != 0 || sensorInfo == nullptr) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Can't get sensors");
-        return;
-    }
-    supportLightSensor_ = false;
-    for (int i = 0; i < count; i++) {
-        if (sensorInfo[i].sensorId == SENSOR_TYPE_ID_AMBIENT_LIGHT) {
-            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT Support");
-            supportLightSensor_ = true;
-            break;
-        }
-    }
-
-    if (!supportLightSensor_) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AMBIENT_LIGHT not support");
-    }
-}
-
-void DisplayPowerMgrService::AmbientLightCallback(SensorEvent* event)
-{
-    if (event->sensorTypeId != SENSOR_TYPE_ID_AMBIENT_LIGHT) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback is not AMBIENT_LIGHT");
-        return;
-    }
-    auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
-    if (pms == nullptr) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Sensor Callback no service");
-        return;
-    }
-    uint32_t mainDispId = pms->GetMainDisplayId();
-    auto mainDisp = pms->controllerMap_.find(mainDispId);
-    if (mainDisp == pms->controllerMap_.end()) {
-        return;
-    }
-    if (mainDisp->second->IsBrightnessOverridden() || mainDisp->second->IsBrightnessBoosted()) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Overwrite or boost brightness scene, auto brightness is invalid");
-        return;
-    }
-    AmbientLightData* data = (AmbientLightData*) event->data;
-    int32_t brightness = static_cast<int32_t>(mainDisp->second->GetCachedSettingBrightness());
-    uint32_t animationUpdateTime = mainDisp->second->GetAnimationUpdateTime();
-    int32_t changeBrightness = 0;
-    if (pms->CalculateBrightness(data->intensity, brightness, changeBrightness)) {
-        double discountStride = static_cast<double>(AUTO_ADJUST_BRIGHTNESS_STRIDE / mainDisp->second->GetDiscount());
-        uint32_t gradualDuration = floor(changeBrightness / discountStride) * animationUpdateTime;
-        pms->AdjustBrightness(mainDispId, brightness, gradualDuration);
-    }
-}
-
-bool DisplayPowerMgrService::IsChangedLux(float scalar)
-{
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "changed: %{public}d, %{public}f vs %{public}f",
-                   luxChanged_, lastLux_, scalar);
-    if (lastLuxTime_ <= 0) {
-        DISPLAY_HILOGD(FEAT_BRIGHTNESS, "receive lux at first time");
-        lastLuxTime_ = time(0);
-        lastLux_ = scalar;
-        luxChanged_ = true;
-        return false;
-    }
-
-    if (!luxChanged_) {
-        float luxChangeMin = (lastLux_ / LUX_CHANGE_RATE_THRESHOLD) + 1;
-        if (abs(scalar - lastLux_) < luxChangeMin) {
-            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Too little change");
-            return false;
-        } else {
-            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "First time to change, wait for stable");
-            luxChanged_ = true;
-            return false;
-        }
-    } else {
-        float luxChangeMin = (lastLux_ / LUX_CHANGE_RATE_THRESHOLD) + 1;
-        if (luxChangeMin < LUX_CHANGE_STABLE_MIN) {
-            luxChangeMin = LUX_CHANGE_STABLE_MIN;
-        }
-        if (abs(scalar - lastLux_) >= luxChangeMin) {
-            time_t currentTime = time(0);
-            time_t sub = currentTime - lastLuxTime_;
-            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "stable lux");
-            if (sub >= LUX_STABLE_TIME) {
-                DISPLAY_HILOGI(FEAT_BRIGHTNESS, "stable enought to change");
-                lastLuxTime_ = time(0);
-                lastLux_ = scalar;
-                luxChanged_ = false;
-                return true;
-            }
-        } else {
-            DISPLAY_HILOGD(FEAT_BRIGHTNESS, "unstable lux, wait for stable");
-            luxChanged_ = true;
-            return false;
-        }
-    }
-    return false;
-}
-#endif
 
 uint32_t DisplayPowerMgrService::GetSafeBrightness(uint32_t value)
 {
@@ -788,41 +614,6 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightn
     }
 
     return safeDiscount;
-}
-
-bool DisplayPowerMgrService::CalculateBrightness(float scalar, int32_t& brightness, int32_t& change)
-{
-    const float lastLux = lastLux_;
-#ifdef ENABLE_SENSOR_PART
-    if (!IsChangedLux(scalar)) {
-        return false;
-    }
-#endif
-    int32_t calcBrightness = GetBrightnessFromLightScalar(scalar);
-    int32_t difference = abs(calcBrightness - brightness);
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "lux: %{public}f -> %{public}f, screen: %{public}d -> %{public}d",
-                   lastLux, scalar, brightness, calcBrightness);
-    if (difference < BRIGHTNESS_CHANGE_MIN
-        || (scalar > lastLux && calcBrightness < brightness)
-        || (scalar < lastLux && calcBrightness > brightness)) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "screen is too light/dark when calculated change");
-        return false;
-    }
-    brightness = calcBrightness;
-    change = difference;
-    return true;
-}
-
-int32_t DisplayPowerMgrService::GetBrightnessFromLightScalar(float scalar)
-{
-    uint32_t brightness = DisplayAutoBrightness::CalculateAutoBrightness(scalar);
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "scalar: %{public}f, brightness: %{public}d", scalar, brightness);
-    if (brightness > BRIGHTNESS_MAX) {
-        brightness = BRIGHTNESS_MAX;
-    } else if (brightness < BRIGHTNESS_MIN) {
-        brightness = BRIGHTNESS_MIN;
-    }
-    return static_cast<int32_t>(brightness);
 }
 
 DisplayErrors DisplayPowerMgrService::GetError()

@@ -376,6 +376,20 @@ uint32_t BrightnessService::SetLightBrightnessThreshold(
     return result;
 }
 
+bool BrightnessService::IsSupportLightSensor(void)
+{
+#ifdef ENABLE_SENSOR_PART
+    return mIsSupportLightSensor;
+#else
+    return false;
+#endif
+}
+
+bool BrightnessService::IsAutoAdjustBrightness(void)
+{
+    return mIsAutoBrightnessEnabled;
+}
+
 #ifdef ENABLE_SENSOR_PART
 bool BrightnessService::AutoAdjustBrightness(bool enable)
 {
@@ -605,11 +619,6 @@ void BrightnessService::DeactivateAllAmbientSensor()
     DeactivateAmbientSensor1();
 }
 #endif
-
-bool BrightnessService::IsAutoAdjustBrightness()
-{
-    return mIsAutoBrightnessEnabled;
-}
 
 void BrightnessService::ProcessLightLux(float lux)
 {
@@ -1073,7 +1082,7 @@ uint32_t BrightnessService::GetMappingBrightnessNit(uint32_t level)
     double nitOut = (double)(levelIn - MIN_MAPPING_BRGIHTNESS_LEVEL)
         * (MAX_DEFAULT_BRGIHTNESS_NIT - MIN_DEFAULT_BRGIHTNESS_NIT)
          / (MAX_MAPPING_BRGIHTNESS_LEVEL - MIN_MAPPING_BRGIHTNESS_LEVEL) + MIN_DEFAULT_BRGIHTNESS_NIT;
-    return round(nitOut);
+    return std::round(nitOut);
 }
 
 uint32_t BrightnessService::GetBrightnessLevelFromNit(uint32_t nit)
@@ -1088,7 +1097,7 @@ uint32_t BrightnessService::GetBrightnessLevelFromNit(uint32_t nit)
     double levelOut = (double)(nitIn - MIN_DEFAULT_BRGIHTNESS_NIT)
         * (MAX_DEFAULT_BRGIHTNESS_LEVEL - MIN_DEFAULT_BRGIHTNESS_LEVEL)
          / (MAX_DEFAULT_BRGIHTNESS_NIT - MIN_DEFAULT_BRGIHTNESS_NIT) + MIN_DEFAULT_BRGIHTNESS_LEVEL;
-    return round(levelOut);
+    return std::round(levelOut);
 }
 
 uint32_t BrightnessService::GetMappingHighBrightnessLevel(uint32_t level)
@@ -1196,7 +1205,7 @@ int BrightnessService::GetSensorIdWithDisplayMode(Rosen::FoldDisplayMode mode)
 
 bool BrightnessService::SetMaxBrightness(double value)
 {
-    uint32_t maxValue = static_cast<uint32_t>(value * MAX_DEFAULT_BRGIHTNESS_LEVEL);
+    uint32_t maxValue = static_cast<uint32_t>(std::round(value * MAX_DEFAULT_BRGIHTNESS_LEVEL));
     if (maxValue == 0 || value < 0) {
         maxValue = brightnessValueMin;
     }

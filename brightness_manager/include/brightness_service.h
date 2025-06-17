@@ -108,9 +108,10 @@ public:
     void SetDisplayState(uint32_t id, DisplayState state);
     DisplayState GetDisplayState();
     bool IsScreenOnState(DisplayState state);
+    bool IsSupportLightSensor(void);
+    bool IsAutoAdjustBrightness(void);
     bool AutoAdjustBrightness(bool enable);
     bool StateChangedSetAutoBrightness(bool enable);
-    bool IsAutoAdjustBrightness();
     void ProcessLightLux(float lux);
     void RegisterSettingBrightnessObserver();
     void UnregisterSettingBrightnessObserver();
