@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2023-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -28,6 +28,7 @@ group("fuzztest") {
     "displaystate_fuzzer:DisplayStateFuzzTest",
     "getbrightness_fuzzer:GetBrightnessFuzzTest",
     "getdisplayid_fuzzer:GetDisplayIdFuzzTest",
+    "notifyscreenpowerstatus_fuzzer:NotifyScreenPowerStatusFuzzTest",
     "overridebrightness_fuzzer:OverrideBrightnessFuzzTest",
     "overridedisplayoffdelay_fuzzer:OverrideDisplayOffDelayFuzzTest",
     "registercallback_fuzzer:RegisterCallbackFuzzTest",
@@ -35,5 +36,6 @@ group("fuzztest") {
     "setcoordinated_fuzzer:SetCoordinatedFuzzTest",
     "setlightbrightnessthreshold_fuzzer:SetLightBrightnessThresholdFuzzTest",
     "setmaxbrightness_fuzzer:SetMaxBrightnessFuzzTest",
+    "setscreenonbrightness_fuzzer:SetScreenOnBrightnessFuzzTest",
   ]
 }
