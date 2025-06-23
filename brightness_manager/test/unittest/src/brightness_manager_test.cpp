@@ -57,7 +57,7 @@ HWTEST_F(BrightnessManagerTest, BrightnessManagerGet001, TestSize.Level0)
 HWTEST_F(BrightnessManagerTest, BrightnessManagerGetDiscount001, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGetDiscount001 function start!");
-    EXPECT_NE(BrightnessService::Get().GetDiscount(), 0);
+    EXPECT_NE(BrightnessManager::Get().GetDiscount(), 0);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGetDiscount001 function end!");
 }
 } // namespace
