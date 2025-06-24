@@ -31,12 +31,16 @@ ohos_shared_library("brightness") {
 
   external_deps = [
     "c_utils:utils",
-    "ets_runtime:libark_jsruntime",
     "hilog:libhilog",
     "ipc:ipc_core",
     "napi:ace_napi",
     "power_manager:powermgr_client",
   ]
+  if (defined(ark_hybrid) && ark_hybrid) {
+    external_deps += [ "runtime_core:libarkruntime" ]
+  } else {
+    external_deps += [ "ets_runtime:libark_jsruntime" ]
+  }
 
   if (has_dfx_hiview_part) {
     external_deps += [ "hiview:libxpower_event_js" ]
