@@ -26,20 +26,29 @@ config("displaymgr_public_config") {
 
 ohos_shared_library("displaymgr") {
   branch_protector_ret = "pac_ret"
-
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "${displaymgr_framework_path}/native/display_power_mgr_client.cpp",
     "${displaymgr_service_zidl}/src/display_brightness_callback_stub.cpp",
     "${displaymgr_service_zidl}/src/display_power_callback_stub.cpp",
-    "${displaymgr_service_zidl}/src/display_power_mgr_proxy.cpp",
   ]
 
   configs = [
     ":displaymgr_private_config",
     "${displaymgr_utils_path}:coverage_flags",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
   ]
 
-  public_configs = [ ":displaymgr_public_config" ]
+  public_configs = [
+    ":displaymgr_public_config",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
+  ]
+
+  deps = [ "${displaymgr_root_path}/service:displaymgr_proxy" ]
 
   external_deps = [
     "c_utils:utils",

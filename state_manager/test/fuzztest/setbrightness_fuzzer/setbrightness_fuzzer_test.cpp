@@ -18,9 +18,9 @@
 #define FUZZ_PROJECT_NAME "setbrightness_fuzzer"
 
 #include "display_fuzzer.h"
-#include "display_power_mgr_ipc_interface_code.h"
+#include "idisplay_power_mgr.h"
 
-using namespace OHOS::PowerMgr;
+using namespace OHOS::DisplayPowerMgr;
 
 namespace {
 }
@@ -31,6 +31,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     DisplayFuzzerTest g_serviceTest;
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::SET_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_BRIGHTNESS), data, size);
     return 0;
 }

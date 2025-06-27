@@ -13,21 +13,25 @@
  * limitations under the License.
  */
 
-/* This files contains faultlog fuzzer test modules. */
+#ifndef DISPLAY_XCOLLIE_H
+#define DISPLAY_XCOLLIE_H
 
-#define FUZZ_PROJECT_NAME "notifyscreenpowerstatus_fuzzer"
+#include <functional>
+#include <string>
+#include <atomic>
 
-#include "display_fuzzer.h"
-#include "idisplay_power_mgr.h"
-
-using namespace OHOS::DisplayPowerMgr;
-
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{
-    /* Run your code on data */
-    DisplayFuzzerTest g_serviceTest;
-    g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_NOTIFY_SCREEN_POWER_STATUS), data, size);
-    return 0;
-}
+namespace OHOS {
+namespace DisplayPowerMgr {
+class DisplayXCollie {
+public:
+    DisplayXCollie(const std::string &logTag, bool isRecovery = false);
+    ~DisplayXCollie();
+private:
+    void CancelDisplayXCollie();
+    int32_t id_;
+    std::string logTag_;
+    std::atomic_bool isCanceled_ = false;
+};
+} // namespace DisplayPowerMgr
+} // namespace OHOS
+#endif // DISPLAY_XCOLLIE_H

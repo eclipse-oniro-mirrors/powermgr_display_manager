@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/components/idl_tool/idl.gni")
 import("../../displaymgr.gni")
 
 config("displaymgr_private_config") {
@@ -21,6 +22,7 @@ config("displaymgr_public_config") {
   include_dirs = [
     "native/include",
     "zidl/include",
+    "${target_gen_dir}",
   ]
 }
 
@@ -33,6 +35,7 @@ ohos_shared_library("displaymgrservice") {
   branch_protector_ret = "pac_ret"
 
   sources = [
+    "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
     "native/src/display_auto_brightness.cpp",
     "native/src/display_common_event_mgr.cpp",
     "native/src/display_param_helper.cpp",
@@ -44,7 +47,6 @@ ohos_shared_library("displaymgrservice") {
     "native/src/screen_controller.cpp",
     "zidl/src/display_brightness_callback_proxy.cpp",
     "zidl/src/display_power_callback_proxy.cpp",
-    "zidl/src/display_power_mgr_stub.cpp",
   ]
 
   configs = [
@@ -53,6 +55,9 @@ ohos_shared_library("displaymgrservice") {
     "${displaymgr_utils_path}:coverage_flags",
   ]
 
+  deps = [
+    "${displaymgr_root_path}/service:displaymgr_stub",
+  ]
   public_configs = [
     ":displaymgr_public_config",
     "${brightnessmgr_root_path}:brightness_manager_config",
@@ -100,15 +105,65 @@ ohos_shared_library("displaymgrservice") {
   part_name = "${displaymgr_part_name}"
 }
 
-ohos_shared_library("displaymgr_stub") {
-  sources = [ "zidl/src/display_power_mgr_stub.cpp" ]
+idl_gen_interface("displaymgr_interface") {
+  sources = [
+    "IDisplayPowerMgr.idl"
+  ]
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":displaymgr_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+  ]
+  log_domainid = "0xD002982"
+  log_tag = "DisplayPowerSvc"
+  part_name = "${displaymgr_part_name}"
+  subsystem_name = "powermgr"
+}
+
+ohos_source_set("displaymgr_proxy") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":displaymgr_interface")
+  sources = filter_include(output_values, [ "*_proxy.cpp" ])
 
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":displaymgr_private_config",
     "${displaymgr_utils_path}:coverage_flags",
   ]
+  deps = [ ":displaymgr_interface" ]
+  public_configs = [ ":displaymgr_public_config" ]
 
+  external_deps = [
+    "c_utils:utils",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "power_manager:power_setting",
+    "safwk:system_ability_fwk",
+  ]
+  part_name = "${displaymgr_part_name}"
+  subsystem_name = "powermgr"
+}
+
+ohos_source_set("displaymgr_stub") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  output_values = get_target_outputs(":displaymgr_interface")
+  sources = filter_include(output_values, [ "*_stub.cpp" ])
+  
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":displaymgr_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+  ]
+  deps = [ ":displaymgr_interface" ]
   public_configs = [ ":displaymgr_public_config" ]
 
   external_deps = [
