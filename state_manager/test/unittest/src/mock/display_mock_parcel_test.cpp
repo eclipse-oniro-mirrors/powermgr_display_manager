@@ -50,30 +50,65 @@ static constexpr int32_t BRIGHTNESS_ADJUST_VALUE = 150;
 static constexpr int32_t MAIN_ID_CLIENT = 0;
 static constexpr int32_t TIMEOUT_MS = 500;
 static constexpr double DISCOUNT_VALUE = 0.30;
+static constexpr uint32_t DEFAULT_DURATION = 500;
+static constexpr uint32_t ERR_OK = 0;
 } // namespace
+
+void DisplayMockParcelTest::DisplayProxyBrightnessTestFunc(std::shared_ptr<DisplayPowerMgrProxy>& sptrDisplayProxy)
+{
+    bool ret = false;
+    int32_t errCode = 0;
+    EXPECT_NE(sptrDisplayProxy->SetBrightness(BRIGHTNESS_SETTING_VALUE, DISPLAY_ID, false, ret, errCode), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->DiscountBrightness(DISCOUNT_VALUE, DISPLAY_ID, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->OverrideBrightness(BRIGHTNESS_OVERRIDE_VALUE, DISPLAY_ID, DEFAULT_DURATION, ret),
+        ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->RestoreBrightness(DISPLAY_ID, DEFAULT_DURATION, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    uint32_t brightness = 0;
+    EXPECT_NE(sptrDisplayProxy->GetBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
+    EXPECT_NE(sptrDisplayProxy->GetDefaultBrightness(brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
+    EXPECT_NE(sptrDisplayProxy->GetMaxBrightness(brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
+    EXPECT_NE(sptrDisplayProxy->GetMinBrightness(brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
+    EXPECT_NE(sptrDisplayProxy->AdjustBrightness(DISPLAY_ID, BRIGHTNESS_ADJUST_VALUE, BRIGHTNESS_DURATION, ret),
+        ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->AutoAdjustBrightness(true, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->AutoAdjustBrightness(false, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->IsAutoAdjustBrightness(ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->BoostBrightness(TIMEOUT_MS, DISPLAY_ID, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    EXPECT_NE(sptrDisplayProxy->CancelBoostBrightness(DISPLAY_ID, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+}
 
 void DisplayMockParcelTest::DisplayProxyTestFunc(std::shared_ptr<DisplayPowerMgrProxy>& sptrDisplayProxy)
 {
     std::vector<uint32_t> result;
     result.push_back(DISPLAY_ID);
-    EXPECT_FALSE(sptrDisplayProxy->SetDisplayState(DISPLAY_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON, REASON));
-    EXPECT_NE(DisplayPowerMgr::DisplayState::DISPLAY_ON, sptrDisplayProxy->GetDisplayState(DISPLAY_ID));
-    EXPECT_NE(result, sptrDisplayProxy->GetDisplayIds());
-    EXPECT_EQ(MAIN_ID_PROXY, sptrDisplayProxy->GetMainDisplayId());
-    EXPECT_FALSE(sptrDisplayProxy->SetBrightness(BRIGHTNESS_SETTING_VALUE, DISPLAY_ID, false));
-    EXPECT_FALSE(sptrDisplayProxy->DiscountBrightness(DISCOUNT_VALUE, DISPLAY_ID));
-    EXPECT_FALSE(sptrDisplayProxy->OverrideBrightness(BRIGHTNESS_OVERRIDE_VALUE, DISPLAY_ID));
-    EXPECT_FALSE(sptrDisplayProxy->RestoreBrightness(DISPLAY_ID));
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetBrightness(DISPLAY_ID));
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetDefaultBrightness());
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetMaxBrightness());
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetMinBrightness());
-    EXPECT_FALSE(sptrDisplayProxy->AdjustBrightness(DISPLAY_ID, BRIGHTNESS_ADJUST_VALUE, BRIGHTNESS_DURATION));
-    EXPECT_FALSE(sptrDisplayProxy->AutoAdjustBrightness(true));
-    EXPECT_FALSE(sptrDisplayProxy->AutoAdjustBrightness(false));
-    EXPECT_FALSE(sptrDisplayProxy->IsAutoAdjustBrightness());
-    EXPECT_FALSE(sptrDisplayProxy->BoostBrightness(TIMEOUT_MS, DISPLAY_ID));
-    EXPECT_FALSE(sptrDisplayProxy->CancelBoostBrightness(DISPLAY_ID));
+    bool ret = false;
+    EXPECT_NE(sptrDisplayProxy->SetDisplayState(DISPLAY_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), REASON, ret), ERR_OK);
+    EXPECT_FALSE(ret);
+    int32_t state = 0;
+    EXPECT_NE(sptrDisplayProxy->GetDisplayState(DISPLAY_ID, state), ERR_OK);
+    EXPECT_NE(DisplayPowerMgr::DisplayState::DISPLAY_ON, DisplayPowerMgr::DisplayState(state));
+    std::vector<uint32_t> ids;
+    EXPECT_NE(sptrDisplayProxy->GetDisplayIds(ids), ERR_OK);
+    EXPECT_NE(result, ids);
+    uint32_t mainId = MAIN_ID_PROXY;
+    EXPECT_NE(sptrDisplayProxy->GetMainDisplayId(mainId), ERR_OK);
+    EXPECT_EQ(MAIN_ID_PROXY, mainId);
+    DisplayProxyBrightnessTestFunc(sptrDisplayProxy);
 }
 
 void DisplayMockParcelTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
@@ -130,10 +165,14 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_002, TestSize.Level0)
     sptr<IDisplayPowerCallback> callbackPtr = nullptr;
 
     DisplayMockParcelTest::DisplayProxyTestFunc(sptrDisplayProxy);
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID));
+    uint32_t brightness = BRIGHTNESS_NONE_VALUE;
+    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
 
-    EXPECT_FALSE(sptrDisplayProxy->RegisterCallback(callbackPtr));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_002 function end!");
+    bool result = false;
+    EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_002 function is end");
 }
 
 /**
@@ -147,9 +186,10 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_003, TestSize.Level0)
     DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_003 function start!");
     auto sptrDisplayProxy = std::make_shared<DisplayPowerMgr::DisplayPowerMgrProxy>(nullptr);
     sptr<IDisplayPowerCallback> callbackPtr = new DisplayMockParcelTest::DisplayPowerMgrTestCallback();
-
-    EXPECT_FALSE(sptrDisplayProxy->RegisterCallback(callbackPtr));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_003 function end!");
+    bool result = false;
+    EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_003 function end");
 }
 
 /**
@@ -167,10 +207,14 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_004, TestSize.Level0)
     sptr<IDisplayPowerCallback> callbackPtr = new DisplayMockParcelTest::DisplayPowerMgrTestCallback();
 
     DisplayMockParcelTest::DisplayProxyTestFunc(sptrDisplayProxy);
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID));
+    uint32_t brightness = 0;
+    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
 
-    EXPECT_FALSE(sptrDisplayProxy->RegisterCallback(callbackPtr));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_004 function end!");
+    bool result = false;
+    EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_004 function end");
 }
 
 /**

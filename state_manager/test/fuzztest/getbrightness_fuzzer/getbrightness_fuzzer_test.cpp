@@ -18,9 +18,9 @@
 #define FUZZ_PROJECT_NAME "getbrightness_fuzzer"
 
 #include "display_fuzzer.h"
-#include "display_power_mgr_ipc_interface_code.h"
+#include "idisplay_power_mgr.h"
 
-using namespace OHOS::PowerMgr;
+using namespace OHOS::DisplayPowerMgr;
 
 namespace {
 }
@@ -31,14 +31,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     DisplayFuzzerTest g_serviceTest;
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::GET_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_GET_BRIGHTNESS), data, size);
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::GET_DEFAULT_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_GET_DEFAULT_BRIGHTNESS), data, size);
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::GET_MAX_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_GET_MAX_BRIGHTNESS), data, size);
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::GET_MIN_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_GET_MIN_BRIGHTNESS), data, size);
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(DisplayPowerMgrInterfaceCode::GET_DEVICE_BRIGHTNESS), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_GET_DEVICE_BRIGHTNESS), data, size);
     return 0;
 }

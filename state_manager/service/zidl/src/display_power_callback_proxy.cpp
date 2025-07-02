@@ -21,6 +21,7 @@
 #include "display_log.h"
 #include "display_common.h"
 #include "display_power_callback_ipc_interface_code.h"
+#include "display_power_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {

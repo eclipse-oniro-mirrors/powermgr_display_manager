@@ -24,6 +24,7 @@
 #include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
 #include "power_state_machine_info.h"
+#include "display_mgr_errors.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -80,6 +81,7 @@ private:
     sptr<IDisplayPowerMgr> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
     static constexpr int32_t INVALID_DISPLAY_ID {-1};
+    static constexpr int32_t DEFAULT_MAIN_DISPLAY_ID {0};
     static constexpr uint32_t BRIGHTNESS_OFF {0};
     static constexpr uint32_t BRIGHTNESS_DEFAULT {102};
     static constexpr uint32_t BRIGHTNESS_MAX {255};

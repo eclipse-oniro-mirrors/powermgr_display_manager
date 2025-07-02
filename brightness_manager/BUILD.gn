@@ -49,6 +49,7 @@ ohos_static_library("brightness_manager") {
     ":brightness_manager_config",
     "${displaymgr_utils_path}:utils_config",
     "${displaymgr_inner_api}:displaymgr_public_config",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
   ]
 
   external_deps = [

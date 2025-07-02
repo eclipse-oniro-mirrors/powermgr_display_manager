@@ -25,6 +25,8 @@ namespace PowerMgr {
 class DisplayMockParcelTest : public testing::Test {
 public:
     static void DisplayProxyTestFunc(std::shared_ptr<DisplayPowerMgr::DisplayPowerMgrProxy>& sptrDisplayProxy);
+    static void DisplayProxyBrightnessTestFunc(std::shared_ptr<DisplayPowerMgr::DisplayPowerMgrProxy>&
+        sptrDisplayProxy);
     class DisplayPowerMgrTestCallback : public OHOS::DisplayPowerMgr::DisplayPowerCallbackStub {
     public:
         DisplayPowerMgrTestCallback() {};

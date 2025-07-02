@@ -1,0 +1,53 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+interface OHOS.DisplayPowerMgr.IDisplayBrightnessCallback;
+interface OHOS.DisplayPowerMgr.IDisplayPowerCallback;
+
+interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
+    [ipccode 0] void SetDisplayState([in] unsigned int id, [in] unsigned int state, [in] unsigned int reason,
+        [out] boolean bResult);
+    void GetDisplayState([in] unsigned int id, [out] int displayState); 
+    void GetDisplayIds([out] unsigned int[] ids);
+    void GetMainDisplayId([out] unsigned int id);
+    void SetBrightness([in] unsigned int value, [in] unsigned int displayId, [in] boolean continuous,
+        [out] boolean bResult, [out] int retCode);
+    void DiscountBrightness([in] double value, [in] unsigned int displayId, [out] boolean bResult);
+    void OverrideBrightness([in] unsigned int value, [in] unsigned int displayId, [in] unsigned int duration,
+        [out] boolean bResult);
+    void OverrideDisplayOffDelay([in] unsigned int delayMs, [out] boolean bResult);
+    void RestoreBrightness([in] unsigned int displayId, [in] unsigned int duration, [out] boolean bResult);
+    void GetBrightness([in] unsigned int displayId, [out] unsigned int brightness);
+    void GetDefaultBrightness([out] unsigned int defaultBrightness);
+    void GetMaxBrightness([out] unsigned int maxBrightness);
+    void GetMinBrightness([out] unsigned int minBrightness);
+    void AdjustBrightness([in] unsigned int id, [in] int value, [in] unsigned int duration, [out] boolean bResult);
+    void AutoAdjustBrightness([in] boolean enable, [out] boolean bResult);
+    void IsAutoAdjustBrightness([out] boolean bResult);
+    void RegisterCallback([in] IDisplayPowerCallback displayPowercallback, [out] boolean bResult);
+    void BoostBrightness([in] int timeoutMs, [in] unsigned int displayId, [out] boolean bResult);
+    void CancelBoostBrightness([in] unsigned int displayId, [out] boolean bResult);
+    void GetDeviceBrightness([in] unsigned int displayId, [out] unsigned int deviceBrightness);
+    void SetCoordinated([in] boolean coordinated, [in] unsigned int displayId, [out] boolean bResult);
+    [ipccode 21] void SetLightBrightnessThreshold([in] int[] threshold,
+        [in] IDisplayBrightnessCallback displayBrightnessCallback, [out] unsigned int retCode);
+    void SetMaxBrightness([in] double value, [in] unsigned int enterTestMode, [out] boolean bResult,
+        [out] int retCode);
+    void SetMaxBrightnessNit([in] unsigned int maxNit, [in] unsigned int enterTestMode, [out] boolean bResult,
+        [out] int retCode);
+    void NotifyScreenPowerStatus([in] unsigned int displayId, [in] unsigned int displayPowerStatus,
+        [out] int retCode);
+    void SetScreenOnBrightness([out] boolean bResult);
+}

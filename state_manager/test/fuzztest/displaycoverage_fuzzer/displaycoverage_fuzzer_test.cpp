@@ -20,7 +20,6 @@
 #include "display_power_mgr_service.h"
 #include "displaycoverage_fuzzer_test.h"
 
-using namespace OHOS::PowerMgr;
 using namespace OHOS::DisplayPowerMgr;
 
 namespace {
@@ -42,7 +41,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     uint32_t reason = 1;
     service->NotifyStateChangeCallback(DISPLAY_ID, state, reason);
     service->HandleBootBrightness();
-    service->SetScreenOnBrightness();
+    bool result = false;
+    service->SetScreenOnBrightness(result);
     service->GetSafeBrightness(BRIGHTNESS_MAX);
     service->GetSafeBrightness(BRIGHTNESS_MIN);
     service->GetSafeDiscount(DISCOUNT_MAX, brightness);

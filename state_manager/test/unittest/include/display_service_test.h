@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
-#define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#ifndef DISPLAY_SERVICE_TEST_H
+#define DISPLAY_SERVICE_TEST_H
 
 #include <gtest/gtest.h>
+#include "display_power_mgr_proxy.h"
 #include "display_power_callback_stub.h"
 
-class DisplayPowerMgrServiceTest : public testing::Test {
+namespace OHOS {
+namespace PowerMgr {
+class DisplayServiceTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
-    void SetUp();
-    void TearDown();
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    static void DisplayServiceInnerTestFunc();
     class DisplayPowerMgrTestCallback : public OHOS::DisplayPowerMgr::DisplayPowerCallbackStub {
     public:
-        DisplayPowerMgrTestCallback() {};
-        virtual ~DisplayPowerMgrTestCallback() {};
+        DisplayPowerMgrTestCallback() {}
+        virtual ~DisplayPowerMgrTestCallback() {}
         virtual void OnDisplayStateChanged(
             uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
     };
 };
-#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+} // namespace PowerMgr
+} // namespace OHOS
+#endif // DISPLAY_SERVICE_TEST_H

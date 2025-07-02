@@ -33,9 +33,13 @@ ohos_fuzztest("GetDisplayIdFuzzTest") {
     "${displaymgr_utils_path}:utils_config",
     "${displaymgr_utils_path}:coverage_flags",
     "${brightnessmgr_root_path}:brightness_manager_config",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
   ]
 
-  deps = [ "${brightnessmgr_root_path}:brightness_manager" ]
+  deps = [
+    "${brightnessmgr_root_path}:brightness_manager",
+    "${displaymgr_root_path}/service:displaymgr_stub",
+  ]
 
   cflags = [
     "-g",
@@ -53,8 +57,7 @@ ohos_fuzztest("GetDisplayIdFuzzTest") {
     "${displaymgr_root_path}/service/native/src/gradual_animator.cpp",
     "${displaymgr_root_path}/service/native/src/screen_action.cpp",
     "${displaymgr_root_path}/service/native/src/screen_controller.cpp",
-    "${displaymgr_root_path}/service/zidl/src/display_power_callback_proxy.cpp",
-    "${displaymgr_root_path}/service/zidl/src/display_power_mgr_stub.cpp",
+    "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
     "../display_utils/display_fuzzer.cpp",
     "./getdisplayid_fuzzer_test.cpp",
   ]

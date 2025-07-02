@@ -22,6 +22,7 @@ ohos_shared_library("brightness") {
   configs = [
     "${displaymgr_utils_path}:utils_config",
     "${displaymgr_utils_path}:coverage_flags",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
   ]
 
   deps = [

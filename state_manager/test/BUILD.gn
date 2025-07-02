@@ -24,7 +24,7 @@ group("displaymgr_native_test") {
   deps = [ "unittest:unittest_display_mgr_service" ]
 }
 
-group("fuzztest") {
+group("displaymgr_fuzztest") {
   testonly = true
   deps = [ "fuzztest:fuzztest" ]
 }
