@@ -74,14 +74,15 @@
           "name": "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr"
         },
         {
-          "name": "//base/powermgr/display_manager/state_manager/frameworks/ets/taihe/ability_delegator:copy_display_manager"
+          "name": "//base/powermgr/display_manager/state_manager/frameworks/ets/taihe/brightness:copy_display_manager"
         }
       ],
       "test": [
         "//base/powermgr/display_manager/state_manager/test:displaymgr_coverage_test",
         "//base/powermgr/display_manager/state_manager/test:displaymgr_native_test",
         "//base/powermgr/display_manager/state_manager/test:fuzztest",
-        "//base/powermgr/display_manager/brightness_manager/test:brightness_manager_test"
+        "//base/powermgr/display_manager/brightness_manager/test:brightness_manager_test",
+        "//base/powermgr/display_manager/state_manager/frameworks/ets/taihe:display_manager_taihe_test"
       ]
     }
   }

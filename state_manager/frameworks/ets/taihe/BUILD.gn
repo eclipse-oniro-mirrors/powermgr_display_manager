@@ -13,7 +13,12 @@
 
 group("display_manager_taihe") {
   deps = [
-    "ability_delegator:brightness_etc",
-    "ability_delegator:display_manager_brightness_taihe_native",
+    "brightness:brightness_etc",
+    "brightness:display_manager_brightness_taihe_native",
   ]
+}
+
+group("display_manager_taihe_test") {
+  testonly = true
+  deps = [ "brightness/test/unittest:brightness_taihe_native_test" ]
 }
