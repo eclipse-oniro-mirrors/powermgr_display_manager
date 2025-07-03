@@ -59,6 +59,7 @@ static const uint32_t OVERRIDE_DELAY_TIME = 200;
 static constexpr int32_t DEFAULT_VALUE = -1;
 static constexpr uint32_t BRIGHTNESS_OFF = 0;
 static const uint32_t TEST_DELAY_TIME_UNSET = 0;
+static constexpr uint32_t DEFAULT_WAITING_TIME = 1200000;
 sptr<DisplayPowerMgrService> g_service;
 } // namespace
 
@@ -115,6 +116,8 @@ namespace {
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceInnerTest001, TestSize.Level1)
 {
+    const int sleepTime = DEFAULT_WAITING_TIME;
+    usleep(sleepTime);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest001 function start!");
     EXPECT_TRUE(g_service != nullptr);
     DisplayServiceTest::DisplayServiceInnerTestFunc();
@@ -528,6 +531,8 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest022, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest022 function start!");
     EXPECT_TRUE(g_service != nullptr);
+    const int sleepTime = DEFAULT_WAITING_TIME;
+    usleep(sleepTime);
     uint32_t brightnessTemp = BRIGHTNESS_OFF;
     g_service->GetBrightness(DISPLAY_MAIN_ID, brightnessTemp);
     bool enable = g_service->GetSettingAutoBrightness();
