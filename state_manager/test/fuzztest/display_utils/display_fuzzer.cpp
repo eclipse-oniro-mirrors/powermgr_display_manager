@@ -20,8 +20,12 @@
 
 #include "message_parcel.h"
 #include "securec.h"
+#include "iremote_object.h"
+#include "idisplay_power_mgr.h"
+#include "display_brightness_callback_stub.h"
 
 using namespace OHOS::DisplayPowerMgr;
+using namespace OHOS::PowerMgr;
 using namespace OHOS;
 
 namespace {
@@ -45,12 +49,32 @@ DisplayFuzzerTest::~DisplayFuzzerTest()
     service_ = nullptr;
 }
 
+void DisplayPowerMgrTestCallback::OnDisplayStateChanged(
+    uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
+}
+
 void DisplayFuzzerTest::TestDisplayServiceStub(const uint32_t code, const uint8_t* data, size_t size)
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(DisplayPowerMgrService::GetDescriptor());
     datas.WriteBuffer(data, size);
     datas.RewindRead(REWIND_READ_DATA);
+    if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_NOTIFY_SCREEN_POWER_STATUS)) {
+        constexpr uint32_t displayId = 0;
+        constexpr uint32_t screenPowerStatus = 3; // 3 represent the POWER_STATUS_OFF
+        datas.WriteUint32(displayId);
+        datas.WriteUint32(screenPowerStatus);
+    }
+    if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_REGISTER_CALLBACK)) {
+        sptr<IDisplayPowerCallback> obj = new DisplayPowerMgrTestCallback();
+        datas.WriteRemoteObject(obj->AsObject());
+    }
+    if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_LIGHT_BRIGHTNESS_THRESHOLD)) {
+        sptr<IDisplayBrightnessCallback> obj = new DisplayBrightnessCallbackStub();
+        datas.WriteRemoteObject(obj->AsObject());
+    }
     MessageParcel reply;
     MessageOption option;
     service_->OnRemoteRequest(code, datas, reply, option);
