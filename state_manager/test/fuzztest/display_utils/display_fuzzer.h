@@ -19,6 +19,7 @@
 #include "securec.h"
 
 #include "display_power_mgr_service.h"
+#include "display_power_callback_stub.h"
 
 class DisplayFuzzerTest {
 public:
@@ -28,6 +29,14 @@ public:
 
 private:
     OHOS::sptr<OHOS::DisplayPowerMgr::DisplayPowerMgrService> service_ {nullptr};
+};
+
+class DisplayPowerMgrTestCallback : public OHOS::DisplayPowerMgr::DisplayPowerCallbackStub {
+public:
+    DisplayPowerMgrTestCallback() {}
+    virtual ~DisplayPowerMgrTestCallback() {}
+    void OnDisplayStateChanged(
+        uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
 };
 
 #endif
