@@ -83,14 +83,14 @@ DisplayState ScreenController::GetState()
 
 DisplayState ScreenController::SetDelayOffState()
 {
-    DISPLAY_HILOGI(COMP_SVC, "Set the dispaly state is DELAY OFF when overriding display off delay");
+    DISPLAY_HILOGI(COMP_SVC, "Set the display state is DELAY OFF when overriding display off delay");
     state_ = DisplayState::DISPLAY_DELAY_OFF;
     return state_;
 }
 
 DisplayState ScreenController::SetOnState()
 {
-    DISPLAY_HILOGI(COMP_SVC, "Set the dispaly state is ON after overriding display on delay");
+    DISPLAY_HILOGI(COMP_SVC, "Set the display state is ON after overriding display on delay");
     state_ = DisplayState::DISPLAY_ON;
     return state_;
 }

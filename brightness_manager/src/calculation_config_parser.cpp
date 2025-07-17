@@ -32,19 +32,32 @@ using namespace OHOS::DisplayPowerMgr;
 bool CalculationConfigParser::ParseConfig(int displayId, CalculationConfig::Data& data)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig start!", displayId);
-    const cJSON* root = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
-    if (!root) {
+    const std::string fileContent = ConfigParserBase::Get().LoadConfigRoot(displayId, CONFIG_NAME);
+    if (!ParseConfigJsonRoot(displayId, fileContent, data)) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig error!", displayId);
         return false;
     }
+
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig over!", displayId);
+    return true;
+}
+
+bool CalculationConfigParser::ParseConfigJsonRoot(
+    int displayId, const std::string& fileContent, CalculationConfig::Data& data)
+{
+    const cJSON* root = cJSON_Parse(fileContent.c_str());
+    if (!root) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", fileContent.c_str());
+        return false;
+    }
     if (!cJSON_IsObject(root)) {
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "root is not an object!");
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "root is not an object!");
         cJSON_Delete(const_cast<cJSON*>(root));
         return false;
     }
 
     const cJSON* defaultBrightnessNode = cJSON_GetObjectItemCaseSensitive(root, "defaultBrightness");
-    if (defaultBrightnessNode && cJSON_IsNumber(defaultBrightnessNode)) {
+    if (DisplayJsonUtils::IsValidJsonNumber(defaultBrightnessNode)) {
         data.defaultBrightness = static_cast<float>(defaultBrightnessNode->valuedouble);
     } else {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "[%{public}d] parse defaultBrightness error!", displayId);
@@ -53,7 +66,6 @@ bool CalculationConfigParser::ParseConfig(int displayId, CalculationConfig::Data
     ConfigParserBase::Get().ParsePointXy(root, "defaultPoints", data.defaultPoints);
 
     cJSON_Delete(const_cast<cJSON*>(root));
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] parse CalculationConfig over!", displayId);
     return true;
 }
 

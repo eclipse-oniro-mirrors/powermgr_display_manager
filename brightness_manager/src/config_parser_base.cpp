@@ -126,24 +126,19 @@ const std::string ConfigParserBase::LoadConfigPath(int displayId, const std::str
     return configPath;
 }
 
-const cJSON* ConfigParserBase::LoadConfigRoot(int displayId, const std::string& configName) const
+const std::string ConfigParserBase::LoadConfigRoot(int displayId, const std::string& configName) const
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[%{public}d] LoadConfigRoot [%{public}s]!", displayId, configName.c_str());
     const std::string configPath = LoadConfigPath(displayId, configName);
     std::ifstream fileStream(configPath, std::ios::in | std::ios::binary);
     if (!fileStream) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Open file %{public}s failure.", configName.c_str());
-        return nullptr;
+        return std::string("");
     }
 
     std::string fileContent((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
     fileStream.close();
-    cJSON* root = cJSON_Parse(fileContent.c_str());
-    if (!root) {
-        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "Parse file %{public}s failure.", configName.c_str());
-        return nullptr;
-    }
-    return root;
+    return fileContent;
 }
 
 void ConfigParserBase::ParsePointXy(
@@ -151,14 +146,14 @@ void ConfigParserBase::ParsePointXy(
 {
     data.clear();
     const cJSON* array = cJSON_GetObjectItemCaseSensitive(root, name.c_str());
-    if (!array || !cJSON_IsArray(array)) {
+    if (!DisplayJsonUtils::IsValidJsonArray(array)) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found or is not an array!", name.c_str());
         return;
     }
 
     cJSON* item = nullptr;
     cJSON_ArrayForEach(item, array) {
-        if (!cJSON_IsArray(item)) {
+        if (!DisplayJsonUtils::IsValidJsonArray(item)) {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "array <%{public}s> element is not an array!", name.c_str());
             return;
         }
@@ -171,14 +166,14 @@ void ConfigParserBase::ParsePointXy(
         }
 
         const cJSON* xNode = cJSON_GetArrayItem(item, POINT_X_INDEX);
-        if (xNode && cJSON_IsNumber(xNode)) {
+        if (DisplayJsonUtils::IsValidJsonNumber(xNode)) {
             pointXy.x = static_cast<float>(xNode->valuedouble);
         } else {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "parse [%{public}s] error!", name.c_str());
         }
 
         const cJSON* yNode = cJSON_GetArrayItem(item, POINT_Y_INDEX);
-        if (yNode && cJSON_IsNumber(yNode)) {
+        if (DisplayJsonUtils::IsValidJsonNumber(yNode)) {
             pointXy.y = static_cast<float>(yNode->valuedouble);
         } else {
             DISPLAY_HILOGW(FEAT_BRIGHTNESS, "parse [%{public}s] error!", name.c_str());
@@ -205,7 +200,7 @@ void ConfigParserBase::ParseScreenData(const cJSON* root, const std::string& nam
 {
     data.clear();
     const cJSON* array = cJSON_GetObjectItemCaseSensitive(root, name.c_str());
-    if (!array || !cJSON_IsArray(array)) {
+    if (!DisplayJsonUtils::IsValidJsonArray(array)) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "root <%{public}s> is not found or is not an array!", name.c_str());
         return;
     }
@@ -218,17 +213,17 @@ void ConfigParserBase::ParseScreenData(const cJSON* root, const std::string& nam
         ScreenData screenData{};
         int displayMode = 0;
         const cJSON* displayModeNode = cJSON_GetObjectItemCaseSensitive(item, paramName.c_str());
-        if (displayModeNode && cJSON_IsNumber(displayModeNode)) {
+        if (DisplayJsonUtils::IsValidJsonNumber(displayModeNode)) {
             displayMode = displayModeNode->valueint;
         }
 
         const cJSON* displayIdNode = cJSON_GetObjectItemCaseSensitive(item, "displayId");
-        if (displayIdNode && cJSON_IsNumber(displayIdNode)) {
+        if (DisplayJsonUtils::IsValidJsonNumber(displayIdNode)) {
             screenData.displayId = displayIdNode->valueint;
         }
 
         const cJSON* sensorIdNode = cJSON_GetObjectItemCaseSensitive(item, "sensorId");
-        if (sensorIdNode && cJSON_IsNumber(sensorIdNode)) {
+        if (DisplayJsonUtils::IsValidJsonNumber(sensorIdNode)) {
             screenData.sensorId = sensorIdNode->valueint;
         }
 

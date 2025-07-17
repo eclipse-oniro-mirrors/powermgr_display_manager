@@ -44,6 +44,8 @@ public:
         cJSON* item, std::unordered_map<std::string, LuxFilterConfig::Data>& data);
     static bool ParseConfig(
         int displayId, std::unordered_map<std::string, LuxFilterConfig::Data>& data);
+    static bool ParseConfigJsonRoot(
+        const std::string& fileContent, std::unordered_map<std::string, LuxFilterConfig::Data>& data);
     static void PrintConfig(
         int displayId, const std::unordered_map<std::string, LuxFilterConfig::Data>& data);
 };

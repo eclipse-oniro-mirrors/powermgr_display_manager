@@ -50,6 +50,7 @@ public:
 
     static void LuxThresholdParseConfigParams(cJSON* item, LuxThresholdConfig::Data& data);
     static bool ParseConfig(int displayId, LuxThresholdConfig::Data& data);
+    static bool ParseConfigJsonRoot(const std::string& fileContent, LuxThresholdConfig::Data& data);
     static void PrintConfig(int displayId, const LuxThresholdConfig::Data& data);
 };
 } // namespace DisplayPowerMgr
