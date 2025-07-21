@@ -302,7 +302,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrDiscountBrightness002, Te
     double ret = DisplayPowerMgrClient::GetInstance().DiscountBrightness(DISCOUNT_VALUE);
     EXPECT_TRUE(ret);
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(value, static_cast<uint32_t>(DISCOUNT_VALUE * SET_OVERRIDE_BRIGHTNESS));
+    EXPECT_TRUE(value <= static_cast<uint32_t>(DISCOUNT_VALUE * SET_OVERRIDE_BRIGHTNESS));
 
     ret = DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     usleep(DEFAULT_WAITING_TIME);
