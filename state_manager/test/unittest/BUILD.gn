@@ -266,12 +266,11 @@ ohos_unittest("unittest_display_service_test") {
   ]
 
   deps = [
+    "${brightnessmgr_root_path}:brightness_manager",
     "${displaymgr_inner_api}:displaymgr",
     "${displaymgr_root_path}/service:displaymgrservice",
     "${displaymgr_root_path}/service:displaymgr_stub",
   ]
-
-  public_deps = [ "${brightnessmgr_root_path}:brightness_manager" ]
 
   external_deps = [ "power_manager:power_permission" ]
 
