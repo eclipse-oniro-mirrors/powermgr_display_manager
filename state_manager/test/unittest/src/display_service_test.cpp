@@ -116,9 +116,9 @@ namespace {
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceInnerTest001, TestSize.Level1)
 {
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest001 function start!");
     const int sleepTime = DEFAULT_WAITING_TIME;
     usleep(sleepTime);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest001 function start!");
     EXPECT_TRUE(g_service != nullptr);
     DisplayServiceTest::DisplayServiceInnerTestFunc();
     EXPECT_NE(BRIGHTNESS_NONE_VALUE, g_service->GetDeviceBrightnessInner(DISPLAY_ID));
