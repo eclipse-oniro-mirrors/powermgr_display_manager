@@ -21,8 +21,8 @@
 #include "message_parcel.h"
 #include "securec.h"
 #include "iremote_object.h"
-#include "idisplay_power_mgr.h"
 #include "display_brightness_callback_stub.h"
+#include "idisplay_power_mgr.h"
 
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS::PowerMgr;
