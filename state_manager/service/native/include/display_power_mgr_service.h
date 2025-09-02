@@ -45,36 +45,37 @@ class DisplayPowerMgrService : public DisplayPowerMgrStub {
 public:
     virtual ~DisplayPowerMgrService() = default;
 
-    int32_t SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result) override;
-    int32_t GetDisplayState(uint32_t id, int32_t& displayState) override;
-    int32_t GetDisplayIds(std::vector<uint32_t>& ids) override;
-    int32_t GetMainDisplayId(uint32_t& id) override;
-    int32_t SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
+    ErrCode SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result) override;
+    ErrCode GetDisplayState(uint32_t id, int32_t& displayState) override;
+    ErrCode GetDisplayIds(std::vector<uint32_t>& ids) override;
+    ErrCode GetMainDisplayId(uint32_t& id) override;
+    ErrCode SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
         int32_t& displayError) override;
-    int32_t SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError) override;
-    int32_t SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result, int32_t& displayError) override;
-    int32_t DiscountBrightness(double discount, uint32_t displayId, bool& result) override;
-    int32_t OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration, bool& result) override;
-    int32_t OverrideDisplayOffDelay(uint32_t delayMs, bool& result) override;
+    ErrCode SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError) override;
+    ErrCode SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result, int32_t& displayError) override;
+    ErrCode DiscountBrightness(double discount, uint32_t displayId, bool& result) override;
+    ErrCode OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration, bool& result) override;
+    ErrCode OverrideDisplayOffDelay(uint32_t delayMs, bool& result) override;
 
-    int32_t RestoreBrightness(uint32_t displayId, uint32_t duration, bool& result) override;
+    ErrCode RestoreBrightness(uint32_t displayId, uint32_t duration, bool& result) override;
 
-    int32_t GetBrightness(uint32_t displayId, uint32_t& brightness) override;
-    int32_t GetDefaultBrightness(uint32_t& defaultBrightness) override;
-    int32_t GetMaxBrightness(uint32_t& maxBrightness) override;
-    int32_t GetMinBrightness(uint32_t& minBrightness) override;
-    int32_t AdjustBrightness(uint32_t id, int32_t value, uint32_t duration, bool& result) override;
-    int32_t AutoAdjustBrightness(bool enable, bool& result) override;
-    int32_t IsAutoAdjustBrightness(bool& result) override;
-    int32_t RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result) override;
-    int32_t BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result) override;
-    int32_t CancelBoostBrightness(uint32_t displayId, bool& result) override;
-    int32_t GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
-    int32_t SetCoordinated(bool coordinated, uint32_t displayId, bool& result) override;
-    int32_t SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
+    ErrCode GetBrightness(uint32_t displayId, uint32_t& brightness) override;
+    ErrCode GetDefaultBrightness(uint32_t& defaultBrightness) override;
+    ErrCode GetMaxBrightness(uint32_t& maxBrightness) override;
+    ErrCode GetMinBrightness(uint32_t& minBrightness) override;
+    ErrCode AdjustBrightness(uint32_t id, int32_t value, uint32_t duration, bool& result) override;
+    ErrCode AutoAdjustBrightness(bool enable, bool& result) override;
+    ErrCode IsAutoAdjustBrightness(bool& result) override;
+    ErrCode RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result) override;
+    ErrCode BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result) override;
+    ErrCode CancelBoostBrightness(uint32_t displayId, bool& result) override;
+    ErrCode GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
+    ErrCode SetCoordinated(bool coordinated, uint32_t displayId, bool& result) override;
+    ErrCode SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
         const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result) override;
-    int32_t SetScreenOnBrightness(bool& result) override;
-    int32_t NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
+    ErrCode SetScreenOnBrightness(bool& result) override;
+    ErrCode NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
+    ErrCode WaitDimmingDone() override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     DisplayState GetDisplayStateInner(uint32_t id);

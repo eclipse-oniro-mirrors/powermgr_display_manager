@@ -135,6 +135,7 @@ public:
     bool DiscountBrightness(double discount, uint32_t gradualDuration = 0);
     double GetDiscount() const;
     uint32_t GetDimmingUpdateTime() const;
+    void WaitDimmingDone() const;
     void ClearOffset();
     void UpdateBrightnessSceneMode(BrightnessSceneMode mode);
     uint32_t GetDisplayId();

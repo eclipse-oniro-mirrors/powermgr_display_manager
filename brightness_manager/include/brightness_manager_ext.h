@@ -50,6 +50,7 @@ public:
     bool IsBrightnessBoosted() const;
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
+    void WaitDimmingDone() const;
     void ClearOffset();
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);
@@ -93,6 +94,7 @@ public:
     void* mIsBrightnessBoostedFunc = nullptr;
     void* mGetBrightnessFunc = nullptr;
     void* mGetDeviceBrightnessFunc = nullptr;
+    void* mWaitDimmingDoneFunc = nullptr;
     void* mClearOffsetFunc = nullptr;
     void* mGetCurrentDisplayIdFunc = nullptr;
     void* mSetDisplayIdFunc = nullptr;

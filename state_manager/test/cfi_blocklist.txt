@@ -1,0 +1,6 @@
+src:*powermgr/display_manager/state_manager/test/unittest/include/*
+src:*powermgr/display_manager/state_manager/test/unittest/include/mock/*
+src:*powermgr/display_manager/state_manager/test/unittest/src/*
+src:*powermgr/display_manager/state_manager/test/unittest/src/mock/*
+src:*third_party/googletest/googlemock/include/gmock/*
+src:*third_party/googletest/googletest/include/gtest/*

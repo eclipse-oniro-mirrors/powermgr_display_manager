@@ -789,6 +789,13 @@ uint32_t BrightnessService::GetDeviceBrightness()
     return GetOrigBrightnessLevel(brightness);
 }
 
+void BrightnessService::WaitDimmingDone() const
+{
+    if (mDimming != nullptr) {
+        mDimming->WaitDimmingDone();
+    }
+}
+
 uint32_t BrightnessService::GetCachedSettingBrightness()
 {
     return mCachedSettingBrightness;

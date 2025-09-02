@@ -32,5 +32,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     DisplayFuzzerTest g_serviceTest;
     g_serviceTest.TestDisplayServiceStub(
         static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_BRIGHTNESS), data, size);
+    g_serviceTest.TestDisplayServiceStub(
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_WAIT_DIMMING_DONE), data, size);
     return 0;
 }

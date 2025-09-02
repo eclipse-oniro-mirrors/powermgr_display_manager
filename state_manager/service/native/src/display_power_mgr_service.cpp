@@ -721,21 +721,21 @@ int DisplayPowerMgrService::NotifyScreenPowerStatusInner(uint32_t displayId, uin
     return BrightnessManager::Get().NotifyScreenPowerStatus(displayId, displayPowerStatus);
 }
 
-int32_t DisplayPowerMgrService::SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result)
+ErrCode DisplayPowerMgrService::SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetDisplayState");
     result = SetDisplayStateInner(id, static_cast<DisplayState>(state), reason);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetDisplayState(uint32_t id, int32_t& displayState)
+ErrCode DisplayPowerMgrService::GetDisplayState(uint32_t id, int32_t& displayState)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDisplayState");
     displayState = static_cast<int32_t>(GetDisplayStateInner(id));
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetDisplayIds(std::vector<uint32_t>& ids)
+ErrCode DisplayPowerMgrService::GetDisplayIds(std::vector<uint32_t>& ids)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDisplayIds");
     auto idsTemp = GetDisplayIdsInner();
@@ -743,14 +743,14 @@ int32_t DisplayPowerMgrService::GetDisplayIds(std::vector<uint32_t>& ids)
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetMainDisplayId(uint32_t& id)
+ErrCode DisplayPowerMgrService::GetMainDisplayId(uint32_t& id)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMainDisplayId");
     id = GetMainDisplayIdInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
+ErrCode DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
     int32_t& displayError)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetBrightness");
@@ -759,14 +759,14 @@ int32_t DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId, bool& result)
+ErrCode DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::DiscountBrightness");
     result = DiscountBrightnessInner(discount, displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration,
+ErrCode DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration,
     bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::OverrideBrightness");
@@ -774,105 +774,105 @@ int32_t DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs, bool& result)
+ErrCode DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::OverrideDisplayOffDelay");
     result = OverrideDisplayOffDelayInner(delayMs);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::RestoreBrightness(uint32_t displayId, uint32_t duration, bool& result)
+ErrCode DisplayPowerMgrService::RestoreBrightness(uint32_t displayId, uint32_t duration, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetBrightness");
     result = RestoreBrightnessInner(displayId, duration);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetBrightness(uint32_t displayId, uint32_t& brightness)
+ErrCode DisplayPowerMgrService::GetBrightness(uint32_t displayId, uint32_t& brightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetBrightness");
     brightness = GetBrightnessInner(displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetDefaultBrightness(uint32_t& defaultBrightness)
+ErrCode DisplayPowerMgrService::GetDefaultBrightness(uint32_t& defaultBrightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDefaultBrightness");
     defaultBrightness = GetDefaultBrightnessInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetMaxBrightness(uint32_t& maxBrightness)
+ErrCode DisplayPowerMgrService::GetMaxBrightness(uint32_t& maxBrightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMaxBrightness");
     maxBrightness = GetMaxBrightnessInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetMinBrightness(uint32_t& minBrightness)
+ErrCode DisplayPowerMgrService::GetMinBrightness(uint32_t& minBrightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMinBrightness");
     minBrightness = GetMinBrightnessInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration, bool& result)
+ErrCode DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::AdjustBrightness");
     result = AdjustBrightnessInner(id, value, duration);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::AutoAdjustBrightness(bool enable, bool& result)
+ErrCode DisplayPowerMgrService::AutoAdjustBrightness(bool enable, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::AutoAdjustBrightness");
     result = AutoAdjustBrightnessInner(enable);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::IsAutoAdjustBrightness(bool& result)
+ErrCode DisplayPowerMgrService::IsAutoAdjustBrightness(bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::IsAutoAdjustBrightness");
     result = IsAutoAdjustBrightnessInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result)
+ErrCode DisplayPowerMgrService::RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterCallback");
     result = RegisterCallbackInner(callback);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result)
+ErrCode DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::BoostBrightness");
     result = BoostBrightnessInner(timeoutMs, displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId, bool& result)
+ErrCode DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::CancelBoostBrightness");
     result = CancelBoostBrightnessInner(displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness)
+ErrCode DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDeviceBrightness");
     deviceBrightness = GetDeviceBrightnessInner(displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displayId, bool& result)
+ErrCode DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displayId, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetCoordinated");
     result = SetCoordinatedInner(coordinated, displayId);
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
+ErrCode DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
     const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetLightBrightnessThreshold");
@@ -880,7 +880,7 @@ int32_t DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<in
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError)
+ErrCode DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMaxBrightness");
     result = SetMaxBrightnessInner(value, mode);
@@ -888,7 +888,7 @@ int32_t DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bo
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result,
+ErrCode DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result,
     int32_t& displayError)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMaxBrightnessNit");
@@ -897,18 +897,29 @@ int32_t DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mo
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
+ErrCode DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetScreenOnBrightness");
     result = SetScreenOnBrightnessInner();
     return ERR_OK;
 }
 
-int32_t DisplayPowerMgrService::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus,
+ErrCode DisplayPowerMgrService::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus,
     int32_t& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::NotifyScreenPowerStatus");
     result = NotifyScreenPowerStatusInner(displayId, displayPowerStatus);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::WaitDimmingDone()
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::WaitDimmingDone");
+    if (!Permission::IsSystem()) {
+        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        return -1; // -1 means failed
+    }
+    BrightnessManager::Get().WaitDimmingDone();
     return ERR_OK;
 }
 } // namespace DisplayPowerMgr

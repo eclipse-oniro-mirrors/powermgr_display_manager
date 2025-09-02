@@ -39,6 +39,7 @@ public:
     void StartDimming(uint32_t from, uint32_t to, uint32_t duration);
     void StopDimming();
     bool IsDimming() const;
+    void WaitDimmingDone() const; // this API may trigger thread switching in ffrt
     uint32_t GetDimmingUpdateTime() const;
     bool Init();
     void Reset();
@@ -61,6 +62,8 @@ private:
     std::atomic_uint32_t mCurrentStep{};
     std::shared_ptr<PowerMgr::FFRTQueue> mQueue;
     std::mutex mAnimatorHandleLock{};
+    mutable ffrt::mutex mLock;
+    mutable ffrt::condition_variable mCondDimmingDone;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

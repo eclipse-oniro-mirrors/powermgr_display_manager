@@ -371,6 +371,16 @@ uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
     return brightness;
 }
 
+void DisplayPowerMgrClient::WaitDimmingDone()
+{
+    auto proxy = GetProxy();
+    RETURN_IF(proxy == nullptr);
+    auto ret = proxy->WaitDimmingDone();
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "WaitDimmingDone, ret = %{public}d", ret);
+    }
+}
+
 bool DisplayPowerMgrClient::SetCoordinated(bool coordinated, uint32_t displayId)
 {
     auto proxy = GetProxy();

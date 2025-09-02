@@ -57,6 +57,7 @@ public:
     bool BoostBrightness(int32_t timeoutMs, uint32_t displayId = 0);
     bool CancelBoostBrightness(uint32_t displayId = 0);
     uint32_t GetDeviceBrightness(uint32_t displayId = 0);
+    void WaitDimmingDone();
     bool SetCoordinated(bool coordinated, uint32_t displayId = 0);
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     DisplayErrors GetError();

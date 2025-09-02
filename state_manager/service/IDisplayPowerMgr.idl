@@ -19,7 +19,7 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerCallback;
 interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     [ipccode 0] void SetDisplayState([in] unsigned int id, [in] unsigned int state, [in] unsigned int reason,
         [out] boolean bResult);
-    void GetDisplayState([in] unsigned int id, [out] int displayState); 
+    void GetDisplayState([in] unsigned int id, [out] int displayState);
     void GetDisplayIds([out] unsigned int[] ids);
     void GetMainDisplayId([out] unsigned int id);
     void SetBrightness([in] unsigned int value, [in] unsigned int displayId, [in] boolean continuous,
@@ -50,4 +50,5 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void NotifyScreenPowerStatus([in] unsigned int displayId, [in] unsigned int displayPowerStatus,
         [out] int retCode);
     void SetScreenOnBrightness([out] boolean bResult);
+    void WaitDimmingDone();
 }

@@ -226,6 +226,7 @@ HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level1)
     usleep(INIT_WAITING_TIME);
     double discount = g_BrightnessManagerExt.GetDiscount();
     EXPECT_EQ(1.0, discount);
+    g_BrightnessManagerExt.WaitDimmingDone();
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerExtInit001 function end!");
 }
 

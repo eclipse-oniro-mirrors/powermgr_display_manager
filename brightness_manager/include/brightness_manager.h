@@ -50,6 +50,7 @@ public:
     bool IsBrightnessBoosted() const;
     uint32_t GetBrightness();
     uint32_t GetDeviceBrightness();
+    void WaitDimmingDone() const;
     void ClearOffset();
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;

@@ -113,6 +113,11 @@ bool BrightnessManagerExt::LoadBrightnessOpsEx1()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym IsAutoAdjustBrightness func failed!");
         return false;
     }
+    mWaitDimmingDoneFunc = dlsym(mBrightnessManagerExtHandle, "WaitDimmingDone");
+    if (!mWaitDimmingDoneFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym WaitDimmingDone func failed!");
+        return false;
+    }
     return true;
 }
 
@@ -244,6 +249,7 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mIsBrightnessBoostedFunc = nullptr;
     mGetBrightnessFunc = nullptr;
     mGetDeviceBrightnessFunc = nullptr;
+    mWaitDimmingDoneFunc = nullptr;
     mClearOffsetFunc = nullptr;
     mGetCurrentDisplayIdFunc = nullptr;
     mSetDisplayIdFunc = nullptr;
@@ -404,6 +410,15 @@ uint32_t BrightnessManagerExt::GetDeviceBrightness()
     }
     auto getDeviceBrightnessFunc = reinterpret_cast<uint32_t (*)()>(mGetDeviceBrightnessFunc);
     return getDeviceBrightnessFunc();
+}
+
+void BrightnessManagerExt::WaitDimmingDone() const
+{
+    if (!mBrightnessManagerExtEnable) {
+        return;
+    }
+    auto waitDimmingDoneFunc = reinterpret_cast<uint32_t (*)()>(mWaitDimmingDoneFunc);
+    waitDimmingDoneFunc();
 }
 
 bool BrightnessManagerExt::IsBrightnessOverridden() const
