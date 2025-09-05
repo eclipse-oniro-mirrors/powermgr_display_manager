@@ -47,8 +47,8 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
         if (!Publish(service)) {
             DISPLAY_HILOGE(COMP_SVC, "Failed to publish service");
         }
-        if (commonEventManager_ != nullptr && commonEventManager_->CheckIfSettingsDataReady()
-            && commonEventManager_->SetKvDataReady()) {
+        if (commonEventManager_ != nullptr && commonEventManager_->CheckIfSettingsDataReady() &&
+            commonEventManager_->SetKvDataReady()) {
             commonEventManager_->HandleBootBrightness();
         }
         isReady = true;
@@ -80,8 +80,8 @@ void DisplaySystemAbility::OnStop()
     DISPLAY_HILOGW(COMP_SVC, "Stop service");
     auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     service->Deinit();
-    RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
     isReady = false;
+    RemoveSystemAbilityListener(DISPLAY_MANAGER_SERVICE_SA_ID);
 }
 } // OHOS
 } // DisplayPowerMgr

@@ -172,7 +172,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_002, TestSize.Level0)
     bool result = false;
     EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
     EXPECT_FALSE(result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_002 function is end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_002 function end!");
 }
 
 /**
@@ -189,7 +189,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_003, TestSize.Level0)
     bool result = false;
     EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
     EXPECT_FALSE(result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_003 function end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_003 function end!");
 }
 
 /**
@@ -214,7 +214,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_004, TestSize.Level0)
     bool result = false;
     EXPECT_NE(sptrDisplayProxy->RegisterCallback(callbackPtr, result), ERR_OK);
     EXPECT_FALSE(result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_004 function end");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_004 function end!");
 }
 
 /**

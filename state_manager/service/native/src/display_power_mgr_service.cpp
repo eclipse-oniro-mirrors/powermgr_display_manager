@@ -438,7 +438,7 @@ bool DisplayPowerMgrService::IsSupportLightSensor(void)
     return BrightnessManager::Get().IsSupportLightSensor();
 }
 
-bool DisplayPowerMgrService::IsAutoAdjustBrightnessInner()
+bool DisplayPowerMgrService::IsAutoAdjustBrightnessInner(void)
 {
     return BrightnessManager::Get().IsAutoAdjustBrightness();
 }
