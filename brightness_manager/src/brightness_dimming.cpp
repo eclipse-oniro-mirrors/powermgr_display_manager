@@ -15,11 +15,14 @@
 
 #include "brightness_dimming.h"
 
+#include <chrono>
+
 #include "brightness_dimming_callback.h"
 #include "display_log.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
+using namespace std::chrono_literals;
 using namespace PowerMgr;
 namespace {
 FFRTHandle g_animatorTaskHandle;
@@ -101,6 +104,7 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
 void BrightnessDimming::StopDimming()
 {
     mDimming = false;
+    mCondDimmingDone.notify_all();
     mAnimatorHandleLock.lock();
     FFRT_CANCEL(g_animatorTaskHandle, mQueue);
     mAnimatorHandleLock.unlock();
@@ -115,6 +119,16 @@ void BrightnessDimming::StopDimming()
 bool BrightnessDimming::IsDimming() const
 {
     return mDimming;
+}
+
+void BrightnessDimming::WaitDimmingDone() const
+{
+    std::unique_lock lck(mLock);
+    while (IsDimming()) {
+        mCondDimmingDone.wait_for(lck, 600ms);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "WaitDimmingDone, mDimming=%{public}d, qos=%{public}d",
+            IsDimming(), ffrt_this_task_get_qos());
+    }
 }
 
 uint32_t BrightnessDimming::GetDimmingUpdateTime() const
@@ -146,6 +160,7 @@ void BrightnessDimming::NextStep()
             mCallback->OnChanged(mCurrentBrightness);
             mCallback->OnEnd();
             mDimming = false;
+            mCondDimmingDone.notify_all();
         } else {
             DISPLAY_HILOGD(FEAT_BRIGHTNESS, "next step last mCurrentBrightness=%{public}u, next=%{public}d",
                 mCurrentBrightness.load(), nextBrightness);
@@ -161,6 +176,7 @@ void BrightnessDimming::NextStep()
         mCallback->OnChanged(mCurrentBrightness);
         mCallback->OnEnd();
         mDimming = false;
+        mCondDimmingDone.notify_all();
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "animating next step, step=%{public}u, brightness=%{public}u, stride=%{public}d",
         mCurrentStep.load(), mCurrentBrightness.load(), mStride.load());

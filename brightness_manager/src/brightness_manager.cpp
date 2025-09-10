@@ -198,6 +198,15 @@ uint32_t BrightnessManager::GetDeviceBrightness()
 #endif
 }
 
+void BrightnessManager::WaitDimmingDone() const
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    mBrightnessManagerExt.WaitDimmingDone();
+#else
+    BrightnessService::Get().WaitDimmingDone();
+#endif
+}
+
 uint32_t BrightnessManager::SetLightBrightnessThreshold(
     std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {

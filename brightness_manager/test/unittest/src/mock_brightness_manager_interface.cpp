@@ -142,6 +142,10 @@ uint32_t GetDeviceBrightness()
     return MockReturnValue();
 }
 
+void WaitDimmingDone()
+{
+}
+
 void ClearOffset()
 {
 }
@@ -193,6 +197,7 @@ void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& e
     ext.mIsBrightnessBoostedFunc = reinterpret_cast<void*>(IsBrightnessBoosted);
     ext.mGetBrightnessFunc = reinterpret_cast<void*>(GetBrightness);
     ext.mGetDeviceBrightnessFunc = reinterpret_cast<void*>(GetDeviceBrightness);
+    ext.mWaitDimmingDoneFunc = reinterpret_cast<void*>(WaitDimmingDone);
     ext.mClearOffsetFunc = reinterpret_cast<void*>(ClearOffset);
     ext.mGetCurrentDisplayIdFunc = reinterpret_cast<void*>(GetCurrentDisplayId);
     ext.mSetDisplayIdFunc = reinterpret_cast<void*>(SetDisplayId);
