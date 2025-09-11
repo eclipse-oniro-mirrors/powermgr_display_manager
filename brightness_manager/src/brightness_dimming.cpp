@@ -125,7 +125,7 @@ void BrightnessDimming::WaitDimmingDone() const
 {
     std::unique_lock lck(mLock);
     while (IsDimming()) {
-        mCondDimmingDone.wait_for(lck, 600ms);
+        mCondDimmingDone.wait_for(lck, 600ms); // 600ms covers typical dimming duration (500ms)
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "WaitDimmingDone, mDimming=%{public}d, qos=%{public}d",
             IsDimming(), ffrt_this_task_get_qos());
     }

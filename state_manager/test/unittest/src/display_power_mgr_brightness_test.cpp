@@ -33,8 +33,8 @@ const double NO_DISCOUNT = 1.00;
 const uint32_t MAX_DEFAULT_BRIGHTNESS_LEVEL = 255;
 const uint32_t TEST_MODE = 1;
 const uint32_t NORMAL_MODE = 2;
-constexpr int32_t CMD_EXECUTION_DELAY = 15 * 1000; // 15s delay before executing command
-constexpr int32_t SET_AUTO_DELAY = 50 * 1000;      // for datashare callback
+constexpr int32_t CMD_EXECUTION_DELAY = 15 * 1000; // 15ms delay before executing command
+constexpr int32_t SET_AUTO_DELAY = 50 * 1000;      // 50ms delay for datashare callback
 }
 
 class DisplayPowerMgrBrightnessTest : public OHOS::PowerMgr::TestBase {
