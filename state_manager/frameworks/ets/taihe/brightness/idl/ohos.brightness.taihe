@@ -16,7 +16,7 @@
 @!namespace("@ohos.brightness","brightness")
 
 @!sts_inject("""
-static { loadLibrary("display_manager_brightness_taihe_native.z") }""")
+static { loadLibraryWithPermissionCheck("display_manager_brightness_taihe_native.z", "@ohos.brightness") }""")
 
 @overload("setValue")
 function SetValueContinuous(value: i32, continuous: bool): void;
