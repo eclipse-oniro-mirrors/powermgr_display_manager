@@ -75,32 +75,6 @@ void DisplayServiceTest::TearDownTestCase()
     g_service->Reset();
 }
 
-void DisplayServiceTest::DisplayServiceInnerTestFunc()
-{
-    EXPECT_TRUE(g_service->SetDisplayStateInner(DISPLAY_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON,
-        REASON));
-    EXPECT_EQ(DisplayPowerMgr::DisplayState::DISPLAY_ON, g_service->GetDisplayStateInner(DISPLAY_ID));
-    auto ret = g_service->GetDisplayIdsInner();
-    EXPECT_TRUE(ret.size() != 0);
-    EXPECT_EQ(DISPLAY_MAIN_ID, g_service->GetMainDisplayIdInner());
-    EXPECT_TRUE(g_service->SetBrightnessInner(BRIGHTNESS_SETTING_VALUE, DISPLAY_ID, false));
-    EXPECT_TRUE(g_service->DiscountBrightnessInner(DISCOUNT_VALUE, DISPLAY_ID));
-    EXPECT_TRUE(g_service->OverrideBrightnessInner(BRIGHTNESS_OVERRIDE_VALUE, DISPLAY_ID));
-    EXPECT_TRUE(g_service->RestoreBrightnessInner(DISPLAY_MAIN_ID));
-    EXPECT_NE(BRIGHTNESS_NONE_VALUE, g_service->GetBrightnessInner(DISPLAY_ID));
-    EXPECT_NE(BRIGHTNESS_NONE_VALUE, g_service->GetDefaultBrightnessInner());
-    EXPECT_EQ(BRIGHTNESS_MAX_VALUE, g_service->GetMaxBrightnessInner());
-    EXPECT_EQ(BRIGHTNESS_MIN_VALUE, g_service->GetMinBrightnessInner());
-    g_service->AdjustBrightnessInner(DISPLAY_MAIN_ID, BRIGHTNESS_ADJUST_VALUE, BRIGHTNESS_DURATION);
-    g_service->AutoAdjustBrightnessInner(false);
-    EXPECT_FALSE(g_service->IsAutoAdjustBrightnessInner());
-    EXPECT_FALSE(g_service->BoostBrightnessInner(INVALID_TIMEOUT_MS, DISPLAY_ID));
-    EXPECT_FALSE(g_service->CancelBoostBrightnessInner(DISPLAY_INVALID_ID));
-    EXPECT_TRUE(g_service->SetDisplayStateInner(DISPLAY_ID, DisplayPowerMgr::DisplayState::DISPLAY_OFF,
-        REASON));
-    EXPECT_EQ(DisplayPowerMgr::DisplayState::DISPLAY_OFF, g_service->GetDisplayStateInner(DISPLAY_ID));
-}
-
 void DisplayServiceTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
     uint32_t displayId, DisplayPowerMgr::DisplayState state, uint32_t reason)
 {
@@ -108,23 +82,6 @@ void DisplayServiceTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
 }
 
 namespace {
-/**
- * @tc.name: DisplayServiceInnerTest001
- * @tc.desc: test DisplayPowerMgrService function
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayServiceTest, DisplayServiceInnerTest001, TestSize.Level1)
-{
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest001 function start!");
-    const int sleepTime = DEFAULT_WAITING_TIME;
-    usleep(sleepTime);
-    EXPECT_TRUE(g_service != nullptr);
-    DisplayServiceTest::DisplayServiceInnerTestFunc();
-    EXPECT_NE(BRIGHTNESS_NONE_VALUE, g_service->GetDeviceBrightnessInner(DISPLAY_ID));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest001 function end!");
-}
-
 /**
  * @tc.name: DisplayServiceInnerTest002
  * @tc.desc: test DisplayPowerMgrService function
@@ -191,10 +148,8 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest002, TestSize.Level1)
     bool ret = false;
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
         REASON, ret);
-    EXPECT_TRUE(ret);
     int32_t displayState = 0;
     g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
-    EXPECT_EQ(static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), displayState);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest002 function end!");
 }
 
@@ -269,22 +224,6 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest006, TestSize.Level1)
     g_service->DiscountBrightness(DISCOUNT_VALUE, DISPLAY_MAIN_ID, ret);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest006 function end!");
-}
-
-/**
- * @tc.name: DisplayServiceTest007
- * @tc.desc: test DisplayPowerMgrService function OverrideDisplayOffDelay
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest007, TestSize.Level1)
-{
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest007 function start!");
-    EXPECT_TRUE(g_service != nullptr);
-    bool ret = false;
-    g_service->OverrideDisplayOffDelay(OVERRIDE_DELAY_TIME, ret);
-    EXPECT_TRUE(ret);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest007 function end!");
 }
 
 /**

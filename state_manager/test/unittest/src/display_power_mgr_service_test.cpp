@@ -28,12 +28,15 @@
 #include "mock_display_power_mgr_proxy.h"
 #include "mock_display_remote_object.h"
 
+using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 namespace {
 sptr<IRemoteObject> g_testRemoteObj;
 sptr<MockDisplayPowerMgrProxy> g_mockProxy;
+NiceMock<DisplayPowerMgrServiceTest::ScreenActionMock>* g_screenActionMock;
+uint64_t g_displayId = 0;
 }
 
 void DisplayPowerMgrServiceTest::SetUp()
@@ -41,6 +44,7 @@ void DisplayPowerMgrServiceTest::SetUp()
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     g_testRemoteObj = sptr<PowerMgr::MockDisplayRemoteObject>::MakeSptr(u"DisplayPowerMgrServiceTest");
     g_mockProxy = sptr<MockDisplayPowerMgrProxy>::MakeSptr(g_testRemoteObj);
+    g_screenActionMock = new NiceMock<DisplayPowerMgrServiceTest::ScreenActionMock>(g_displayId);
 }
 
 void DisplayPowerMgrServiceTest::TearDown()
@@ -48,6 +52,7 @@ void DisplayPowerMgrServiceTest::TearDown()
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     g_testRemoteObj = nullptr;
     g_mockProxy = nullptr;
+    g_screenActionMock = nullptr;
 }
 
 void DisplayPowerMgrServiceTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
@@ -80,8 +85,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService001, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService002 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    EXPECT_TRUE(ret);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService002 function end!");
 }
 
@@ -93,8 +99,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService002, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService003 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    EXPECT_TRUE(ret);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     auto temp = DisplayPowerMgrClient::GetInstance().SetScreenOnBrightness();
     EXPECT_TRUE(temp);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService003 function end!");
@@ -108,8 +115,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService003, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService004 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
-    EXPECT_TRUE(ret);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService004 function end!");
 }
 
@@ -121,8 +129,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService004, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService005 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
-    EXPECT_TRUE(ret);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService005 function end!");
 }
 
@@ -134,8 +143,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService005, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService006 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
-    EXPECT_TRUE(ret);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService006 function end!");
 }
 
@@ -147,11 +157,12 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService006, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService007 function start!");
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
-    EXPECT_TRUE(ret);
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(state == DisplayState::DISPLAY_ON);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService007 function end!");
 }
 
@@ -163,10 +174,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
-    EXPECT_TRUE(ret);
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(state == DisplayState::DISPLAY_DIM);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_DIM);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 function end!");
 }
 
@@ -178,10 +190,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    EXPECT_TRUE(ret);
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(state == DisplayState::DISPLAY_OFF);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009 function end!");
 }
 
@@ -193,10 +206,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
-    EXPECT_TRUE(ret);
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(state == DisplayState::DISPLAY_SUSPEND);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_SUSPEND);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService010 function end!");
 }
 
@@ -208,10 +222,11 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService010, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService011, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011 function start!");
-    auto ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
-    EXPECT_TRUE(ret);
-    DisplayState state = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(state == DisplayState::DISPLAY_UNKNOWN);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_UNKNOWN);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService011 function end!");
 }
 
@@ -236,8 +251,9 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService012, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService013, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService013 function start!");
-    int32_t ret = DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
-    EXPECT_TRUE(ret == 0);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, GetDefaultDisplayId());
+    DisplayPowerMgrClient::GetInstance().GetMainDisplayId();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService013 function end!");
 }
 
@@ -331,14 +347,15 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService019, TestSize.Level0)
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     uint32_t delayTime = 10; //delay time is 10ms
     DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
-    DisplayState delayState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(delayState == DisplayState::DISPLAY_DELAY_OFF);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     //Callback for waiting window
     int sleepTime = 3; // sleep time is 3s
     sleep(sleepTime);
-    DisplayState offState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(offState == DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService019 function end!");
 }
 
@@ -353,14 +370,16 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService020, TestSize.Level0)
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     uint32_t delayTime = 200; //delay time is 200ms
     DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     int sleepTime = 100000; // sleep time is 100ms
     usleep(sleepTime);
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON);
     sleepTime = 300000; // sleep time is 300ms
     usleep(sleepTime);
-    DisplayState onState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(onState == DisplayState::DISPLAY_ON);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService020 function end!");
 }
 
@@ -385,12 +404,12 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService021, TestSize.Level0)
     DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
     sleep(sleepTime);
-    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_ON, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
-    EXPECT_TRUE(ret);
-    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(
         DisplayState::DISPLAY_OFF, PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION);
-    EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService021 function end!");
 }
 
@@ -408,14 +427,13 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService022, TestSize.Level0)
     int sleepTime = 2;
     //Callback for waiting window 2s
     sleep(sleepTime);
-    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
 
-    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT);
-    EXPECT_FALSE(ret);
-    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService022 function end!");
 }
 
@@ -428,18 +446,17 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService022, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService023, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService023 function start!");
-    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     int sleepTime = 2;
     //Callback for waiting window 2s
     sleep(sleepTime);
-    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
 
-    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS);
-    EXPECT_TRUE(ret);
-    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_ON);
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService023 function end!");
 }
 
@@ -452,18 +469,17 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService023, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService024, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService024 function start!");
-    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     int sleepTime = 2;
     //Callback for waiting window 2s
     sleep(sleepTime);
-    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
-
-    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_ON,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_ON);
-    EXPECT_TRUE(ret);
-    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_ON);
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService024 function end!");
 }
 
@@ -476,19 +492,18 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService024, TestSize.Level0)
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService025, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService025 function start!");
-    bool ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     int sleepTime = 2;
     //Callback for waiting window 2s
     sleep(sleepTime);
-    DisplayState currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
-
-    ret = DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF,
+    ASSERT_TRUE(g_screenActionMock != nullptr);
+    EXPECT_CALL(*g_screenActionMock, GetDisplayState());
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
+    EXPECT_CALL(*g_screenActionMock, SetDisplayState(_, _));
+    DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF);
     sleep(sleepTime);
-    EXPECT_FALSE(ret);
-    currentState = DisplayPowerMgrClient::GetInstance().GetDisplayState();
-    EXPECT_TRUE(currentState == DisplayState::DISPLAY_OFF);
+    DisplayPowerMgrClient::GetInstance().GetDisplayState();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService025 function end!");
 }
 

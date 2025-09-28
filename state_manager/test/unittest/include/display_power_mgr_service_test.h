@@ -17,7 +17,9 @@
 #define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "display_power_callback_stub.h"
+#include "screen_action.h"
 
 class DisplayPowerMgrServiceTest : public testing::Test {
 public:
@@ -31,6 +33,15 @@ public:
         virtual ~DisplayPowerMgrTestCallback() {};
         virtual void OnDisplayStateChanged(
             uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
+    };
+    class ScreenActionMock : public OHOS::DisplayPowerMgr::ScreenAction {
+    public:
+        ScreenActionMock(uint32_t displayId) : OHOS::DisplayPowerMgr::ScreenAction(displayId) {}
+        ~ScreenActionMock() = default;
+        MOCK_METHOD0(GetDefaultDisplayId, uint32_t());
+        MOCK_METHOD0(GetDisplayState, OHOS::DisplayPowerMgr::DisplayState());
+        MOCK_METHOD2(SetDisplayState, bool(OHOS::DisplayPowerMgr::DisplayState,
+            const std::function<void(OHOS::DisplayPowerMgr::DisplayState)>&));
     };
 };
 #endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
