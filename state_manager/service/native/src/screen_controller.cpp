@@ -277,6 +277,7 @@ bool ScreenController::IsNeedSkipNextProc(uint32_t reason)
 void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
 {
     auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    int32_t value = -1;
     if (pms == nullptr) {
         DISPLAY_HILOGW(FEAT_STATE, "pms is nullptr");
         return;
@@ -293,10 +294,9 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
     }
     if (state == DisplayState::DISPLAY_ON) {
         bool result = false;
-        pms->SetScreenOnBrightness(result);
+        value = pms->SetScreenOnBrightness(result);
         // Restore the brightness before screen off
-        uint32_t screenOnBrightness = GetScreenOnBrightness();
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "OnStateChanged set screenOnBrightness=%{public}d", screenOnBrightness);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetScreenOnBrightness return value=%{public}d", value);
     }
     if (state == DisplayState::DISPLAY_SUSPEND || state == DisplayState::DISPLAY_DOZE) {
         state = DisplayState::DISPLAY_OFF;
