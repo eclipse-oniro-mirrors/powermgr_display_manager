@@ -19,11 +19,6 @@ group("displaymgr_coverage_test") {
   deps = [ "unittest:unittest" ]
 }
 
-group("displaymgr_native_test") {
-  testonly = true
-  deps = [ "unittest:unittest_display_mgr_service" ]
-}
-
 group("displaymgr_fuzztest") {
   testonly = true
   deps = [ "fuzztest:fuzztest" ]
