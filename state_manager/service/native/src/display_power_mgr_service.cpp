@@ -260,8 +260,7 @@ bool DisplayPowerMgrService::SetDisplayStateInner(uint32_t id, DisplayState stat
             DISPLAY_HILOGI(COMP_SVC, "screen off immediately");
             bool ret = iterator->second->UpdateState(state, reason);
             if (!ret) {
-                DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]undo brightness SetDisplayState");
-                BrightnessManager::Get().SetDisplayState(id, iterator->second->GetState(), reason);
+                UndoSetDisplayState(id, iterator->second->GetState(), reason);
             }
             return ret;
         }
@@ -282,6 +281,15 @@ bool DisplayPowerMgrService::SetDisplayStateInner(uint32_t id, DisplayState stat
         }
     }
     return iterator->second->UpdateState(state, reason);
+}
+
+void DisplayPowerMgrService::UndoSetDisplayState(uint32_t id, DisplayState curState, uint32_t reason)
+{
+    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]undo brightness SetDisplayState:%{public}u", curState);
+    BrightnessManager::Get().SetDisplayState(id, curState, reason);
+    if (curState == DisplayState::DISPLAY_ON) {
+        BrightnessManager::Get().SetScreenOnBrightness();
+    }
 }
 
 DisplayState DisplayPowerMgrService::GetDisplayStateInner(uint32_t id)
