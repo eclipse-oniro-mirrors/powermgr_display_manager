@@ -603,4 +603,20 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest025, TestSize.Level1)
     EXPECT_FALSE(g_service->isDisplayDelayOff_);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest025 function end!");
 }
+
+/**
+ * @tc.name: DisplayServiceTest026
+ * @tc.desc: test DisplayPowerMgrService function UndoSetDisplayStateInner
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest026, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function start!");
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_ON;
+    uint32_t reason = 0;
+    g_service->UndoSetDisplayStateInner(DISPLAY_ID, state, reason);
+    EXPECT_TRUE(g_service != nullptr);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function end!");
+}
 } // namespace
