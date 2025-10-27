@@ -38,10 +38,14 @@ export default function BrightnessTest() {
           hilog.info(domain, tag, '%{public}s', typeof value);
           expect(new Number(value)).assertEqual(new Number(200));
           done();
-        } catch (e : BusinessError) {
-          hilog.error(domain, tag, '%{public}s', JSON.stringify(e));
-          expect(e.code).assertEqual(ERROR_CODE);
-          done();
+        } catch (e) {
+          if (e instanceof BusinessError) {
+            hilog.error(domain, tag, '%{public}s', JSON.stringify(e));
+            expect(e.code).assertEqual(ERROR_CODE);
+            done();
+          } else {
+            throw e;
+          }
         }
       })
     it("BrightnessTest0200", TestType.FUNCTION | Size.MEDIUMTEST | Level.LEVEL1,
@@ -55,10 +59,14 @@ export default function BrightnessTest() {
           hilog.info(domain, tag, '%{public}s', typeof value);
           expect(new Number(value)).assertEqual(new Number(30));
           done();
-        } catch (e : BusinessError) {
-          hilog.error(domain, tag, '%{public}s', JSON.stringify(e));
-          expect(e.code).assertEqual(ERROR_CODE);
-          done();
+        } catch (e) {
+          if (e instanceof BusinessError) {
+            hilog.error(domain, tag, '%{public}s', JSON.stringify(e));
+            expect(e.code).assertEqual(ERROR_CODE);
+            done();
+          } else {
+            throw e;
+          }
         }
       })
   })
