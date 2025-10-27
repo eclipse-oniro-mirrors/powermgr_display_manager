@@ -156,5 +156,13 @@ int32_t MockDisplayPowerMgrProxy::NotifyScreenPowerStatus(uint32_t displayId, ui
     return ERR_FAIL;
 }
 
+int32_t MockDisplayPowerMgrProxy::SetScreenDisplayState(uint64_t screenId, uint32_t status, uint32_t reason)
+{
+    if (status == static_cast<uint32_t>(DisplayState::DISPLAY_ON) ||
+        status == static_cast<uint32_t>(DisplayState::DISPLAY_OFF)) {
+        return ERR_OK;
+    }
+    return ERR_FAIL;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

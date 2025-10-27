@@ -395,6 +395,7 @@ ohos_unittest("unittest_display_service_test") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "googletest:gmock_main",
     "googletest:gtest_main",
     "graphic_2d:librender_service_base",
     "hicollie:libhicollie",

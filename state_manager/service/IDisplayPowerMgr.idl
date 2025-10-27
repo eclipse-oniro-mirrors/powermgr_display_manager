@@ -51,4 +51,5 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [out] int retCode);
     void SetScreenOnBrightness([out] boolean bResult);
     void WaitDimmingDone();
+    void SetScreenDisplayState([in] unsigned long id, [in] unsigned int status, [in] unsigned int reason);
 }

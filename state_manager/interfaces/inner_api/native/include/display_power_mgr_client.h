@@ -32,6 +32,10 @@ class DisplayPowerMgrClient : public DelayedRefSingleton<DisplayPowerMgrClient> 
     DECLARE_DELAYED_REF_SINGLETON(DisplayPowerMgrClient);
 
 public:
+    // SetScreenDisplayState: Set the display status of the spercified screen. The caller must ensure the accurary of
+    // the screenId passed.
+    bool SetScreenDisplayState(uint64_t screenId, DisplayState status, uint32_t reason);
+    // SetDisplayState: For PowerMgrService only, updating screen status.
     bool SetDisplayState(DisplayState state,
         PowerMgr::StateChangeReason reason = PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN,
         uint32_t id = 0);
