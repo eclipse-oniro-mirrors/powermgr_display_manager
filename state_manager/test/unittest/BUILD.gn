@@ -100,6 +100,109 @@ ohos_unittest("unittest_display_mgr_service") {
   ]
 }
 
+##############################unittest##########################################
+ohos_unittest("unittest_display_cilent_mock") {
+  module_out_path = module_output_path
+
+  defines += [ "GTEST" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../cfi_blocklist.txt"
+  }
+
+  sources = [
+    "mock/src/mock_display_power_mgr_proxy.cpp",
+    "mock/src/mock_display_remote_object.cpp",
+    "src/mock_display_client_test.cpp",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
+  ]
+
+  deps = [
+    "${displaymgr_inner_api}:displaymgr",
+    "${displaymgr_root_path}/service:displaymgr_proxy",
+    "${displaymgr_root_path}/service:displaymgr_stub",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_core",
+    "power_manager:power_setting",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
+  ]
+}
+
+##############################unittest##########################################
+ohos_unittest("unittest_display_mgr_xcollie") {
+  module_out_path = module_output_path
+
+  defines += [ "GTEST" ]
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../cfi_blocklist.txt"
+  }
+
+  sources = [
+    "src/display_service_xcollie_test.cpp",
+    "${displaymgr_root_path}/utils/native/src/display_xcollie.cpp",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    ":module_private_config",
+    "${displaymgr_utils_path}:coverage_flags",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
+  ]
+
+  deps = [
+    "${displaymgr_inner_api}:displaymgr",
+    "${displaymgr_root_path}/service:displaymgr_proxy",
+    "${displaymgr_root_path}/service:displaymgr_stub",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "data_share:datashare_consumer",
+    "googletest:gmock_main",
+    "googletest:gtest_main",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "ipc:ipc_core",
+    "power_manager:power_setting",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
+  ]
+}
+
 ############################display_service_death_test#############################
 ohos_unittest("display_service_death_test") {
   module_out_path = module_output_path
@@ -325,6 +428,9 @@ group("unittest") {
     ":display_mock_parcel_test",
     ":display_mock_test",
     ":display_service_death_test",
+    ":unittest_display_cilent_mock",
+    ":unittest_display_mgr_service",
+    ":unittest_display_mgr_xcollie",
     ":unittest_display_service_test",
   ]
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,16 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
-#define DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#ifndef DISPLAYMGR_DISPLAY_CLIENT_MOCK_TEST_H
+#define DISPLAYMGR_DISPLAY_CLIENT_MOCK_TEST_H
 
 #include <gtest/gtest.h>
+#include "display_power_callback_stub.h"
 
-class DisplayPowerMgrServiceTest : public testing::Test {
+class DisplayPowerMgrClientMockTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     void SetUp();
     void TearDown();
+    class DisplayPowerMgrTestCallback : public OHOS::DisplayPowerMgr::DisplayPowerCallbackStub {
+    public:
+        DisplayPowerMgrTestCallback() {};
+        virtual ~DisplayPowerMgrTestCallback() {};
+        virtual void OnDisplayStateChanged(
+            uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
+    };
 };
-#endif // DISPLAYMGR_DISPLAY_MGR_SERVICE_TEST_H
+#endif // DISPLAYMGR_DISPLAY_CLIENT_MOCK_TEST_H

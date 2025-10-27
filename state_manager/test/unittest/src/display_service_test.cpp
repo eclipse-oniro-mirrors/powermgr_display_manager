@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include "display_brightness_callback_stub.h"
 #include "display_power_mgr_service.h"
+#include "screen_manager_lite.h"
 
 using namespace testing::ext;
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
@@ -61,6 +62,7 @@ static constexpr uint32_t BRIGHTNESS_OFF = 0;
 static const uint32_t TEST_DELAY_TIME_UNSET = 0;
 static constexpr uint32_t DEFAULT_WAITING_TIME = 1200000;
 sptr<DisplayPowerMgrService> g_service;
+OHOS::Rosen::ScreenPowerState g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
 } // namespace
 
 void DisplayServiceTest::SetUpTestCase()
@@ -80,6 +82,18 @@ void DisplayServiceTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrTestCallback::OnDisplayStateChangedStub");
 }
+
+namespace OHOS::Rosen {
+bool DisplayManagerLite::SetDisplayState(DisplayState state, DisplayStateCallback callback)
+{
+    return true;
+}
+
+ScreenPowerState ScreenManagerLite::GetScreenPower()
+{
+    return g_powerState;
+}
+} //namespace OHOS::Rosen
 
 namespace {
 /**
@@ -541,5 +555,146 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest025, TestSize.Level1)
     g_service->OverrideDisplayOffDelay(OVERRIDE_DELAY_TIME, ret);
     EXPECT_FALSE(g_service->isDisplayDelayOff_);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest025 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest026
+ * @tc.desc: test set screen state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest026, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    bool result = false;
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF), REASON, result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        REASON, result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_DIM),
+        REASON, result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_SUSPEND), REASON, result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN), REASON, result);
+    EXPECT_TRUE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest027
+ * @tc.desc: test get screen state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest027, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    bool result = false;
+    int32_t displayState = 0;
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF), REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_OFF;
+    g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
+    EXPECT_EQ(displayState, 0);
+
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
+    EXPECT_EQ(displayState, 2);
+
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_DIM),
+        REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_STAND_BY;
+    g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
+    EXPECT_EQ(displayState, 1);
+
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_SUSPEND), REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_SUSPEND;
+    g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
+    EXPECT_EQ(displayState, 3);
+
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN), REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::INVALID_STATE;
+    g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
+    EXPECT_EQ(displayState, 7);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function end!");
+}
+
+
+/**
+ * @tc.name: DisplayServiceTest028
+ * @tc.desc: Test set coordinated and set display state
+ * @tc.type: FUNC
+ * @tc.require: issueI8JBT4
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest028, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function start!");
+    bool result = false;
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
+        REASON, result);
+    int sleepTime = 2;
+    //Callback for waiting window 2s
+    sleep(sleepTime);
+    // Prepare test environment.
+    // If the state of display is DISPLAY_ON, change it to DISPLAY_OFF.
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION), result);
+    EXPECT_TRUE(result);
+    sleep(sleepTime);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION), result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPLICATION), result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT), result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_SUCCESS), result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_ON), result);
+    EXPECT_TRUE(result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF),
+        result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest029
+ * @tc.desc: Test srceen delay off
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest029, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function start!");
+    bool result = false;
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        REASON, result);
+    uint32_t delayTime = 10; //delay time is 10ms
+    int32_t displayState = 0;
+    g_service->OverrideDisplayOffDelay(delayTime, result);
+    g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
+        REASON, result);
+    EXPECT_TRUE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function end!");
 }
 } // namespace
