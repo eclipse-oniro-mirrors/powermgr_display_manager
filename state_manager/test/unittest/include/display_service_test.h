@@ -17,8 +17,10 @@
 #define DISPLAY_SERVICE_TEST_H
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "display_power_mgr_proxy.h"
 #include "display_power_callback_stub.h"
+#include "brightness_service.h"
 
 namespace OHOS {
 namespace PowerMgr {
@@ -33,6 +35,13 @@ public:
         virtual ~DisplayPowerMgrTestCallback() {}
         virtual void OnDisplayStateChanged(
             uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
+    };
+
+    class BrightnessServiceMock : public OHOS::DisplayPowerMgr::BrightnessService {
+    public:
+        BrightnessServiceMock() {}
+        ~BrightnessServiceMock() = default;
+        MOCK_METHOD0(SetScreenOnBrightness, void());
     };
 };
 } // namespace PowerMgr

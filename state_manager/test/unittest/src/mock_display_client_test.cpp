@@ -556,4 +556,24 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient027, TestSize.Level
     EXPECT_EQ(ret, DEFAULT_VALUE);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient027 function end!");
 }
+
+/**
+ * @tc.name: DisplayPowerMgrClient028
+ * @tc.desc: test SetScreenDisplayState() when proxy return fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient028, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient028 function start!");
+    auto& client = DisplayPowerMgrClient::GetInstance();
+    auto proxy = client.proxy_;
+    client.proxy_ = g_mockProxy;
+    auto ret = client.SetScreenDisplayState(0, DisplayState::DISPLAY_OFF, 0);
+    EXPECT_TRUE(ret);
+    ret = client.SetScreenDisplayState(0, DisplayState::DISPLAY_UNKNOWN, 0);
+    EXPECT_FALSE(ret);
+    client.proxy_ = proxy;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient028 function end!");
+}
 } // namespace

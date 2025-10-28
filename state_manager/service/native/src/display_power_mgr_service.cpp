@@ -39,6 +39,7 @@
 namespace OHOS {
 namespace DisplayPowerMgr {
 using namespace OHOS::PowerMgr;
+using namespace Rosen;
 namespace {
 DisplayParamHelper::BootCompletedCallback g_bootCompletedCallback;
 FFRTHandle g_screenOffDelayTaskHandle;
@@ -727,6 +728,34 @@ int DisplayPowerMgrService::NotifyScreenPowerStatusInner(uint32_t displayId, uin
     DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]NotifyScreenPowerStatus displayId=%{public}u, Status=%{public}u", displayId,
         displayPowerStatus);
     return BrightnessManager::Get().NotifyScreenPowerStatus(displayId, displayPowerStatus);
+}
+
+ErrCode DisplayPowerMgrService::SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::SetScreenDisplayState");
+    if (!Permission::IsSystem()) {
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+    Rosen::ScreenPowerState status = Rosen::ScreenPowerState::POWER_ON;
+    if (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON)) {
+        status = Rosen::ScreenPowerState::POWER_ON;
+    } else if (state == static_cast<uint32_t>(DisplayState::DISPLAY_OFF)) {
+        status = Rosen::ScreenPowerState::POWER_OFF;
+    } else {
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    bool ret = Rosen::DisplayManagerLite::GetInstance().SetScreenPowerById(static_cast<Rosen::ScreenId>(screenId),
+        status, static_cast<Rosen::PowerStateChangeReason>(reason));
+    DISPLAY_HILOGI(COMP_SVC,
+        "SetScreenDisplayState, screenId: %{public}u, status: %{public}u, reason: %{public}u, ret: %{public}u",
+        static_cast<uint32_t>(screenId), status, reason, ret);
+    if (ret == false) {
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    if (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON)) {
+        BrightnessManager::Get().SetScreenOnBrightness();
+    }
+    return ERR_OK;
 }
 
 ErrCode DisplayPowerMgrService::SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result)

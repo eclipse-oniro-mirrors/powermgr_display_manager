@@ -27,7 +27,9 @@
 #include "display_brightness_callback_stub.h"
 #include "display_power_mgr_service.h"
 #include "screen_manager_lite.h"
+#include "permission.h"
 
+using namespace testing;
 using namespace testing::ext;
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 using namespace OHOS::HiviewDFX;
@@ -63,18 +65,44 @@ static const uint32_t TEST_DELAY_TIME_UNSET = 0;
 static constexpr uint32_t DEFAULT_WAITING_TIME = 1200000;
 sptr<DisplayPowerMgrService> g_service;
 OHOS::Rosen::ScreenPowerState g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+bool g_isPermissionGranted = true;
+NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_brightnessServiceMock;
 } // namespace
+
+namespace OHOS::PowerMgr {
+bool Permission::IsSystem()
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest IsSystem, g_isPermissionGranted: %{pubilc}d", g_isPermissionGranted);
+    return g_isPermissionGranted;
+}
+} // namespace OHOS::PowerMgr
+
+namespace OHOS::Rosen {
+bool DisplayManagerLite::SetScreenPowerById(
+    Rosen::ScreenId screenId, Rosen::ScreenPowerState status, Rosen::PowerStateChangeReason reason)
+{
+    if (reason == Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_UNKNOWN) {
+        return false;
+    }
+    return true;
+}
+} // namespace OHOS::Rosen
 
 void DisplayServiceTest::SetUpTestCase()
 {
     g_service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     g_service->Init();
+
+    g_brightnessServiceMock = new NiceMock<DisplayServiceTest::BrightnessServiceMock>();
 }
 
 void DisplayServiceTest::TearDownTestCase()
 {
     g_service->Deinit();
     g_service->Reset();
+
+    testing::Mock::AllowLeak(g_brightnessServiceMock);
+    g_brightnessServiceMock = nullptr;
 }
 
 void DisplayServiceTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
@@ -711,6 +739,38 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level0)
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
         REASON, result);
     EXPECT_TRUE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest030
+ * @tc.desc: test set screen diaplay state
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    ASSERT_TRUE(g_brightnessServiceMock != nullptr);
+    EXPECT_CALL(*g_brightnessServiceMock, SetScreenOnBrightness());
+    
+    ErrCode ret = ERR_OK;
+    g_isPermissionGranted = false;
+    ret = g_service->SetScreenDisplayState(0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), 0);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED));
+
+    g_isPermissionGranted = true;
+    ret = g_service->SetScreenDisplayState(0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), 0);
+    EXPECT_EQ(ret, ERR_OK);
+    ret = g_service->SetScreenDisplayState(0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF), 0);
+    EXPECT_EQ(ret, ERR_OK);
+    ret = g_service->SetScreenDisplayState(
+        0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN), 0);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+
+    ret = g_service->SetScreenDisplayState(0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
+        static_cast<uint32_t>(Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_UNKNOWN));
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function end!");
 }
 } // namespace

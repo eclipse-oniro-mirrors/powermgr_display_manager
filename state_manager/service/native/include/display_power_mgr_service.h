@@ -76,6 +76,7 @@ public:
     ErrCode SetScreenOnBrightness(bool& result) override;
     ErrCode NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
     ErrCode WaitDimmingDone() override;
+    ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
