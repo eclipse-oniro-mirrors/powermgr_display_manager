@@ -559,13 +559,29 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest025, TestSize.Level1)
 
 /**
  * @tc.name: DisplayServiceTest026
- * @tc.desc: test set screen state
+ * @tc.desc: test DisplayPowerMgrService function UndoSetDisplayStateInner
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceTest026, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function start!");
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_ON;
+    uint32_t reason = 0;
+    g_service->UndoSetDisplayStateInner(DISPLAY_ID, state, reason);
+    EXPECT_TRUE(g_service != nullptr);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest027
+ * @tc.desc: test set screen state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest027, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function start!");
     EXPECT_TRUE(g_service != nullptr);
     bool result = false;
     g_service->SetDisplayState(DISPLAY_MAIN_ID,
@@ -583,18 +599,18 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest026, TestSize.Level1)
     g_service->SetDisplayState(DISPLAY_MAIN_ID,
         static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN), REASON, result);
     EXPECT_TRUE(result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest026 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function end!");
 }
 
 /**
- * @tc.name: DisplayServiceTest027
+ * @tc.name: DisplayServiceTest028
  * @tc.desc: test get screen state
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest027, TestSize.Level1)
+HWTEST_F(DisplayServiceTest, DisplayServiceTest028, TestSize.Level1)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function start!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function start!");
     EXPECT_TRUE(g_service != nullptr);
     bool result = false;
     int32_t displayState = 0;
@@ -632,19 +648,19 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest027, TestSize.Level1)
     g_powerState = OHOS::Rosen::ScreenPowerState::INVALID_STATE;
     g_service->GetDisplayState(DISPLAY_MAIN_ID, displayState);
     EXPECT_EQ(displayState, 7);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest027 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function end!");
 }
 
 
 /**
- * @tc.name: DisplayServiceTest028
+ * @tc.name: DisplayServiceTest029
  * @tc.desc: Test set coordinated and set display state
  * @tc.type: FUNC
  * @tc.require: issueI8JBT4
  */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest028, TestSize.Level0)
+HWTEST_F(DisplayServiceTest, DisplayServiceTest029, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function start!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function start!");
     bool result = false;
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
         REASON, result);
@@ -675,17 +691,17 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest028, TestSize.Level0)
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
         static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF),
         result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest028 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function end!");
 }
 
 /**
- * @tc.name: DisplayServiceTest029
+ * @tc.name: DisplayServiceTest030
  * @tc.desc: Test srceen delay off
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest029, TestSize.Level0)
+HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level0)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function start!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function start!");
     bool result = false;
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
         REASON, result);
@@ -695,6 +711,6 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest029, TestSize.Level0)
     g_service->SetDisplayState(DISPLAY_MAIN_ID, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF),
         REASON, result);
     EXPECT_TRUE(result);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest029 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function end!");
 }
 } // namespace
