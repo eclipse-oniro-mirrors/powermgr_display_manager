@@ -743,13 +743,13 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level0)
 }
 
 /**
- * @tc.name: DisplayServiceTest030
+ * @tc.name: DisplayServiceTest031
  * @tc.desc: test set screen diaplay state
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level1)
+HWTEST_F(DisplayServiceTest, DisplayServiceTest031, TestSize.Level1)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function start!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest031 function start!");
     EXPECT_TRUE(g_service != nullptr);
     ASSERT_TRUE(g_brightnessServiceMock != nullptr);
     EXPECT_CALL(*g_brightnessServiceMock, SetScreenOnBrightness());
@@ -771,6 +771,6 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest030, TestSize.Level1)
     ret = g_service->SetScreenDisplayState(0, static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON),
         static_cast<uint32_t>(Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_UNKNOWN));
     EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest030 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest031 function end!");
 }
 } // namespace
