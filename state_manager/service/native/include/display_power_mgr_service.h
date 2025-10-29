@@ -77,6 +77,7 @@ public:
     int32_t NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
+    void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
     DisplayState GetDisplayStateInner(uint32_t id);
     std::vector<uint32_t> GetDisplayIdsInner();
     uint32_t GetMainDisplayIdInner();
