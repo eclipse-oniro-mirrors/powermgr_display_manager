@@ -80,6 +80,7 @@
       "test": [
         "//base/powermgr/display_manager/state_manager/test:displaymgr_coverage_test",
         "//base/powermgr/display_manager/state_manager/test:displaymgr_fuzztest",
+        "//base/powermgr/display_manager/state_manager/test:systemtest",
         "//base/powermgr/display_manager/brightness_manager/test:brightness_manager_test",
         "//base/powermgr/display_manager/state_manager/frameworks/ets/taihe:display_manager_taihe_test"
       ]

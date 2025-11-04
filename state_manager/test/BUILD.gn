@@ -23,3 +23,8 @@ group("displaymgr_fuzztest") {
   testonly = true
   deps = [ "fuzztest:fuzztest" ]
 }
+
+group("systemtest") {
+  testonly = true
+  deps = [ "systemtest:systemtest" ]
+}
