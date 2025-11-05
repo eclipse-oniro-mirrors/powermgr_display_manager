@@ -43,7 +43,7 @@ std::shared_ptr<RunningLock> runningLock =
 typedef void (*brightness_callback)(void* data);
 
 static void SyncWorkSendEvent(napi_env env, Brightness *asyncContext,
-    brightness_callback complete, napi_event_priority prio)
+    brightness_callback complete, napi_event_priority prio, const std::string& resName)
 {
     auto task = [asyncContext, complete]() {
         DISPLAY_HILOGD(COMP_FWK, "CompleteCallback In");
@@ -53,13 +53,13 @@ static void SyncWorkSendEvent(napi_env env, Brightness *asyncContext,
         }
         complete(asyncContext);
     };
-    if (napi_send_event(env, task, prio) != napi_status::napi_ok) {
+    if (napi_send_event(env, task, prio, resName.c_str()) != napi_status::napi_ok) {
         DISPLAY_HILOGE(COMP_FWK, "failed to SendEvent!");
         delete asyncContext;
     }
 }
 
-static napi_value SyncWork(napi_env env, const std::string resName, const std::string valName,
+static napi_value SyncWork(napi_env env, const std::string& resName, const std::string& valName,
     napi_callback_info& info, brightness_callback complete)
 {
     napi_value undefined;
@@ -72,7 +72,7 @@ static napi_value SyncWork(napi_env env, const std::string resName, const std::s
     if (!valName.empty()) {
         asyncBrightness->CreateValueRef(options, valName, napi_number);
     }
-    SyncWorkSendEvent(env, asyncBrightness.get(), complete, napi_eprio_low);
+    SyncWorkSendEvent(env, asyncBrightness.get(), complete, napi_eprio_low, resName);
     asyncBrightness.release();
     return nullptr;
 }
@@ -164,7 +164,7 @@ static void SetKeepScreenOnSendEvent(napi_env env, Brightness *asyncContext, nap
         asyncContext->SetKeepScreenOn();
         delete asyncContext;
     };
-    if (napi_send_event(env, task, prio) != napi_status::napi_ok) {
+    if (napi_send_event(env, task, prio, __func__) != napi_status::napi_ok) {
         DISPLAY_HILOGE(COMP_FWK, "failed to SendEvent!");
         delete asyncContext;
     }
