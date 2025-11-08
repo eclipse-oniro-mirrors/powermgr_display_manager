@@ -329,7 +329,7 @@ uint32_t DisplayPowerMgrService::GetMainDisplayIdInner()
 bool DisplayPowerMgrService::SetBrightnessInner(uint32_t value, uint32_t displayId, bool continuous)
 {
     if (!Permission::IsSystem()) {
-        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         return false;
     }
 
@@ -639,9 +639,15 @@ double DisplayPowerMgrService::GetSafeDiscount(double discount, uint32_t brightn
 
 DisplayErrors DisplayPowerMgrService::GetError()
 {
-    DisplayErrors tmpError = lastError_;
-    lastError_ = DisplayErrors::ERR_OK;
+    DisplayErrors tmpError = static_cast<DisplayErrors>(lastError_.load());
+    lastError_ = static_cast<int32_t>(DisplayErrors::ERR_OK);
     return tmpError;
+}
+
+void DisplayPowerMgrService::UnregisterCallbackInner()
+{
+    std::lock_guard lock(mutex_);
+    callback_ = nullptr;
 }
 
 void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
@@ -653,8 +659,7 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
         return;
     }
 
-    std::lock_guard lock(callbackMutex_);
-    pms->callback_ = nullptr;
+    pms->UnregisterCallbackInner();
 }
 
 /**
@@ -668,7 +673,7 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
 bool DisplayPowerMgrService::SetMaxBrightnessInner(double value, uint32_t mode)
 {
     if (!Permission::IsSystem()) {
-        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         DISPLAY_HILOGE(COMP_SVC, "SetMaxBrightness Permission Error!");
         return false;
     }
@@ -699,7 +704,7 @@ bool DisplayPowerMgrService::SetMaxBrightnessInner(double value, uint32_t mode)
 bool DisplayPowerMgrService::SetMaxBrightnessNitInner(uint32_t maxNit, uint32_t mode)
 {
     if (!Permission::IsSystem()) {
-        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         DISPLAY_HILOGE(COMP_SVC, "SetMaxBrightness Permission Error!");
         return false;
     }
@@ -722,7 +727,7 @@ bool DisplayPowerMgrService::SetMaxBrightnessNitInner(uint32_t maxNit, uint32_t 
 int DisplayPowerMgrService::NotifyScreenPowerStatusInner(uint32_t displayId, uint32_t displayPowerStatus)
 {
     if (!Permission::IsSystem()) {
-        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         return -1; // -1 means failed
     }
     DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]NotifyScreenPowerStatus displayId=%{public}u, Status=%{public}u", displayId,
@@ -953,7 +958,7 @@ ErrCode DisplayPowerMgrService::WaitDimmingDone()
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::WaitDimmingDone");
     if (!Permission::IsSystem()) {
-        lastError_ = DisplayErrors::ERR_SYSTEM_API_DENIED;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         return -1; // -1 means failed
     }
     BrightnessManager::Get().WaitDimmingDone();

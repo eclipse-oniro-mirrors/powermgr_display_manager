@@ -141,6 +141,22 @@ HWTEST_F(DisplayServiceTest, DisplayServiceInnerTest001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DisplayServiceInnerTest002
+ * @tc.desc: test DisplayPowerMgrService function
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest002 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    sptr<IDisplayPowerCallback> callbackPtr = new DisplayServiceTest::DisplayPowerMgrTestCallback();
+    g_service->UnregisterCallbackInner();
+    EXPECT_FALSE(callbackPtr == nullptr);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceInnerTest002 function end!");
+}
+
+/**
  * @tc.name: DisplayServiceTest001
  * @tc.desc: test DisplayPowerMgrService function SetDisplayState id != DISPLAY_MAIN_ID
  * @tc.type: FUNC
