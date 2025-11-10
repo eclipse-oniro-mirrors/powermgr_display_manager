@@ -69,6 +69,10 @@ ohos_unittest("brightness_manager_ext_test") {
   include_dirs = [ "./include/" ]
 
   defines += [ "BRIGHTNESS_DT_ENABLE" ]
+
+  if (has_hiviewdfx_hisysevent_part) {
+    external_deps += [ "hisysevent:libhisysevent" ]
+  }
 }
 
 ohos_unittest("brightness_manager_test") {
