@@ -130,7 +130,7 @@ void BrightnessService::Init(uint32_t defaultMax, uint32_t defaultMin)
 void BrightnessService::DeInit()
 {
     bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::init isFoldable=%{public}d", isFoldable);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "BrightnessService::deinit isFoldable=%{public}d", isFoldable);
     if (isFoldable) {
         UnRegisterFoldStatusListener();
     }
@@ -879,7 +879,7 @@ bool BrightnessService::IsBrightnessOverridden()
 
 bool BrightnessService::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDuration)
 {
-    if (!CanBoostBrightness()) {
+    if (!CanBoostBrightness() || queue_ == nullptr) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot boost brightness, ignore the change");
         return false;
     }
@@ -903,7 +903,7 @@ bool BrightnessService::BoostBrightness(uint32_t timeoutMs, uint32_t gradualDura
 bool BrightnessService::CancelBoostBrightness(uint32_t gradualDuration)
 {
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Cancel boost brightness");
-    if (!IsBrightnessBoosted()) {
+    if (!IsBrightnessBoosted() || queue_ == nullptr) {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "Brightness is not boost, no need to restore");
         return false;
     }

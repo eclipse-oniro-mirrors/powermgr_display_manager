@@ -42,6 +42,7 @@ BrightnessDimming::BrightnessDimming(const std::string& name, std::shared_ptr<Br
 
 bool BrightnessDimming::Init()
 {
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "start dimming queue");
     mQueue = std::make_shared<FFRTQueue> ("brightness_animator_queue");
     if (mQueue == nullptr) {
         return false;
@@ -51,7 +52,7 @@ bool BrightnessDimming::Init()
 
 void BrightnessDimming::Reset()
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "start dimming queue");
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "reset dimming queue");
     if (mQueue) {
         mQueue.reset();
         g_animatorTaskHandle = nullptr;
@@ -68,8 +69,8 @@ void BrightnessDimming::StartDimming(uint32_t from, uint32_t to, uint32_t durati
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "animation from=%{public}u, to=%{public}u, duration=%{public}u",
         from, to, duration);
-    if (mCallback == nullptr) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "mCallback is nullptr");
+    if (mCallback == nullptr || mQueue == nullptr) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "mCallback or mQueue is nullptr");
         return;
     }
     mFromBrightness = from;
@@ -142,8 +143,8 @@ void BrightnessDimming::NextStep()
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "is not animating, return");
         return;
     }
-    if (mCallback == nullptr) {
-        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Callback is nullptr");
+    if (mCallback == nullptr || mQueue == nullptr) {
+        DISPLAY_HILOGW(FEAT_BRIGHTNESS, "mCallback or mQueue is nullptr");
         return;
     }
     mCurrentStep++;
