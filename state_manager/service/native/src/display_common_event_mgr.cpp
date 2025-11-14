@@ -42,7 +42,7 @@ DisplayCommonEventManager::DisplayCommonEventManager(const CommonEventSubscribeI
 void DisplayCommonEventManager::OnReceiveEvent(const CommonEventData &data)
 {
     std::string action = data.GetWant().GetAction();
-    if (action == "usual.event.DATA_SHARE_READY") {
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         DISPLAY_HILOGI(COMP_SVC, "on receive data_share ready.");
         if (GetDpmsRemoteObj() && SetKvDataReady()) {
             HandleBootBrightness();

@@ -56,7 +56,7 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
     if (systemAbilityId == COMMON_EVENT_SERVICE_ID) {
         DISPLAY_HILOGI(COMP_SVC, "COMMON_EVENT_SERVICE_ID loaded");
         OHOS::EventFwk::MatchingSkills matchingSkills;
-        matchingSkills.AddEvent("usual.event.DATA_SHARE_READY");
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
         OHOS::EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         if (commonEventManager_ == nullptr) {
             commonEventManager_ = std::make_shared<DisplayCommonEventManager>(subscribeInfo);
