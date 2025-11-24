@@ -81,6 +81,7 @@ private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
     DisplayState GetDisplayStateInner(uint32_t id);
+    void UnregisterCallbackInner();
     std::vector<uint32_t> GetDisplayIdsInner();
     uint32_t GetMainDisplayIdInner();
     bool SetBrightnessInner(uint32_t value, uint32_t displayId, bool continuous = false);
@@ -157,7 +158,7 @@ private:
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
 
-    DisplayErrors lastError_ {DisplayErrors::ERR_OK};
+    std::atomic_int32_t lastError_ {static_cast<int32_t>(DisplayErrors::ERR_OK)};
     std::mutex mutex_;
     static std::atomic_bool isBootCompleted_;
     uint32_t displayOffDelayMs_ {0};
