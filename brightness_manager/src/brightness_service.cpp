@@ -226,13 +226,13 @@ uint32_t BrightnessService::GetCurrentDisplayId(uint32_t defaultId)
     uint32_t currentId = defaultId;
     bool isFoldable = Rosen::DisplayManagerLite::GetInstance().IsFoldable();
     if (!isFoldable) {
-        DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId not fold phone return default id=%{public}d", defaultId);
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "GetCurrentDisplayId not fold phone return default id=%{public}d", defaultId);
         return currentId;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     auto foldMode = Rosen::DisplayManagerLite::GetInstance().GetFoldDisplayMode();
     currentId = static_cast<uint32_t>(GetDisplayIdWithDisplayMode(foldMode));
-    DISPLAY_HILOGI(FEAT_STATE, "GetCurrentDisplayId foldMode=%{public}u", foldMode);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "GetCurrentDisplayId foldMode=%{public}u", foldMode);
     IPCSkeleton::SetCallingIdentity(identity);
     return static_cast<uint32_t>(currentId);
 }

@@ -28,7 +28,8 @@
 namespace OHOS {
 namespace PowerMgr {
 using DisplayPowerMgr::LABEL_TEST;
-using DisplayPowerMgr::DISPLAY_LABEL;
+using DisplayPowerMgr::DISPLAY_LABEL_TAG;
+using DisplayPowerMgr::DISPLAY_LABEL_DOMAIN;
 
 inline void PrintTimestamp(void)
 {

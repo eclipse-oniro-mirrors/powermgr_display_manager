@@ -43,7 +43,7 @@ DisplayState BrightnessAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
     Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(mDisplayId);
-    DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
             state = DisplayState::DISPLAY_ON;
@@ -60,7 +60,7 @@ DisplayState BrightnessAction::GetDisplayState()
         default:
             break;
     }
-    DISPLAY_HILOGI(FEAT_STATE, "state=%{public}u displayId=%{public}u", static_cast<uint32_t>(state), mDisplayId);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "state=%{public}u displayId=%{public}u", static_cast<uint32_t>(state), mDisplayId);
     return state;
 }
 

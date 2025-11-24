@@ -54,12 +54,9 @@ constexpr unsigned int TEST_DOMAIN_ID = 0xD000F00;
 
 enum DisplayManagerLogLabel {
     // Component labels, you can add if needed
-    COMP_APP = 0,
-    COMP_FWK = 1,
-    COMP_SVC = 2,
-    COMP_HDI = 3,
-    COMP_DRV = 4,
-    COMP_UTS = 5,
+    COMP_FWK = 0,
+    COMP_SVC = 1,
+    COMP_UTS = 2,
     FEAT_BRIGHTNESS,
     FEAT_STATE,
     // Test label
@@ -69,48 +66,59 @@ enum DisplayManagerLogLabel {
 };
 
 enum DisplayManagerLogDomain {
-    DOMAIN_APP = DISPLAY_DOMAIN_ID_START + COMP_APP, // 0xD002980
-    DOMAIN_FRAMEWORK, // 0xD002981
-    DOMAIN_SERVICE, // 0xD002982
-    DOMAIN_HDI, // 0xD002983
-    DOMAIN_DRIVER, // 0xD002984
-    DOMAIN_UTILS, // 0xD002985
-    DOMAIN_FEAT_BRIGHTNESS,
-    DOMAIN_FEAT_STATE,
+    DOMAIN_SERVICE = DISPLAY_DOMAIN_ID_START + COMP_SVC, // 0xD002981
+    DOMAIN_FEAT_BRIGHTNESS, // 0xD002982
     DOMAIN_TEST = TEST_DOMAIN_ID, // 0xD000F00
     DOMAIN_END = DISPLAY_DOMAIN_ID_END, // Max to 0xD00299F, keep the sequence and length same as DisplayManagerLogLabel
 };
 
-struct DisplayManagerLogLabelDomain {
-    uint32_t domainId;
+struct DisplayManagerLogLabelTag {
+    uint32_t logLabel;
     const char* tag;
 };
 
-// Keep the sequence and length same as DisplayManagerLogDomain
-static const DisplayManagerLogLabelDomain DISPLAY_LABEL[LABEL_END] = {
-    {DOMAIN_APP,               "DisplayPowerApp"},
-    {DOMAIN_FRAMEWORK,         "DisplayPowerFwk"},
-    {DOMAIN_SERVICE,           "DisplayPowerSvc"},
-    {DOMAIN_HDI,               "DisplayPowerHdi"},
-    {DOMAIN_DRIVER,            "DisplayPowerDrv"},
-    {DOMAIN_UTILS,             "DisplayPowerUts"},
-    {DOMAIN_FEAT_BRIGHTNESS,   "DisplayPowerBrightness"},
-    {DOMAIN_FEAT_STATE,        "DisplayPowerState"},
-    {DOMAIN_TEST,              "DisplayPowerTest"},
+// Keep the sequence same as DisplayManagerLogDomain
+static constexpr DisplayManagerLogLabelTag DISPLAY_LABEL_TAG[LABEL_END] = {
+    {COMP_FWK,          "DisplayFwk"},
+    {COMP_SVC,          "DisplaySvc"},
+    {COMP_UTS,          "DisplayUts"},
+    {FEAT_BRIGHTNESS,   "DisplayBrightness"},
+    {FEAT_STATE,        "DisplayState"},
+    {LABEL_TEST,        "DisplayTest"},
+};
+
+struct DisplayManagerLogLabelDomain {
+    uint32_t logLabel;
+    uint32_t domainId;
+};
+
+// Keep the sequence same as DisplayManagerLogDomain
+static constexpr DisplayManagerLogLabelDomain DISPLAY_LABEL_DOMAIN[LABEL_END] = {
+    {COMP_FWK,          DOMAIN_SERVICE},
+    {COMP_SVC,          DOMAIN_SERVICE},
+    {COMP_UTS,          DOMAIN_SERVICE},
+    {FEAT_BRIGHTNESS,   DOMAIN_FEAT_BRIGHTNESS},
+    {FEAT_STATE,        DOMAIN_SERVICE},
+    {LABEL_TEST,        DOMAIN_TEST},
 };
 
 // In order to improve performance, do not check the module range.
 // Besides, make sure module is less than LABEL_END.
 #define DISPLAY_HILOGF(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_FATAL, DISPLAY_LABEL_DOMAIN[domain].domainId, DISPLAY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 #define DISPLAY_HILOGE(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_ERROR, DISPLAY_LABEL_DOMAIN[domain].domainId, DISPLAY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 #define DISPLAY_HILOGW(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_WARN, DISPLAY_LABEL_DOMAIN[domain].domainId, DISPLAY_LABEL_TAG[domain].tag,    \
+    ##__VA_ARGS__))
 #define DISPLAY_HILOGI(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_INFO, DISPLAY_LABEL_DOMAIN[domain].domainId, DISPLAY_LABEL_TAG[domain].tag,    \
+    ##__VA_ARGS__))
 #define DISPLAY_HILOGD(domain, ...) \
-    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, DISPLAY_LABEL[domain].domainId, DISPLAY_LABEL[domain].tag, ##__VA_ARGS__))
+    ((void)HILOG_IMPL(LOG_CORE, LOG_DEBUG, DISPLAY_LABEL_DOMAIN[domain].domainId, DISPLAY_LABEL_TAG[domain].tag,   \
+    ##__VA_ARGS__))
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 
