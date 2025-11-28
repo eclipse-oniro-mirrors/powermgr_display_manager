@@ -207,6 +207,40 @@ void BrightnessManager::WaitDimmingDone() const
 #endif
 }
 
+std::string BrightnessManager::RunJsonCommand(const std::string& request)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.RunJsonCommand(request);
+#else
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "not support RunJsonCommand: %{public}s", request.c_str());
+    return R"({"ret": -1, "error": "not support RunJsonCommand"})";
+#endif
+}
+
+int32_t BrightnessManager::RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.RegisterDataChangeListener(listener, listenerType, callerId, params);
+#else
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "RegisterDataChangeListener: %{public}u, %{public}s",
+        listenerType, callerId.c_str());
+    return 0;
+#endif
+}
+
+int32_t BrightnessManager::UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.UnregisterDataChangeListener(listenerType, callerId);
+#else
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "UnregisterDataChangeListener: %{public}u, %{public}s",
+        listenerType, callerId.c_str());
+    return 0;
+#endif
+}
+
 uint32_t BrightnessManager::SetLightBrightnessThreshold(
     std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {

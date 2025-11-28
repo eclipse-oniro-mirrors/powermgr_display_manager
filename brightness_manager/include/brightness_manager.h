@@ -52,6 +52,11 @@ public:
     uint32_t GetDeviceBrightness();
     void WaitDimmingDone() const;
     void ClearOffset();
+    std::string RunJsonCommand(const std::string& request);
+    int32_t RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+        DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params);
+    int32_t UnregisterDataChangeListener(
+        DisplayDataChangeListenerType listenerType, const std::string& callerId);
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);

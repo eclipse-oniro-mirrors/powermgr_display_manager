@@ -22,6 +22,7 @@
 #include "refbase.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
+
 #include "display_log.h"
 #include "display_common.h"
 #include "display_power_info.h"
@@ -402,6 +403,44 @@ bool DisplayPowerMgrClient::SetCoordinated(bool coordinated, uint32_t displayId)
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SetCoordinated, ret = %{public}d", ret);
         return false;
+    }
+    return result;
+}
+
+std::string DisplayPowerMgrClient::RunJsonCommand(const std::string& request)
+{
+    auto proxy = GetProxy();
+    std::string result = R"({"ret": -1, "error": "ipc connect fail"})";
+    RETURN_IF_WITH_RET(proxy == nullptr, result);
+    auto ret = proxy->RunJsonCommand(request, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "RunJsonCommand, ret = %{public}d", ret);
+    }
+    return result;
+}
+
+int32_t DisplayPowerMgrClient::RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, -1); // -1 means failed
+    int32_t result = DEFAULT_VALUE;
+    auto ret = proxy->RegisterDataChangeListener(listener, listenerType, callerId, params, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "RegisterDataChangeListener, ret = %{public}d", ret);
+    }
+    return result;
+}
+
+int32_t DisplayPowerMgrClient::UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, -1); // -1 means failed
+    int32_t result = DEFAULT_VALUE;
+    auto ret = proxy->UnregisterDataChangeListener(listenerType, callerId, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "UnregisterDataChangeListener, ret = %{public}d", ret);
     }
     return result;
 }

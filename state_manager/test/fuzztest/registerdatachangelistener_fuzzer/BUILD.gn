@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,9 +17,10 @@ import("../../../../displaymgr.gni")
 module_output_path = "display_manager/display_state_manager"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DisplayStateFuzzTest") {
+ohos_fuzztest("RegisterDataChangeListenerFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${displaymgr_root_path}/test/fuzztest/displaystate_fuzzer"
+  fuzz_config_file =
+      "${displaymgr_root_path}/test/fuzztest/registerdatachangelistener_fuzzer"
 
   include_dirs = [
     "./",
@@ -60,7 +61,7 @@ ohos_fuzztest("DisplayStateFuzzTest") {
     "${displaymgr_root_path}/service/native/src/screen_controller.cpp",
     "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
     "../display_utils/display_fuzzer.cpp",
-    "./displaystate_fuzzer_test.cpp",
+    "./registerdatachangelistener_fuzzer_test.cpp",
   ]
 
   external_deps = [ "power_manager:power_permission" ]

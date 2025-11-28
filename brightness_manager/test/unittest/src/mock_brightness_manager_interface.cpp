@@ -36,6 +36,9 @@ void MockClearValues(void)
 
 static double MockReturnValue(void)
 {
+    if (g_values.empty()) {
+        return 0;
+    }
     auto v = g_values.front();
     g_values.pop_front();
     return v;
@@ -159,6 +162,23 @@ void SetDisplayId(uint32_t id)
 {
 }
 
+std::string RunJsonCommand(const std::string& request)
+{
+    return R"({"ret": -1, "error": "mock interface"})";
+}
+
+int32_t RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params)
+{
+    return MockReturnValue();
+}
+
+int32_t UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId)
+{
+    return MockReturnValue();
+}
+
 uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback)
 {
     return MockReturnValue();
@@ -233,6 +253,9 @@ void MockDeInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt&
     ext.mSetLightBrightnessThresholdFunc = nullptr;
     ext.mSetMaxBrightnessFunc = nullptr;
     ext.mSetMaxBrightnessNitFunc = nullptr;
+    ext.mRunJsonCommandFunc = nullptr;
+    ext.mRegisterDataChangeListenerFunc = nullptr;
+    ext.mUnregisterDataChangeListenerFunc = nullptr;
 }
 }
 }

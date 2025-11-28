@@ -21,6 +21,7 @@
 #include <securec.h>
 #include <system_ability_definition.h>
 #include "errors.h"
+#include "ipc_skeleton.h"
 #include "new"
 #include "screen_action.h"
 #ifdef ENABLE_SENSOR_PART
@@ -442,12 +443,12 @@ bool DisplayPowerMgrService::AdjustBrightnessInner(uint32_t id, int32_t value, u
     return iterator->second->SetBrightness(value, duration);
 }
 
-bool DisplayPowerMgrService::IsSupportLightSensor(void)
+bool DisplayPowerMgrService::IsSupportLightSensor()
 {
     return BrightnessManager::Get().IsSupportLightSensor();
 }
 
-bool DisplayPowerMgrService::IsAutoAdjustBrightnessInner(void)
+bool DisplayPowerMgrService::IsAutoAdjustBrightnessInner()
 {
     return BrightnessManager::Get().IsAutoAdjustBrightness();
 }
@@ -962,6 +963,64 @@ ErrCode DisplayPowerMgrService::WaitDimmingDone()
         return -1; // -1 means failed
     }
     BrightnessManager::Get().WaitDimmingDone();
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::RunJsonCommand(const std::string& request, std::string& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::RunJsonCommand");
+    if (!Permission::IsSystem()) {
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return -1; // -1 means failed
+    }
+    if (request.length() > MAX_PARAMS_LENGTH) {
+        DISPLAY_HILOGE(COMP_SVC, "RunJsonCommand, params too long: %{public}zu", request.length());
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return -1;
+    }
+    result = BrightnessManager::Get().RunJsonCommand(request);
+    return ERR_OK;
+}
+
+std::string DisplayPowerMgrService::GetCallerIdWithPid(const std::string& callerId)
+{
+    return std::to_string(IPCSkeleton::GetCallingPid()) + "_" + callerId;
+}
+
+ErrCode DisplayPowerMgrService::RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params,
+    int32_t& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterDataChangeListener");
+    if (!Permission::IsSystem()) {
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return -1; // -1 means failed
+    }
+    if (callerId.length() > MAX_PARAMS_LENGTH || params.length() > MAX_PARAMS_LENGTH) {
+        DISPLAY_HILOGE(COMP_SVC, "RegisterDataChangeListener, params too long: %{public}zu, %{public}zu",
+            callerId.length(), params.length());
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return -1;
+    }
+    auto id = GetCallerIdWithPid(callerId);
+    result = BrightnessManager::Get().RegisterDataChangeListener(listener, listenerType, id, params);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, int32_t& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::UnregisterDataChangeListener");
+    if (!Permission::IsSystem()) {
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return -1; // -1 means failed
+    }
+    if (callerId.length() > MAX_PARAMS_LENGTH) {
+        DISPLAY_HILOGE(COMP_SVC, "UnregisterDataChangeListener, params too long: %{public}zu", callerId.length());
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return -1;
+    }
+    result = BrightnessManager::Get().UnregisterDataChangeListener(listenerType, GetCallerIdWithPid(callerId));
     return ERR_OK;
 }
 } // namespace DisplayPowerMgr

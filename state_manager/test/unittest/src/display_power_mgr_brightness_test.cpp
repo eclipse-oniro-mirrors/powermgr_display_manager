@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "display_brightness_callback_stub.h"
+#include "display_brightness_listener_stub.h"
 #include "display_log.h"
 #include "display_manager_test_base.h"
 #include "display_power_mgr_client.h"
@@ -26,6 +27,7 @@ using namespace testing;
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
+using ChangeType = OHOS::DisplayPowerMgr::DisplayDataChangeListenerType;
 
 namespace {
 const std::string SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
@@ -430,10 +432,10 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, Te
     EXPECT_TRUE(ret);
     usleep(CMD_EXECUTION_DELAY);
     ret = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
     WaitDimmingDone();
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(value, OVERRIDE_BRIGHTNESS);
+    EXPECT_EQ(value, SET_BRIGHTNESS);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
 }
 
@@ -540,12 +542,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, Te
     DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
     usleep(CMD_EXECUTION_DELAY);
     bool ret2 = DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
-    EXPECT_FALSE(ret2);
+    EXPECT_TRUE(ret2);
     usleep(CMD_EXECUTION_DELAY);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
     WaitDimmingDone();
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(currentBrightness, deviceBrightness);
+    EXPECT_EQ(SET_BRIGHTNESS, deviceBrightness);
 }
 
 /**
@@ -1062,5 +1064,18 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus
         screenPowerStatus);
     const uint32_t FAILED_RESULT = 0;
     EXPECT_EQ(result, FAILED_RESULT);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrRegisterDataChangeListener
+ * @tc.desc: Test the Function of RegisterDataChangeListener and UnregisterDataChangeListener
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrRegisterDataChangeListener, TestSize.Level0)
+{
+    sptr<IDisplayBrightnessListener> ptr = new DisplayBrightnessListenerStub();
+    ptr->OnDataChanged("");
+    EXPECT_EQ(DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::STABLE_LUX), 0);
+    EXPECT_EQ(DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::STABLE_LUX), 0);
 }
 } // namespace

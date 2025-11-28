@@ -37,5 +37,7 @@ group("fuzztest") {
     "setlightbrightnessthreshold_fuzzer:SetLightBrightnessThresholdFuzzTest",
     "setmaxbrightness_fuzzer:SetMaxBrightnessFuzzTest",
     "setscreenonbrightness_fuzzer:SetScreenOnBrightnessFuzzTest",
+    "runjsoncommand_fuzzer:RunJsonCommandFuzzTest",
+    "registerdatachangelistener_fuzzer:RegisterDataChangeListenerFuzzTest",
   ]
 }

@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+import DisplayPowerMgrIdlTypes;
 interface OHOS.DisplayPowerMgr.IDisplayBrightnessCallback;
+interface OHOS.DisplayPowerMgr.IDisplayBrightnessListener;
 interface OHOS.DisplayPowerMgr.IDisplayPowerCallback;
 
 interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
@@ -43,6 +45,12 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void SetCoordinated([in] boolean coordinated, [in] unsigned int displayId, [out] boolean bResult);
     [ipccode 21] void SetLightBrightnessThreshold([in] int[] threshold,
         [in] IDisplayBrightnessCallback displayBrightnessCallback, [out] unsigned int retCode);
+    void RunJsonCommand([in] String request, [out] String strResult);
+    void RegisterDataChangeListener([in] IDisplayBrightnessListener listener,
+        [in] DisplayDataChangeListenerType listenerType, [in] String callerId,
+        [in] String params, [out] int retCode);
+    void UnregisterDataChangeListener(
+        [in] DisplayDataChangeListenerType listenerType, [in] String callerId, [out] int retCode);
     void SetMaxBrightness([in] double value, [in] unsigned int enterTestMode, [out] boolean bResult,
         [out] int retCode);
     void SetMaxBrightnessNit([in] unsigned int maxNit, [in] unsigned int enterTestMode, [out] boolean bResult,
