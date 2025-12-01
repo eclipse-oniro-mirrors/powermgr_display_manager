@@ -242,6 +242,12 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     } else {
         ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+    if (!ret) {
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "ABNORMAL_FAULT",
+            HiviewDFX::HiSysEvent::EventType::FAULT, "TYPE", "SCREEN_ON_OFF", "REASON", "SetDisplayPower failed");
+    }
+#endif
     DISPLAY_HILOGI(FEAT_STATE,
         "[UL_POWER] SetDisplayPower state=%{public}u, reason=%{public}u, ret=%{public}d, coordinated=%{public}d",
         static_cast<uint32_t>(state), reason, ret, coordinated_);

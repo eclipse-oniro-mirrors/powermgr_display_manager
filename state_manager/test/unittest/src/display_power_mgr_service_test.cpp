@@ -24,11 +24,14 @@
 
 #include "display_power_mgr_client.h"
 #include "display_log.h"
+#include "screen_manager_lite.h"
+#include "screen_action.h"
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 namespace {
+bool g_powerState = false;
 }
 
 void DisplayPowerMgrServiceTest::SetUp()
@@ -38,6 +41,19 @@ void DisplayPowerMgrServiceTest::SetUp()
 void DisplayPowerMgrServiceTest::TearDown()
 {
 }
+
+namespace OHOS::Rosen {
+bool ScreenManagerLite::SetScreenPowerForAll(ScreenPowerState state, PowerStateChangeReason reason)
+{
+    return g_powerState;
+}
+
+bool ScreenManagerLite::SetSpecifiedScreenPower(ScreenId screenId,
+    ScreenPowerState state, PowerStateChangeReason reason)
+{
+    return g_powerState;
+}
+} // namespace OHOS::Rosen
 
 namespace {
 /**
@@ -145,5 +161,25 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService007, TestSize.Level0)
     bool ret = DisplayPowerMgrClient::GetInstance().OverrideDisplayOffDelay(delayTime);
     EXPECT_FALSE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService007 function end!");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrService008
+ * @tc.desc: Test set screen power fail
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 function start!");
+    uint32_t displayId = 0;
+    uint32_t reason = 0;
+    std::shared_ptr<ScreenAction> action = std::make_shared<ScreenAction>(displayId);
+    bool ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
+    EXPECT_EQ(ret, false);
+    g_powerState = true;
+    ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
+    EXPECT_EQ(ret, true);
+    g_powerState = false;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 function end!");
 }
 } // namespace

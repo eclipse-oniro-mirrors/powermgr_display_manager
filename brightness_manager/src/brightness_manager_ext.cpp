@@ -15,6 +15,9 @@
 
 #include <dlfcn.h>
 #include "brightness_manager_ext.h"
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+#include <hisysevent.h>
+#endif
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -51,6 +54,11 @@ bool BrightnessManagerExt::LoadBrightnessExtLibrary()
     mBrightnessManagerExtHandle = dlopen("libbrightness_wrapper.z.so", RTLD_NOW);
 #endif
     if (!mBrightnessManagerExtHandle) {
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "ABNORMAL_FAULT",
+            HiviewDFX::HiSysEvent::EventType::FAULT, "TYPE", "SCREEN_ON_OFF", "REASON",
+            "dlopen brightness.so failed");
+#endif // HAS_HIVIEWDFX_HISYSEVENT_PART
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlopen libbrightness_wrapper.z.so failed!");
         return false;
     }
