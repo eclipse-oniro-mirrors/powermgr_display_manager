@@ -23,6 +23,7 @@
 #include "display_log.h"
 #include "power_state_machine_info.h"
 #include "screen_manager_lite.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -137,8 +138,9 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     int32_t beginTimeMs = GetTickCount();
 #endif
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u", displayId_,
-        static_cast<uint32_t>(state));
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u, ffrtId=%{public}u",
+        displayId_, static_cast<uint32_t>(state), ffrtId);
     Rosen::DisplayState rds = ParseDisplayState(state);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::DisplayManagerLite::GetInstance().SetDisplayState(rds,
@@ -173,8 +175,10 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::DISPLAY, "SCREEN_STATE",
         HiviewDFX::HiSysEvent::EventType::STATISTIC, "STATE", static_cast<int32_t>(state));
 #endif
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d",
-        displayId_, static_cast<uint32_t>(state), ret);
+    ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d, ffrtId=%{public}u",
+        displayId_, static_cast<uint32_t>(state), ret, ffrtId);
     return ret;
 }
 
@@ -208,8 +212,10 @@ Rosen::PowerStateChangeReason ScreenAction::ParseSpecialReason(uint32_t reason)
 
 bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
-                   displayId_, static_cast<uint32_t>(state), reason);
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
+        displayId_, static_cast<uint32_t>(state), reason, ffrtId);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -242,15 +248,16 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     } else {
         ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
+    ffrtId = ffrt::this_task::get_id();
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     if (!ret) {
         HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "ABNORMAL_FAULT",
             HiviewDFX::HiSysEvent::EventType::FAULT, "TYPE", "SCREEN_ON_OFF", "REASON", "SetDisplayPower failed");
     }
 #endif
-    DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER] SetDisplayPower state=%{public}u, reason=%{public}u, ret=%{public}d, coordinated=%{public}d",
-        static_cast<uint32_t>(state), reason, ret, coordinated_);
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayPower state=%{public}u, reason=%{public}u, "
+        "ret=%{public}d, coordinated=%{public}d, ffrtId=%{public}u",
+        static_cast<uint32_t>(state), reason, ret, coordinated_, ffrtId);
     return (state == DisplayState::DISPLAY_DIM || state == DisplayState::DISPLAY_SUSPEND) ? true : ret;
 }
 
