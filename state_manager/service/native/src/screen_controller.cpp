@@ -97,8 +97,10 @@ DisplayState ScreenController::SetOnState()
 
 bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u",
-                   static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason);
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER] UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
+        static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason, ffrtId);
     if (reason != static_cast<uint32_t>
         (PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF)) {
         RETURN_IF_WITH_RET(state == state_, true);
@@ -123,7 +125,9 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
                     bind(&ScreenController::OnStateChanged, this, placeholders::_1, reason);
                 bool ret = action_->SetDisplayState(state, callback);
                 if (!ret) {
-                    DISPLAY_HILOGW(FEAT_STATE, "Update display state failed, state=%{public}d", state);
+                    ffrtId = ffrt::this_task::get_id();
+                    DISPLAY_HILOGW(FEAT_STATE, "Update display state failed, state=%{public}d, ffrtId=%{public}u",
+                        state, ffrtId);
                     return ret;
                 }
             }
@@ -144,8 +148,8 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     lock_guard lock(mutexState_);
     state_ = state;
     stateChangeReason_ = reason;
-
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] Update screen state to %{public}u", state);
+    ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] Update screen state to %{public}u, ffrtId=%{public}u", state, ffrtId);
     return true;
 }
 
@@ -281,8 +285,9 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
         DISPLAY_HILOGW(FEAT_STATE, "pms is nullptr");
         return;
     }
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged state=%{public}d, reason=%{public}u",
-        static_cast<int>(state), reason);
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER] OnStateChanged state=%{public}d, reason=%{public}u, ffrtId=%{public}u",
+        static_cast<int>(state), reason, ffrtId);
     bool ret = action_->SetDisplayPower(state, reason);
     if (reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT)) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "No need to set brightness, reason=%{public}d", reason);

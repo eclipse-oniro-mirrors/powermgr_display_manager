@@ -241,7 +241,9 @@ bool DisplayPowerMgrService::SetDisplayStateInner(uint32_t id, DisplayState stat
     if (!Permission::IsSystem()) {
         return false;
     }
-    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER] SetDisplayState %{public}d, %{public}d, %{public}u", id, state, reason);
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER] SetDisplayState %{public}d, %{public}d, %{public}u, ffrtId=%{public}u",
+        id, state, reason, ffrtId);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
         if (id != DEFALUT_DISPLAY_ID) {
