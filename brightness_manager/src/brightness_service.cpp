@@ -780,13 +780,13 @@ uint32_t BrightnessService::GetBrightness()
     return GetSettingBrightness();
 }
 
-uint32_t BrightnessService::GetDeviceBrightness()
+uint32_t BrightnessService::GetDeviceBrightness(bool useHbm)
 {
     uint32_t brightness = DEFAULT_BRIGHTNESS;
     if (mAction != nullptr) {
         brightness = mAction->GetBrightness();
     }
-    return GetOrigBrightnessLevel(brightness);
+    return useHbm ? brightness : GetOrigBrightnessLevel(brightness);
 }
 
 void BrightnessService::WaitDimmingDone() const

@@ -69,7 +69,7 @@ public:
     ErrCode RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result) override;
     ErrCode BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result) override;
     ErrCode CancelBoostBrightness(uint32_t displayId, bool& result) override;
-    ErrCode GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
+    ErrCode GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness) override;
     ErrCode SetCoordinated(bool coordinated, uint32_t displayId, bool& result) override;
     ErrCode SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
         const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result) override;
@@ -102,7 +102,7 @@ private:
     bool RegisterCallbackInner(sptr<IDisplayPowerCallback> callback);
     bool BoostBrightnessInner(int32_t timeoutMs, uint32_t displayId);
     bool CancelBoostBrightnessInner(uint32_t displayId);
-    uint32_t GetDeviceBrightnessInner(uint32_t displayId);
+    uint32_t GetDeviceBrightnessInner(uint32_t displayId, bool useHbm);
     bool SetCoordinatedInner(bool coordinated, uint32_t displayId);
     uint32_t SetLightBrightnessThresholdInner(
         std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);

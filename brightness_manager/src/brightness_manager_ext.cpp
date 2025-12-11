@@ -403,13 +403,13 @@ uint32_t BrightnessManagerExt::GetBrightness()
     return getBrightnessFunc();
 }
 
-uint32_t BrightnessManagerExt::GetDeviceBrightness()
+uint32_t BrightnessManagerExt::GetDeviceBrightness(bool useHbm)
 {
     if (!mBrightnessManagerExtEnable) {
         return 0;
     }
-    auto getDeviceBrightnessFunc = reinterpret_cast<uint32_t (*)()>(mGetDeviceBrightnessFunc);
-    return getDeviceBrightnessFunc();
+    auto getDeviceBrightnessFunc = reinterpret_cast<uint32_t (*)(bool)>(mGetDeviceBrightnessFunc);
+    return getDeviceBrightnessFunc(useHbm);
 }
 
 void BrightnessManagerExt::WaitDimmingDone() const

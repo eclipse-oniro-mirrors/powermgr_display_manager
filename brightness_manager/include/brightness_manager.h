@@ -49,7 +49,7 @@ public:
     bool IsBrightnessOverridden() const;
     bool IsBrightnessBoosted() const;
     uint32_t GetBrightness();
-    uint32_t GetDeviceBrightness();
+    uint32_t GetDeviceBrightness(bool useHbm = false);
     void WaitDimmingDone() const;
     void ClearOffset();
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);

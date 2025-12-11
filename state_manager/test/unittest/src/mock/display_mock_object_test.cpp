@@ -102,7 +102,7 @@ HWTEST_F(DisplayMockObjectTest, DisplayMockObjectTest_002, TestSize.Level0)
     EXPECT_FALSE(bRet);
     EXPECT_NE(sptrDisplayProxy->GetBrightness(DISPLAY_ID, brightness), ERR_OK);
     EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
-    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, false, brightness), ERR_OK);
     EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
     EXPECT_NE(sptrDisplayProxy->GetDefaultBrightness(brightness), ERR_OK);
     EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);

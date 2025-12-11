@@ -319,7 +319,7 @@ HWTEST_F(DisplayPowerServiceBrightnessTest, DisplayPowerServiceBrightnessTest013
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerServiceBrightnessTest013 function start!");
     EXPECT_TRUE(g_service != nullptr);
     uint32_t brightness = 0;
-    g_service->GetDeviceBrightness(DISPLAY_MAIN_ID, brightness);
+    g_service->GetDeviceBrightness(DISPLAY_MAIN_ID, false, brightness);
     EXPECT_NE(brightness, BRIGHTNESS_NONE_VALUE);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerServiceBrightnessTest013 function end!");
 }
