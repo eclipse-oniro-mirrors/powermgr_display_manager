@@ -36,6 +36,7 @@
 #include "dm_common.h"
 #include "iremote_object.h"
 #include "idisplay_brightness_callback.h"
+#include "idisplay_brightness_listener.h"
 #include "light_lux_manager.h"
 #include "refbase.h"
 #include "brightness_ffrt.h"

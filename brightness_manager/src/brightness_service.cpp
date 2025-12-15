@@ -715,7 +715,7 @@ bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, 
     if (!CanSetBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot set brightness, ignore the change");
         mCachedSettingBrightness = value;
-        return false;
+        return IsBrightnessOverridden();
     }
     if (gradualDuration == 0) {
         bool isSettingOn = IsAutoAdjustBrightness();

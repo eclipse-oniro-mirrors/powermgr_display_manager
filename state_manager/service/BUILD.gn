@@ -46,6 +46,7 @@ ohos_shared_library("displaymgrservice") {
     "native/src/screen_action.cpp",
     "native/src/screen_controller.cpp",
     "zidl/src/display_brightness_callback_proxy.cpp",
+    "zidl/src/display_brightness_listener_proxy.cpp",
     "zidl/src/display_power_callback_proxy.cpp",
   ]
 
@@ -108,6 +109,9 @@ ohos_shared_library("displaymgrservice") {
 idl_gen_interface("displaymgr_interface") {
   sources = [
     "IDisplayPowerMgr.idl"
+  ]
+  sources_common = [
+    "DisplayPowerMgrIdlTypes.idl"
   ]
   configs = [
     "${displaymgr_utils_path}:utils_config",

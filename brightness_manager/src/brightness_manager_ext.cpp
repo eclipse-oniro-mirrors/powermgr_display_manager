@@ -126,6 +126,21 @@ bool BrightnessManagerExt::LoadBrightnessOpsEx1()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym WaitDimmingDone func failed!");
         return false;
     }
+    mRunJsonCommandFunc = dlsym(mBrightnessManagerExtHandle, "RunJsonCommand");
+    if (!mRunJsonCommandFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym RunJsonCommand func failed!");
+        return false;
+    }
+    mRegisterDataChangeListenerFunc = dlsym(mBrightnessManagerExtHandle, "RegisterDataChangeListener");
+    if (!mRegisterDataChangeListenerFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym RegisterDataChangeListener func failed!");
+        return false;
+    }
+    mUnregisterDataChangeListenerFunc = dlsym(mBrightnessManagerExtHandle, "UnregisterDataChangeListener");
+    if (!mUnregisterDataChangeListenerFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym UnregisterDataChangeListener func failed!");
+        return false;
+    }
     return true;
 }
 
@@ -264,6 +279,9 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mSetMaxBrightnessFunc = nullptr;
     mSetMaxBrightnessNitFunc = nullptr;
     mNotifyScreenPowerStatusFunc = nullptr;
+    mRunJsonCommandFunc = nullptr;
+    mRegisterDataChangeListenerFunc = nullptr;
+    mUnregisterDataChangeListenerFunc = nullptr;
 }
 
 void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
@@ -463,6 +481,40 @@ void BrightnessManagerExt::SetDisplayId(uint32_t id)
     }
     auto setDisplayIdFunc = reinterpret_cast<void (*)(uint32_t)>(mSetDisplayIdFunc);
     setDisplayIdFunc(id);
+}
+
+std::string BrightnessManagerExt::RunJsonCommand(const std::string& request)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return R"({"ret": -1, "error": "BrightnessManagerExt init fail"})";
+    }
+    std::string result = "";
+    reinterpret_cast<void (*)(const std::string&, std::string&)>(mRunJsonCommandFunc)(request, result);
+    return result;
+}
+
+int32_t BrightnessManagerExt::RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params)
+{
+    if (!mBrightnessManagerExtEnable) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "RegisterDataChangeListener not available");
+        return -1;
+    }
+    auto func = reinterpret_cast<int32_t (*)(const sptr<IDisplayBrightnessListener>&, DisplayDataChangeListenerType,
+        const std::string&, const std::string&)>(mRegisterDataChangeListenerFunc);
+    return func(listener, listenerType, callerId, params);
+}
+
+int32_t BrightnessManagerExt::UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId)
+{
+    if (!mBrightnessManagerExtEnable) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "UnregisterDataChangeListener not available");
+        return -1;
+    }
+    auto func = reinterpret_cast<int32_t (*)(DisplayDataChangeListenerType, const std::string&)>(
+        mUnregisterDataChangeListenerFunc);
+    return func(listenerType, callerId);
 }
 
 uint32_t BrightnessManagerExt::SetLightBrightnessThreshold(

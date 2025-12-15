@@ -35,6 +35,7 @@ ohos_shared_library("displaymgr") {
     "${displaymgr_framework_path}/native/display_power_mgr_client.cpp",
     "${displaymgr_service_zidl}/src/display_brightness_callback_stub.cpp",
     "${displaymgr_service_zidl}/src/display_power_callback_stub.cpp",
+    "${displaymgr_service_zidl}/src/display_brightness_listener_stub.cpp",
   ]
 
   configs = [

@@ -54,6 +54,11 @@ public:
     void ClearOffset();
     uint32_t GetCurrentDisplayId(uint32_t defaultId) const;
     void SetDisplayId(uint32_t id = 0);
+    std::string RunJsonCommand(const std::string& request);
+    int32_t RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+        DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params);
+    int32_t UnregisterDataChangeListener(
+        DisplayDataChangeListenerType listenerType, const std::string& callerId);
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     bool SetMaxBrightness(double value);
     bool SetMaxBrightnessNit(uint32_t maxNit);
@@ -102,6 +107,9 @@ public:
     void* mSetMaxBrightnessFunc = nullptr;
     void* mSetMaxBrightnessNitFunc = nullptr;
     void* mNotifyScreenPowerStatusFunc = nullptr;
+    void* mRunJsonCommandFunc = nullptr;
+    void* mRegisterDataChangeListenerFunc = nullptr;
+    void* mUnregisterDataChangeListenerFunc = nullptr;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

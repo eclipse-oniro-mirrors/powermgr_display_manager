@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "display_log.h"
+#include "display_brightness_listener_stub.h"
 #include "mock_brightness_manager_interface.h"
 
 using namespace testing;
@@ -22,6 +23,7 @@ using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::DisplayPowerMgr;
 using namespace std;
+using ChangeType = OHOS::DisplayPowerMgr::DisplayDataChangeListenerType;
 
 namespace {
     const double NO_DISCOUNT = 1.00;
@@ -227,6 +229,10 @@ HWTEST_F(BrightnessManagerExtTest, Init, TestSize.Level1)
     double discount = g_BrightnessManagerExt.GetDiscount();
     EXPECT_EQ(1.0, discount);
     g_BrightnessManagerExt.WaitDimmingDone();
+    EXPECT_GT(g_BrightnessManagerExt.RunJsonCommand("").length(), 0);
+    sptr<IDisplayBrightnessListener> listener = new DisplayBrightnessListenerStub();
+    EXPECT_EQ(g_BrightnessManagerExt.RegisterDataChangeListener(listener, ChangeType::STABLE_LUX, "", ""), 0);
+    EXPECT_EQ(g_BrightnessManagerExt.UnregisterDataChangeListener(ChangeType::STABLE_LUX, ""), 0);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerExtInit001 function end!");
 }
 

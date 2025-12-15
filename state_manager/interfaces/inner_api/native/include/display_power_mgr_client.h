@@ -63,6 +63,13 @@ public:
     uint32_t GetDeviceBrightness(uint32_t displayId = 0);
     void WaitDimmingDone();
     bool SetCoordinated(bool coordinated, uint32_t displayId = 0);
+    std::string RunJsonCommand(const std::string& request);
+    // Registers a brightness data change listener. Returns 0 on success.
+    // Both callerId (for server-side deduplication) and params (a JSON string) are optional.
+    int32_t RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+        DisplayDataChangeListenerType listenerType, const std::string& callerId = "", const std::string& params = "");
+    int32_t UnregisterDataChangeListener(
+        DisplayDataChangeListenerType listenerType, const std::string& callerId = "");
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     DisplayErrors GetError();
     int NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status);
@@ -85,6 +92,7 @@ private:
 
     sptr<IDisplayPowerMgr> GetProxy();
     void OnRemoteDied(const wptr<IRemoteObject>& remote);
+
     static constexpr int32_t INVALID_DISPLAY_ID {-1};
     static constexpr int32_t DEFAULT_MAIN_DISPLAY_ID {0};
     static constexpr uint32_t BRIGHTNESS_OFF {0};

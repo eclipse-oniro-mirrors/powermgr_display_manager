@@ -423,6 +423,7 @@ ohos_unittest("unittest_display_service_test") {
     "${displaymgr_root_path}/service/native/src/screen_action.cpp",
     "${displaymgr_root_path}/service/native/src/screen_controller.cpp",
     "${displaymgr_root_path}/service/zidl/src/display_brightness_callback_proxy.cpp",
+    "${displaymgr_root_path}/service/zidl/src/display_brightness_listener_proxy.cpp",
     "${displaymgr_root_path}/service/zidl/src/display_power_callback_proxy.cpp",
   ]
 

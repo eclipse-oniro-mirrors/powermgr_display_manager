@@ -71,6 +71,12 @@ public:
     ErrCode CancelBoostBrightness(uint32_t displayId, bool& result) override;
     ErrCode GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
     ErrCode SetCoordinated(bool coordinated, uint32_t displayId, bool& result) override;
+    ErrCode RunJsonCommand(const std::string& request, std::string& result) override;
+    ErrCode RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+        DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params,
+        int32_t& result) override;
+    ErrCode UnregisterDataChangeListener(DisplayDataChangeListenerType listenerType, const std::string& callerId,
+        int32_t& result) override;
     ErrCode SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
         const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result) override;
     ErrCode SetScreenOnBrightness(bool& result) override;
@@ -129,6 +135,7 @@ private:
         std::mutex callbackMutex_;
     };
 
+    static const size_t MAX_PARAMS_LENGTH = 4096;
     static const uint32_t BRIGHTNESS_OFF = 0;
     static const uint32_t BRIGHTNESS_MIN;
     static const uint32_t BRIGHTNESS_DEFAULT;
@@ -151,7 +158,8 @@ private:
     static void AutoBrightnessSettingUpdateFunc(const std::string& key);
     static bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
     void ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason);
-    bool IsSupportLightSensor(void);
+    bool IsSupportLightSensor();
+    std::string GetCallerIdWithPid(const std::string& callerId);
 
     static constexpr const char* SETTING_AUTO_ADJUST_BRIGHTNESS_KEY {"settings.display.auto_screen_brightness"};
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
