@@ -24,7 +24,6 @@ namespace DisplayPowerMgr {
 void MockSetValue(double value);
 void MockClearValues(void);
 void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& ext);
-void MockDeInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& ext);
 
 } // namespace DisplayPowerMgr
 } // namespace OHOS

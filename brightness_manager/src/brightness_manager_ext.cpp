@@ -252,6 +252,7 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
 #endif
         mBrightnessManagerExtHandle = nullptr;
     }
+    mBrightnessManagerExtEnable = false;
     mBrightnessManagerInitFunc = nullptr;
     mBrightnessManagerDeInitFunc = nullptr;
     mSetDisplayStateFunc = nullptr;

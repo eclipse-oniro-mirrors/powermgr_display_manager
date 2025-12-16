@@ -18,8 +18,7 @@
 #include <cstdint>
 #include <list>
 #include <vector>
-namespace OHOS {
-namespace DisplayPowerMgr {
+namespace OHOS::DisplayPowerMgr {
 static std::list<double> g_values{};
 
 // 打桩接口
@@ -162,9 +161,9 @@ void SetDisplayId(uint32_t id)
 {
 }
 
-std::string RunJsonCommand(const std::string& request)
+void RunJsonCommand(const std::string& reques, std::string& result)
 {
-    return R"({"ret": -1, "error": "mock interface"})";
+    result = R"({"ret": -1, "error": "mock interface"})";
 }
 
 int32_t RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
@@ -196,6 +195,7 @@ bool SetMaxBrightnessNit(uint32_t maxNit)
 
 void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& ext)
 {
+    ext.CloseBrightnessExtLibrary();
     ext.mBrightnessManagerExtEnable = true;
     ext.mBrightnessManagerInitFunc = reinterpret_cast<void*>(Init);
     ext.mBrightnessManagerDeInitFunc = reinterpret_cast<void*>(DeInit);
@@ -224,38 +224,9 @@ void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& e
     ext.mSetLightBrightnessThresholdFunc = reinterpret_cast<void*>(SetLightBrightnessThreshold);
     ext.mSetMaxBrightnessFunc = reinterpret_cast<void*>(SetMaxBrightness);
     ext.mSetMaxBrightnessNitFunc = reinterpret_cast<void*>(SetMaxBrightnessNit);
+    ext.mRunJsonCommandFunc = reinterpret_cast<void*>(RunJsonCommand);
+    ext.mRegisterDataChangeListenerFunc = reinterpret_cast<void*>(RegisterDataChangeListener);
+    ext.mUnregisterDataChangeListenerFunc = reinterpret_cast<void*>(UnregisterDataChangeListener);
 }
 
-void MockDeInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& ext)
-{
-    ext.mBrightnessManagerExtEnable = false;
-    ext.mBrightnessManagerInitFunc = nullptr;
-    ext.mBrightnessManagerDeInitFunc = nullptr;
-    ext.mSetDisplayStateFunc = nullptr;
-    ext.mGetDisplayStateFunc = nullptr;
-    ext.mAutoAdjustBrightnessFunc = nullptr;
-    ext.mSetBrightnessFunc = nullptr;
-    ext.mDiscountBrightnessFunc = nullptr;
-    ext.mGetDiscountFunc = nullptr;
-    ext.mSetScreenOnBrightnessFunc = nullptr;
-    ext.mGetScreenOnBrightnessFunc = nullptr;
-    ext.mOverrideBrightnessFunc = nullptr;
-    ext.mRestoreBrightnessFunc = nullptr;
-    ext.mBoostBrightnessFunc = nullptr;
-    ext.mCancelBoostBrightnessFunc = nullptr;
-    ext.mIsBrightnessOverriddenFunc = nullptr;
-    ext.mIsBrightnessBoostedFunc = nullptr;
-    ext.mGetBrightnessFunc = nullptr;
-    ext.mGetDeviceBrightnessFunc = nullptr;
-    ext.mClearOffsetFunc = nullptr;
-    ext.mGetCurrentDisplayIdFunc = nullptr;
-    ext.mSetDisplayIdFunc = nullptr;
-    ext.mSetLightBrightnessThresholdFunc = nullptr;
-    ext.mSetMaxBrightnessFunc = nullptr;
-    ext.mSetMaxBrightnessNitFunc = nullptr;
-    ext.mRunJsonCommandFunc = nullptr;
-    ext.mRegisterDataChangeListenerFunc = nullptr;
-    ext.mUnregisterDataChangeListenerFunc = nullptr;
-}
-}
-}
+} // namespace OHOS::DisplayPowerMgr
