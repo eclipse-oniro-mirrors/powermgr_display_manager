@@ -371,12 +371,12 @@ bool DisplayPowerMgrClient::CancelBoostBrightness(uint32_t displayId)
     return result;
 }
 
-uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId)
+uint32_t DisplayPowerMgrClient::GetDeviceBrightness(uint32_t displayId, bool useHbm)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, 0);
     uint32_t brightness = BRIGHTNESS_OFF;
-    auto ret = proxy->GetDeviceBrightness(displayId, brightness);
+    auto ret = proxy->GetDeviceBrightness(displayId, useHbm, brightness);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "GetDeviceBrightness, ret = %{public}d", ret);
         return BRIGHTNESS_OFF;

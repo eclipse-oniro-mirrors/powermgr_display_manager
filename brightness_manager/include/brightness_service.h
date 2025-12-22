@@ -117,7 +117,7 @@ public:
     void RegisterSettingBrightnessObserver();
     void UnregisterSettingBrightnessObserver();
     uint32_t GetBrightness();
-    uint32_t GetDeviceBrightness();
+    uint32_t GetDeviceBrightness(bool useHbm);
     uint32_t GetCachedSettingBrightness();
     uint32_t GetScreenOnBrightness(bool isUpdateTarget);
     uint32_t GetBrightnessLevel(float lux);

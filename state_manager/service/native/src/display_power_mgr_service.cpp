@@ -515,14 +515,14 @@ bool DisplayPowerMgrService::CancelBoostBrightnessInner(uint32_t displayId)
     return iter->second->CancelBoostBrightness();
 }
 
-uint32_t DisplayPowerMgrService::GetDeviceBrightnessInner(uint32_t displayId)
+uint32_t DisplayPowerMgrService::GetDeviceBrightnessInner(uint32_t displayId, bool useHbm)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "GetDeviceBrightness displayId=%{public}u", displayId);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "GetDeviceBrightness displayId=%{public}u useHbm=%{public}d", displayId, useHbm);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return BRIGHTNESS_OFF;
     }
-    return BrightnessManager::Get().GetDeviceBrightness();
+    return BrightnessManager::Get().GetDeviceBrightness(useHbm);
 }
 
 bool DisplayPowerMgrService::SetCoordinatedInner(bool coordinated, uint32_t displayId)
@@ -903,10 +903,10 @@ ErrCode DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId, bool& 
     return ERR_OK;
 }
 
-ErrCode DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness)
+ErrCode DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDeviceBrightness");
-    deviceBrightness = GetDeviceBrightnessInner(displayId);
+    deviceBrightness = GetDeviceBrightnessInner(displayId, useHbm);
     return ERR_OK;
 }
 

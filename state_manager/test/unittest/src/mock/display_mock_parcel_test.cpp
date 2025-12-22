@@ -148,7 +148,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_001, TestSize.Level0)
     EXPECT_FALSE(client.IsAutoAdjustBrightness());
     EXPECT_FALSE(client.BoostBrightness(TIMEOUT_MS, DISPLAY_ID));
     EXPECT_FALSE(client.CancelBoostBrightness(DISPLAY_ID));
-    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, client.GetDeviceBrightness(DISPLAY_ID));
+    EXPECT_EQ(BRIGHTNESS_NONE_VALUE, client.GetDeviceBrightness(DISPLAY_ID, false));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayMockParcelTest_001 function end!");
 }
 
@@ -166,7 +166,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_002, TestSize.Level0)
 
     DisplayMockParcelTest::DisplayProxyTestFunc(sptrDisplayProxy);
     uint32_t brightness = BRIGHTNESS_NONE_VALUE;
-    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, false, brightness), ERR_OK);
     EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
 
     bool result = false;
@@ -208,7 +208,7 @@ HWTEST_F(DisplayMockParcelTest, DisplayMockParcelTest_004, TestSize.Level0)
 
     DisplayMockParcelTest::DisplayProxyTestFunc(sptrDisplayProxy);
     uint32_t brightness = 0;
-    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, brightness), ERR_OK);
+    EXPECT_NE(sptrDisplayProxy->GetDeviceBrightness(DISPLAY_ID, false, brightness), ERR_OK);
     EXPECT_EQ(BRIGHTNESS_NONE_VALUE, brightness);
 
     bool result = false;

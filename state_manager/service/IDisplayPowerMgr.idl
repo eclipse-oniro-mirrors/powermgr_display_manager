@@ -41,7 +41,7 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void RegisterCallback([in] IDisplayPowerCallback displayPowercallback, [out] boolean bResult);
     void BoostBrightness([in] int timeoutMs, [in] unsigned int displayId, [out] boolean bResult);
     void CancelBoostBrightness([in] unsigned int displayId, [out] boolean bResult);
-    void GetDeviceBrightness([in] unsigned int displayId, [out] unsigned int deviceBrightness);
+    void GetDeviceBrightness([in] unsigned int displayId, [in] boolean useHbm, [out] unsigned int deviceBrightness);
     void SetCoordinated([in] boolean coordinated, [in] unsigned int displayId, [out] boolean bResult);
     [ipccode 21] void SetLightBrightnessThreshold([in] int[] threshold,
         [in] IDisplayBrightnessCallback displayBrightnessCallback, [out] unsigned int retCode);

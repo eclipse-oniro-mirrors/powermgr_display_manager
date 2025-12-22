@@ -123,7 +123,7 @@ int32_t MockDisplayPowerMgrProxy::CancelBoostBrightness(uint32_t displayId, bool
     return ERR_FAIL;
 }
 
-int32_t MockDisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness)
+int32_t MockDisplayPowerMgrProxy::GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness)
 {
     return ERR_FAIL;
 }

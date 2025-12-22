@@ -47,7 +47,7 @@ public:
     int32_t IsAutoAdjustBrightness(bool& bResult) override;
     int32_t BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& bResult) override;
     int32_t CancelBoostBrightness(uint32_t displayId, bool& bResult) override;
-    int32_t GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
+    int32_t GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness) override;
     int32_t SetCoordinated(bool coordinated, uint32_t displayId, bool& bResult) override;
     ErrCode WaitDimmingDone() override;
     ErrCode RunJsonCommand(const std::string& request, std::string& result) override;

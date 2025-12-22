@@ -49,7 +49,7 @@ public:
     bool IsBrightnessOverridden() const;
     bool IsBrightnessBoosted() const;
     uint32_t GetBrightness();
-    uint32_t GetDeviceBrightness();
+    uint32_t GetDeviceBrightness(bool useHbm = false);
     void WaitDimmingDone() const;
     void ClearOffset();
     std::string RunJsonCommand(const std::string& request);

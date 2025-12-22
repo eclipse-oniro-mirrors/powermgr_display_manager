@@ -60,7 +60,7 @@ public:
     bool RegisterCallback(sptr<IDisplayPowerCallback> callback);
     bool BoostBrightness(int32_t timeoutMs, uint32_t displayId = 0);
     bool CancelBoostBrightness(uint32_t displayId = 0);
-    uint32_t GetDeviceBrightness(uint32_t displayId = 0);
+    uint32_t GetDeviceBrightness(uint32_t displayId = 0, bool useHbm = false);
     void WaitDimmingDone();
     bool SetCoordinated(bool coordinated, uint32_t displayId = 0);
     std::string RunJsonCommand(const std::string& request);

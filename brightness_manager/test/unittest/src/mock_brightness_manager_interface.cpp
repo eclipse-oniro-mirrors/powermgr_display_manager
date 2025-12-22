@@ -139,7 +139,7 @@ uint32_t GetBrightness()
     return MockReturnValue();
 }
 
-uint32_t GetDeviceBrightness()
+uint32_t GetDeviceBrightness(bool useHbm)
 {
     return MockReturnValue();
 }

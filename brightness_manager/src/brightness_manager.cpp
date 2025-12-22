@@ -189,12 +189,12 @@ uint32_t BrightnessManager::GetBrightness()
 #endif
 }
 
-uint32_t BrightnessManager::GetDeviceBrightness()
+uint32_t BrightnessManager::GetDeviceBrightness(bool useHbm)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
-    return mBrightnessManagerExt.GetDeviceBrightness();
+    return mBrightnessManagerExt.GetDeviceBrightness(useHbm);
 #else
-    return BrightnessService::Get().GetDeviceBrightness();
+    return BrightnessService::Get().GetDeviceBrightness(useHbm);
 #endif
 }
 
