@@ -133,6 +133,29 @@ int32_t MockDisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t disp
     return ERR_FAIL;
 }
 
+ErrCode MockDisplayPowerMgrProxy::WaitDimmingDone()
+{
+    return ERR_FAIL;
+}
+
+ErrCode MockDisplayPowerMgrProxy::RunJsonCommand(const std::string& request, std::string& result)
+{
+    return ERR_FAIL;
+}
+
+ErrCode MockDisplayPowerMgrProxy::RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params,
+    int32_t& result)
+{
+    return ERR_FAIL;
+}
+
+ErrCode MockDisplayPowerMgrProxy::UnregisterDataChangeListener(
+    DisplayDataChangeListenerType listenerType, const std::string& callerId, int32_t& result)
+{
+    return ERR_FAIL;
+}
+
 int32_t MockDisplayPowerMgrProxy::SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
     const sptr<IDisplayBrightnessCallback>& displayBrightnessCallback, uint32_t& retCode)
 {

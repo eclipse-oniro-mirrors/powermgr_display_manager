@@ -17,6 +17,7 @@
 #define DISPLAYMGR_DISPLAY_CLIENT_MOCK_TEST_H
 
 #include <gtest/gtest.h>
+#include "display_power_mgr_client.h"
 #include "display_power_callback_stub.h"
 
 class DisplayPowerMgrClientMockTest : public testing::Test {
@@ -32,5 +33,8 @@ public:
         virtual void OnDisplayStateChanged(
             uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
     };
+
+    OHOS::DisplayPowerMgr::DisplayPowerMgrClient& mClient = OHOS::DisplayPowerMgr::DisplayPowerMgrClient::GetInstance();
+    OHOS::sptr<OHOS::DisplayPowerMgr::IDisplayPowerMgr> mProxyBack{nullptr};
 };
 #endif // DISPLAYMGR_DISPLAY_CLIENT_MOCK_TEST_H

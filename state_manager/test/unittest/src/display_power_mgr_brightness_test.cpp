@@ -426,6 +426,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness002, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, TestSize.Level0)
 {
+    sptr<IDisplayBrightnessListener> ptr = new DisplayBrightnessListenerStub();
+    DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::FORCE_EXIT_OVERRIDDEN_MODE);
     const uint32_t SET_BRIGHTNESS = 105;
     const uint32_t OVERRIDE_BRIGHTNESS = 255;
     bool ret = DisplayPowerMgrClient::GetInstance().OverrideBrightness(OVERRIDE_BRIGHTNESS);
@@ -437,6 +439,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness003, Te
     uint32_t value = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(value, SET_BRIGHTNESS);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
+    DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::FORCE_EXIT_OVERRIDDEN_MODE);
 }
 
 /**
@@ -533,6 +536,8 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, TestSize.Level0)
 {
+    sptr<IDisplayBrightnessListener> ptr = new DisplayBrightnessListenerStub();
+    DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::FORCE_EXIT_OVERRIDDEN_MODE);
     const uint32_t OVERRIDE_BRIGHTNESS = 156;
     const uint32_t SET_BRIGHTNESS = 66;
     auto currentBrightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
@@ -548,6 +553,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness009, Te
     WaitDimmingDone();
     uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, deviceBrightness);
+    DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::FORCE_EXIT_OVERRIDDEN_MODE);
 }
 
 /**
@@ -1073,9 +1079,19 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, NotifyBrightnessManagerScreenPowerStatus
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrRegisterDataChangeListener, TestSize.Level0)
 {
+    std::string cmd = R"({"domain":"brightness_wrapper","handler":"QueryInfo","params":{"argc":0}})";
+    EXPECT_GT(DisplayPowerMgrClient::GetInstance().RunJsonCommand(cmd).length(), 0);
+
+    std::string longStr(10000, 'a'); // more than 4096
+    EXPECT_GT(DisplayPowerMgrClient::GetInstance().RunJsonCommand("").length(), 0);
+    EXPECT_GT(DisplayPowerMgrClient::GetInstance().RunJsonCommand(longStr).length(), 0);
+
     sptr<IDisplayBrightnessListener> ptr = new DisplayBrightnessListenerStub();
     ptr->OnDataChanged("");
     EXPECT_EQ(DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::STABLE_LUX), 0);
     EXPECT_EQ(DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::STABLE_LUX), 0);
+
+    EXPECT_NE(DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::STABLE_LUX, longStr), 0);
+    EXPECT_NE(DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::STABLE_LUX, longStr), 0);
 }
 } // namespace

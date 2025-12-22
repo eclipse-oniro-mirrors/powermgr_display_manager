@@ -711,11 +711,14 @@ uint32_t BrightnessService::GetBrightnessHighLevel(uint32_t level)
 
 bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
 {
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}d, duration=%{public}d", value, gradualDuration);
-    if (!CanSetBrightness()) {
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "SetBrightness val=%{public}u, duration=%{public}u", value, gradualDuration);
+    if (IsBrightnessOverridden()) {
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "ForceExitOverriddenMode brightness=%{public}u", value);
+        mIsBrightnessOverridden = false;
+    } else if (!CanSetBrightness()) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Cannot set brightness, ignore the change");
         mCachedSettingBrightness = value;
-        return IsBrightnessOverridden();
+        return false;
     }
     if (gradualDuration == 0) {
         bool isSettingOn = IsAutoAdjustBrightness();

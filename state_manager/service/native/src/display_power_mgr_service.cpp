@@ -962,7 +962,7 @@ ErrCode DisplayPowerMgrService::WaitDimmingDone()
     DisplayXCollie displayXCollie("DisplayPowerMgrService::WaitDimmingDone");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
-        return -1; // -1 means failed
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
     BrightnessManager::Get().WaitDimmingDone();
     return ERR_OK;
@@ -973,12 +973,12 @@ ErrCode DisplayPowerMgrService::RunJsonCommand(const std::string& request, std::
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RunJsonCommand");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
-        return -1; // -1 means failed
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
     if (request.length() > MAX_PARAMS_LENGTH) {
         DISPLAY_HILOGE(COMP_SVC, "RunJsonCommand, params too long: %{public}zu", request.length());
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
-        return -1;
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
     result = BrightnessManager::Get().RunJsonCommand(request);
     return ERR_OK;
@@ -996,13 +996,13 @@ ErrCode DisplayPowerMgrService::RegisterDataChangeListener(const sptr<IDisplayBr
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterDataChangeListener");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
-        return -1; // -1 means failed
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
     if (callerId.length() > MAX_PARAMS_LENGTH || params.length() > MAX_PARAMS_LENGTH) {
         DISPLAY_HILOGE(COMP_SVC, "RegisterDataChangeListener, params too long: %{public}zu, %{public}zu",
             callerId.length(), params.length());
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
-        return -1;
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
     auto id = GetCallerIdWithPid(callerId);
     result = BrightnessManager::Get().RegisterDataChangeListener(listener, listenerType, id, params);
@@ -1015,12 +1015,12 @@ ErrCode DisplayPowerMgrService::UnregisterDataChangeListener(
     DisplayXCollie displayXCollie("DisplayPowerMgrService::UnregisterDataChangeListener");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
-        return -1; // -1 means failed
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
     if (callerId.length() > MAX_PARAMS_LENGTH) {
         DISPLAY_HILOGE(COMP_SVC, "UnregisterDataChangeListener, params too long: %{public}zu", callerId.length());
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
-        return -1;
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
     result = BrightnessManager::Get().UnregisterDataChangeListener(listenerType, GetCallerIdWithPid(callerId));
     return ERR_OK;

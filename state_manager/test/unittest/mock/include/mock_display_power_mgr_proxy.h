@@ -49,6 +49,13 @@ public:
     int32_t CancelBoostBrightness(uint32_t displayId, bool& bResult) override;
     int32_t GetDeviceBrightness(uint32_t displayId, uint32_t& deviceBrightness) override;
     int32_t SetCoordinated(bool coordinated, uint32_t displayId, bool& bResult) override;
+    ErrCode WaitDimmingDone() override;
+    ErrCode RunJsonCommand(const std::string& request, std::string& result) override;
+    ErrCode RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,
+        DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params,
+        int32_t& result) override;
+    ErrCode UnregisterDataChangeListener(DisplayDataChangeListenerType listenerType, const std::string& callerId,
+        int32_t& result) override;
     int32_t SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
         const sptr<IDisplayBrightnessCallback>& displayBrightnessCallback, uint32_t& retCode) override;
     int32_t RegisterCallback(const sptr<IDisplayPowerCallback>& displayPowercallback, bool& bResult) override;

@@ -55,9 +55,7 @@ int32_t DisplayBrightnessListenerStub::OnRemoteRequest(
     } else {
         ret = IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    if (id > INVALID_ID) {
-        HiviewDFX::XCollie::GetInstance().CancelTimer(id);
-    }
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id); // cancel to prevent freeze, even when id <= INVALID_ID
     return ret;
 }
 
