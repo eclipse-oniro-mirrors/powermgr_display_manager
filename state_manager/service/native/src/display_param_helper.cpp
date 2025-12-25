@@ -16,6 +16,7 @@
 #include "display_param_helper.h"
 
 #include "sysparam.h"
+#include "display_log.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -23,18 +24,21 @@ using namespace OHOS::PowerMgr;
 uint32_t DisplayParamHelper::GetDefaultBrightness()
 {
     int32_t value = SysParam::GetIntValue(KEY_DEFAULT_BRIGHTNESS, BRIGHTNESS_DEFAULT);
+    DISPLAY_HILOGD(FEAT_STATE, "GetDefaultBrightness value=%{public}d", value);
     return static_cast<uint32_t>(value);
 }
 
 uint32_t DisplayParamHelper::GetMaxBrightness()
 {
     int32_t value = SysParam::GetIntValue(KEY_MAX_BRIGHTNESS, BRIGHTNESS_MAX);
+    DISPLAY_HILOGD(FEAT_STATE, "GetMaxBrightness value=%{public}d", value);
     return static_cast<uint32_t>(value);
 }
 
 uint32_t DisplayParamHelper::GetMinBrightness()
 {
     int32_t value = SysParam::GetIntValue(KEY_MIN_BRIGHTNESS, BRIGHTNESS_MIN);
+    DISPLAY_HILOGD(FEAT_STATE, "GetMinBrightness value=%{public}d", value);
     return static_cast<uint32_t>(value);
 }
 
