@@ -74,12 +74,16 @@ void DisplayFuzzerTest::TestDisplayServiceStub(const uint32_t code, const uint8_
         sptr<IDisplayBrightnessListener> obj = new DisplayBrightnessListenerStub();
         datas.WriteRemoteObject(obj->AsObject());
     }
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(REWIND_READ_DATA);
     if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_LIGHT_BRIGHTNESS_THRESHOLD)) {
+        constexpr int32_t thresholdSize = 1;
+        constexpr int32_t value = 2;
+        datas.WriteInt32(thresholdSize);
+        datas.WriteInt32(value);
         sptr<IDisplayBrightnessCallback> obj = new DisplayBrightnessCallbackStub();
         datas.WriteRemoteObject(obj->AsObject());
     }
+    datas.WriteBuffer(data, size);
+    datas.RewindRead(REWIND_READ_DATA);
     MessageParcel reply;
     MessageOption option;
     service_->OnRemoteRequest(code, datas, reply, option);
