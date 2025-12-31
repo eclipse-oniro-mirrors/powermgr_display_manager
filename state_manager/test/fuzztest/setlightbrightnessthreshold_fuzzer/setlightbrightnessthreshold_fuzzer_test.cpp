@@ -31,8 +31,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     DisplayFuzzerTest g_serviceTest;
     g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_MAX_BRIGHTNESS), data, size);
-    g_serviceTest.TestDisplayServiceStub(
-        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_MAX_BRIGHTNESS_NIT), data, size);
+        static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_SET_LIGHT_BRIGHTNESS_THRESHOLD), data, size);
     return 0;
 }
