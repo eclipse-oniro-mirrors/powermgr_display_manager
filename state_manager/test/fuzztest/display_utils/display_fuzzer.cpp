@@ -59,6 +59,7 @@ void DisplayPowerMgrTestCallback::OnDisplayStateChanged(
 void DisplayFuzzerTest::TestDisplayServiceStub(const uint32_t code, const uint8_t* data, size_t size)
 {
     MessageParcel datas;
+    datas.WriteInterfaceToken(DisplayPowerMgrService::GetDescriptor());
     if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_NOTIFY_SCREEN_POWER_STATUS)) {
         constexpr uint32_t displayId = 0;
         constexpr uint32_t screenPowerStatus = 3; // 3 represent the POWER_STATUS_OFF
@@ -69,7 +70,6 @@ void DisplayFuzzerTest::TestDisplayServiceStub(const uint32_t code, const uint8_
         sptr<IDisplayPowerCallback> obj = new DisplayPowerMgrTestCallback();
         datas.WriteRemoteObject(obj->AsObject());
     }
-    datas.WriteInterfaceToken(DisplayPowerMgrService::GetDescriptor());
     if (code == static_cast<uint32_t>(IDisplayPowerMgrIpcCode::COMMAND_REGISTER_DATA_CHANGE_LISTENER)) {
         sptr<IDisplayBrightnessListener> obj = new DisplayBrightnessListenerStub();
         datas.WriteRemoteObject(obj->AsObject());
