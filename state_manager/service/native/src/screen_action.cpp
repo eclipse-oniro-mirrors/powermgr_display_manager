@@ -263,7 +263,7 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     else if (ScreenPowerOffStrategy::GetInstance().IsSpecificStrategy() &&
         status != Rosen::ScreenPowerState::POWER_ON) {
         DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
-        ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(displayId_, status,
+        ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status,
             ParseSpecialReason(static_cast<uint32_t>(ScreenPowerOffStrategy::GetInstance().GetReason())));
     }
 #endif
