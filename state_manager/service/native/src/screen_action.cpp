@@ -258,16 +258,14 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
         ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
-    }
+    } else {
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-    else if (ScreenPowerOffStrategy::GetInstance().IsSpecificStrategy() &&
-        status != Rosen::ScreenPowerState::POWER_ON) {
-        DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
-        ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status,
-            ParseSpecialReason(static_cast<uint32_t>(ScreenPowerOffStrategy::GetInstance().GetReason())));
-    }
+        if (ScreenPowerOffStrategy::GetInstance().IsSpecificStrategy() &&
+            status != Rosen::ScreenPowerState::POWER_ON) {
+            DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
+            changeReason = ParseSpecialReason(static_cast<uint32_t>(ScreenPowerOffStrategy::GetInstance().GetReason()));
+        }
 #endif
-    else {
         ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
     ffrtId = ffrt::this_task::get_id();
