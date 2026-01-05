@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-class ScreenPowerOffStrategy : public DelayedRefSingleton<ScreenPowerOffStrategy> {
-    DECLARE_DELAYED_REF_SINGLETON(ScreenPowerOffStrategy);
+class MiscellaneousDisplayPowerStrategy : public DelayedRefSingleton<MiscellaneousDisplayPowerStrategy> {
+    DECLARE_DELAYED_REF_SINGLETON(MiscellaneousDisplayPowerStrategy);
 
 public:
     void SetStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason);

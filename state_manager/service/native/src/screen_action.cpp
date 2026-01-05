@@ -24,7 +24,7 @@
 #include "screen_manager_lite.h"
 #include "ffrt.h"
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-#include "screen_power_off_strategy.h"
+#include "miscellaneous_display_power_strategy.h"
 #endif
 
 
@@ -260,10 +260,11 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
     } else {
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-        if (ScreenPowerOffStrategy::GetInstance().IsSpecificStrategy() &&
+        if (MiscellaneousDisplayPowerStrategy::GetInstance().IsSpecificStrategy() &&
             status != Rosen::ScreenPowerState::POWER_ON) {
             DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
-            changeReason = ParseSpecialReason(static_cast<uint32_t>(ScreenPowerOffStrategy::GetInstance().GetReason()));
+            changeReason = ParseSpecialReason(static_cast<uint32_t>(
+                MiscellaneousDisplayPowerStrategy::GetInstance().GetReason()));
         }
 #endif
         ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);

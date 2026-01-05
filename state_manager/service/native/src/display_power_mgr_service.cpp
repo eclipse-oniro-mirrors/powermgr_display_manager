@@ -37,7 +37,7 @@
 #include "setting_provider.h"
 #include "ffrt_utils.h"
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-#include "screen_power_off_strategy.h"
+#include "miscellaneous_display_power_strategy.h"
 #endif
 
 namespace OHOS {
@@ -768,7 +768,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     static sptr<InvokerDeathRecipient> drt =
         sptr<InvokerDeathRecipient>::MakeSptr(__func__, [this](const sptr<DisplayPowerMgrService>& dpms) {
             DISPLAY_HILOGE(COMP_SVC, "client dead! reset specific screen power strategy");
-            ScreenPowerOffStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+            MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
                 PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
         });
     if (!Permission::IsSystem()) {
@@ -789,7 +789,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     }
     DISPLAY_HILOGI(COMP_SVC, "strategy =%{public}d, reason = %{public}u, CallingPid = %{public}d, uid = %{public}d",
         strategy, reason, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
-    ScreenPowerOffStrategy::GetInstance().SetStrategy(strategy, reason);
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(strategy, reason);
     return static_cast<int32_t>(DisplayErrors::ERR_OK);
 }
 #endif

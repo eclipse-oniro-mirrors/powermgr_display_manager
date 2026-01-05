@@ -27,7 +27,7 @@
 #include "screen_manager_lite.h"
 #include "screen_action.h"
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-#include "screen_power_off_strategy.h"
+#include "miscellaneous_display_power_strategy.h"
 #endif
 
 
@@ -199,14 +199,14 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level1)
     uint32_t displayId = 0;
     uint32_t reason = 0;
     std::shared_ptr<ScreenAction> action = std::make_shared<ScreenAction>(displayId);
-    ScreenPowerOffStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST);
     bool ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
     EXPECT_EQ(ret, false);
     ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_OFF, reason);
     EXPECT_EQ(ret, false);
 
-    ScreenPowerOffStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
     ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
     EXPECT_EQ(ret, false);

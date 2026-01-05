@@ -29,7 +29,7 @@
 #include "screen_manager_lite.h"
 #include "permission.h"
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-#include "screen_power_off_strategy.h"
+#include "miscellaneous_display_power_strategy.h"
 #endif
 
 using namespace testing;
