@@ -677,7 +677,7 @@ void DisplayPowerMgrService::InvokerDeathRecipient::OnRemoteDied(const wptr<IRem
         DISPLAY_HILOGI(COMP_SVC, "proxy no longer exists, return early");
         return;
     }
-    DISPLAY_HILOGI(COMP_SVC, "the last client using %{public}s has died", interfaceName_.c_str());
+    DISPLAY_HILOGI(COMP_SVC, "the client using %{public}s has died", interfaceName_.c_str());
     auto dpms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     if (!dpms) {
         DISPLAY_HILOGE(COMP_SVC, "cannot get DisplayPowerMgrService, return early");
@@ -772,7 +772,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
                 PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
         });
     if (!Permission::IsSystem()) {
-        return static_cast<int32_t>(DisplayErrors::ERR_PERMISSION_DENIED);
+        return static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
     std::lock_guard<std::mutex> lock(strategyMutex_);
     if (token && token->IsProxyObject() && token != thisInterfaceInvoker) {

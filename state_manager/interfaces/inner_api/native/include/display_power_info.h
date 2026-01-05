@@ -36,7 +36,7 @@ enum class DisplayState : uint32_t {
  * Screen Power Off Strategy
  */
 enum class PowerOffStrategy : uint32_t {
-    STRATEGY_DEFAULT = 0,
+    STRATEGY_ALL = 0, // default strategy
     STRATEGY_SPECIFIC = 1,
     STRATEGY_UNKNOWN
 };

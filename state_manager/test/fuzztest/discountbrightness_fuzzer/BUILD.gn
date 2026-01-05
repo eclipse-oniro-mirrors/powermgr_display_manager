@@ -100,7 +100,7 @@ ohos_fuzztest("DiscountBrightnessFuzzTest") {
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]
   }
-  if (display_manager_feature_strategy) {
+  if (display_manager_feature_poweroff_strategy) {
     sources += [
       "${displaymgr_root_path}/service/native/src/screen_power_off_strategy.cpp",
     ]

@@ -101,7 +101,4 @@ ohos_fuzztest("SetScreenPowerOffStrategyFuzzTest") {
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]
   }
-  if (display_manager_feature_strategy) {
-    defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
-  }
 }

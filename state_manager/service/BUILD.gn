@@ -101,11 +101,10 @@ ohos_shared_library("displaymgrservice") {
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]
   }
-  if (display_manager_feature_strategy) {
+  if (display_manager_feature_poweroff_strategy) {
     sources += [
       "native/src/screen_power_off_strategy.cpp",
     ]
-    defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
   }
   shlib_type = "sa"
   subsystem_name = "powermgr"
