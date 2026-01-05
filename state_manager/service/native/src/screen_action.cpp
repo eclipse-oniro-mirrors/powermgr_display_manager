@@ -252,8 +252,7 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
     DISPLAY_HILOGI(FEAT_STATE,
         "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
         displayId_, static_cast<uint32_t>(state), reason, ffrtId);
-    auto changeReason = ParseSpecialReason(reason);
-
+    Rosen::ScreenPowerState status = ParseScreenPowerState(state);
     bool ret = false;
     auto changeReason = ParseSpecialReason(reason);
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
