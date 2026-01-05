@@ -38,7 +38,6 @@
 #include "ffrt_utils.h"
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 #include "screen_power_off_strategy.h"
-#include "ipc_skeleton.h"
 #endif
 
 namespace OHOS {
@@ -675,13 +674,13 @@ void DisplayPowerMgrService::InvokerDeathRecipient::OnRemoteDied(const wptr<IRem
     DISPLAY_HILOGI(COMP_SVC, "OnRemoteDied Called");
     auto remoteObj = remote.promote();
     if (!remoteObj) {
-        DISPLAY_HILOGI(COMP_SVC, "zgh proxy no longer exists, return early");
+        DISPLAY_HILOGI(COMP_SVC, "proxy no longer exists, return early");
         return;
     }
-    DISPLAY_HILOGI(COMP_SVC, "zgh the last client using %{public}s has died", interfaceName_.c_str());
+    DISPLAY_HILOGI(COMP_SVC, "the last client using %{public}s has died", interfaceName_.c_str());
     auto dpms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
     if (!dpms) {
-        DISPLAY_HILOGE(COMP_SVC, "zgh cannot get DisplayPowerMgrService, return early");
+        DISPLAY_HILOGE(COMP_SVC, "cannot get DisplayPowerMgrService, return early");
         return;
     }
     callback_(dpms);
