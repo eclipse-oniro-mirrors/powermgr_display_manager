@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-class ScreenPowerOffStrategy : public DelayedRefSingleton<ScreenPowerOffStrategy> {
-    DECLARE_DELAYED_REF_SINGLETON(ScreenPowerOffStrategy);
+class MiscellaneousDisplayPowerStrategy : public DelayedRefSingleton<MiscellaneousDisplayPowerStrategy> {
+    DECLARE_DELAYED_REF_SINGLETON(MiscellaneousDisplayPowerStrategy);
 
 public:
     void SetStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason);
