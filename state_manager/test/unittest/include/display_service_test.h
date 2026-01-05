@@ -44,6 +44,47 @@ public:
         MOCK_METHOD0(SetScreenOnBrightness, void());
     };
 };
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+class MockRemoteObject : public IRemoteObject {
+public:
+    MockRemoteObject() : IRemoteObject(u"") {};
+    virtual ~MockRemoteObject() {};
+    bool IsProxyObject() const
+    {
+        return isProxyObject_;
+    };
+
+    int32_t GetObjectRefCount()
+    {
+        return 0;
+    }
+
+    int Dump(int fd, const std::vector<std::u16string> &args)
+    {
+        (void) args;
+        return 0;
+    }
+
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    {
+        return 0;
+    }
+
+    bool AddDeathRecipient(const sptr <DeathRecipient> &recipient)
+    {
+        (void) recipient;
+        return false;
+    }
+
+    bool RemoveDeathRecipient(const sptr <DeathRecipient> &recipient)
+    {
+        (void) recipient;
+        return false;
+    }
+
+    bool isProxyObject_ = false;
+};
+#endif
 } // namespace PowerMgr
 } // namespace OHOS
 #endif // DISPLAY_SERVICE_TEST_H

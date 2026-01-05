@@ -19,7 +19,7 @@
       "SystemCapability.PowerManager.DisplayPowerManager",
       "SystemCapability.PowerManager.DisplayPowerManager.Lite"
     ],
-    "features": [ "display_manager_feature_brightnessext" ],
+    "features": [ "display_manager_feature_brightnessext", "display_manager_feature_strategy" ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
     "ram": "2048KB",

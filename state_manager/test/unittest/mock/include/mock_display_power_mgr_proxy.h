@@ -62,6 +62,10 @@ public:
     int32_t SetScreenOnBrightness(bool& bResult) override;
     int32_t NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& retCode) override;
     int32_t SetScreenDisplayState(uint64_t screenId, uint32_t status, uint32_t reason) override;
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    int32_t SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
+        const sptr<IRemoteObject>& token, int32_t& result) override;
+#endif
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

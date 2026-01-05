@@ -479,4 +479,25 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient029, TestSize.Level
     EXPECT_NE(mClient.UnregisterDataChangeListener(ChangeType::STABLE_LUX), 0);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient029 function end!");
 }
+ 
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+/**
+ * @tc.name: DisplayPowerMgrClient030
+ * @tc.desc: test SetSpecificScreenPowerOffStrategy() when proxy return fail
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient030, TestSize.Level0)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient030 function start!");
+    auto ret = mClient.SetScreenPowerOffStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
+ 
+    EXPECT_NE(ret, DisplayErrors::ERR_OK);
+    ret = mClient.SetScreenPowerOffStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient030 function end!");
+}
+#endif
 } // namespace

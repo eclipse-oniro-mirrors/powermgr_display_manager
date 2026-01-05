@@ -1,0 +1,107 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../../displaymgr.gni")
+
+module_output_path = "display_manager/display_state_manager"
+
+##############################fuzztest##########################################
+ohos_fuzztest("SetScreenPowerOffStrategyFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "${displaymgr_root_path}/test/fuzztest/setscreenpoweroffstrategy_fuzzer"
+
+  include_dirs = [
+    "./",
+    "${displaymgr_root_path}/service/native/include",
+    "${displaymgr_root_path}/service/zidl/include",
+    "${displaymgr_inner_api}/native/include",
+    "../display_utils",
+  ]
+
+  configs = [
+    "${displaymgr_utils_path}:utils_config",
+    "${displaymgr_utils_path}:coverage_flags",
+    "${brightnessmgr_root_path}:brightness_manager_config",
+    "${displaymgr_root_path}/service:displaymgr_public_config",
+  ]
+
+  deps = [
+    "${brightnessmgr_root_path}:brightness_manager",
+    "${displaymgr_root_path}/service:displaymgr_stub",
+    "${displaymgr_root_path}/interfaces/inner_api:displaymgr",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [
+    "${displaymgr_root_path}/service/native/src/display_auto_brightness.cpp",
+    "${displaymgr_root_path}/service/native/src/display_common_event_mgr.cpp",
+    "${displaymgr_root_path}/service/native/src/display_param_helper.cpp",
+    "${displaymgr_root_path}/service/native/src/display_power_mgr_service.cpp",
+    "${displaymgr_root_path}/service/native/src/display_setting_helper.cpp",
+    "${displaymgr_root_path}/service/native/src/display_system_ability.cpp",
+    "${displaymgr_root_path}/service/native/src/gradual_animator.cpp",
+    "${displaymgr_root_path}/service/native/src/screen_action.cpp",
+    "${displaymgr_root_path}/service/native/src/screen_controller.cpp",
+    "${displaymgr_root_path}/service/native/src/screen_power_off_strategy.cpp",
+    "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
+    "../display_utils/display_fuzzer.cpp",
+    "./setscreenpoweroffstrategy_fuzzer_test.cpp",
+  ]
+
+  external_deps = [ "power_manager:power_permission" ]
+  external_deps += [
+    "ability_base:base",
+    "ability_base:want",
+    "ability_runtime:ability_manager",
+    "cJSON:cjson",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "hicollie:libhicollie",
+    "hilog:libhilog",
+    "image_framework:image_native",
+    "ipc:ipc_core",
+    "power_manager:power_ffrt",
+    "power_manager:power_setting",
+    "power_manager:power_sysparam",
+    "power_manager:powermgr_client",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
+  ]
+
+  defines = []
+  if (has_sensors_sensor_part) {
+    external_deps += [ "sensor:sensor_interface_native" ]
+    defines += [ "ENABLE_SENSOR_PART" ]
+  }
+  if (has_hiviewdfx_hisysevent_part) {
+    external_deps += [ "hisysevent:libhisysevent" ]
+  }
+  if (use_clang_coverage) {
+    defines += [ "FUZZ_COV_TEST" ]
+  }
+  if (display_manager_feature_strategy) {
+    defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
+  }
+}

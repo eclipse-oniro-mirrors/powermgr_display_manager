@@ -21,9 +21,12 @@
 #include <ipc_skeleton.h>
 
 #include "display_log.h"
-#include "power_state_machine_info.h"
 #include "screen_manager_lite.h"
 #include "ffrt.h"
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+#include "screen_power_off_strategy.h"
+#endif
+
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -204,18 +207,19 @@ Rosen::PowerStateChangeReason ScreenAction::ParseSpecialReason(uint32_t reason)
         case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_POWER_KEY):
             changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_POWER_KEY;
             break;
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_APPCAST;
+            break;
+#endif
         default:
             break;
     }
     return changeReason;
 }
 
-bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
+Rosen::ScreenPowerState ScreenAction::ParseScreenPowerState(DisplayState state)
 {
-    uint32_t ffrtId = ffrt::this_task::get_id();
-    DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
-        displayId_, static_cast<uint32_t>(state), reason, ffrtId);
     Rosen::ScreenPowerState status = Rosen::ScreenPowerState::INVALID_STATE;
     switch (state) {
         case DisplayState::DISPLAY_ON:
@@ -239,13 +243,32 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
         default:
             break;
     }
+    return status;
+}
+
+bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
+{
+    uint32_t ffrtId = ffrt::this_task::get_id();
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER] SetDisplayPower displayId=%{public}u, state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
+        displayId_, static_cast<uint32_t>(state), reason, ffrtId);
+    auto changeReason = ParseSpecialReason(reason);
 
     bool ret = false;
     auto changeReason = ParseSpecialReason(reason);
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
         ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
-    } else {
+    }
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    else if (ScreenPowerOffStrategy::GetInstance().IsSpecificStrategy() &&
+        status != Rosen::ScreenPowerState::POWER_ON) {
+        DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
+        ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(displayId_, status,
+            ParseSpecialReason(static_cast<uint32_t>(ScreenPowerOffStrategy::GetInstance().GetReason())));
+    }
+#endif
+    else {
         ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
     }
     ffrtId = ffrt::this_task::get_id();

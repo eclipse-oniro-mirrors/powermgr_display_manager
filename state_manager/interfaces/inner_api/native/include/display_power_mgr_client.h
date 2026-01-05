@@ -73,6 +73,8 @@ public:
     uint32_t SetLightBrightnessThreshold(std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     DisplayErrors GetError();
     int NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status);
+    DisplayErrors SetScreenPowerOffStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason =
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
 
 #ifndef DISPLAY_SERVICE_DEATH_UT
 private:
@@ -104,6 +106,9 @@ private:
     std::mutex mutex_;
     sptr<IDisplayPowerMgr> proxy_ {nullptr};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    sptr<IRemoteObject> token_ {nullptr};
+#endif
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

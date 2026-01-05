@@ -62,6 +62,9 @@ ohos_shared_library("displaymgr") {
   install_images = [ system_base_dir ]
   relative_install_dir = "platformsdk"
 
+  if (display_manager_feature_strategy) {
+    defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
+  }
   subsystem_name = "powermgr"
   innerapi_tags = [ "platformsdk" ]
   part_name = "${displaymgr_part_name}"
