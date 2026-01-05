@@ -36,6 +36,7 @@ group("fuzztest") {
     "setcoordinated_fuzzer:SetCoordinatedFuzzTest",
     "setlightbrightnessthreshold_fuzzer:SetLightBrightnessThresholdFuzzTest",
     "setmaxbrightness_fuzzer:SetMaxBrightnessFuzzTest",
+    "setscreendisplaystate_fuzzer:SetScreenDisplayStateFuzzTest",
     "setscreenonbrightness_fuzzer:SetScreenOnBrightnessFuzzTest",
     "runjsoncommand_fuzzer:RunJsonCommandFuzzTest",
     "registerdatachangelistener_fuzzer:RegisterDataChangeListenerFuzzTest",
