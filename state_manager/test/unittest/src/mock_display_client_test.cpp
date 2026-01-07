@@ -483,7 +483,7 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient029, TestSize.Level
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 /**
  * @tc.name: DisplayPowerMgrClient030
- * @tc.desc: test SetSpecificScreenPowerOffStrategy() when proxy return fail
+ * @tc.desc: test SetScreenPowerOffStrategy() when proxy return fail
  * @tc.type: FUNC
  * @tc.require:
  */

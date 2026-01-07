@@ -190,7 +190,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level1)
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 /**
  * @tc.name: DisplayPowerMgrService009
- * @tc.desc: Test set screen power fail
+ * @tc.desc: Test set screen power with specific strategy
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level1)
