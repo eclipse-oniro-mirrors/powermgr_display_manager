@@ -69,7 +69,7 @@
           "//base/powermgr/display_manager/brightness_manager:brightness_manager"
         ]
       },
-      "inner_api": [
+      "inner_kits": [
         {
           "name": "//base/powermgr/display_manager/state_manager/interfaces/inner_api:displaymgr"
         },
