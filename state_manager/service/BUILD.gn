@@ -103,7 +103,7 @@ ohos_shared_library("displaymgrservice") {
   }
   if (display_manager_feature_poweroff_strategy) {
     sources += [
-      "native/src/screen_power_off_strategy.cpp",
+      "native/src/miscellaneous_display_power_strategy.cpp",
     ]
   }
   shlib_type = "sa"

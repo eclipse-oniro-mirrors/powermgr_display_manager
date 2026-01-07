@@ -59,7 +59,7 @@ ohos_fuzztest("SetScreenPowerOffStrategyFuzzTest") {
     "${displaymgr_root_path}/service/native/src/gradual_animator.cpp",
     "${displaymgr_root_path}/service/native/src/screen_action.cpp",
     "${displaymgr_root_path}/service/native/src/screen_controller.cpp",
-    "${displaymgr_root_path}/service/native/src/screen_power_off_strategy.cpp",
+    "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
     "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
     "../display_utils/display_fuzzer.cpp",
     "./setscreenpoweroffstrategy_fuzzer_test.cpp",
