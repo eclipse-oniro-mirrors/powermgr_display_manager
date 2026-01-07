@@ -207,11 +207,9 @@ Rosen::PowerStateChangeReason ScreenAction::ParseSpecialReason(uint32_t reason)
         case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_POWER_KEY):
             changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_POWER_KEY;
             break;
-#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
         case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST):
             changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_APPCAST;
             break;
-#endif
         default:
             break;
     }
@@ -254,20 +252,14 @@ bool ScreenAction::SetDisplayPower(DisplayState state, uint32_t reason)
         displayId_, static_cast<uint32_t>(state), reason, ffrtId);
     Rosen::ScreenPowerState status = ParseScreenPowerState(state);
     bool ret = false;
-    auto changeReason = ParseSpecialReason(reason);
     if (coordinated_ && reason == static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_TIMEOUT)) {
         ret = Rosen::ScreenManagerLite::GetInstance().SetSpecifiedScreenPower(
             displayId_, status, Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_COLLABORATION);
     } else {
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-        if (MiscellaneousDisplayPowerStrategy::GetInstance().IsSpecificStrategy() &&
-            status != Rosen::ScreenPowerState::POWER_ON) {
-            DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
-            changeReason = ParseSpecialReason(static_cast<uint32_t>(
-                MiscellaneousDisplayPowerStrategy::GetInstance().GetReason()));
-        }
+        reason = MiscellaneousDisplayPowerStrategy::GetInstance().GetSpecificStrategyReason(state, reason);
 #endif
-        ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, changeReason);
+        ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForAll(status, ParseSpecialReason(reason));
     }
     ffrtId = ffrt::this_task::get_id();
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART

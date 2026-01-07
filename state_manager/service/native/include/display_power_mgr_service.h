@@ -200,9 +200,6 @@ private:
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
     bool isInTestMode_ {false};
     std::once_flag initFlag_;
-#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-    std::mutex strategyMutex_;
-#endif
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

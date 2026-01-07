@@ -523,6 +523,10 @@ DisplayErrors DisplayPowerMgrClient::SetScreenPowerOffStrategy(PowerOffStrategy 
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
+    if (strategy < PowerOffStrategy::STRATEGY_ALL || strategy > PowerOffStrategy::STRATEGY_UNKNOWN) {
+        DISPLAY_HILOGE(COMP_FWK, "%{public}s, invalid strategy = %{public}d", __func__, strategy);
+        return DisplayErrors::ERR_PARAM_INVALID;
+    }
     int32_t result = DEFAULT_VALUE;
     auto ret = proxy->SetScreenPowerOffStrategy(static_cast<uint32_t>(strategy),
         static_cast<uint32_t>(reason), token_, result);

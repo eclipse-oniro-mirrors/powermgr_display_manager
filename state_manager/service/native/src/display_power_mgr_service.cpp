@@ -683,6 +683,10 @@ void DisplayPowerMgrService::InvokerDeathRecipient::OnRemoteDied(const wptr<IRem
         DISPLAY_HILOGE(COMP_SVC, "cannot get DisplayPowerMgrService, return early");
         return;
     }
+    if (!callback_) {
+        DISPLAY_HILOGE(COMP_SVC, "callback is null");
+        return;
+    }
     callback_(dpms);
 }
 #endif
@@ -765,6 +769,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     PowerMgr::StateChangeReason reason, const sptr<IRemoteObject>& token)
 {
     static sptr<IRemoteObject> thisInterfaceInvoker = nullptr;
+    static std::mutex localMutex_;
     static sptr<InvokerDeathRecipient> drt =
         sptr<InvokerDeathRecipient>::MakeSptr(__func__, [this](const sptr<DisplayPowerMgrService>& dpms) {
             DISPLAY_HILOGE(COMP_SVC, "client dead! reset specific screen power strategy");
@@ -774,7 +779,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     if (!Permission::IsSystem()) {
         return static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
-    std::lock_guard<std::mutex> lock(strategyMutex_);
+    localMutex_.lock();
     if (token && token->IsProxyObject() && token != thisInterfaceInvoker) {
         // The strategyMutex_ only ensures that the "remove, assign, add" actions for THIS drt are thread safe.
         // AddDeathRecipient/RemoveDeathRecipient are thread safe theirselves.
@@ -787,6 +792,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
         thisInterfaceInvoker = token;
         thisInterfaceInvoker->AddDeathRecipient(drt); // added to the new invoker
     }
+    localMutex_.unlock();
     DISPLAY_HILOGI(COMP_SVC, "strategy =%{public}d, reason = %{public}u, CallingPid = %{public}d, uid = %{public}d",
         strategy, reason, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
     MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(strategy, reason);

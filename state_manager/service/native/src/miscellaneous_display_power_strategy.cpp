@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "miscellaneous_display_power_strategy.h"
+#include "display_log.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -23,18 +24,19 @@ MiscellaneousDisplayPowerStrategy::~MiscellaneousDisplayPowerStrategy() = defaul
 void MiscellaneousDisplayPowerStrategy::SetStrategy(PowerOffStrategy strategy,
     PowerMgr::StateChangeReason reason)
 {
+    std::lock_guard<std::mutex> lock(strategyMutex_);
     strategy_ = strategy;
     reason_ = reason;
 }
 
-bool MiscellaneousDisplayPowerStrategy::IsSpecificStrategy()
+uint32_t MiscellaneousDisplayPowerStrategy::GetSpecificStrategyReason(DisplayState state, uint32_t originalReason)
 {
-    return strategy_ == PowerOffStrategy::STRATEGY_SPECIFIC;
-}
-
-PowerMgr::StateChangeReason MiscellaneousDisplayPowerStrategy::GetReason()
-{
-    return reason_;
+    std::lock_guard<std::mutex> lock(strategyMutex_);
+    if (strategy_ == PowerOffStrategy::STRATEGY_SPECIFIC && state != DisplayState::DISPLAY_ON) {
+        DISPLAY_HILOGI(FEAT_STATE, "enable specific screen power strategy");
+        return static_cast<uint32_t>(reason_);
+    }
+    return originalReason;
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

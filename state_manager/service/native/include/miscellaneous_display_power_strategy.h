@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAYMGR_SCREEN_POWER_OFF_STRATEGY_H
-#define DISPLAYMGR_SCREEN_POWER_OFF_STRATEGY_H
+#ifndef DISPLAYMGR_MISCELLANEOUS_DISPLAY_POWER_STRATEGY_H
+#define DISPLAYMGR_MISCELLANEOUS_DISPLAY_POWER_STRATEGY_H
 
 #include "refbase.h"
 #include "display_power_info.h"
@@ -28,13 +28,13 @@ class MiscellaneousDisplayPowerStrategy : public DelayedRefSingleton<Miscellaneo
 
 public:
     void SetStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason);
-    bool IsSpecificStrategy();
-    PowerMgr::StateChangeReason GetReason();
+    uint32_t GetSpecificStrategyReason(DisplayState state, uint32_t originalReason);
 
 private:
     PowerOffStrategy strategy_ = PowerOffStrategy::STRATEGY_ALL;
     PowerMgr::StateChangeReason reason_ = PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN;
+    std::mutex strategyMutex_;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
-#endif // DISPLAYMGR_SCREEN_POWER_OFF_STRATEGY_H
+#endif // DISPLAYMGR_MISCELLANEOUS_DISPLAY_POWER_STRATEGY_H
