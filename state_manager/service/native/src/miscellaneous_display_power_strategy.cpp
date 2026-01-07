@@ -32,7 +32,7 @@ bool MiscellaneousDisplayPowerStrategy::IsSpecificStrategy()
     return strategy_ == PowerOffStrategy::STRATEGY_SPECIFIC;
 }
 
-PowerMgr::MiscellaneousDisplayPowerStrategy ScreenPowerOffStrategy::GetReason()
+PowerMgr::StateChangeReason MiscellaneousDisplayPowerStrategy::GetReason()
 {
     return reason_;
 }
