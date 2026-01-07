@@ -206,7 +206,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level1)
     ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_OFF, reason);
     EXPECT_EQ(ret, false);
 
-    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_ALL,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
     ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
     EXPECT_EQ(ret, false);

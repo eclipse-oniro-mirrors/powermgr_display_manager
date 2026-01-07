@@ -513,7 +513,7 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest032, TestSize.Level1)
     int32_t ret = 0;
     sptr<IRemoteObject> token = nullptr;
     g_isPermissionGranted = false;
-    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_DEFAULT),
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_ALL),
         static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN), token, ret);
     EXPECT_FALSE(ret);
  

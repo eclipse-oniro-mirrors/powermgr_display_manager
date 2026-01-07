@@ -490,7 +490,7 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient029, TestSize.Level
 HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient030, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient030 function start!");
-    auto ret = mClient.SetScreenPowerOffStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+    auto ret = mClient.SetScreenPowerOffStrategy(PowerOffStrategy::STRATEGY_ALL,
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
  
     EXPECT_NE(ret, DisplayErrors::ERR_OK);

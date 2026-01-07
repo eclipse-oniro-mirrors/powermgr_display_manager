@@ -768,7 +768,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     static sptr<InvokerDeathRecipient> drt =
         sptr<InvokerDeathRecipient>::MakeSptr(__func__, [this](const sptr<DisplayPowerMgrService>& dpms) {
             DISPLAY_HILOGE(COMP_SVC, "client dead! reset specific screen power strategy");
-            MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_DEFAULT,
+            MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_ALL,
                 PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
         });
     if (!Permission::IsSystem()) {

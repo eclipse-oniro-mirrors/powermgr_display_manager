@@ -32,7 +32,7 @@ public:
     PowerMgr::StateChangeReason GetReason();
 
 private:
-    PowerOffStrategy strategy_ = PowerOffStrategy::STRATEGY_DEFAULT;
+    PowerOffStrategy strategy_ = PowerOffStrategy::STRATEGY_ALL;
     PowerMgr::StateChangeReason reason_ = PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN;
 };
 } // namespace DisplayPowerMgr
