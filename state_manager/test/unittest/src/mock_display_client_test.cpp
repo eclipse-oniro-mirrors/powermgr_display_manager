@@ -495,7 +495,7 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient030, TestSize.Level
  
     EXPECT_NE(ret, DisplayErrors::ERR_OK);
     ret = mClient.SetScreenPowerOffStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
-        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST);
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST);
     EXPECT_EQ(ret, DisplayErrors::ERR_OK);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient030 function end!");
 }

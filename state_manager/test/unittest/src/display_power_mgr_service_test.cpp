@@ -200,7 +200,7 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level1)
     uint32_t reason = 0;
     std::shared_ptr<ScreenAction> action = std::make_shared<ScreenAction>(displayId);
     MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
-        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST);
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST);
     bool ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
     EXPECT_EQ(ret, false);
     ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_OFF, reason);

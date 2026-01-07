@@ -208,8 +208,8 @@ Rosen::PowerStateChangeReason ScreenAction::ParseSpecialReason(uint32_t reason)
             changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_POWER_KEY;
             break;
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
-        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST):
-            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_APPCAST;
+        case static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST):
+            changeReason = Rosen::PowerStateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST;
             break;
 #endif
         default:

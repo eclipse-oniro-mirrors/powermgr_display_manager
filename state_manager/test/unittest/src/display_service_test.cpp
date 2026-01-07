@@ -519,7 +519,7 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest032, TestSize.Level1)
  
     g_isPermissionGranted = true;
     g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
-        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST), token, ret);
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest032 function end!");
 }
@@ -538,16 +538,16 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest033, TestSize.Level1)
     sptr<MockRemoteObject> token = new MockRemoteObject();
     token->isProxyObject_ = true;
     g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
-        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST), token, ret);
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
     EXPECT_TRUE(ret);
     sptr<MockRemoteObject> tokenTwo = new MockRemoteObject();
     tokenTwo->isProxyObject_ = true;
     g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
-    static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST), tokenTwo, ret);
+    static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), tokenTwo, ret);
     EXPECT_TRUE(ret);
     token->isProxyObject_ = false;
     g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
-        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_APPCAST), token, ret);
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
     token = nullptr;
     tokenTwo = nullptr;
     EXPECT_TRUE(ret);
