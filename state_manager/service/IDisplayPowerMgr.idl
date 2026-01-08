@@ -14,6 +14,7 @@
  */
 
 import DisplayPowerMgrIdlTypes;
+sequenceable OHOS.IRemoteObject;
 interface OHOS.DisplayPowerMgr.IDisplayBrightnessCallback;
 interface OHOS.DisplayPowerMgr.IDisplayBrightnessListener;
 interface OHOS.DisplayPowerMgr.IDisplayPowerCallback;
@@ -60,4 +61,6 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void SetScreenOnBrightness([out] boolean bResult);
     void WaitDimmingDone();
     void SetScreenDisplayState([in] unsigned long id, [in] unsigned int status, [in] unsigned int reason);
+    void SetScreenPowerOffStrategy([in] unsigned int strategy, [in] unsigned int reason,
+        [in] IRemoteObject token, [out] int retCode);
 }

@@ -25,6 +25,7 @@
 #include "dm_common.h"
 #include "display_manager_lite.h"
 #include "display_power_info.h"
+#include "power_state_machine_info.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -53,6 +54,7 @@ private:
     uint32_t displayId_ {DEFAULT_DISPLAY_ID};
     bool coordinated_ {false};
     Rosen::PowerStateChangeReason ParseSpecialReason(uint32_t reason);
+    Rosen::ScreenPowerState ParseScreenPowerState(DisplayState state);
     Rosen::DisplayState ParseDisplayState(DisplayState state);
 };
 } // namespace DisplayPowerMgr

@@ -125,6 +125,11 @@ ohos_systemtest("systemtest_display_mgr_service") {
     external_deps += [ "sensor:sensor_interface_native" ]
     defines += [ "ENABLE_SENSOR_PART" ]
   }
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 group("systemtest") {

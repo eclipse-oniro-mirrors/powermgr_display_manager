@@ -32,7 +32,12 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-DisplayPowerMgrClient::DisplayPowerMgrClient() = default;
+DisplayPowerMgrClient::DisplayPowerMgrClient()
+{
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    token_ = sptr<IPCObjectStub>::MakeSptr(u"ohos.powermgr.DisplayPowerMgrClientToken");
+#endif
+}
 DisplayPowerMgrClient::~DisplayPowerMgrClient() = default;
 namespace {
 constexpr int32_t DEFAULT_VALUE = -1;
@@ -510,6 +515,30 @@ int DisplayPowerMgrClient::NotifyBrightnessManagerScreenPowerStatus(uint32_t dis
     }
     lastError_ = static_cast<DisplayErrors>(result);
     return result;
+}
+
+DisplayErrors DisplayPowerMgrClient::SetScreenPowerOffStrategy(PowerOffStrategy strategy,
+    PowerMgr::StateChangeReason reason)
+{
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
+    if (strategy < PowerOffStrategy::STRATEGY_ALL || strategy > PowerOffStrategy::STRATEGY_UNKNOWN) {
+        DISPLAY_HILOGE(COMP_FWK, "%{public}s, invalid strategy = %{public}d", __func__, strategy);
+        return DisplayErrors::ERR_PARAM_INVALID;
+    }
+    int32_t result = DEFAULT_VALUE;
+    auto ret = proxy->SetScreenPowerOffStrategy(static_cast<uint32_t>(strategy),
+        static_cast<uint32_t>(reason), token_, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "%{public}s, ret = %{public}d", __func__, ret);
+        return DisplayErrors::ERR_CONNECTION_FAIL;
+    }
+    DisplayErrors errorResult = static_cast<DisplayErrors>(result);
+    return errorResult;
+#else
+    return DisplayErrors::ERR_PARAM_INVALID;
+#endif
 }
 
 }  // namespace DisplayPowerMgr

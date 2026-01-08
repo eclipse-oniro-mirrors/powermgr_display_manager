@@ -83,6 +83,8 @@ public:
     ErrCode NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
     ErrCode WaitDimmingDone() override;
     ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
+    ErrCode SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
+        const sptr<IRemoteObject>& token, int32_t& result) override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
@@ -113,6 +115,10 @@ private:
     uint32_t SetLightBrightnessThresholdInner(
         std::vector<int32_t> threshold, sptr<IDisplayBrightnessCallback> callback);
     int NotifyScreenPowerStatusInner(uint32_t displayId, uint32_t displayPowerStatus);
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    int32_t SetScreenPowerOffStrategyInner(PowerOffStrategy strategy,
+        PowerMgr::StateChangeReason reason, const sptr<IRemoteObject>& token);
+#endif
 public:
     DisplayErrors GetError();
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
@@ -134,6 +140,23 @@ private:
     private:
         std::mutex callbackMutex_;
     };
+
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    class InvokerDeathRecipient : public DeathRecipient {
+        using CallbackType = std::function<void(const sptr<DisplayPowerMgrService>&)>;
+
+    public:
+        InvokerDeathRecipient(std::string interfaceName, CallbackType callback)
+            : interfaceName_(interfaceName),
+              callback_(callback) {}
+        virtual ~InvokerDeathRecipient() = default;
+        virtual void OnRemoteDied(const wptr<IRemoteObject>& remote) override;
+
+    private:
+        std::string interfaceName_;
+        CallbackType callback_;
+    };
+#endif
 
     static const size_t MAX_PARAMS_LENGTH = 4096;
     static const uint32_t BRIGHTNESS_OFF = 0;

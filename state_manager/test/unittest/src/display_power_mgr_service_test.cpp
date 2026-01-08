@@ -26,6 +26,10 @@
 #include "display_log.h"
 #include "screen_manager_lite.h"
 #include "screen_action.h"
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+#include "miscellaneous_display_power_strategy.h"
+#endif
+
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -182,4 +186,33 @@ HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService008, TestSize.Level1)
     g_powerState = false;
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService008 function end!");
 }
+
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+/**
+ * @tc.name: DisplayPowerMgrService009
+ * @tc.desc: Test set screen power with specific strategy
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrServiceTest, DisplayPowerMgrService009, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009 function start!");
+    uint32_t displayId = 0;
+    uint32_t reason = 0;
+    std::shared_ptr<ScreenAction> action = std::make_shared<ScreenAction>(displayId);
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_SPECIFIC,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST);
+    bool ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
+    EXPECT_EQ(ret, false);
+    ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_OFF, reason);
+    EXPECT_EQ(ret, false);
+
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_ALL,
+        PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
+    ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_ON, reason);
+    EXPECT_EQ(ret, false);
+    ret = action->SetDisplayPower(DisplayPowerMgr::DisplayState::DISPLAY_OFF, reason);
+    EXPECT_EQ(ret, false);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrService009 function end!");
+}
+#endif
 } // namespace

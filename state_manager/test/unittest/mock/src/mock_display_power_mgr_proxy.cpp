@@ -187,5 +187,16 @@ int32_t MockDisplayPowerMgrProxy::SetScreenDisplayState(uint64_t screenId, uint3
     }
     return ERR_FAIL;
 }
+
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+int32_t MockDisplayPowerMgrProxy::SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
+    const sptr<IRemoteObject>& token, int32_t& result)
+{
+    if (strategy == static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC)) {
+        return ERR_OK;
+    }
+    return ERR_FAIL;
+}
+#endif
 } // namespace DisplayPowerMgr
 } // namespace OHOS

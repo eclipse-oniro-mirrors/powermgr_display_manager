@@ -100,4 +100,9 @@ ohos_fuzztest("NotifyScreenPowerStatusFuzzTest") {
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]
   }
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }

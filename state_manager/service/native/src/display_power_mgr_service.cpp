@@ -36,6 +36,9 @@
 #include "power_state_machine_info.h"
 #include "setting_provider.h"
 #include "ffrt_utils.h"
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+#include "miscellaneous_display_power_strategy.h"
+#endif
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -665,6 +668,29 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
     pms->UnregisterCallbackInner();
 }
 
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+void DisplayPowerMgrService::InvokerDeathRecipient::OnRemoteDied(const wptr<IRemoteObject>& remote)
+{
+    DISPLAY_HILOGI(COMP_SVC, "OnRemoteDied Called");
+    auto remoteObj = remote.promote();
+    if (!remoteObj) {
+        DISPLAY_HILOGI(COMP_SVC, "proxy no longer exists, return early");
+        return;
+    }
+    DISPLAY_HILOGI(COMP_SVC, "the client using %{public}s has died", interfaceName_.c_str());
+    auto dpms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    if (!dpms) {
+        DISPLAY_HILOGE(COMP_SVC, "cannot get DisplayPowerMgrService, return early");
+        return;
+    }
+    if (!callback_) {
+        DISPLAY_HILOGE(COMP_SVC, "callback is null");
+        return;
+    }
+    callback_(dpms);
+}
+#endif
+
 /**
 * @brief Function to limit maximum screen brightness
 * @param value  The max brightness level that needs to be restricted
@@ -737,6 +763,42 @@ int DisplayPowerMgrService::NotifyScreenPowerStatusInner(uint32_t displayId, uin
         displayPowerStatus);
     return BrightnessManager::Get().NotifyScreenPowerStatus(displayId, displayPowerStatus);
 }
+
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy strategy,
+    PowerMgr::StateChangeReason reason, const sptr<IRemoteObject>& token)
+{
+    static sptr<IRemoteObject> thisInterfaceInvoker = nullptr;
+    static std::mutex localMutex_;
+    static sptr<InvokerDeathRecipient> drt =
+        sptr<InvokerDeathRecipient>::MakeSptr(__func__, [this](const sptr<DisplayPowerMgrService>& dpms) {
+            DISPLAY_HILOGE(COMP_SVC, "client dead! reset specific screen power strategy");
+            MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(PowerOffStrategy::STRATEGY_ALL,
+                PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
+        });
+    if (!Permission::IsSystem()) {
+        return static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+    localMutex_.lock();
+    if (token && token->IsProxyObject() && token != thisInterfaceInvoker) {
+        // The strategyMutex_ only ensures that the "remove, assign, add" actions for THIS drt are thread safe.
+        // AddDeathRecipient/RemoveDeathRecipient are thread safe theirselves.
+        // Different remote objects(invokers) do not interfere wich each other
+        // Different DeathRecipients for the same invoker do not interfere wich each other
+        // Only one RemoteObject may hold the death recipient defined in this method and only once.
+        if (thisInterfaceInvoker) {
+            thisInterfaceInvoker->RemoveDeathRecipient(drt);
+        } // removed from the old invoker
+        thisInterfaceInvoker = token;
+        thisInterfaceInvoker->AddDeathRecipient(drt); // added to the new invoker
+    }
+    localMutex_.unlock();
+    DISPLAY_HILOGI(COMP_SVC, "strategy =%{public}d, reason = %{public}u, CallingPid = %{public}d, uid = %{public}d",
+        strategy, reason, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+    MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(strategy, reason);
+    return static_cast<int32_t>(DisplayErrors::ERR_OK);
+}
+#endif
 
 ErrCode DisplayPowerMgrService::SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason)
 {
@@ -1023,6 +1085,17 @@ ErrCode DisplayPowerMgrService::UnregisterDataChangeListener(
         return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
     result = BrightnessManager::Get().UnregisterDataChangeListener(listenerType, GetCallerIdWithPid(callerId));
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
+    const sptr<IRemoteObject>& token, int32_t& result)
+{
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::SpecificScreenPowerStrategy");
+    result = SetScreenPowerOffStrategyInner(static_cast<PowerOffStrategy>(strategy),
+        static_cast<PowerMgr::StateChangeReason>(reason), token);
+#endif
     return ERR_OK;
 }
 } // namespace DisplayPowerMgr

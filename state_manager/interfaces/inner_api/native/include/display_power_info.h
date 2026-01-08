@@ -31,6 +31,15 @@ enum class DisplayState : uint32_t {
     DISPLAY_DOZE_SUSPEND,
     DISPLAY_UNKNOWN
 };
+
+/**
+ * Screen Power Off Strategy
+ */
+enum class PowerOffStrategy : uint32_t {
+    STRATEGY_ALL = 0, // default strategy
+    STRATEGY_SPECIFIC = 1,
+    STRATEGY_UNKNOWN
+};
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_DISPLAY_POWER_INFO_H

@@ -13,6 +13,7 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
+import("../../../displaymgr.gni")
 
 group("fuzztest") {
   testonly = true
@@ -41,4 +42,9 @@ group("fuzztest") {
     "runjsoncommand_fuzzer:RunJsonCommandFuzzTest",
     "registerdatachangelistener_fuzzer:RegisterDataChangeListenerFuzzTest",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    deps += [
+      "setscreenpoweroffstrategy_fuzzer:SetScreenPowerOffStrategyFuzzTest",
+    ]
+  }
 }

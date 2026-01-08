@@ -28,6 +28,9 @@
 #include "display_power_mgr_service.h"
 #include "screen_manager_lite.h"
 #include "permission.h"
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+#include "miscellaneous_display_power_strategy.h"
+#endif
 
 using namespace testing;
 using namespace testing::ext;
@@ -495,4 +498,84 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest014, TestSize.Level1)
     EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest014 function end!");
 }
+
+#ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+/**
+ * @tc.name: DisplayServiceTest032
+ * @tc.desc: test DisplayPowerMgrService function SetScreenPowerOffStrategy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest032, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest032 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    int32_t ret = 0;
+    sptr<IRemoteObject> token = nullptr;
+    g_isPermissionGranted = false;
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_ALL),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN), token, ret);
+    EXPECT_FALSE(ret);
+ 
+    g_isPermissionGranted = true;
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest032 function end!");
+}
+ 
+/**
+ * @tc.name: DisplayServiceTest033
+ * @tc.desc: test DisplayPowerMgrService function SetScreenPowerOffStrategy
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest033, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest033 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    int32_t ret = 0;
+    sptr<MockRemoteObject> token = new MockRemoteObject();
+    token->isProxyObject_ = true;
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
+    EXPECT_TRUE(ret);
+    sptr<MockRemoteObject> tokenTwo = new MockRemoteObject();
+    tokenTwo->isProxyObject_ = true;
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
+    static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), tokenTwo, ret);
+    EXPECT_TRUE(ret);
+    token->isProxyObject_ = false;
+    g_service->SetScreenPowerOffStrategy(static_cast<uint32_t>(PowerOffStrategy::STRATEGY_SPECIFIC),
+        static_cast<uint32_t>(PowerMgr::StateChangeReason::STATE_CHANGE_REASON_WIRED_APPCAST), token, ret);
+    token = nullptr;
+    tokenTwo = nullptr;
+    EXPECT_TRUE(ret);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest033 function end!");
+}
+ 
+/**
+ * @tc.name: DisplayServiceTest034
+ * @tc.desc: test DisplayPowerMgrService function OnRemoteDied
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest034, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest034 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    sptr<DisplayPowerMgrService::InvokerDeathRecipient> deathRecipient =
+        sptr<DisplayPowerMgrService::InvokerDeathRecipient>::MakeSptr(__func__,
+            [](const sptr<DisplayPowerMgrService>& service) {
+            DISPLAY_HILOGE(COMP_SVC, "client dead! reset specific screen power strategy");
+        });
+    EXPECT_NE(deathRecipient, nullptr);
+    wptr<IRemoteObject> remoteObj = new MockRemoteObject();
+    deathRecipient->OnRemoteDied(remoteObj);
+    remoteObj = nullptr;
+    deathRecipient->OnRemoteDied(remoteObj);
+    EXPECT_EQ(remoteObj, nullptr);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest034 function end!");
+}
+#endif
 } // namespace

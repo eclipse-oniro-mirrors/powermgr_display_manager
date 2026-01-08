@@ -100,6 +100,11 @@ ohos_unittest("unittest_display_mgr_service") {
     "samgr:samgr_proxy",
     "window_manager:libdm_lite",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 ohos_unittest("unittest_display_mgr_brightness") {
@@ -154,6 +159,11 @@ ohos_unittest("unittest_display_mgr_brightness") {
     "samgr:samgr_proxy",
     "window_manager:libdm_lite",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 ##############################unittest##########################################
@@ -206,6 +216,11 @@ ohos_unittest("unittest_display_cilent_mock") {
     "samgr:samgr_proxy",
     "window_manager:libdm_lite",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 ##############################unittest##########################################
@@ -257,6 +272,11 @@ ohos_unittest("unittest_display_mgr_xcollie") {
     "samgr:samgr_proxy",
     "window_manager:libdm_lite",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 ############################display_service_death_test#############################
@@ -286,7 +306,11 @@ ohos_unittest("display_service_death_test") {
     "${displaymgr_root_path}/service:displaymgr_proxy",
     "${displaymgr_root_path}/service:displaymgr_stub",
   ]
-
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
   external_deps = [ "googletest:gtest_main" ]
   external_deps += deps_ex
 }
@@ -319,6 +343,11 @@ ohos_unittest("display_mock_parcel_test") {
     "${displaymgr_inner_api}:displaymgr",
     "${displaymgr_root_path}/service:displaymgr_proxy",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
   external_deps = [ "googletest:gtest_main" ]
   external_deps += deps_ex
 }
@@ -357,6 +386,11 @@ ohos_unittest("display_mock_test") {
     "${displaymgr_inner_api}:displaymgr",
     "${displaymgr_root_path}/service:displaymgr_proxy",
   ]
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 
   external_deps = [ "googletest:gtest_main" ]
   external_deps += deps_ex
@@ -392,6 +426,12 @@ ohos_unittest("display_mock_object_test") {
 
   external_deps = [ "googletest:gtest_main" ]
   external_deps += deps_ex
+
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
 }
 
 ############################unittest_display_service_test#############################
@@ -476,6 +516,11 @@ ohos_unittest("unittest_display_service_test") {
   }
   if (has_hiviewdfx_hisysevent_part) {
     external_deps += [ "hisysevent:libhisysevent" ]
+  }
+  if (display_manager_feature_poweroff_strategy) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
   }
 }
 

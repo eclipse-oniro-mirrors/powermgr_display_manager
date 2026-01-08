@@ -23,6 +23,7 @@ declare_args() {
     has_sensors_sensor_part = false
   }
   display_manager_feature_brightnessext = ""
+  display_manager_feature_poweroff_strategy = false
 
   if (!defined(global_parts_info) ||
       defined(global_parts_info.hiviewdfx_hisysevent)) {
@@ -40,7 +41,9 @@ declare_args() {
     has_dfx_hiview_part = false
   }
 }
-
+if (display_manager_feature_poweroff_strategy) {
+    defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
+}
 displaymgr_part_name = "display_manager"
 
 displaymgr_root_path = "//base/powermgr/display_manager/state_manager"
