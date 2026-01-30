@@ -138,8 +138,9 @@ void ScreenAction::WriteHiSysEvent(DisplayState state, int32_t beginTimeMs)
 
 bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback)
 {
+    int32_t beginTimeMs = 0;
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
-    int32_t beginTimeMs = GetTickCount();
+    beginTimeMs = GetTickCount();
 #endif
     uint32_t ffrtId = ffrt::this_task::get_id();
     DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState displayId=%{public}u, state=%{public}u, ffrtId=%{public}u",
@@ -147,7 +148,7 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
     Rosen::DisplayState rds = ParseDisplayState(state);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::DisplayManagerLite::GetInstance().SetDisplayState(rds,
-        [callback](Rosen::DisplayState rosenState) {
+        [callback, state, beginTimeMs, this](Rosen::DisplayState rosenState) {
         DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] SetDisplayState Callback:%{public}d", static_cast<uint32_t>(rosenState));
         DisplayState state;
         switch (rosenState) {
@@ -169,9 +170,9 @@ bool ScreenAction::SetDisplayState(DisplayState state, const std::function<void(
             default:
                 return;
         }
+        WriteHiSysEvent(state, beginTimeMs);
         callback(state);
     });
-    WriteHiSysEvent(state, beginTimeMs);
     IPCSkeleton::SetCallingIdentity(identity);
     // Notify screen state change event to battery statistics
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
