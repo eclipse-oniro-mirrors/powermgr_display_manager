@@ -78,21 +78,21 @@ void ScreenController::AnimateCallbackImpl::DiscountBrightness(double discount)
 
 DisplayState ScreenController::GetState()
 {
-    return state_;
+    return state_.load();
 }
 
 DisplayState ScreenController::SetDelayOffState()
 {
     DISPLAY_HILOGI(COMP_SVC, "Set the display state is DELAY OFF when overriding display off delay");
     state_ = DisplayState::DISPLAY_DELAY_OFF;
-    return state_;
+    return state_.load();
 }
 
 DisplayState ScreenController::SetOnState()
 {
     DISPLAY_HILOGI(COMP_SVC, "Set the display state is ON after overriding display on delay");
     state_ = DisplayState::DISPLAY_ON;
-    return state_;
+    return state_.load();
 }
 
 bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
@@ -100,18 +100,18 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
     uint32_t ffrtId = ffrt::this_task::get_id();
     DISPLAY_HILOGI(FEAT_STATE,
         "[UL_POWER] UpdateState, state=%{public}u, current state=%{public}u, reason=%{public}u, ffrtId=%{public}u",
-        static_cast<uint32_t>(state), static_cast<uint32_t>(state_), reason, ffrtId);
+        static_cast<uint32_t>(state), static_cast<uint32_t>(state_.load()), reason, ffrtId);
     if (reason != static_cast<uint32_t>
         (PowerMgr::StateChangeReason::STATE_CHANGE_REASON_PRE_BRIGHT_AUTH_FAIL_SCREEN_OFF)) {
-        RETURN_IF_WITH_RET(state == state_, true);
+        RETURN_IF_WITH_RET(state == state_.load(), true);
     }
-    if (state == DisplayState::DISPLAY_DIM && state_ == DisplayState::DISPLAY_OFF) {
+    if (state == DisplayState::DISPLAY_DIM && state_.load() == DisplayState::DISPLAY_OFF) {
         DISPLAY_HILOGI(FEAT_STATE, "Not allowed to set DIM state.");
         return true;
     }
     switch (state) {
         case DisplayState::DISPLAY_ON:
-            if (state_ == DisplayState::DISPLAY_DIM) {
+            if (state_.load() == DisplayState::DISPLAY_DIM) {
                 break;
             }
             [[fallthrough]];
@@ -156,7 +156,7 @@ bool ScreenController::UpdateState(DisplayState state, uint32_t reason)
 bool ScreenController::IsScreenOn()
 {
     lock_guard lock(mutexState_);
-    return (state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM);
+    return (state_.load() == DisplayState::DISPLAY_ON || state_.load() == DisplayState::DISPLAY_DIM);
 }
 
 bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
@@ -312,7 +312,7 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
 
 bool ScreenController::SkipNotify(DisplayState targetState)
 {
-    bool isScreenOn = state_ == DisplayState::DISPLAY_ON || state_ == DisplayState::DISPLAY_DIM;
+    bool isScreenOn = state_.load() == DisplayState::DISPLAY_ON || state_.load() == DisplayState::DISPLAY_DIM;
     bool isTargetStateOn = targetState == DisplayState::DISPLAY_ON || targetState == DisplayState::DISPLAY_DIM;
     return isScreenOn == isTargetStateOn;
 }

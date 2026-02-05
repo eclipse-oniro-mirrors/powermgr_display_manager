@@ -88,7 +88,7 @@ private:
     bool SkipNotify(DisplayState targetState);
 
     static const constexpr char* SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
-    DisplayState state_;
+    std::atomic<DisplayState> state_ {DisplayState::DISPLAY_UNKNOWN};
     std::mutex mutexState_;
     uint32_t stateChangeReason_ {0};
     double discount_ {1.0};
