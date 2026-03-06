@@ -36,8 +36,7 @@
 using namespace OHOS::DisplayPowerMgr;
 using namespace OHOS::PowerMgr;
 namespace {
-std::shared_ptr<RunningLock> runningLock =
-    PowerMgrClient::GetInstance().CreateRunningLock(std::string("KeepScreenOn"), RunningLockType::RUNNINGLOCK_SCREEN);
+std::shared_ptr<RunningLock> g_runningLock = nullptr;
 }
 
 typedef void (*brightness_callback)(void* data);
@@ -172,7 +171,11 @@ static void SetKeepScreenOnSendEvent(napi_env env, Brightness *asyncContext, nap
 
 static napi_value SetKeepScreenOn(napi_env env, napi_callback_info info)
 {
-    std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env, runningLock);
+    if (g_runningLock == nullptr) {
+        g_runningLock = PowerMgrClient::GetInstance().CreateRunningLock(
+            std::string("KeepScreenOn"), RunningLockType::RUNNINGLOCK_SCREEN);
+    }
+    std::unique_ptr<Brightness> asyncBrightness = std::make_unique<Brightness>(env, g_runningLock);
     RETURN_IF_WITH_RET(asyncBrightness == nullptr, nullptr);
     napi_value options = asyncBrightness->GetCallbackInfo(info, 0, napi_object);
     RETURN_IF_WITH_RET(options == nullptr, nullptr);
