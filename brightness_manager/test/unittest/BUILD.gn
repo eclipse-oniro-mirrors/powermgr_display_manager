@@ -45,6 +45,7 @@ set_defaults("ohos_unittest") {
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "googletest:gmock_main",
     "googletest:gtest_main",
     "hicollie:libhicollie",
     "hilog:libhilog",
@@ -87,6 +88,12 @@ ohos_unittest("brightness_service_test") {
   deps += [ "${brightnessmgr_root_path}:brightness_manager" ]
 }
 
+ohos_unittest("brightness_service_advanced_test") {
+  sources = [ "./src/brightness_service_advanced_test.cpp" ]
+
+  deps += [ "${brightnessmgr_root_path}:brightness_manager" ]
+}
+
 ohos_unittest("brightness_config_parse_test") {
   sanitize = {
     cfi = true
@@ -104,11 +111,13 @@ ohos_unittest("brightness_config_parse_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":brightness_manager_test" ]
+  deps = [
+    ":brightness_manager_test",
+    ":brightness_service_test",
+    ":brightness_service_advanced_test",
+  ]
   if (display_manager_feature_brightnessext != "") {
     deps += [ ":brightness_manager_ext_test" ]
-  } else {
-    deps += [ ":brightness_service_test" ]
   }
   deps += [ ":brightness_config_parse_test" ]
 }
