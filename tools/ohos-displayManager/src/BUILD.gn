@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("../../../displaymgr.gni")
+import("//build/ohos/cli/ohos_cli_executable.gni")
 
 config("ohos_display_manager_cli_config") {
   include_dirs = [
@@ -21,7 +22,7 @@ config("ohos_display_manager_cli_config") {
   ]
 }
 
-ohos_executable("ohos-displayManager") {
+ohos_cli_executable("ohos-displayManager") {
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -29,6 +30,7 @@ ohos_executable("ohos-displayManager") {
   }
   branch_protector_ret = "pac_ret"
 
+  cli_config_file = "../ohos-displayManager.json"
   sources = [
     "cli_command.cpp",
     "main.cpp",
@@ -51,7 +53,6 @@ ohos_executable("ohos-displayManager") {
 
   install_enable = true
   install_images = [ "system" ]
-  relative_install_dir = "cli_tool/executable"
 
   subsystem_name = "powermgr"
   part_name = "${displaymgr_part_name}"
