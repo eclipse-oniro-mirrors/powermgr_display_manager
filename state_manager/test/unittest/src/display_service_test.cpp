@@ -120,7 +120,7 @@ bool DisplayManagerLite::SetDisplayState(DisplayState state, DisplayStateCallbac
     return true;
 }
 
-bool DisplayManagerLite::SetScreenBrightness(uint64_t screenId, uint32_t level)
+bool DisplayManagerLite::SetScreenBrightness(const DmsScreenBrightnessData& brightnessData)
 {
     return true;
 }
