@@ -24,12 +24,15 @@ namespace DisplayPowerMgr {
 
 struct SetBrightnessArgs {
     bool hasValue = false;
+    bool hasContinuous = false;
     uint32_t value = 0;
     bool continuous = false;
+    std::string unknownArg;
 };
 
 int OutputSuccess(const std::string& jsonData);
 int OutputError(const std::string& code, const std::string& message);
+int OutputFallbackError(const std::string& code, const std::string& message);
 
 SetBrightnessArgs ParseSetBrightnessArgs(int argc, char** argv);
 int CmdSetBrightness(int argc, char** argv);

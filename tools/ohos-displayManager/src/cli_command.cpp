@@ -36,18 +36,41 @@ using CommandHandler = std::function<int(int, char**)>;
 namespace OHOS {
 namespace DisplayPowerMgr {
 
-static const uint32_t BRIGHTNESS_MIN_VALUE = 0;
 static const uint32_t BRIGHTNESS_MAX_VALUE = 255;
+static const uint32_t DECIMAL_BASE = 10;
+static const int32_t ARG_OFFSET = 2;
+static const int32_t SUBCMD_HELP_ARGC = 3;
+static const char* const UNKNOWN_ARG_HELP_SUFFIX =
+    ". Use 'ohos-displayManager set-brightness --help' for usage information.";
+static const char* const FALLBACK_SUGGESTION =
+    "Run 'ohos-displayManager --help' to see available commands and usage.";
 
 int OutputSuccess(const std::string& jsonData)
 {
     cJSON* response = cJSON_CreateObject();
-    cJSON_AddStringToObject(response, "status", "success");
+    if (response == nullptr) {
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to create JSON response.");
+    }
+    if (cJSON_AddStringToObject(response, "type", "result") == nullptr ||
+        cJSON_AddStringToObject(response, "status", "success") == nullptr) {
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to create JSON response.");
+    }
     cJSON* data = cJSON_Parse(jsonData.c_str());
-    if (data != nullptr) {
-        cJSON_AddItemToObject(response, "data", data);
+    if (data == nullptr) {
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
+    }
+    if (!cJSON_AddItemToObject(response, "data", data)) {
+        cJSON_Delete(data);
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
     }
     char* out = cJSON_PrintUnformatted(response);
+    if (out == nullptr) {
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
+    }
     std::cout << out << std::endl;
     cJSON_free(out);
     cJSON_Delete(response);
@@ -57,27 +80,64 @@ int OutputSuccess(const std::string& jsonData)
 int OutputError(const std::string& code, const std::string& message)
 {
     cJSON* response = cJSON_CreateObject();
-    cJSON_AddStringToObject(response, "status", "error");
-    cJSON_AddStringToObject(response, "errCode", code.c_str());
-    cJSON_AddStringToObject(response, "errMsg", message.c_str());
+    if (response == nullptr) {
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
+    }
+    if (cJSON_AddStringToObject(response, "type", "result") == nullptr ||
+        cJSON_AddStringToObject(response, "status", "failed") == nullptr ||
+        cJSON_AddStringToObject(response, "data", "") == nullptr ||
+        cJSON_AddStringToObject(response, "errCode", code.c_str()) == nullptr ||
+        cJSON_AddStringToObject(response, "errMsg", message.c_str()) == nullptr ||
+        cJSON_AddStringToObject(response, "suggestion", FALLBACK_SUGGESTION) == nullptr) {
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
+    }
     char* out = cJSON_PrintUnformatted(response);
+    if (out == nullptr) {
+        cJSON_Delete(response);
+        return OutputFallbackError("ERR_INTERNAL_ERROR", "Failed to format JSON response.");
+    }
     std::cout << out << std::endl;
     cJSON_free(out);
     cJSON_Delete(response);
     return 1;
 }
 
+int OutputFallbackError(const std::string& code, const std::string& message)
+{
+    std::cout << R"({"type":"result","status":"failed","data":"","errCode":")" << code <<
+              R"(","errMsg":")" << message <<
+              R"(","suggestion":")" << FALLBACK_SUGGESTION <<
+              R"("})" << std::endl;
+    return 1;
+}
+
 SetBrightnessArgs ParseSetBrightnessArgs(int argc, char** argv)
 {
     SetBrightnessArgs args;
-    const uint32_t temp = 10;
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "--value") == 0 && i + 1 < argc) {
+            if (args.hasValue) {
+                args.unknownArg = "--value";
+                break;
+            }
             args.hasValue = true;
-            args.value = static_cast<uint32_t>(std::strtoul(argv[i + 1], nullptr, temp));
+            char* endPtr = nullptr;
+            args.value = static_cast<uint32_t>(std::strtoul(argv[i + 1], &endPtr, DECIMAL_BASE));
+            if (endPtr == argv[i + 1] || *endPtr != '\0') {
+                args.unknownArg = argv[i + 1];
+            }
             i++;
         } else if (strcmp(argv[i], "--continuous") == 0) {
+            if (args.hasContinuous) {
+                args.unknownArg = "--continuous";
+                break;
+            }
+            args.hasContinuous = true;
             args.continuous = true;
+        } else {
+            args.unknownArg = argv[i];
+            break;
         }
     }
     return args;
@@ -87,16 +147,23 @@ int CmdSetBrightness(int argc, char** argv)
 {
     SetBrightnessArgs args = ParseSetBrightnessArgs(argc, argv);
 
+    if (!args.unknownArg.empty()) {
+        return OutputError("ERR_UNKNOWN_ARG",
+            "Unknown or invalid argument: " + args.unknownArg +
+            ". Supported arguments: --value <brightness>, --continuous" +
+            UNKNOWN_ARG_HELP_SUFFIX);
+    }
+
     if (!args.hasValue) {
         return OutputError("ERR_ARG_MISSING",
             "Missing required parameter: --value is required to specify brightness level."
                 " Example: ohos-displayManager set-brightness --value 128");
     }
 
-    if (args.value < BRIGHTNESS_MIN_VALUE || args.value > BRIGHTNESS_MAX_VALUE) {
+    if (args.value > BRIGHTNESS_MAX_VALUE) {
         return OutputError("ERR_ARG_OUT_OF_RANGE",
-            "Brightness value " + std::to_string(args.value) + " is out of range, must be"
-                " between 0 and 255. Example: --value 128");
+            "Brightness value " + std::to_string(args.value) +
+                " is out of range, must be between 0 and 255. Example: --value 128");
     }
 
 #ifdef CLI_UT_TEST
@@ -131,8 +198,8 @@ int CmdSetBrightness(int argc, char** argv)
                 break;
             default:
                 errCodeStr = "ERR_INTERNAL_ERROR";
-                errMsg = "Set brightness failed with internal error code: "
-                    + std::to_string(static_cast<int32_t>(err)) +
+                errMsg = "Set brightness failed with internal error code: " +
+                    std::to_string(static_cast<int32_t>(err)) +
                     ". Please check system logs for details or try again later.";
                 break;
         }
@@ -140,10 +207,20 @@ int CmdSetBrightness(int argc, char** argv)
     }
 
     cJSON* data = cJSON_CreateObject();
-    cJSON_AddNumberToObject(data, "value", args.value);
-    cJSON_AddBoolToObject(data, "continuous", args.continuous);
-    cJSON_AddStringToObject(data, "message", "Brightness set successfully");
+    if (data == nullptr) {
+        return OutputError("ERR_INTERNAL_ERROR", "Failed to create JSON data for brightness result.");
+    }
+    if (cJSON_AddNumberToObject(data, "value", args.value) == nullptr ||
+        cJSON_AddBoolToObject(data, "continuous", args.continuous) == nullptr ||
+        cJSON_AddStringToObject(data, "message", "Brightness set successfully") == nullptr) {
+        cJSON_Delete(data);
+        return OutputError("ERR_INTERNAL_ERROR", "Failed to build JSON data for brightness result.");
+    }
     char* dataStr = cJSON_PrintUnformatted(data);
+    if (dataStr == nullptr) {
+        cJSON_Delete(data);
+        return OutputError("ERR_INTERNAL_ERROR", "Failed to format JSON data for brightness result.");
+    }
     std::string dataJson(dataStr);
     cJSON_free(dataStr);
     cJSON_Delete(data);
@@ -152,40 +229,45 @@ int CmdSetBrightness(int argc, char** argv)
 
 void PrintHelp(const char* prog)
 {
-    std::cerr << prog << " - Display brightness management CLI tool for adjusting screen brightness" << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "Usage:" << std::endl;
-    std::cerr << "  " << prog << " <command> [options]" << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "Parameters:" << std::endl;
-    std::cerr << "  --help                  Display this help message" << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "Commands:" << std::endl;
-    std::cerr << "  set-brightness          Set display screen brightness" << std::endl;
+    std::cout << prog << " - Display brightness management CLI tool for adjusting screen brightness" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "  " << prog << " <command> [options]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Parameters:" << std::endl;
+    std::cout << "  --help                  Display this help message" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Commands:" << std::endl;
+    std::cout << "  set-brightness          Set display screen brightness" << std::endl;
 }
 
 void PrintSubCommandHelp(const char* prog)
 {
-    std::cerr << prog << " set-brightness - Set the brightness of a display device" << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "Usage:" << std::endl;
-    std::cerr << "  " << prog << " set-brightness --value <brightness> [--continuous]" << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "Parameters:" << std::endl;
-    std::cerr << "  --value <brightness>    Brightness value (required, range: 0-255)" << std::endl;
-    std::cerr << "  --continuous            Continuous adjustment mode (optional, default: false)" << std::endl;
-    std::cerr << "  --help                  Display this help message" << std::endl;
+    std::cout << prog << " set-brightness - Set the brightness of a display device" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Usage:" << std::endl;
+    std::cout << "  " << prog << " set-brightness --value <brightness> [--continuous]" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Parameters:" << std::endl;
+    std::cout << "  --value <brightness>    Brightness value (required, range: 0-255)" << std::endl;
+    std::cout << "  --continuous            Continuous adjustment mode (optional, default: false)" << std::endl;
+    std::cout << "  --help                  Display this help message" << std::endl;
 }
 
 int DispatchCommand(int argc, char** argv)
 {
-    const uint32_t ARGC_MAX = 2;
-    if (argc < ARGC_MAX) {
+    if (argc < ARG_OFFSET) {
         PrintHelp(argv[0]);
         return 1;
     }
 
     if (strcmp(argv[1], "--help") == 0) {
+        if (argc > ARG_OFFSET) {
+            return OutputError("ERR_UNKNOWN_ARG",
+                "Unexpected argument after --help: " + std::string(argv[ARG_OFFSET]) +
+                ". '--help' does not accept additional arguments."
+                " Usage: ohos-displayManager --help");
+        }
         PrintHelp(argv[0]);
         return 0;
     }
@@ -196,27 +278,27 @@ int DispatchCommand(int argc, char** argv)
 
     std::string cmdName = argv[1];
 
-    // Subcommand --help support: <cli-name> <subcommand> --help
-    for (int i = 2; i < argc; i++) {
+    auto it = commands.find(cmdName);
+    if (it == commands.end()) {
+        return OutputError("ERR_UNKNOWN_COMMAND",
+            "Unknown command: " + cmdName +
+            ". Use '--help' to see available commands.");
+    }
+
+    for (int i = ARG_OFFSET; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0) {
-            if (cmdName == "set-brightness") {
-                PrintSubCommandHelp(argv[0]);
-                return 0;
+            if (argc > SUBCMD_HELP_ARGC) {
+                return OutputError("ERR_UNKNOWN_ARG",
+                    "Unexpected arguments with --help."
+                    " '--help' does not accept additional arguments."
+                    " Usage: ohos-displayManager " + cmdName + " --help");
             }
-            PrintHelp(argv[0]);
+            PrintSubCommandHelp(argv[0]);
             return 0;
         }
     }
 
-    auto it = commands.find(cmdName);
-    if (it == commands.end()) {
-        std::cerr << "[ERROR] Unknown command: " << cmdName << std::endl;
-        PrintHelp(argv[0]);
-        return 1;
-    }
-
-    const uint32_t ARGC_MAX = 2;
-    return it->second(argc - ARGC_MAX, argv + ARGC_MAX);
+    return it->second(argc - ARG_OFFSET, argv + ARG_OFFSET);
 }
 
 }  // namespace DisplayPowerMgr

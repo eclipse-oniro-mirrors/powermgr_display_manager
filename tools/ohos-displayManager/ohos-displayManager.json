@@ -18,13 +18,19 @@
   "outputSchema": {
     "type": "object",
     "properties": {
+      "type": {
+        "type": "string",
+        "enum": ["result"],
+        "description": "Response type, always 'result'."
+      },
       "status": {
         "type": "string",
-        "description": "Execution result status: success or error."
+        "enum": ["success", "failed"],
+        "description": "Execution result status: success or failed."
       },
       "data": {
         "type": "object",
-        "description": "Response data on success.",
+        "description": "Response data on success, empty string on failure.",
         "properties": {
           "message": {
             "type": "string",
@@ -39,6 +45,10 @@
       "errMsg": {
         "type": "string",
         "description": "Error description when operation fails."
+      },
+      "suggestion": {
+        "type": "string",
+        "description": "Suggested next operation for error recovery."
       }
     }
   },
@@ -66,9 +76,15 @@
       "outputSchema": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["result"],
+            "description": "Response type, always 'result'."
+          },
           "status": {
             "type": "string",
-            "description": "Execution result status."
+            "enum": ["success", "failed"],
+            "description": "Execution result status: success or failed."
           },
           "data": {
             "type": "object",
@@ -95,6 +111,10 @@
           "errMsg": {
             "type": "string",
             "description": "Error description when operation fails."
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "Suggested next operation for error recovery."
           }
         }
       }
