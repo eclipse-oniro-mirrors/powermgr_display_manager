@@ -257,8 +257,7 @@ void PrintSubCommandHelp(const char* prog)
 int DispatchCommand(int argc, char** argv)
 {
     if (argc < ARG_OFFSET) {
-        PrintHelp(argv[0]);
-        return 1;
+        return OutputError("ERR_NO_COMMAND", "No command specified");
     }
 
     if (strcmp(argv[1], "--help") == 0) {
