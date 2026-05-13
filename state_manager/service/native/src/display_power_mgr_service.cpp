@@ -373,7 +373,6 @@ bool DisplayPowerMgrService::OverrideBrightnessInner(uint32_t brightness, uint32
     }
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u, duration=%{public}d",
         displayId, brightness, duration);
-    CHECK_PARAM_WITH_RET(brightness, 0, 255, false);
     CHECK_PARAM_DURATION(duration);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
@@ -449,7 +448,6 @@ bool DisplayPowerMgrService::AdjustBrightnessInner(uint32_t id, int32_t value, u
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AdjustBrightness %{public}d, %{public}d, %{public}d",
                    id, value, duration);
-    CHECK_PARAM_WITH_RET(value, 0, 255, false);
     CHECK_PARAM_DURATION(duration);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
