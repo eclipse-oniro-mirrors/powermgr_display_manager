@@ -163,13 +163,13 @@ TEST_F(CliCommandTest, ParseArgs_DuplicateContinuous)
 
 // ==================== DispatchCommand Tests ====================
 
-TEST_F(CliCommandTest, Dispatch_NoArgs_ShowsHelp)
+TEST_F(CliCommandTest, Dispatch_NoArgs_ReturnsError)
 {
     char prog[] = "ohos-displayManager";
     char* argv[] = {prog};
     int ret = DispatchCommand(1, argv);
     EXPECT_EQ(ret, 1);
-    EXPECT_NE(GetOutput().find("Usage:"), std::string::npos);
+    EXPECT_NE(GetOutput().find("ERR_NO_COMMAND"), std::string::npos);
 }
 
 TEST_F(CliCommandTest, Dispatch_HelpFlag)
