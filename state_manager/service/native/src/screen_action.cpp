@@ -289,7 +289,8 @@ bool ScreenAction::SetBrightness(uint32_t value)
 {
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, brightness=%{public}u", displayId_, value);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    bool isSucc = Rosen::DisplayManagerLite::GetInstance().SetScreenBrightness(displayId_, value);
+    Rosen::DmsScreenBrightnessData brightnessData(displayId_, value);
+    bool isSucc = Rosen::DisplayManagerLite::GetInstance().SetScreenBrightness(brightnessData);
     IPCSkeleton::SetCallingIdentity(identity);
     std::lock_guard lock(mutexBrightness_);
     brightness_ = isSucc ? value : brightness_;
