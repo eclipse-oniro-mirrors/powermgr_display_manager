@@ -130,7 +130,7 @@ void DisplayPowerMgrService::Reset()
 void DisplayPowerMgrService::HandleBootBrightness()
 {
     BrightnessManager::Get().Init(BRIGHTNESS_MAX, BRIGHTNESS_MIN);
-    std::call_once(initFlag_, [] {
+    std::call_once(initFlag_, [this] {
         SetBootCompletedBrightness();
         SetBootCompletedAutoBrightness();
     });
@@ -161,7 +161,6 @@ void DisplayPowerMgrService::SetBootCompletedAutoBrightness()
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedAutoBrightness enable=%{public}d", enable);
     bool result = false;
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(enable, result);
-    BrightnessManager::Get().AutoAdjustBrightness(enable);
 }
 
 void DisplayPowerMgrService::RegisterSettingObservers()
@@ -173,7 +172,9 @@ void DisplayPowerMgrService::RegisterSettingObservers()
     if (iter != controllerMap.end()) {
         iter->second->RegisterSettingBrightnessObserver();
     }
-    RegisterSettingAutoBrightnessObserver();
+    DisplaySettingHelper::RegisterSettingAutoBrightnessObserver([](const std::string& key) {
+        DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoBrightnessSettingUpdateFunc(key);
+    });
 }
 
 void DisplayPowerMgrService::UnregisterSettingObservers()
@@ -185,13 +186,7 @@ void DisplayPowerMgrService::UnregisterSettingObservers()
     if (iter != controllerMap.end()) {
         iter->second->UnregisterSettingBrightnessObserver();
     }
-    UnregisterSettingAutoBrightnessObserver();
-}
-
-void DisplayPowerMgrService::RegisterSettingAutoBrightnessObserver()
-{
-    SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) { AutoBrightnessSettingUpdateFunc(key); };
-    DisplaySettingHelper::RegisterSettingAutoBrightnessObserver(updateFunc);
+    DisplaySettingHelper::UnregisterSettingAutoBrightnessObserver();
 }
 
 void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& key)
@@ -204,7 +199,6 @@ void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& 
         return;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoBrightnessSettingUpdateFunc isSettingEnable=%{public}d", isSettingEnable);
-    BrightnessManager::Get().AutoAdjustBrightness(isSettingEnable);
     bool result = false;
     DelayedSpSingleton<DisplayPowerMgrService>::GetInstance()->AutoAdjustBrightness(isSettingEnable, result);
     if (!isSettingEnable) {
@@ -228,7 +222,9 @@ void DisplayPowerMgrService::ClearOffset()
 
 bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
 {
-    return DisplaySettingHelper::GetSettingAutoBrightness(key);
+    bool ret = DisplaySettingHelper::GetSettingAutoBrightness(key);
+    autoBrightness_ = ret;
+    return ret;
 }
 
 void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason)
@@ -240,11 +236,6 @@ void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uin
         return;
     }
     iterator->second->UpdateState(state, reason);
-}
-
-void DisplayPowerMgrService::UnregisterSettingAutoBrightnessObserver()
-{
-    DisplaySettingHelper::UnregisterSettingAutoBrightnessObserver();
 }
 
 bool DisplayPowerMgrService::SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason)
@@ -476,6 +467,11 @@ bool DisplayPowerMgrService::AutoAdjustBrightnessInner(bool enable)
         return false;
     }
     DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
+    if (autoBrightness_ != enable) {
+        DisplaySettingHelper::SetSettingAutoBrightness(enable);
+        autoBrightness_ = enable;
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness write setting: %{public}d", enable);
+    }
     return BrightnessManager::Get().AutoAdjustBrightness(enable);
 }
 
