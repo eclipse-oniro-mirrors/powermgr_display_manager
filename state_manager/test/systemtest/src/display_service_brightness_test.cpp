@@ -135,7 +135,7 @@ HWTEST_F(DisplayPowerServiceBrightnessTest, DisplayPowerServiceBrightnessTest002
     EXPECT_TRUE(g_service != nullptr);
     bool ret = false;
     int32_t errCode = 0;
-    uint32_t result = g_service->SetMaxBrightness(MAX_BRIGHTNESS_SET, TEST_MODE, ret, errCode);
+    uint32_t result = g_service->SetMaxBrightness(1.0, TEST_MODE, ret, errCode);
     uint32_t maxBrightness = 0;
     g_service->GetMaxBrightness(maxBrightness);
     EXPECT_TRUE(ret);
