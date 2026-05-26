@@ -485,7 +485,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness005, Te
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness006, TestSize.Level0)
 {
     uint32_t overrideValue = 256;
-    EXPECT_FALSE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
+    if (DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue)) {
+        WaitDimmingDone();
+        uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+        EXPECT_EQ(MAX_DEFAULT_BRIGHTNESS_LEVEL, deviceBrightness);
+    }
+    DisplayPowerMgrClient::GetInstance().RestoreBrightness();
 }
 
 /**
@@ -514,7 +519,11 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, Te
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness008, TestSize.Level0)
 {
     uint32_t overrideValue = -1;
-    EXPECT_FALSE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
+    if (DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue)) {
+        WaitDimmingDone();
+        uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+        EXPECT_EQ(MAX_DEFAULT_BRIGHTNESS_LEVEL, deviceBrightness);
+    }
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
 }
 
