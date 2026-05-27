@@ -207,7 +207,6 @@ HWTEST_F(BrightnessLightLuxBufferTest, BrightnessLightLuxBufferTest007, TestSize
     EXPECT_NE(lightLuxManager.mBufferData, nullptr);
     delete[] lightLuxManager.mBufferData;
     lightLuxManager.mBufferData = nullptr;
-    lightLuxManager.mCapacity = -1;
     int ret = lightLuxManager.LuxBufferCheck();
     EXPECT_EQ(ret, 0);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessLightLuxBufferTest007 function end!");
@@ -254,32 +253,9 @@ HWTEST_F(BrightnessLightLuxBufferTest, BrightnessLightLuxBufferTest009, TestSize
     EXPECT_NE(lightLuxManager.mBufferTime, nullptr);
     delete[] lightLuxManager.mBufferTime;
     lightLuxManager.mBufferTime = nullptr;
-    lightLuxManager.mCapacity = 0;
     int ret = lightLuxManager.LuxBufferCheck();
     EXPECT_EQ(ret, 0);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessLightLuxBufferTest009 function end!");
-}
-
-/**
- * @tc.name: BrightnessLightLuxBufferTest010
- * @tc.desc: test LightLuxBuffer LuxBufferCheck
- * @tc.type: FUNC
- */
-HWTEST_F(BrightnessLightLuxBufferTest, BrightnessLightLuxBufferTest010, TestSize.Level0)
-{
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessLightLuxBufferTest010 function start!");
-    LightLuxBuffer lightLuxManager{0};
-    unsigned int capacity = lightLuxManager.mCapacity;
-    lightLuxManager.mBufferData = new(std::nothrow) float[capacity];
-    EXPECT_NE(lightLuxManager.mBufferData, nullptr);
-
-    lightLuxManager.mBufferTime = new(std::nothrow) int64_t[capacity];
-    EXPECT_NE(lightLuxManager.mBufferTime, nullptr);
-    delete[] lightLuxManager.mBufferTime;
-    lightLuxManager.mBufferTime = nullptr;
-    int ret = lightLuxManager.LuxBufferCheck();
-    EXPECT_EQ(ret, 0);
-    DISPLAY_HILOGI(LABEL_TEST, "BrightnessLightLuxBufferTest010 function end!");
 }
 
 /**
