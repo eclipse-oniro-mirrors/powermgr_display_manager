@@ -145,7 +145,7 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
     auto state = GetDisplayStateInner(mainDisplayId);
     BrightnessManager::Get().SetDisplayId(currentDisplayId);
     BrightnessManager::Get().SetDisplayState(currentDisplayId, state, 0);
-    bool result = SetBrightnessInner(brightness, mainDisplayId, false);
+    SetBrightnessInner(brightness, mainDisplayId, false);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedBrightness currentDisplayId=%{public}d", currentDisplayId);
 }
 
