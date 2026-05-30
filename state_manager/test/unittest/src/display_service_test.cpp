@@ -588,4 +588,104 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest034, TestSize.Level1)
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest034 function end!");
 }
 #endif
+
+/**
+ * @tc.name: DisplayServiceTest035
+ * @tc.desc: Test GetSettingAutoBrightness reads DB/Setting value into autoBrightness_
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest035, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest035 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_service->autoBrightness_.store(-1);
+    g_service->GetSettingAutoBrightness();
+    EXPECT_NE(g_service->autoBrightness_.load(), -1);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest035 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest036
+ * @tc.desc: Test AutoAdjustBrightness returns false without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest036, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest036 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    g_service->HandleBootBrightness();
+    bool result = false;
+    g_service->AutoAdjustBrightness(true, result);
+    EXPECT_FALSE(result);
+    g_service->AutoAdjustBrightness(false, result);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest036 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest037
+ * @tc.desc: Test AutoAdjustBrightness updates autoBrightness_ with permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest037, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest037 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    g_service->HandleBootBrightness();
+
+    g_service->autoBrightness_.store(-1);
+    bool result = false;
+    g_service->AutoAdjustBrightness(true, result);
+    if (g_service->IsSupportLightSensor()) {
+        EXPECT_TRUE(result);
+        EXPECT_EQ(g_service->autoBrightness_, 1);
+    } else {
+        EXPECT_FALSE(result);
+    }
+    result = false;
+    g_service->AutoAdjustBrightness(false, result);
+    if (g_service->IsSupportLightSensor()) {
+        EXPECT_TRUE(result);
+        EXPECT_EQ(g_service->autoBrightness_, 0);
+    } else {
+        EXPECT_FALSE(result);
+    }
+
+    g_service->UnregisterSettingObservers();
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest037 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest038
+ * @tc.desc: Test RestoreBrightness with and without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest038, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest038 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    bool result = false;
+    g_service->RestoreBrightness(DISPLAY_MAIN_ID, DEFAULT_DURATION, result);
+    EXPECT_FALSE(result);
+    g_isPermissionGranted = true;
+    auto ret = g_service->RestoreBrightness(DISPLAY_MAIN_ID, DEFAULT_DURATION, result);
+    EXPECT_EQ(ret, ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest038 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest039
+ * @tc.desc: Test RegisterBootCompletedCallback does not crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest039, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest039 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_service->RegisterBootCompletedCallback();
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest039 function end!");
+}
 } // namespace
