@@ -1163,8 +1163,8 @@ HWTEST_F(BrightnessServiceAdvancedTest, BoostTimeout_ZeroDuration_AllowZero, Tes
     // Zero timeout should be allowed
     bool result = brightnessService->BoostBrightness(0, 0);
     if (result) {
-        bool cancelResult = brightnessService->CancelBoostBrightness(0);
-        EXPECT_TRUE(cancelResult);
+        usleep(5000); // Wait 5ms for FFRT delayed task to execute (timeout=0 triggers immediate execution)
+        EXPECT_FALSE(brightnessService->IsBrightnessBoosted());
     }
     DISPLAY_HILOGI(LABEL_TEST, "BoostTimeout_ZeroDuration_AllowZero end!");
 }
@@ -1735,4 +1735,35 @@ HWTEST_F(BrightnessServiceAdvancedTest, GetCachedSettingBrightness_AfterSetBrigh
     DISPLAY_HILOGI(LABEL_TEST, "GetCachedSettingBrightness_AfterSetBrightness_Updated end!");
 }
 
+// ==================== GetFeatureSupport Tests ====================
+
+HWTEST_F(BrightnessServiceAdvancedTest, GetFeatureSupport_OutOfRangeValue_ReturnsFalse, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetFeatureSupport_OutOfRangeValue_ReturnsFalse start!");
+    // Legal feature type, call to ensure no crash
+    brightnessService->GetFeatureSupport(BrightnessFeatureType::DEFAULT);
+    // Value below BrightnessFeatureType::DEFAULT (1000), treated as out-of-range
+    bool result = brightnessService->GetFeatureSupport(static_cast<BrightnessFeatureType>(-1));
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "GetFeatureSupport_OutOfRangeValue_ReturnsFalse end!");
+}
+
+// ==================== SetForcedBrightness Tests ====================
+
+HWTEST_F(BrightnessServiceAdvancedTest, SetForcedBrightness_InvalidValueType_ReturnsFalse, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetForcedBrightness_InvalidValueType_ReturnsFalse start!");
+    brightnessService->SetDisplayState(0, DisplayState::DISPLAY_ON);
+    // Legal value types, call to ensure no crash
+    brightnessService->SetForcedBrightness(0.5, 0, BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
+    brightnessService->SetForcedBrightness(0.8, 0, BrightnessValueType::RELATIVE_TO_MAX_RANGE);
+    brightnessService->SetForcedBrightness(200.0, 0, BrightnessValueType::ABSOLUTE_NIT);
+    brightnessService->SetForcedBrightness(-1, 0, BrightnessValueType::ABSOLUTE_NIT);
+
+    // Use an out-of-range valueType to trigger the default branch
+    bool result = brightnessService->SetForcedBrightness(0.5, 0, BrightnessValueType::MAX);
+    EXPECT_FALSE(result);
+    brightnessService->SetForcedBrightness(-1, 0, BrightnessValueType::ABSOLUTE_NIT);
+    DISPLAY_HILOGI(LABEL_TEST, "SetForcedBrightness_InvalidValueType_ReturnsFalse end!");
+}
 } // namespace

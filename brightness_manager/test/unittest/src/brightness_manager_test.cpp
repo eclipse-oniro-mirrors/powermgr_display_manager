@@ -60,4 +60,28 @@ HWTEST_F(BrightnessManagerTest, BrightnessManagerGetDiscount001, TestSize.Level1
     EXPECT_NE(BrightnessManager::Get().GetDiscount(), 0);
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGetDiscount001 function end!");
 }
+
+// ==================== GetFeatureSupport Tests ====================
+
+HWTEST_F(BrightnessManagerTest, BrightnessManagerGetFeatureSupport001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGetFeatureSupport001 function start!");
+    // Legal feature type, call to ensure no crash
+    BrightnessManager::Get().GetFeatureSupport(BrightnessFeatureType::DEFAULT);
+    // Out-of-range sentinel BrightnessFeatureType::MAX, should return false
+    EXPECT_FALSE(BrightnessManager::Get().GetFeatureSupport(BrightnessFeatureType::MAX));
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerGetFeatureSupport001 function end!");
+}
+
+// ==================== SetForcedBrightness Tests ====================
+
+HWTEST_F(BrightnessManagerTest, BrightnessManagerSetForcedBrightness001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerSetForcedBrightness001 function start!");
+    // Legal value type, call to ensure no crash
+    BrightnessManager::Get().SetForcedBrightness(0.5, 0, BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
+    // Out-of-range sentinel BrightnessValueType::MAX, should return false
+    EXPECT_FALSE(BrightnessManager::Get().SetForcedBrightness(0.5, 0, BrightnessValueType::MAX));
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerSetForcedBrightness001 function end!");
+}
 } // namespace

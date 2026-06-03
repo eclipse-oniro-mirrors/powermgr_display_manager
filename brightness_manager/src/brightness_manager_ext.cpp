@@ -126,6 +126,16 @@ bool BrightnessManagerExt::LoadBrightnessOpsEx1()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym WaitDimmingDone func failed!");
         return false;
     }
+    mGetFeatureSupportFunc = dlsym(mBrightnessManagerExtHandle, "GetFeatureSupport");
+    if (!mGetFeatureSupportFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym GetFeatureSupport func failed!");
+        return false;
+    }
+    mSetForcedBrightnessFunc = dlsym(mBrightnessManagerExtHandle, "SetForcedBrightness");
+    if (!mSetForcedBrightnessFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetForcedBrightness func failed!");
+        return false;
+    }
     mRunJsonCommandFunc = dlsym(mBrightnessManagerExtHandle, "RunJsonCommand");
     if (!mRunJsonCommandFunc) {
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym RunJsonCommand func failed!");
@@ -274,6 +284,8 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mGetBrightnessFunc = nullptr;
     mGetDeviceBrightnessFunc = nullptr;
     mWaitDimmingDoneFunc = nullptr;
+    mGetFeatureSupportFunc = nullptr;
+    mSetForcedBrightnessFunc = nullptr;
     mClearOffsetFunc = nullptr;
     mGetCurrentDisplayIdFunc = nullptr;
     mSetDisplayIdFunc = nullptr;
@@ -283,6 +295,15 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mRunJsonCommandFunc = nullptr;
     mRegisterDataChangeListenerFunc = nullptr;
     mUnregisterDataChangeListenerFunc = nullptr;
+}
+
+bool BrightnessManagerExt::GetFeatureSupport(BrightnessFeatureType feature)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto getFeatureSupportFunc = reinterpret_cast<bool (*)(BrightnessFeatureType)>(mGetFeatureSupportFunc);
+    return getFeatureSupportFunc(feature);
 }
 
 void BrightnessManagerExt::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
@@ -329,6 +350,15 @@ bool BrightnessManagerExt::AutoAdjustBrightness(bool enable)
     }
     auto autoAdjustBrightnessFunc = reinterpret_cast<bool (*)(bool)>(mAutoAdjustBrightnessFunc);
     return autoAdjustBrightnessFunc(enable);
+}
+
+bool BrightnessManagerExt::SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    using SetForcedBrightnessFunc = bool (*)(double, uint32_t, BrightnessValueType);
+    return reinterpret_cast<SetForcedBrightnessFunc>(mSetForcedBrightnessFunc)(value, duration, valueType);
 }
 
 bool BrightnessManagerExt::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
@@ -562,4 +592,4 @@ int BrightnessManagerExt::NotifyScreenPowerStatus(uint32_t displayId, uint32_t s
     return NotifyScreenPowerStatusFunc(displayId, status);
 }
 } // namespace DisplayPowerMgr
-} // namespace OHOS
+} // namespace OHOS

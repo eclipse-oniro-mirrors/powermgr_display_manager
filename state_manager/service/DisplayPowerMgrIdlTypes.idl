@@ -16,9 +16,29 @@
 package OHOS.DisplayPowerMgr;
 
 enum DisplayDataChangeListenerType {
+    DEFAULT = 0,
     LIGHT_OR_BRIGHTNESS_FOR_APS = 0,     // notify light or brightness changes for APS
     STABLE_LUX = 1,                      // notify stable ambient lux changes
     FORCE_EXIT_OVERRIDDEN_MODE = 2,      // notify force exit from overridden state
-    BRIGHTNESS_FOR_UI = 3,               // notify all brightness updates, including dimming
+    BRIGHTNESS_FOR_UI = 3,               // notify all brightness updates, including dimming;
+                                         // recommended via DMS BrightnessInfo.brightnessPosition
     BRIGHTNESS_TARGET = 4,               // notify final target brightness changes only
+    FACE_DETECTION_STATE = 5,            // notify face detection state changes (on/off)
+    BRIGHTNESS_SLIDER = 6,               // notify brightness slider press/release events
+    MAX
+};
+
+enum BrightnessFeatureType {
+    DEFAULT = 1000,
+    CARE_MODE = 1001,
+    SCREEN_FLASH = 1002,
+    MAX
+};
+
+enum BrightnessValueType {
+    DEFAULT = 0,
+    RELATIVE_TO_CURRENT_RANGE = 0,  // Value range: (0, 1], 1 represents max brightness under current range
+    RELATIVE_TO_MAX_RANGE,          // Value range: (0, 1], 1 represents max screen brightness
+    ABSOLUTE_NIT,                   // Value in nits, range: (0, infinity), capped at screen max if exceeded
+    MAX
 };

@@ -41,6 +41,15 @@ void BrightnessManager::DeInit()
 #endif
 }
 
+bool BrightnessManager::GetFeatureSupport(BrightnessFeatureType feature)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.GetFeatureSupport(feature);
+#else
+    return BrightnessService::Get().GetFeatureSupport(feature);
+#endif
+}
+
 void BrightnessManager::SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
 #ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
@@ -87,6 +96,15 @@ bool BrightnessManager::AutoAdjustBrightness(bool enable)
     #else
         return false;
     #endif
+#endif
+}
+
+bool BrightnessManager::SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.SetForcedBrightness(value, duration, valueType);
+#else
+    return BrightnessService::Get().SetForcedBrightness(value, duration, valueType);
 #endif
 }
 

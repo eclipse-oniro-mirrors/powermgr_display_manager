@@ -161,6 +161,20 @@ int32_t DisplayPowerMgrClient::GetMainDisplayId()
     return id;
 }
 
+bool DisplayPowerMgrClient::SetForcedBrightness(double value, uint32_t displayId, uint32_t duration,
+    BrightnessValueType valueType)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->SetForcedBrightness(value, displayId, duration, valueType, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SetForcedBrightness, ret = %{public}d", ret);
+        return false;
+    }
+    return result;
+}
+
 bool DisplayPowerMgrClient::SetBrightness(uint32_t value, uint32_t displayId, bool continuous)
 {
     auto proxy = GetProxy();
@@ -410,6 +424,18 @@ void DisplayPowerMgrClient::WaitDimmingDone()
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "WaitDimmingDone, ret = %{public}d", ret);
     }
+}
+
+bool DisplayPowerMgrClient::GetFeatureSupport(BrightnessFeatureType feature)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->GetFeatureSupport(feature, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "GetFeatureSupport, ret = %{public}d", ret);
+    }
+    return result;
 }
 
 bool DisplayPowerMgrClient::SetCoordinated(bool coordinated, uint32_t displayId)

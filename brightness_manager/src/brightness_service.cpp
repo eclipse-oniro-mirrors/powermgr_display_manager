@@ -305,6 +305,15 @@ void BrightnessService::DimmingCallbackImpl::DiscountBrightness(double discount)
     mDiscount = discount;
 }
 
+bool BrightnessService::GetFeatureSupport(BrightnessFeatureType feature)
+{
+    if (feature < BrightnessFeatureType::DEFAULT || feature >= BrightnessFeatureType::MAX) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "GetFeatureSupport invalid feature: %{public}d", feature);
+        return false;
+    }
+    return false; // not support by default
+}
+
 void BrightnessService::SetDisplayState(uint32_t id, DisplayState state)
 {
     mState = state;
@@ -707,6 +716,20 @@ uint32_t BrightnessService::GetBrightnessLevel(float lux)
 uint32_t BrightnessService::GetBrightnessHighLevel(uint32_t level)
 {
     return level;
+}
+
+bool BrightnessService::SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType)
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS,
+        "SetForcedBrightness: value=%{public}.2f, duration=%{public}u, valueType=%{public}d",
+        value, duration, static_cast<int>(valueType));
+
+    if (valueType < BrightnessValueType::DEFAULT || valueType >= BrightnessValueType::MAX) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "SetForcedBrightness: unknown valueType=%{public}d",
+            static_cast<int>(valueType));
+        return false;
+    }
+    return true;
 }
 
 bool BrightnessService::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)

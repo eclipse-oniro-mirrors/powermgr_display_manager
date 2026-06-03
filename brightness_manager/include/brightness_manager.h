@@ -32,11 +32,13 @@ public:
 
     void Init(uint32_t defaultMax, uint32_t defaultMin);
     void DeInit();
+    bool GetFeatureSupport(BrightnessFeatureType feature);
     void SetDisplayState(uint32_t id, DisplayState state, uint32_t reason);
     DisplayState GetState();
     bool IsSupportLightSensor(void);
     bool IsAutoAdjustBrightness(void);
     bool AutoAdjustBrightness(bool enable);
+    bool SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     bool DiscountBrightness(double discount);
     double GetDiscount() const;

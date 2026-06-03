@@ -43,6 +43,8 @@ public:
     DisplayState GetDisplayState(uint32_t id = 0);
     std::vector<uint32_t> GetDisplayIds();
     int32_t GetMainDisplayId();
+    bool SetForcedBrightness(double value, uint32_t displayId = 0, uint32_t duration = 500,
+        BrightnessValueType valueType = BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
     bool SetBrightness(uint32_t value, uint32_t displayId = 0, bool continuous = false);
     bool SetMaxBrightness(double value, uint32_t enterTestMode = 0);
     bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode = 0);
@@ -64,6 +66,7 @@ public:
     bool CancelBoostBrightness(uint32_t displayId = 0);
     uint32_t GetDeviceBrightness(uint32_t displayId = 0, bool useHbm = false);
     void WaitDimmingDone();
+    bool GetFeatureSupport(BrightnessFeatureType feature);
     bool SetCoordinated(bool coordinated, uint32_t displayId = 0);
     std::string RunJsonCommand(const std::string& request);
     // Registers a brightness data change listener. Returns 0 on success.

@@ -58,8 +58,8 @@ const int32_t ERR_OK = 0;
 
 #define CHECK_PARAM_WITH_RET(value, lower, upper, ret) \
     RETURN_IF_WITH_RET(IS_OUT_RANGE(value, lower, upper), ret)
-#define CHECK_PARAM_DURATION(value) \
-    RETURN_IF_WITH_RET(IS_OUT_RANGE(value, 0, 60 * 1000), false)
+#define CHECK_PARAM_DURATION_WITH_RET(value, ret) \
+    RETURN_IF_WITH_RET(IS_OUT_RANGE(value, 0, 60 * 1000), ret)
 }
 namespace {
 const uint32_t ID_AUTO_SWITCH_CALLBACK = 0;
@@ -373,7 +373,7 @@ bool DisplayPowerMgrService::OverrideBrightnessInner(uint32_t brightness, uint32
     }
     DISPLAY_HILOGI(COMP_SVC, "OverrideBrightness displayId=%{public}u, value=%{public}u, duration=%{public}d",
         displayId, brightness, duration);
-    CHECK_PARAM_DURATION(duration);
+    CHECK_PARAM_DURATION_WITH_RET(duration, false);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
@@ -404,7 +404,7 @@ bool DisplayPowerMgrService::RestoreBrightnessInner(uint32_t displayId, uint32_t
     }
     DISPLAY_HILOGI(COMP_SVC, "RestoreBrightness displayId=%{public}u, duration=%{public}d",
         displayId, duration);
-    CHECK_PARAM_DURATION(duration);
+    CHECK_PARAM_DURATION_WITH_RET(duration, false);
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
         return false;
@@ -448,7 +448,7 @@ bool DisplayPowerMgrService::AdjustBrightnessInner(uint32_t id, int32_t value, u
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AdjustBrightness %{public}d, %{public}d, %{public}d",
                    id, value, duration);
-    CHECK_PARAM_DURATION(duration);
+    CHECK_PARAM_DURATION_WITH_RET(duration, false);
     auto iterator = controllerMap_.find(id);
     if (iterator == controllerMap_.end()) {
         return false;
@@ -893,6 +893,28 @@ ErrCode DisplayPowerMgrService::GetMainDisplayId(uint32_t& id)
     return ERR_OK;
 }
 
+ErrCode DisplayPowerMgrService::SetForcedBrightness(double value, uint32_t displayId, uint32_t duration,
+    BrightnessValueType valueType, bool& result)
+{
+    NoCoroutineSwitchGuard threadIdGuard;
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::SetForcedBrightness");
+    if (!Permission::IsSystem()) {
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+    CHECK_PARAM_DURATION_WITH_RET(duration, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    DISPLAY_HILOGI(COMP_SVC, "SetForcedBrightness value=%{public}.2f, duration=%{public}u, valueType=%{public}d",
+        value, duration, static_cast<int>(valueType));
+    if (valueType < BrightnessValueType::DEFAULT || valueType >= BrightnessValueType::MAX) {
+        DISPLAY_HILOGE(COMP_SVC, "SetForcedBrightness: invalid valueType=%{public}d",
+            static_cast<int>(valueType));
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    result = BrightnessManager::Get().SetForcedBrightness(value, duration, valueType);
+    return ERR_OK;
+}
+
 ErrCode DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
     int32_t& displayError)
 {
@@ -1097,6 +1119,25 @@ ErrCode DisplayPowerMgrService::WaitDimmingDone()
     return ERR_OK;
 }
 
+ErrCode DisplayPowerMgrService::GetFeatureSupport(BrightnessFeatureType feature, bool& result)
+{
+    NoCoroutineSwitchGuard threadIdGuard;
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::GetFeatureSupport");
+    if (!Permission::IsSystem()) {
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+    DISPLAY_HILOGI(COMP_SVC, "GetFeatureSupport feature=%{public}d", static_cast<int>(feature));
+    if (feature < BrightnessFeatureType::DEFAULT || feature >= BrightnessFeatureType::MAX) {
+        DISPLAY_HILOGE(COMP_SVC, "GetFeatureSupport: invalid feature=%{public}d",
+            static_cast<int>(feature));
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    result = BrightnessManager::Get().GetFeatureSupport(feature);
+    return ERR_OK;
+}
+
 ErrCode DisplayPowerMgrService::RunJsonCommand(const std::string& request, std::string& result)
 {
     NoCoroutineSwitchGuard threadIdGuard;
@@ -1136,6 +1177,12 @@ ErrCode DisplayPowerMgrService::RegisterDataChangeListener(const sptr<IDisplayBr
         return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
     auto id = GetCallerIdWithPid(callerId);
+    if (listenerType < DisplayDataChangeListenerType::DEFAULT || listenerType >= DisplayDataChangeListenerType::MAX) {
+        DISPLAY_HILOGE(COMP_SVC, "RegisterDataChangeListener: invalid listenerType=%{public}d",
+            static_cast<int>(listenerType));
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
     result = BrightnessManager::Get().RegisterDataChangeListener(listener, listenerType, id, params);
     return ERR_OK;
 }
@@ -1151,6 +1198,12 @@ ErrCode DisplayPowerMgrService::UnregisterDataChangeListener(
     }
     if (callerId.length() > MAX_PARAMS_LENGTH) {
         DISPLAY_HILOGE(COMP_SVC, "UnregisterDataChangeListener, params too long: %{public}zu", callerId.length());
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    if (listenerType < DisplayDataChangeListenerType::DEFAULT || listenerType >= DisplayDataChangeListenerType::MAX) {
+        DISPLAY_HILOGE(COMP_SVC, "UnregisterDataChangeListener: invalid listenerType=%{public}d",
+            static_cast<int>(listenerType));
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
         return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
     }
