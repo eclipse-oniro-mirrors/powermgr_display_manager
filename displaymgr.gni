@@ -24,6 +24,7 @@ declare_args() {
   }
   display_manager_feature_brightnessext = ""
   display_manager_feature_poweroff_strategy = false
+  display_manager_feature_per_screen_power = false
   display_manager_feature_support_display_cli = false
 
   if (!defined(global_parts_info) ||
@@ -44,6 +45,9 @@ declare_args() {
 }
 if (display_manager_feature_poweroff_strategy) {
     defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
+}
+if (display_manager_feature_per_screen_power) {
+    defines += [ "ENABLE_PER_SCREEN_POWER" ]
 }
 displaymgr_part_name = "display_manager"
 

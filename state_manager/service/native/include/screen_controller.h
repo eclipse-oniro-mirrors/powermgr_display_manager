@@ -46,6 +46,7 @@ public:
     };
 
     DisplayState GetState();
+    void SetState(DisplayState state);
     DisplayState SetDelayOffState();
     DisplayState SetOnState();
     bool UpdateState(DisplayState state, uint32_t reason);
