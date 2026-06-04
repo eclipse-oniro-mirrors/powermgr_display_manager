@@ -31,6 +31,10 @@
 #include "sensor_agent_type.h"
 #endif
 #include "idisplay_power_callback.h"
+#ifdef ENABLE_PER_SCREEN_POWER
+#include "iscreen_display_state_callback.h"
+#include "screen_power_adapter.h"
+#endif
 #include "display_power_info.h"
 #include "display_common.h"
 #include "display_power_mgr_stub.h"
@@ -85,6 +89,17 @@ public:
     ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
     ErrCode SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
         const sptr<IRemoteObject>& token, int32_t& result) override;
+    ErrCode SetDisplayStateById(uint64_t displayId, uint32_t state, uint32_t reason, int32_t& retCode) override;
+    ErrCode GetDisplayStateById(uint64_t displayId, int32_t& displayState) override;
+    ErrCode RegisterScreenDisplayStateCallback(const sptr<IRemoteObject>& callback, bool& result) override;
+    ErrCode UnregisterScreenDisplayStateCallback(bool& result) override;
+#ifdef ENABLE_PER_SCREEN_POWER
+private:
+    bool RegisterScreenDisplayStateCallbackInner(const sptr<IRemoteObject>& callback);
+    void UnregisterScreenDisplayStateCallbackInner();
+    void NotifyScreenDisplayStateCallback(uint64_t displayId, uint32_t state, uint32_t reason);
+    void PublishScreenDisplayChangedEvent(uint64_t displayId, uint32_t state, uint32_t reason);
+#endif
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
@@ -186,6 +201,9 @@ private:
     std::map<uint64_t, std::shared_ptr<ScreenController>> controllerMap_;
     sptr<IDisplayPowerCallback> callback_;
     sptr<CallbackDeathRecipient> cbDeathRecipient_;
+#ifdef ENABLE_PER_SCREEN_POWER
+    sptr<IScreenDisplayStateCallback> screenDisplayStateCallback_;
+#endif
 
     std::atomic_int32_t lastError_ {static_cast<int32_t>(DisplayErrors::ERR_OK)};
     std::mutex mutex_;

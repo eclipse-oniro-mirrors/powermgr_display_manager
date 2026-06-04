@@ -541,5 +541,57 @@ DisplayErrors DisplayPowerMgrClient::SetScreenPowerOffStrategy(PowerOffStrategy 
 #endif
 }
 
+DisplayErrors DisplayPowerMgrClient::SetDisplayStateById(uint64_t displayId, uint32_t state, uint32_t reason)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
+    int32_t retCode = DEFAULT_VALUE;
+    auto ret = proxy->SetDisplayStateById(displayId, state, reason, retCode);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SetDisplayStateById, ret = %{public}d", ret);
+        return DisplayErrors::ERR_CONNECTION_FAIL;
+    }
+    return static_cast<DisplayErrors>(retCode);
+}
+
+DisplayState DisplayPowerMgrClient::GetDisplayStateById(uint64_t displayId)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, DisplayState::DISPLAY_UNKNOWN);
+    int32_t displayState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
+    auto ret = proxy->GetDisplayStateById(displayId, displayState);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "GetDisplayStateById, ret = %{public}d", ret);
+        return DisplayState::DISPLAY_UNKNOWN;
+    }
+    return static_cast<DisplayState>(displayState);
+}
+
+bool DisplayPowerMgrClient::RegisterScreenDisplayStateCallback(sptr<IScreenDisplayStateCallback> callback)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->RegisterScreenDisplayStateCallback(callback->AsObject(), result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "RegisterScreenDisplayStateCallback, ret = %{public}d", ret);
+        return false;
+    }
+    return result;
+}
+
+bool DisplayPowerMgrClient::UnregisterScreenDisplayStateCallback()
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->UnregisterScreenDisplayStateCallback(result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "UnregisterScreenDisplayStateCallback, ret = %{public}d", ret);
+        return false;
+    }
+    return result;
+}
+
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

@@ -22,6 +22,7 @@
 
 #include "display_power_info.h"
 #include "idisplay_power_callback.h"
+#include "iscreen_display_state_callback.h"
 #include "idisplay_power_mgr.h"
 #include "power_state_machine_info.h"
 #include "display_mgr_errors.h"
@@ -75,6 +76,10 @@ public:
     int NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status);
     DisplayErrors SetScreenPowerOffStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason =
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
+    DisplayErrors SetDisplayStateById(uint64_t displayId, uint32_t state, uint32_t reason);
+    DisplayState GetDisplayStateById(uint64_t displayId);
+    bool RegisterScreenDisplayStateCallback(sptr<IScreenDisplayStateCallback> callback);
+    bool UnregisterScreenDisplayStateCallback();
 
 #ifndef DISPLAY_SERVICE_DEATH_UT
 private:

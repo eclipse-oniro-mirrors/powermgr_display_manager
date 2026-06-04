@@ -38,6 +38,12 @@ ohos_shared_library("displaymgr") {
     "${displaymgr_service_zidl}/src/display_brightness_listener_stub.cpp",
   ]
 
+  if (display_manager_feature_per_screen_power) {
+    sources += [
+      "${displaymgr_service_zidl}/src/screen_display_state_callback_stub.cpp",
+    ]
+  }
+
   configs = [
     ":displaymgr_private_config",
     "${displaymgr_utils_path}:coverage_flags",

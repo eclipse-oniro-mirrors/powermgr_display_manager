@@ -106,6 +106,12 @@ ohos_shared_library("displaymgrservice") {
       "native/src/miscellaneous_display_power_strategy.cpp",
     ]
   }
+  if (display_manager_feature_per_screen_power) {
+    sources += [
+      "native/src/screen_power_adapter.cpp",
+      "zidl/src/screen_display_state_callback_proxy.cpp",
+    ]
+  }
   shlib_type = "sa"
   subsystem_name = "powermgr"
   part_name = "${displaymgr_part_name}"
