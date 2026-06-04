@@ -159,6 +159,16 @@ bool ScreenController::IsScreenOn()
     return (state_.load() == DisplayState::DISPLAY_ON || state_.load() == DisplayState::DISPLAY_DIM);
 }
 
+DisplayState ScreenController::UpdateCachedState()
+{
+    DisplayState displayState = action_->GetDisplayState(true);
+    lock_guard lock(mutexState_);
+    DISPLAY_HILOGI(FEAT_STATE, "UpdateCachedState, old=%{public}u, new=%{public}u",
+        static_cast<uint32_t>(state_.load()), static_cast<uint32_t>(displayState));
+    state_ = displayState;
+    return displayState;
+}
+
 bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)
 {
     if (CanSetBrightness()) { // not set brightness

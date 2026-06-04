@@ -173,6 +173,11 @@ int32_t MockDisplayPowerMgrProxy::SetScreenOnBrightness(bool& isResult)
     return ERR_FAIL;
 }
 
+int32_t MockDisplayPowerMgrProxy::IsScreenOnStrengthen(bool& isResult)
+{
+    return ERR_FAIL;
+}
+
 int32_t MockDisplayPowerMgrProxy::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus,
     int32_t& retCode)
 {

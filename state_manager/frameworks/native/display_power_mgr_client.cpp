@@ -332,6 +332,19 @@ bool DisplayPowerMgrClient::SetScreenOnBrightness()
     return result;
 }
 
+bool DisplayPowerMgrClient::IsScreenOnStrengthen()
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->IsScreenOnStrengthen(result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "IsScreenOnStrengthen, ret = %{public}d", ret);
+        return false;
+    }
+    return result;
+}
+
 bool DisplayPowerMgrClient::RegisterCallback(sptr<IDisplayPowerCallback> callback)
 {
     if (callback == nullptr) {

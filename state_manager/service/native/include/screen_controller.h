@@ -50,6 +50,7 @@ public:
     DisplayState SetOnState();
     bool UpdateState(DisplayState state, uint32_t reason);
     bool IsScreenOn();
+    DisplayState UpdateCachedState();
 
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     uint32_t GetBrightness();

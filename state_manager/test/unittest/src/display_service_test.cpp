@@ -129,6 +129,11 @@ ScreenPowerState ScreenManagerLite::GetScreenPower()
 {
     return g_powerState;
 }
+
+ScreenPowerState ScreenManagerLite::GetScreenPower(ScreenId screenId)
+{
+    return g_powerState;
+}
 } //namespace OHOS::Rosen
 
 namespace {
@@ -687,5 +692,109 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest039, TestSize.Level1)
     EXPECT_TRUE(g_service != nullptr);
     g_service->RegisterBootCompletedCallback();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest039 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest040
+ * @tc.desc: Test IsScreenOnStrengthen when screen power is POWER_ON
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest040, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest040 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    bool result = false;
+    // Set screen to ON state first
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    ErrCode ret = g_service->IsScreenOnStrengthen(result);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest040 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest041
+ * @tc.desc: Test IsScreenOnStrengthen when screen power is POWER_OFF
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest041, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest041 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    bool result = false;
+    // Set screen to OFF state first
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF), REASON, result);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_OFF;
+    ErrCode ret = g_service->IsScreenOnStrengthen(result);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_FALSE(result);
+    // Restore to ON state
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), REASON, result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest041 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest042
+ * @tc.desc: Test IsScreenOnStrengthenInner when controller is not in controllerMap_
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest042, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest042 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    auto controller = g_service->controllerMap_[DISPLAY_MAIN_ID];
+    g_service->controllerMap_.erase(DISPLAY_MAIN_ID);
+    bool result = false;
+    ErrCode ret = g_service->IsScreenOnStrengthen(result);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_FALSE(result);
+    g_service->controllerMap_.emplace(DISPLAY_MAIN_ID, controller);
+    result = false;
+    ret = g_service->IsScreenOnStrengthen(result);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_TRUE(result);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_OFF;
+    controller->UpdateCachedState();
+    result = true;
+    ret = g_service->IsScreenOnStrengthen(result);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest042 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest043
+ * @tc.desc: Test ScreenController UpdateCachedState
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest043, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest043 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    auto iter = g_service->controllerMap_.find(DISPLAY_MAIN_ID);
+    ASSERT_TRUE(iter != g_service->controllerMap_.end());
+    auto& controller = iter->second;
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    bool resultSettle = false;
+    g_service->SetDisplayState(DISPLAY_MAIN_ID,
+        static_cast<uint32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON), REASON, resultSettle);
+    EXPECT_EQ(controller->GetState(), DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_OFF;
+    DisplayPowerMgr::DisplayState retState = controller->UpdateCachedState();
+    EXPECT_EQ(retState, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    EXPECT_EQ(controller->GetState(), DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    g_powerState = OHOS::Rosen::ScreenPowerState::POWER_ON;
+    retState = controller->UpdateCachedState();
+    EXPECT_EQ(retState, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    EXPECT_EQ(controller->GetState(), DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest043 function end!");
 }
 } // namespace

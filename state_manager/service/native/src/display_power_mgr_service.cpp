@@ -205,6 +205,19 @@ bool DisplayPowerMgrService::SetScreenOnBrightnessInner()
     return true;
 }
 
+bool DisplayPowerMgrService::IsScreenOnStrengthenInner()
+{
+    bool isScreenOn = false;
+    for (auto& iter: controllerMap_) {
+        DisplayState state = iter.second->UpdateCachedState();
+        if (state == DisplayState::DISPLAY_ON) {
+            isScreenOn = true;
+        }
+    }
+    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER] IsScreenOnStrengthen %{public}d", isScreenOn);
+    return isScreenOn;
+}
+
 void DisplayPowerMgrService::ClearOffset()
 {
     BrightnessManager::Get().ClearOffset();
@@ -1009,6 +1022,13 @@ ErrCode DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetScreenOnBrightness");
     result = SetScreenOnBrightnessInner();
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::IsScreenOnStrengthen(bool& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::IsScreenOnStrengthen");
+    result = IsScreenOnStrengthenInner();
     return ERR_OK;
 }
 

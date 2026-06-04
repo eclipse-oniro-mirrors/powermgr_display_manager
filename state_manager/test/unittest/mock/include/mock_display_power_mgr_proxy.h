@@ -60,6 +60,7 @@ public:
         const sptr<IDisplayBrightnessCallback>& displayBrightnessCallback, uint32_t& retCode) override;
     int32_t RegisterCallback(const sptr<IDisplayPowerCallback>& displayPowercallback, bool& bResult) override;
     int32_t SetScreenOnBrightness(bool& bResult) override;
+    int32_t IsScreenOnStrengthen(bool& bResult) override;
     int32_t NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& retCode) override;
     int32_t SetScreenDisplayState(uint64_t screenId, uint32_t status, uint32_t reason) override;
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
