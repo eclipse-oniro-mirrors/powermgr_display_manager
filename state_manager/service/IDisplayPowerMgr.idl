@@ -63,4 +63,9 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void SetScreenDisplayState([in] unsigned long id, [in] unsigned int status, [in] unsigned int reason);
     void SetScreenPowerOffStrategy([in] unsigned int strategy, [in] unsigned int reason,
         [in] IRemoteObject token, [out] int retCode);
+    void SetDisplayStateById([in] unsigned long displayId, [in] unsigned int state, [in] unsigned int reason,
+        [out] int retCode);
+    void GetDisplayStateById([in] unsigned long displayId, [out] int displayState);
+    void RegisterScreenDisplayStateCallback([in] IRemoteObject callback, [out] boolean bResult);
+    void UnregisterScreenDisplayStateCallback([out] boolean bResult);
 }
