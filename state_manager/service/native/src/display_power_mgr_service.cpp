@@ -39,6 +39,14 @@
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 #include "miscellaneous_display_power_strategy.h"
 #endif
+#ifdef ENABLE_PER_SCREEN_POWER
+#include <common_event_data.h>
+#include <common_event_manager.h>
+#include <common_event_publish_info.h>
+#include <want.h>
+#include "iscreen_display_state_callback.h"
+#include "screen_display_state_callback_proxy.h"
+#endif
 
 namespace OHOS {
 namespace DisplayPowerMgr {
@@ -664,7 +672,21 @@ void DisplayPowerMgrService::CallbackDeathRecipient::OnRemoteDied(const wptr<IRe
         return;
     }
 
-    pms->UnregisterCallbackInner();
+    auto remoteObj = remote.promote();
+    if (remoteObj == nullptr) {
+        DISPLAY_HILOGI(COMP_SVC, "OnRemoteDied remote is null");
+        return;
+    }
+
+    if (pms->callback_ != nullptr && pms->callback_->AsObject() == remoteObj) {
+        pms->UnregisterCallbackInner();
+    }
+#ifdef ENABLE_PER_SCREEN_POWER
+    if (pms->screenDisplayStateCallback_ != nullptr &&
+        pms->screenDisplayStateCallback_->AsObject() == remoteObj) {
+        pms->UnregisterScreenDisplayStateCallbackInner();
+    }
+#endif
 }
 
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
@@ -1099,5 +1121,206 @@ ErrCode DisplayPowerMgrService::SetScreenPowerOffStrategy(uint32_t strategy, uin
 #endif
     return ERR_OK;
 }
+
+#ifdef ENABLE_PER_SCREEN_POWER
+
+ErrCode DisplayPowerMgrService::SetDisplayStateById(uint64_t displayId, uint32_t state, uint32_t reason,
+    int32_t& retCode)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::SetDisplayStateById");
+    retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+
+    if (!Permission::IsSystem()) {
+        retCode = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return ERR_OK;
+    }
+
+    if (state != static_cast<uint32_t>(DisplayState::DISPLAY_ON) &&
+        state != static_cast<uint32_t>(DisplayState::DISPLAY_OFF)) {
+        DISPLAY_HILOGE(COMP_SVC, "SetDisplayStateById invalid state: %{public}u", state);
+        retCode = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return ERR_OK;
+    }
+
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        DISPLAY_HILOGE(COMP_SVC, "SetDisplayStateById displayId not found: %{public}lu", displayId);
+        retCode = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return ERR_OK;
+    }
+
+    DisplayState currentState = iter->second->GetState();
+    if (static_cast<uint32_t>(currentState) == state) {
+        DISPLAY_HILOGI(COMP_SVC, "Display %{public}lu already in state %{public}u", displayId, state);
+        return ERR_OK;
+    }
+
+    Rosen::ScreenPowerState powerState = (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON))
+        ? Rosen::ScreenPowerState::POWER_ON : Rosen::ScreenPowerState::POWER_OFF;
+    auto dmsReason = static_cast<Rosen::PowerStateChangeReason>(reason);
+
+    if (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON)) {
+        ScreenPowerAdapter::GetInstance().WakeUpBegin(displayId, dmsReason);
+    } else {
+        ScreenPowerAdapter::GetInstance().SuspendBegin(displayId, dmsReason);
+    }
+
+    bool ret = ScreenPowerAdapter::GetInstance().SetScreenPowerById(
+        static_cast<Rosen::ScreenId>(displayId), powerState, dmsReason);
+    if (!ret) {
+        DISPLAY_HILOGE(COMP_SVC, "SetScreenPowerById failed, displayId=%{public}lu, state=%{public}u",
+            displayId, state);
+        retCode = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return ERR_OK;
+    }
+
+    iter->second->SetState(static_cast<DisplayState>(state));
+
+    if (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON)) {
+        ScreenPowerAdapter::GetInstance().SetScreenOnBrightness(displayId);
+    }
+
+    NotifyScreenDisplayStateCallback(displayId, state, reason);
+    PublishScreenDisplayChangedEvent(displayId, state, reason);
+
+    if (state == static_cast<uint32_t>(DisplayState::DISPLAY_ON)) {
+        ScreenPowerAdapter::GetInstance().WakeUpEnd(displayId);
+    } else {
+        ScreenPowerAdapter::GetInstance().SuspendEnd(displayId);
+    }
+
+    DISPLAY_HILOGI(COMP_SVC, "SetDisplayStateById done, displayId=%{public}lu, state=%{public}u", displayId, state);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::GetDisplayStateById(uint64_t displayId, int32_t& displayState)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDisplayStateById");
+    displayState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
+
+    if (!Permission::IsSystem()) {
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+
+    auto iter = controllerMap_.find(displayId);
+    if (iter == controllerMap_.end()) {
+        DISPLAY_HILOGW(COMP_SVC, "GetDisplayStateById displayId not found: %{public}lu", displayId);
+        return ERR_OK;
+    }
+
+    displayState = static_cast<int32_t>(iter->second->GetState());
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::RegisterScreenDisplayStateCallback(const sptr<IRemoteObject>& callback, bool& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterScreenDisplayStateCallback");
+    result = RegisterScreenDisplayStateCallbackInner(callback);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::UnregisterScreenDisplayStateCallback(bool& result)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::UnregisterScreenDisplayStateCallback");
+    UnregisterScreenDisplayStateCallbackInner();
+    result = true;
+    return ERR_OK;
+}
+
+bool DisplayPowerMgrService::RegisterScreenDisplayStateCallbackInner(const sptr<IRemoteObject>& callback)
+{
+    if (!Permission::IsSystem()) {
+        return false;
+    }
+    if (callback == nullptr) {
+        DISPLAY_HILOGE(COMP_SVC, "RegisterScreenDisplayStateCallback callback is null");
+        return false;
+    }
+    std::lock_guard lock(mutex_);
+    screenDisplayStateCallback_ = iface_cast<IScreenDisplayStateCallback>(callback);
+    if (screenDisplayStateCallback_ == nullptr) {
+        DISPLAY_HILOGE(COMP_SVC, "RegisterScreenDisplayStateCallback iface_cast failed");
+        return false;
+    }
+    sptr<IRemoteObject> remote = screenDisplayStateCallback_->AsObject();
+    if (remote == nullptr || !remote->IsProxyObject()) {
+        DISPLAY_HILOGE(COMP_SVC, "RegisterScreenDisplayStateCallback not a proxy");
+        return false;
+    }
+    if (cbDeathRecipient_ == nullptr) {
+        cbDeathRecipient_ = new CallbackDeathRecipient();
+    }
+    remote->AddDeathRecipient(cbDeathRecipient_);
+    DISPLAY_HILOGI(COMP_SVC, "RegisterScreenDisplayStateCallback success");
+    return true;
+}
+
+void DisplayPowerMgrService::UnregisterScreenDisplayStateCallbackInner()
+{
+    std::lock_guard lock(mutex_);
+    if (screenDisplayStateCallback_ != nullptr) {
+        sptr<IRemoteObject> remote = screenDisplayStateCallback_->AsObject();
+        if (remote != nullptr && cbDeathRecipient_ != nullptr) {
+            remote->RemoveDeathRecipient(cbDeathRecipient_);
+        }
+        screenDisplayStateCallback_ = nullptr;
+    }
+    DISPLAY_HILOGI(COMP_SVC, "UnregisterScreenDisplayStateCallback done");
+}
+
+void DisplayPowerMgrService::NotifyScreenDisplayStateCallback(uint64_t displayId, uint32_t state, uint32_t reason)
+{
+    std::lock_guard lock(mutex_);
+    if (screenDisplayStateCallback_ != nullptr) {
+        screenDisplayStateCallback_->OnDisplayStateChanged(displayId, state, reason);
+    }
+}
+
+void DisplayPowerMgrService::PublishScreenDisplayChangedEvent(uint64_t displayId, uint32_t state, uint32_t reason)
+{
+    AAFwk::Want want;
+    want.SetAction("usual.event.SCREEN_DISPLAY_CHANGED");
+    want.SetParam("displayId", static_cast<int64_t>(displayId));
+    want.SetParam("state", static_cast<int32_t>(state));
+    want.SetParam("reason", static_cast<int32_t>(reason));
+
+    EventFwk::CommonEventData event(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+
+    bool result = EventFwk::CommonEventManager::PublishCommonEvent(event, publishInfo, nullptr);
+    DISPLAY_HILOGI(COMP_SVC,
+        "PublishScreenDisplayChangedEvent displayId=%{public}lu state=%{public}u reason=%{public}u ret=%{public}d",
+        displayId, state, reason, result);
+}
+
+#else // !ENABLE_PER_SCREEN_POWER
+
+ErrCode DisplayPowerMgrService::SetDisplayStateById(uint64_t displayId, uint32_t state, uint32_t reason,
+    int32_t& retCode)
+{
+    retCode = static_cast<int32_t>(DisplayErrors::ERR_DEVICE_NOT_SUPPORTED);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::GetDisplayStateById(uint64_t displayId, int32_t& displayState)
+{
+    displayState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::RegisterScreenDisplayStateCallback(const sptr<IRemoteObject>& callback, bool& result)
+{
+    result = false;
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::UnregisterScreenDisplayStateCallback(bool& result)
+{
+    result = false;
+    return ERR_OK;
+}
+
+#endif // ENABLE_PER_SCREEN_POWER
 } // namespace DisplayPowerMgr
 } // namespace OHOS
