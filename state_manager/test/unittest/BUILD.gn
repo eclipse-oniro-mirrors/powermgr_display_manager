@@ -452,6 +452,7 @@ ohos_unittest("unittest_display_service_test") {
 
   sources = [
     "src/display_service_test.cpp",
+    "src/display_per_screen_power_test.cpp",
     "${displaymgr_utils_path}/native/src/display_xcollie.cpp",
     "${displaymgr_root_path}/service/native/src/display_auto_brightness.cpp",
     "${displaymgr_root_path}/service/native/src/display_common_event_mgr.cpp",
@@ -520,6 +521,11 @@ ohos_unittest("unittest_display_service_test") {
   if (display_manager_feature_poweroff_strategy) {
     sources += [
       "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
+    ]
+  }
+  if (display_manager_feature_per_screen_power) {
+    sources += [
+      "${displaymgr_root_path}/service/zidl/src/screen_display_state_callback_proxy.cpp",
     ]
   }
 }
