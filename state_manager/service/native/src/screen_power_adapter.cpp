@@ -15,6 +15,8 @@
 
 #ifdef ENABLE_PER_SCREEN_POWER
 
+#include <cinttypes>
+
 #include "screen_power_adapter.h"
 
 namespace OHOS {
@@ -31,7 +33,7 @@ ScreenPowerAdapter& ScreenPowerAdapter::GetInstance()
 bool ScreenPowerAdapter::WakeUpBegin(uint64_t displayId, Rosen::PowerStateChangeReason reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::WakeUpBegin MOCK, displayId=%{public}lu, reason=%{public}u",
+        "ScreenPowerAdapter::WakeUpBegin MOCK, displayId=%{public}" PRIu64 ", reason=%{public}u",
         displayId, static_cast<uint32_t>(reason));
     RecordCall("WakeUpBegin", displayId, static_cast<int32_t>(reason));
     return true;
@@ -40,7 +42,7 @@ bool ScreenPowerAdapter::WakeUpBegin(uint64_t displayId, Rosen::PowerStateChange
 bool ScreenPowerAdapter::WakeUpEnd(uint64_t displayId)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::WakeUpEnd MOCK, displayId=%{public}lu",
+        "ScreenPowerAdapter::WakeUpEnd MOCK, displayId=%{public}" PRIu64 "",
         displayId);
     RecordCall("WakeUpEnd", displayId, 0);
     return true;
@@ -49,7 +51,7 @@ bool ScreenPowerAdapter::WakeUpEnd(uint64_t displayId)
 bool ScreenPowerAdapter::SuspendBegin(uint64_t displayId, Rosen::PowerStateChangeReason reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::SuspendBegin MOCK, displayId=%{public}lu, reason=%{public}u",
+        "ScreenPowerAdapter::SuspendBegin MOCK, displayId=%{public}" PRIu64 ", reason=%{public}u",
         displayId, static_cast<uint32_t>(reason));
     RecordCall("SuspendBegin", displayId, static_cast<int32_t>(reason));
     return true;
@@ -58,7 +60,7 @@ bool ScreenPowerAdapter::SuspendBegin(uint64_t displayId, Rosen::PowerStateChang
 bool ScreenPowerAdapter::SuspendEnd(uint64_t displayId)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::SuspendEnd MOCK, displayId=%{public}lu",
+        "ScreenPowerAdapter::SuspendEnd MOCK, displayId=%{public}" PRIu64 "",
         displayId);
     RecordCall("SuspendEnd", displayId, 0);
     return true;
@@ -70,14 +72,14 @@ bool ScreenPowerAdapter::SetScreenPowerById(uint64_t displayId,
     Rosen::ScreenPowerState powerState, Rosen::PowerStateChangeReason reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::SetScreenPowerById REAL, displayId=%{public}lu, powerState=%{public}u, reason=%{public}u",
+        "ScreenPowerAdapter::SetScreenPowerById REAL, displayId=%{public}" PRIu64 ", powerState=%{public}u, reason=%{public}u",
         displayId, static_cast<uint32_t>(powerState), static_cast<uint32_t>(reason));
     RecordCall("SetScreenPowerById", displayId, static_cast<int32_t>(powerState));
     bool ret = Rosen::DisplayManagerLite::GetInstance().SetScreenPowerById(
         static_cast<Rosen::ScreenId>(displayId), powerState, reason);
     if (!ret) {
         DISPLAY_HILOGE(COMP_SVC,
-            "SetScreenPowerById REAL failed, displayId=%{public}lu", displayId);
+            "SetScreenPowerById REAL failed, displayId=%{public}" PRIu64 "", displayId);
     }
     return ret;
 }
@@ -87,7 +89,7 @@ bool ScreenPowerAdapter::SetScreenPowerById(uint64_t displayId,
 bool ScreenPowerAdapter::SetScreenOnBrightness(uint64_t displayId)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "ScreenPowerAdapter::SetScreenOnBrightness MOCK, displayId=%{public}lu",
+        "ScreenPowerAdapter::SetScreenOnBrightness MOCK, displayId=%{public}" PRIu64 "",
         displayId);
     RecordCall("SetScreenOnBrightness", displayId, 0);
     // MOCK: In production mock, also call the existing global version for basic brightness

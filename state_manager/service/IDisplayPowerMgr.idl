@@ -66,6 +66,6 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void SetDisplayStateById([in] unsigned long displayId, [in] unsigned int state, [in] unsigned int reason,
         [out] int retCode);
     void GetDisplayStateById([in] unsigned long displayId, [out] int displayState);
-    void RegisterScreenDisplayStateCallback([in] IRemoteObject callback, [out] boolean bResult);
+    void RegisterScreenDisplayStateCallback([in] IRemoteObject displayStateCb, [out] boolean bResult);
     void UnregisterScreenDisplayStateCallback([out] boolean bResult);
 }

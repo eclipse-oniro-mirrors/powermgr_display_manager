@@ -115,7 +115,7 @@ private:
 
     void RecordCall(const std::string& methodName, uint64_t displayId, int32_t param);
 
-    std::mutex recordsMutex_;
+    mutable std::mutex recordsMutex_;
     std::vector<CallRecord> callRecords_;
 };
 
