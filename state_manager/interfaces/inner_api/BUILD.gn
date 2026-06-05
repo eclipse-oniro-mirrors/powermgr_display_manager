@@ -42,6 +42,7 @@ ohos_shared_library("displaymgr") {
     sources += [
       "${displaymgr_service_zidl}/src/screen_display_state_callback_stub.cpp",
     ]
+    defines += [ "ENABLE_PER_SCREEN_POWER" ]
   }
 
   configs = [

@@ -111,6 +111,7 @@ ohos_shared_library("displaymgrservice") {
       "native/src/screen_power_adapter.cpp",
       "zidl/src/screen_display_state_callback_proxy.cpp",
     ]
+    defines += [ "ENABLE_PER_SCREEN_POWER" ]
   }
   shlib_type = "sa"
   subsystem_name = "powermgr"

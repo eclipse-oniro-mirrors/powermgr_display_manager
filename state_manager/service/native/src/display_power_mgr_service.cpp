@@ -14,6 +14,7 @@
  */
 
 #include "display_power_mgr_service.h"
+#include <cinttypes>
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
 #include <hisysevent.h>
 #endif
@@ -1144,14 +1145,14 @@ ErrCode DisplayPowerMgrService::SetDisplayStateById(uint64_t displayId, uint32_t
 
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
-        DISPLAY_HILOGE(COMP_SVC, "SetDisplayStateById displayId not found: %{public}lu", displayId);
+        DISPLAY_HILOGE(COMP_SVC, "SetDisplayStateById displayId not found: %{public}" PRIu64, displayId);
         retCode = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
         return ERR_OK;
     }
 
     DisplayState currentState = iter->second->GetState();
     if (static_cast<uint32_t>(currentState) == state) {
-        DISPLAY_HILOGI(COMP_SVC, "Display %{public}lu already in state %{public}u", displayId, state);
+        DISPLAY_HILOGI(COMP_SVC, "Display %{public}" PRIu64 " already in state %{public}u", displayId, state);
         return ERR_OK;
     }
 
@@ -1168,7 +1169,7 @@ ErrCode DisplayPowerMgrService::SetDisplayStateById(uint64_t displayId, uint32_t
     bool ret = ScreenPowerAdapter::GetInstance().SetScreenPowerById(
         static_cast<Rosen::ScreenId>(displayId), powerState, dmsReason);
     if (!ret) {
-        DISPLAY_HILOGE(COMP_SVC, "SetScreenPowerById failed, displayId=%{public}lu, state=%{public}u",
+        DISPLAY_HILOGE(COMP_SVC, "SetScreenPowerById failed, displayId=%{public}" PRIu64 ", state=%{public}u",
             displayId, state);
         retCode = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
         return ERR_OK;
@@ -1189,7 +1190,7 @@ ErrCode DisplayPowerMgrService::SetDisplayStateById(uint64_t displayId, uint32_t
         ScreenPowerAdapter::GetInstance().SuspendEnd(displayId);
     }
 
-    DISPLAY_HILOGI(COMP_SVC, "SetDisplayStateById done, displayId=%{public}lu, state=%{public}u", displayId, state);
+    DISPLAY_HILOGI(COMP_SVC, "SetDisplayStateById done, displayId=%{public}" PRIu64 ", state=%{public}u", displayId, state);
     return ERR_OK;
 }
 
@@ -1204,7 +1205,7 @@ ErrCode DisplayPowerMgrService::GetDisplayStateById(uint64_t displayId, int32_t&
 
     auto iter = controllerMap_.find(displayId);
     if (iter == controllerMap_.end()) {
-        DISPLAY_HILOGW(COMP_SVC, "GetDisplayStateById displayId not found: %{public}lu", displayId);
+        DISPLAY_HILOGW(COMP_SVC, "GetDisplayStateById displayId not found: %{public}" PRIu64, displayId);
         return ERR_OK;
     }
 
@@ -1290,7 +1291,7 @@ void DisplayPowerMgrService::PublishScreenDisplayChangedEvent(uint64_t displayId
 
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(event, publishInfo, nullptr);
     DISPLAY_HILOGI(COMP_SVC,
-        "PublishScreenDisplayChangedEvent displayId=%{public}lu state=%{public}u reason=%{public}u ret=%{public}d",
+        "PublishScreenDisplayChangedEvent displayId=%{public}" PRIu64 " state=%{public}u reason=%{public}u ret=%{public}d",
         displayId, state, reason, result);
 }
 
