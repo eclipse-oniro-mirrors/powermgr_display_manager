@@ -16,6 +16,7 @@
 #ifndef DISPLAYMGR_DISPLAY_MGR_CLIENT_H
 #define DISPLAYMGR_DISPLAY_MGR_CLIENT_H
 
+#include <atomic>
 #include <iremote_object.h>
 #include <singleton.h>
 #include <vector>
@@ -102,7 +103,7 @@ private:
     static constexpr uint32_t BRIGHTNESS_MAX {255};
     static constexpr uint32_t BRIGHTNESS_MIN {1};
 
-    DisplayErrors lastError_ {DisplayErrors::ERR_OK};
+    std::atomic<DisplayErrors> lastError_ {DisplayErrors::ERR_OK};
     std::mutex mutex_;
     sptr<IDisplayPowerMgr> proxy_ {nullptr};
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ {nullptr};
