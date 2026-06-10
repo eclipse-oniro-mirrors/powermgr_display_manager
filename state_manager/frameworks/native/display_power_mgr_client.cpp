@@ -466,11 +466,7 @@ uint32_t DisplayPowerMgrClient::SetLightBrightnessThreshold(
 
 DisplayErrors DisplayPowerMgrClient::GetError()
 {
-    DisplayErrors tmpError = lastError_;
-    if (lastError_ != DisplayErrors::ERR_OK) {
-        lastError_ = DisplayErrors::ERR_OK;
-    }
-    return tmpError;
+    return lastError_.exchange(DisplayErrors::ERR_OK);
 }
 
 bool DisplayPowerMgrClient::SetMaxBrightness(double value, uint32_t enterTestMode)
