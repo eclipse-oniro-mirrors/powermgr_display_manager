@@ -38,7 +38,7 @@ public:
     static std::vector<uint32_t> GetAllDisplayId();
 
     uint32_t GetDisplayId();
-    DisplayState GetDisplayState();
+    DisplayState GetDisplayState(bool byId = false);
     void WriteHiSysEvent(DisplayState state, int32_t beginTimeMs);
     bool SetDisplayState(DisplayState state, const std::function<void(DisplayState)>& callback);
     bool SetDisplayPower(DisplayState state, uint32_t reason);

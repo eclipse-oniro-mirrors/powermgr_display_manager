@@ -58,10 +58,15 @@ uint32_t ScreenAction::GetDisplayId()
     return displayId_;
 }
 
-DisplayState ScreenAction::GetDisplayState()
+DisplayState ScreenAction::GetDisplayState(bool byId)
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
+    Rosen::ScreenPowerState powerState = Rosen::ScreenPowerState::INVALID_STATE;
+    if (byId) {
+        powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
+    } else {
+        powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower();
+    }
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:

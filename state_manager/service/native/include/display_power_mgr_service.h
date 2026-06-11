@@ -80,6 +80,7 @@ public:
     ErrCode SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
         const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result) override;
     ErrCode SetScreenOnBrightness(bool& result) override;
+    ErrCode IsScreenOnStrengthen(bool& result) override;
     ErrCode NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
     ErrCode WaitDimmingDone() override;
     ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
@@ -107,6 +108,7 @@ private:
     bool AutoAdjustBrightnessInner(bool enable);
     bool IsAutoAdjustBrightnessInner();
     bool SetScreenOnBrightnessInner();
+    bool IsScreenOnStrengthenInner();
     bool RegisterCallbackInner(sptr<IDisplayPowerCallback> callback);
     bool BoostBrightnessInner(int32_t timeoutMs, uint32_t displayId);
     bool CancelBoostBrightnessInner(uint32_t displayId);
