@@ -595,21 +595,6 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest034, TestSize.Level1)
 #endif
 
 /**
- * @tc.name: DisplayServiceTest035
- * @tc.desc: Test GetSettingAutoBrightness reads DB/Setting value into autoBrightness_
- * @tc.type: FUNC
- */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest035, TestSize.Level1)
-{
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest035 function start!");
-    EXPECT_TRUE(g_service != nullptr);
-    g_service->autoBrightness_.store(-1);
-    g_service->GetSettingAutoBrightness();
-    EXPECT_NE(g_service->autoBrightness_.load(), -1);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest035 function end!");
-}
-
-/**
  * @tc.name: DisplayServiceTest036
  * @tc.desc: Test AutoAdjustBrightness returns false without permission
  * @tc.type: FUNC
@@ -630,7 +615,7 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest036, TestSize.Level1)
 
 /**
  * @tc.name: DisplayServiceTest037
- * @tc.desc: Test AutoAdjustBrightness updates autoBrightness_ with permission
+ * @tc.desc: Test AutoAdjustBrightness with permission
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceTest037, TestSize.Level1)
@@ -640,23 +625,12 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest037, TestSize.Level1)
     g_isPermissionGranted = true;
     g_service->HandleBootBrightness();
 
-    g_service->autoBrightness_.store(-1);
     bool result = false;
     g_service->AutoAdjustBrightness(true, result);
-    if (g_service->IsSupportLightSensor()) {
-        EXPECT_TRUE(result);
-        EXPECT_EQ(g_service->autoBrightness_, 1);
-    } else {
-        EXPECT_FALSE(result);
-    }
+    EXPECT_EQ(g_service->IsSupportLightSensor(), result);
     result = false;
     g_service->AutoAdjustBrightness(false, result);
-    if (g_service->IsSupportLightSensor()) {
-        EXPECT_TRUE(result);
-        EXPECT_EQ(g_service->autoBrightness_, 0);
-    } else {
-        EXPECT_FALSE(result);
-    }
+    EXPECT_EQ(g_service->IsSupportLightSensor(), result);
 
     g_service->UnregisterSettingObservers();
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest037 function end!");

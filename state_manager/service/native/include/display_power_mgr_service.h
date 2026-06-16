@@ -105,7 +105,7 @@ private:
     uint32_t GetMaxBrightnessInner();
     uint32_t GetMinBrightnessInner();
     bool AdjustBrightnessInner(uint32_t id, int32_t value, uint32_t duration);
-    bool AutoAdjustBrightnessInner(bool enable);
+    bool AutoAdjustBrightnessInner(bool enable, bool updateSetting);
     bool IsAutoAdjustBrightnessInner();
     bool SetScreenOnBrightnessInner();
     bool IsScreenOnStrengthenInner();
@@ -175,11 +175,9 @@ private:
     void DumpDisplayInfo(std::string& result);
     void RegisterBootCompletedCallback();
     void SetBootCompletedBrightness();
-    void SetBootCompletedAutoBrightness();
     void RegisterSettingObservers();
     void UnregisterSettingObservers();
-    void AutoBrightnessSettingUpdateFunc(const std::string& key);
-    bool GetSettingAutoBrightness(const std::string& key = SETTING_AUTO_ADJUST_BRIGHTNESS_KEY);
+    void AutoBrightnessSettingUpdateFunc();
     void ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason);
     bool IsSupportLightSensor();
     std::string GetCallerIdWithPid(const std::string& callerId);
@@ -191,7 +189,6 @@ private:
 
     std::atomic_int32_t lastError_ {static_cast<int32_t>(DisplayErrors::ERR_OK)};
     std::mutex mutex_;
-    std::atomic_int32_t autoBrightness_ {-1};
     static std::atomic_bool isBootCompleted_;
     uint32_t displayOffDelayMs_ {0};
     bool isDisplayDelayOff_ = false;
@@ -199,6 +196,8 @@ private:
     DisplayState displayState_ {DisplayState::DISPLAY_UNKNOWN};
     uint32_t displayReason_ {0};
     std::shared_ptr<PowerMgr::FFRTQueue> queue_;
+    ffrt::mutex autoBrightnessMutex_;
+    PowerMgr::FFRTTimer autoBrightnessQueue_ {"auto_brightness_queue"};
     bool isInTestMode_ {false};
     std::once_flag initFlag_;
     ffrt::mutex screenOffDelayTaskMutex_;

@@ -61,6 +61,10 @@ const int32_t ERR_OK = 0;
 #define CHECK_PARAM_DURATION(value) \
     RETURN_IF_WITH_RET(IS_OUT_RANGE(value, 0, 60 * 1000), false)
 }
+namespace {
+const uint32_t ID_AUTO_SWITCH_CALLBACK = 0;
+const uint32_t ID_AUTO_SWITCH_UPDATE = 1;
+}
 
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_MIN = DisplayParamHelper::GetMinBrightness();
 const uint32_t DisplayPowerMgrService::BRIGHTNESS_DEFAULT = DisplayParamHelper::GetDefaultBrightness();
@@ -132,7 +136,14 @@ void DisplayPowerMgrService::HandleBootBrightness()
     BrightnessManager::Get().Init(BRIGHTNESS_MAX, BRIGHTNESS_MIN);
     std::call_once(initFlag_, [this] {
         SetBootCompletedBrightness();
-        SetBootCompletedAutoBrightness();
+        FFRTTask task = []() {
+            if (auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance(); pms != nullptr) {
+                bool enable = DisplaySettingHelper::GetSettingAutoBrightness();
+                DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedAutoBrightness enable=%{public}d", enable);
+                pms->AutoAdjustBrightnessInner(enable, false);
+            }
+        };
+        autoBrightnessQueue_.SetTimer(ID_AUTO_SWITCH_CALLBACK, task);
     });
     RegisterSettingObservers();
 }
@@ -149,13 +160,6 @@ void DisplayPowerMgrService::SetBootCompletedBrightness()
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedBrightness currentDisplayId=%{public}d", currentDisplayId);
 }
 
-void DisplayPowerMgrService::SetBootCompletedAutoBrightness()
-{
-    bool enable = GetSettingAutoBrightness();
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBootCompletedAutoBrightness enable=%{public}d", enable);
-    AutoAdjustBrightnessInner(enable);
-}
-
 void DisplayPowerMgrService::RegisterSettingObservers()
 {
     uint32_t mainDisplayId = GetMainDisplayIdInner();
@@ -163,11 +167,18 @@ void DisplayPowerMgrService::RegisterSettingObservers()
     if (iter != controllerMap_.end()) {
         iter->second->RegisterSettingBrightnessObserver();
     }
+    // The callback may be fired immediately when the observer is registered
     DisplaySettingHelper::RegisterSettingAutoBrightnessObserver([](const std::string& key) {
         auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
-        if (pms != nullptr) {
-            pms->AutoBrightnessSettingUpdateFunc(key);
+        if (pms == nullptr) {
+            return;
         }
+        FFRTTask task = []() {
+            if (auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance(); pms != nullptr) {
+                pms->AutoBrightnessSettingUpdateFunc();
+            }
+        };
+        pms->autoBrightnessQueue_.SetTimer(ID_AUTO_SWITCH_CALLBACK, task);
     });
 }
 
@@ -181,16 +192,16 @@ void DisplayPowerMgrService::UnregisterSettingObservers()
     DisplaySettingHelper::UnregisterSettingAutoBrightnessObserver();
 }
 
-void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc(const std::string& key)
+void DisplayPowerMgrService::AutoBrightnessSettingUpdateFunc()
 {
-    bool isSettingEnable = GetSettingAutoBrightness(key);
+    bool isSettingEnable = DisplaySettingHelper::GetSettingAutoBrightness();
     bool isSystemEnable = IsAutoAdjustBrightnessInner();
     if (isSettingEnable == isSystemEnable) {
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "no need change autoAdjustSwitch");
         return;
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoBrightnessSettingUpdateFunc isSettingEnable=%{public}d", isSettingEnable);
-    AutoAdjustBrightnessInner(isSettingEnable);
+    AutoAdjustBrightnessInner(isSettingEnable, false);
     if (!isSettingEnable) {
         ClearOffset();
     }
@@ -221,13 +232,6 @@ bool DisplayPowerMgrService::IsScreenOnStrengthenInner()
 void DisplayPowerMgrService::ClearOffset()
 {
     BrightnessManager::Get().ClearOffset();
-}
-
-bool DisplayPowerMgrService::GetSettingAutoBrightness(const std::string& key)
-{
-    bool ret = DisplaySettingHelper::GetSettingAutoBrightness(key);
-    autoBrightness_.store(static_cast<int32_t>(ret));
-    return ret;
 }
 
 void DisplayPowerMgrService::ScreenOffDelay(uint32_t id, DisplayState state, uint32_t reason)
@@ -464,18 +468,29 @@ bool DisplayPowerMgrService::IsAutoAdjustBrightnessInner()
     return BrightnessManager::Get().IsAutoAdjustBrightness();
 }
 
-bool DisplayPowerMgrService::AutoAdjustBrightnessInner(bool enable)
+bool DisplayPowerMgrService::AutoAdjustBrightnessInner(bool enable, bool updateSetting)
 {
     if (!Permission::IsSystem()) {
         return false;
     }
-    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start");
+    // Use mutex to synchronize BrightnessManager::AutoAdjustBrightness + autoBrightnessQueue_ operations,
+    // ensuring atomic brightness adjustment and avoiding data races across threads.
+    std::lock_guard lock(autoBrightnessMutex_);
+    DISPLAY_HILOGD(FEAT_BRIGHTNESS, "AutoAdjustBrightness start, enable: %{public}d", enable);
     auto ret = BrightnessManager::Get().AutoAdjustBrightness(enable);
-    if (ret && autoBrightness_.load() != static_cast<int32_t>(enable)) {
-        autoBrightness_.store(static_cast<int32_t>(enable));
-        DisplaySettingHelper::SetSettingAutoBrightness(enable);
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness write setting: %{public}d", enable);
+    if (!ret || !updateSetting) {
+        return ret;
     }
+    autoBrightnessQueue_.CancelAllTimer();
+    FFRTTask task = [enable]() {
+        if (DisplaySettingHelper::GetSettingAutoBrightness() != enable) {
+            DisplaySettingHelper::SetSettingAutoBrightness(enable);
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness write setting: %{public}d", enable);
+        } else {
+            DISPLAY_HILOGI(FEAT_BRIGHTNESS, "AutoAdjustBrightness skip write same setting: %{public}d", enable);
+        }
+    };
+    autoBrightnessQueue_.SetTimer(ID_AUTO_SWITCH_UPDATE, task);
     return ret;
 }
 
@@ -947,7 +962,7 @@ ErrCode DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uin
 ErrCode DisplayPowerMgrService::AutoAdjustBrightness(bool enable, bool& result)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::AutoAdjustBrightness");
-    result = AutoAdjustBrightnessInner(enable);
+    result = AutoAdjustBrightnessInner(enable, true);
     return ERR_OK;
 }
 
