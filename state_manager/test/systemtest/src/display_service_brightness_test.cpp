@@ -376,9 +376,7 @@ HWTEST_F(DisplayPowerServiceBrightnessTest, DisplayPowerServiceBrightnessTest016
     usleep(sleepTime);
     uint32_t brightnessTemp = BRIGHTNESS_OFF;
     g_service->GetBrightness(DISPLAY_MAIN_ID, brightnessTemp);
-    bool enable = g_service->GetSettingAutoBrightness();
     g_service->SetBootCompletedBrightness();
-    g_service->SetBootCompletedAutoBrightness();
     g_service->RegisterSettingObservers();
     uint32_t brightness = BRIGHTNESS_OFF;
     g_service->GetBrightness(DISPLAY_MAIN_ID, brightness);
