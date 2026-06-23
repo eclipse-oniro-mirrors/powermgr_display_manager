@@ -831,6 +831,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
 
 ErrCode DisplayPowerMgrService::SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetScreenDisplayState");
     if (!Permission::IsSystem()) {
         return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -859,6 +860,7 @@ ErrCode DisplayPowerMgrService::SetScreenDisplayState(uint64_t screenId, uint32_
 
 ErrCode DisplayPowerMgrService::SetDisplayState(uint32_t id, uint32_t state, uint32_t reason, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetDisplayState");
     result = SetDisplayStateInner(id, static_cast<DisplayState>(state), reason);
     return ERR_OK;
@@ -866,6 +868,7 @@ ErrCode DisplayPowerMgrService::SetDisplayState(uint32_t id, uint32_t state, uin
 
 ErrCode DisplayPowerMgrService::GetDisplayState(uint32_t id, int32_t& displayState)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDisplayState");
     displayState = static_cast<int32_t>(GetDisplayStateInner(id));
     return ERR_OK;
@@ -873,6 +876,7 @@ ErrCode DisplayPowerMgrService::GetDisplayState(uint32_t id, int32_t& displaySta
 
 ErrCode DisplayPowerMgrService::GetDisplayIds(std::vector<uint32_t>& ids)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDisplayIds");
     auto idsTemp = GetDisplayIdsInner();
     ids = std::move(idsTemp);
@@ -881,6 +885,7 @@ ErrCode DisplayPowerMgrService::GetDisplayIds(std::vector<uint32_t>& ids)
 
 ErrCode DisplayPowerMgrService::GetMainDisplayId(uint32_t& id)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMainDisplayId");
     id = GetMainDisplayIdInner();
     return ERR_OK;
@@ -889,6 +894,7 @@ ErrCode DisplayPowerMgrService::GetMainDisplayId(uint32_t& id)
 ErrCode DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
     int32_t& displayError)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetBrightness");
     result = SetBrightnessInner(value, displayId, continuous);
     displayError = static_cast<int32_t>(GetError());
@@ -897,6 +903,7 @@ ErrCode DisplayPowerMgrService::SetBrightness(uint32_t value, uint32_t displayId
 
 ErrCode DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t displayId, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::DiscountBrightness");
     result = DiscountBrightnessInner(discount, displayId);
     return ERR_OK;
@@ -905,6 +912,7 @@ ErrCode DisplayPowerMgrService::DiscountBrightness(double discount, uint32_t dis
 ErrCode DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t displayId, uint32_t duration,
     bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::OverrideBrightness");
     result = OverrideBrightnessInner(brightness, displayId, duration);
     return ERR_OK;
@@ -912,6 +920,7 @@ ErrCode DisplayPowerMgrService::OverrideBrightness(uint32_t brightness, uint32_t
 
 ErrCode DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::OverrideDisplayOffDelay");
     result = OverrideDisplayOffDelayInner(delayMs);
     return ERR_OK;
@@ -919,6 +928,7 @@ ErrCode DisplayPowerMgrService::OverrideDisplayOffDelay(uint32_t delayMs, bool& 
 
 ErrCode DisplayPowerMgrService::RestoreBrightness(uint32_t displayId, uint32_t duration, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RestoreBrightness");
     result = RestoreBrightnessInner(displayId, duration);
     return ERR_OK;
@@ -926,6 +936,7 @@ ErrCode DisplayPowerMgrService::RestoreBrightness(uint32_t displayId, uint32_t d
 
 ErrCode DisplayPowerMgrService::GetBrightness(uint32_t displayId, uint32_t& brightness)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetBrightness");
     brightness = GetBrightnessInner(displayId);
     return ERR_OK;
@@ -933,6 +944,7 @@ ErrCode DisplayPowerMgrService::GetBrightness(uint32_t displayId, uint32_t& brig
 
 ErrCode DisplayPowerMgrService::GetDefaultBrightness(uint32_t& defaultBrightness)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDefaultBrightness");
     defaultBrightness = GetDefaultBrightnessInner();
     return ERR_OK;
@@ -940,6 +952,7 @@ ErrCode DisplayPowerMgrService::GetDefaultBrightness(uint32_t& defaultBrightness
 
 ErrCode DisplayPowerMgrService::GetMaxBrightness(uint32_t& maxBrightness)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMaxBrightness");
     maxBrightness = GetMaxBrightnessInner();
     return ERR_OK;
@@ -947,6 +960,7 @@ ErrCode DisplayPowerMgrService::GetMaxBrightness(uint32_t& maxBrightness)
 
 ErrCode DisplayPowerMgrService::GetMinBrightness(uint32_t& minBrightness)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMinBrightness");
     minBrightness = GetMinBrightnessInner();
     return ERR_OK;
@@ -954,6 +968,7 @@ ErrCode DisplayPowerMgrService::GetMinBrightness(uint32_t& minBrightness)
 
 ErrCode DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uint32_t duration, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::AdjustBrightness");
     result = AdjustBrightnessInner(id, value, duration);
     return ERR_OK;
@@ -961,6 +976,7 @@ ErrCode DisplayPowerMgrService::AdjustBrightness(uint32_t id, int32_t value, uin
 
 ErrCode DisplayPowerMgrService::AutoAdjustBrightness(bool enable, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::AutoAdjustBrightness");
     result = AutoAdjustBrightnessInner(enable, true);
     return ERR_OK;
@@ -968,6 +984,7 @@ ErrCode DisplayPowerMgrService::AutoAdjustBrightness(bool enable, bool& result)
 
 ErrCode DisplayPowerMgrService::IsAutoAdjustBrightness(bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::IsAutoAdjustBrightness");
     result = IsAutoAdjustBrightnessInner();
     return ERR_OK;
@@ -975,6 +992,7 @@ ErrCode DisplayPowerMgrService::IsAutoAdjustBrightness(bool& result)
 
 ErrCode DisplayPowerMgrService::RegisterCallback(const sptr<IDisplayPowerCallback>& callback, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterCallback");
     result = RegisterCallbackInner(callback);
     return ERR_OK;
@@ -982,6 +1000,7 @@ ErrCode DisplayPowerMgrService::RegisterCallback(const sptr<IDisplayPowerCallbac
 
 ErrCode DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t displayId, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::BoostBrightness");
     result = BoostBrightnessInner(timeoutMs, displayId);
     return ERR_OK;
@@ -989,6 +1008,7 @@ ErrCode DisplayPowerMgrService::BoostBrightness(int32_t timeoutMs, uint32_t disp
 
 ErrCode DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::CancelBoostBrightness");
     result = CancelBoostBrightnessInner(displayId);
     return ERR_OK;
@@ -996,6 +1016,7 @@ ErrCode DisplayPowerMgrService::CancelBoostBrightness(uint32_t displayId, bool& 
 
 ErrCode DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetDeviceBrightness");
     deviceBrightness = GetDeviceBrightnessInner(displayId, useHbm);
     return ERR_OK;
@@ -1003,6 +1024,7 @@ ErrCode DisplayPowerMgrService::GetDeviceBrightness(uint32_t displayId, bool use
 
 ErrCode DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displayId, bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetCoordinated");
     result = SetCoordinatedInner(coordinated, displayId);
     return ERR_OK;
@@ -1011,6 +1033,7 @@ ErrCode DisplayPowerMgrService::SetCoordinated(bool coordinated, uint32_t displa
 ErrCode DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<int32_t>& threshold,
     const sptr<IDisplayBrightnessCallback>& callback, uint32_t& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetLightBrightnessThreshold");
     result = SetLightBrightnessThresholdInner(threshold, callback);
     return ERR_OK;
@@ -1018,6 +1041,7 @@ ErrCode DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<in
 
 ErrCode DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMaxBrightness");
     result = SetMaxBrightnessInner(value, mode);
     displayError = static_cast<int32_t>(GetError());
@@ -1027,6 +1051,7 @@ ErrCode DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bo
 ErrCode DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result,
     int32_t& displayError)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMaxBrightnessNit");
     result = SetMaxBrightnessNitInner(maxNit, mode);
     displayError = static_cast<int32_t>(GetError());
@@ -1035,6 +1060,7 @@ ErrCode DisplayPowerMgrService::SetMaxBrightnessNit(uint32_t maxNit, uint32_t mo
 
 ErrCode DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetScreenOnBrightness");
     result = SetScreenOnBrightnessInner();
     return ERR_OK;
@@ -1042,6 +1068,7 @@ ErrCode DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
 
 ErrCode DisplayPowerMgrService::IsScreenOnStrengthen(bool& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::IsScreenOnStrengthen");
     result = IsScreenOnStrengthenInner();
     return ERR_OK;
@@ -1050,6 +1077,7 @@ ErrCode DisplayPowerMgrService::IsScreenOnStrengthen(bool& result)
 ErrCode DisplayPowerMgrService::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus,
     int32_t& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::NotifyScreenPowerStatus");
     result = NotifyScreenPowerStatusInner(displayId, displayPowerStatus);
     return ERR_OK;
@@ -1057,6 +1085,7 @@ ErrCode DisplayPowerMgrService::NotifyScreenPowerStatus(uint32_t displayId, uint
 
 ErrCode DisplayPowerMgrService::WaitDimmingDone()
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::WaitDimmingDone");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -1068,6 +1097,7 @@ ErrCode DisplayPowerMgrService::WaitDimmingDone()
 
 ErrCode DisplayPowerMgrService::RunJsonCommand(const std::string& request, std::string& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RunJsonCommand");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -1091,6 +1121,7 @@ ErrCode DisplayPowerMgrService::RegisterDataChangeListener(const sptr<IDisplayBr
     DisplayDataChangeListenerType listenerType, const std::string& callerId, const std::string& params,
     int32_t& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterDataChangeListener");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -1110,6 +1141,7 @@ ErrCode DisplayPowerMgrService::RegisterDataChangeListener(const sptr<IDisplayBr
 ErrCode DisplayPowerMgrService::UnregisterDataChangeListener(
     DisplayDataChangeListenerType listenerType, const std::string& callerId, int32_t& result)
 {
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::UnregisterDataChangeListener");
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -1128,6 +1160,7 @@ ErrCode DisplayPowerMgrService::SetScreenPowerOffStrategy(uint32_t strategy, uin
     const sptr<IRemoteObject>& token, int32_t& result)
 {
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
+    NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SpecificScreenPowerStrategy");
     result = SetScreenPowerOffStrategyInner(static_cast<PowerOffStrategy>(strategy),
         static_cast<PowerMgr::StateChangeReason>(reason), token);
