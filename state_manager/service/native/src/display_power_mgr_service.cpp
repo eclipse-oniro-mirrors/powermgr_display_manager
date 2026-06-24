@@ -216,17 +216,19 @@ bool DisplayPowerMgrService::SetScreenOnBrightnessInner()
     return true;
 }
 
-bool DisplayPowerMgrService::IsScreenOnStrengthenInner()
+bool DisplayPowerMgrService::UpdateScreenPowerStateInner(bool isScreenOn)
 {
-    bool isScreenOn = false;
-    for (auto& iter: controllerMap_) {
-        DisplayState state = iter.second->UpdateCachedState();
-        if (state == DisplayState::DISPLAY_ON) {
-            isScreenOn = true;
+    DisplayState displayState = isScreenOn ? DisplayState::DISPLAY_ON : DisplayState::DISPLAY_OFF;
+    auto iterator = controllerMap_.find(DEFALUT_DISPLAY_ID);
+    if (iterator == controllerMap_.end()) {
+        iterator = controllerMap_.find(GetMainDisplayIdInner());
+        if (iterator == controllerMap_.end()) {
+            DISPLAY_HILOGE(COMP_SVC, "UpdateScreenPowerState failed, no controller found");
+            return false;
         }
     }
-    DISPLAY_HILOGI(COMP_SVC, "[UL_POWER] IsScreenOnStrengthen %{public}d", isScreenOn);
-    return isScreenOn;
+    iterator->second->UpdateCachedState(displayState);
+    return true;
 }
 
 void DisplayPowerMgrService::ClearOffset()
@@ -1066,11 +1068,11 @@ ErrCode DisplayPowerMgrService::SetScreenOnBrightness(bool& result)
     return ERR_OK;
 }
 
-ErrCode DisplayPowerMgrService::IsScreenOnStrengthen(bool& result)
+ErrCode DisplayPowerMgrService::UpdateScreenPowerState(bool isScreenOn, bool& result)
 {
     NoCoroutineSwitchGuard threadIdGuard;
-    DisplayXCollie displayXCollie("DisplayPowerMgrService::IsScreenOnStrengthen");
-    result = IsScreenOnStrengthenInner();
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::UpdateScreenPowerState");
+    result = UpdateScreenPowerStateInner(isScreenOn);
     return ERR_OK;
 }
 
