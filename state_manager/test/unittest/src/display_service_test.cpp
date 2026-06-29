@@ -76,7 +76,7 @@ NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_brightnessServiceMock;
 namespace OHOS::PowerMgr {
 bool Permission::IsSystem()
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest IsSystem, g_isPermissionGranted: %{pubilc}d", g_isPermissionGranted);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest IsSystem, g_isPermissionGranted: %{public}d", g_isPermissionGranted);
     return g_isPermissionGranted;
 }
 } // namespace OHOS::PowerMgr
@@ -728,5 +728,154 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest042, TestSize.Level1)
     EXPECT_TRUE(result);
     g_isMock = false;
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest042 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest044
+ * @tc.desc: Test GetFeatureSupport via service without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest044, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest044 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    bool result = false;
+    auto ret = g_service->GetFeatureSupport(BrightnessFeatureType::DEFAULT, result);
+    EXPECT_NE(ret, ERR_OK);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest044 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest045
+ * @tc.desc: Test GetFeatureSupport via service with permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest045, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest045 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+    auto ret = g_service->GetFeatureSupport(BrightnessFeatureType::DEFAULT, result);
+    EXPECT_EQ(ret, ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest045 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest046
+ * @tc.desc: Test SetForcedBrightness via service with permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest046, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest046 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+    auto ret = g_service->SetForcedBrightness(0.5, DISPLAY_MAIN_ID, DEFAULT_DURATION,
+        BrightnessValueType::RELATIVE_TO_CURRENT_RANGE, result);
+    EXPECT_EQ(ret, ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest046 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest047
+ * @tc.desc: Test SetForcedBrightness via service without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest047, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest047 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    bool result = false;
+    auto ret = g_service->SetForcedBrightness(0.5, DISPLAY_MAIN_ID, DEFAULT_DURATION,
+        BrightnessValueType::RELATIVE_TO_CURRENT_RANGE, result);
+    EXPECT_NE(ret, ERR_OK);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest047 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest048
+ * @tc.desc: Test SetForcedBrightness with invalid valueType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest048, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest048 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+    // valueType < DEFAULT
+    auto valueTypeNum = static_cast<int>(BrightnessValueType::DEFAULT) - 1;
+    auto valueType = static_cast<BrightnessValueType>(valueTypeNum);
+    auto ret = g_service->SetForcedBrightness(0.5, DISPLAY_MAIN_ID, DEFAULT_DURATION, valueType, result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+
+    // valueType >= MAX
+    valueTypeNum = static_cast<int>(BrightnessValueType::MAX) + 1;
+    valueType = static_cast<BrightnessValueType>(valueTypeNum);
+    ret = g_service->SetForcedBrightness(0.5, DISPLAY_MAIN_ID, DEFAULT_DURATION, valueType, result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest048 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest049
+ * @tc.desc: Test GetFeatureSupport with invalid feature
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest049, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest049 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+
+    // feature < DEFAULT
+    auto featureNum = static_cast<int>(BrightnessFeatureType::DEFAULT) - 1;
+    auto feature = static_cast<BrightnessFeatureType>(featureNum);
+    auto ret = g_service->GetFeatureSupport(feature, result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+
+    // feature >= MAX
+    featureNum = static_cast<int>(BrightnessFeatureType::MAX) + 1;
+    feature = static_cast<BrightnessFeatureType>(featureNum);
+    ret = g_service->GetFeatureSupport(feature, result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest049 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest050
+ * @tc.desc: Test RegisterDataChangeListener and UnregisterDataChangeListener with invalid listenerType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest050, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest050 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    int32_t result = 0;
+
+    // listenerType < DEFAULT
+    auto listenerTypeNum = static_cast<int>(DisplayDataChangeListenerType::DEFAULT) - 1;
+    auto listenerType = static_cast<DisplayDataChangeListenerType>(listenerTypeNum);
+    auto ret = g_service->RegisterDataChangeListener(nullptr, listenerType, "test", "", result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    ret = g_service->UnregisterDataChangeListener(listenerType, "test", result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+
+    // listenerType >= MAX
+    listenerTypeNum = static_cast<int>(DisplayDataChangeListenerType::MAX) + 1;
+    listenerType = static_cast<DisplayDataChangeListenerType>(listenerTypeNum);
+    ret = g_service->RegisterDataChangeListener(nullptr, listenerType, "test", "", result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    ret = g_service->UnregisterDataChangeListener(listenerType, "test", result);
+    EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest050 function end!");
 }
 } // namespace

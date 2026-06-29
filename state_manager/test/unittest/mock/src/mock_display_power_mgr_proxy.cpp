@@ -39,6 +39,12 @@ int32_t MockDisplayPowerMgrProxy::GetMainDisplayId(uint32_t& id)
     return ERR_FAIL;
 }
 
+ErrCode MockDisplayPowerMgrProxy::SetForcedBrightness(double value, uint32_t displayId, uint32_t duration,
+    BrightnessValueType valueType, bool& result)
+{
+    return ERR_FAIL;
+}
+
 int32_t MockDisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& isResult,
     int32_t& retCode)
 {
@@ -134,6 +140,11 @@ int32_t MockDisplayPowerMgrProxy::SetCoordinated(bool coordinated, uint32_t disp
 }
 
 ErrCode MockDisplayPowerMgrProxy::WaitDimmingDone()
+{
+    return ERR_FAIL;
+}
+
+ErrCode MockDisplayPowerMgrProxy::GetFeatureSupport(BrightnessFeatureType feature, bool& result)
 {
     return ERR_FAIL;
 }

@@ -56,6 +56,11 @@ void DeInit()
 {
 }
 
+bool GetFeatureSupport(BrightnessFeatureType feature)
+{
+    return MockReturnBool();
+}
+
 void SetDisplayState(uint32_t id, DisplayState state, uint32_t reason)
 {
 }
@@ -76,6 +81,11 @@ bool IsAutoAdjustBrightness(void)
 }
 
 bool AutoAdjustBrightness(bool enable)
+{
+    return MockReturnBool();
+}
+
+bool SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType)
 {
     return MockReturnBool();
 }
@@ -225,6 +235,8 @@ void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& e
     ext.mSetMaxBrightnessFunc = reinterpret_cast<void*>(SetMaxBrightness);
     ext.mSetMaxBrightnessNitFunc = reinterpret_cast<void*>(SetMaxBrightnessNit);
     ext.mRunJsonCommandFunc = reinterpret_cast<void*>(RunJsonCommand);
+    ext.mGetFeatureSupportFunc = reinterpret_cast<void*>(GetFeatureSupport);
+    ext.mSetForcedBrightnessFunc = reinterpret_cast<void*>(SetForcedBrightness);
     ext.mRegisterDataChangeListenerFunc = reinterpret_cast<void*>(RegisterDataChangeListener);
     ext.mUnregisterDataChangeListenerFunc = reinterpret_cast<void*>(UnregisterDataChangeListener);
 }

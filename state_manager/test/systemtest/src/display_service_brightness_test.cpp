@@ -64,7 +64,7 @@ bool g_isPermissionGranted = true;
 namespace OHOS::PowerMgr {
 bool Permission::IsSystem()
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerServiceBrightnessTest IsSystem, g_isPermissionGranted: %{pubilc}d",
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerServiceBrightnessTest IsSystem, g_isPermissionGranted: %{public}d",
         g_isPermissionGranted);
     return g_isPermissionGranted;
 }

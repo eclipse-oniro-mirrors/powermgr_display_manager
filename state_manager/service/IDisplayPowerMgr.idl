@@ -60,6 +60,9 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [out] int retCode);
     void SetScreenOnBrightness([out] boolean bResult);
     void WaitDimmingDone();
+    void GetFeatureSupport([in] BrightnessFeatureType feature, [out] boolean bResult);
+    void SetForcedBrightness([in] double value, [in] unsigned int displayId, [in] unsigned int duration,
+        [in] BrightnessValueType valueType, [out] boolean bResult);
     void SetScreenDisplayState([in] unsigned long id, [in] unsigned int status, [in] unsigned int reason);
     void SetScreenPowerOffStrategy([in] unsigned int strategy, [in] unsigned int reason,
         [in] IRemoteObject token, [out] int retCode);

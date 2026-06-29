@@ -501,12 +501,15 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness006, Te
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrOverrideBrightness007, TestSize.Level0)
 {
-    uint32_t overrideValue = 0;
-    uint32_t brightnessMin = DisplayPowerMgrClient::GetInstance().GetMinBrightness();
-    EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(overrideValue));
+    DisplayPowerMgrClient::GetInstance().SetBrightness(MAX_DEFAULT_BRIGHTNESS_LEVEL);
     WaitDimmingDone();
-    uint32_t deviceBrightness = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
-    EXPECT_EQ(brightnessMin, deviceBrightness);
+    uint32_t before = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    EXPECT_TRUE(DisplayPowerMgrClient::GetInstance().OverrideBrightness(0)); // brighness is 0
+    WaitDimmingDone();
+    uint32_t after = DisplayPowerMgrClient::GetInstance().GetDeviceBrightness();
+    // Use EXPECT_GT instead of comparing with GetMinBrightness because on some devices
+    // the minimum override brightness depends on the ambient light sensor reading.
+    EXPECT_GT(before, after);
     DisplayPowerMgrClient::GetInstance().RestoreBrightness();
 }
 
@@ -963,19 +966,18 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetLightBrightnessThresho
  */
 HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightnessNit001, TestSize.Level0)
 {
-    const uint32_t SET_BRIGHTNESS = 150; // mapping nit = 350
-    const uint32_t SET_BRIGHTNESS_NIT = 350;
-    DisplayPowerMgrClient::GetInstance().SetBrightness(SET_BRIGHTNESS);
+    DisplayPowerMgrClient::GetInstance().SetBrightness(MAX_DEFAULT_BRIGHTNESS_LEVEL);
     usleep(CMD_EXECUTION_DELAY);
+    uint32_t before = DisplayPowerMgrClient::GetInstance().GetBrightness();
 
-    const uint32_t SET_MAX_BRIGHTNESS = 98; // mapping nit = 231
-    const uint32_t SET_MAX_BRIGHTNESS_NIT = 231;
+    const uint32_t SET_MAX_BRIGHTNESS_NIT = 100; // 100nit
     bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_MAX_BRIGHTNESS_NIT, 2);
     EXPECT_TRUE(ret);
     WaitDimmingDone();
-    uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
-    EXPECT_EQ(SET_MAX_BRIGHTNESS, brightness);
-    DisplayPowerMgrClient::GetInstance().SetMaxBrightnessNit(SET_BRIGHTNESS_NIT, 1);
+    uint32_t after = DisplayPowerMgrClient::GetInstance().GetBrightness();
+    // The same nit value maps to different brightness levels on different devices.
+    // EXPECT_GT only verifies that thermal control took effect and brightness was lowered.
+    EXPECT_GT(before, after);
 }
 
 /**
@@ -1093,5 +1095,31 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrRegisterDataChangeListene
 
     EXPECT_NE(DisplayPowerMgrClient::GetInstance().RegisterDataChangeListener(ptr, ChangeType::STABLE_LUX, longStr), 0);
     EXPECT_NE(DisplayPowerMgrClient::GetInstance().UnregisterDataChangeListener(ChangeType::STABLE_LUX, longStr), 0);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrGetFeatureSupport
+ * @tc.desc: Test GetFeatureSupport through DisplayPowerMgrClient
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrGetFeatureSupport, TestSize.Level0)
+{
+    // Use the enum value DEFAULT (1000) as a generic feature request
+    DisplayPowerMgrClient::GetInstance().GetFeatureSupport(BrightnessFeatureType::DEFAULT);
+    auto result = DisplayPowerMgrClient::GetInstance().GetFeatureSupport(BrightnessFeatureType::MAX);
+    EXPECT_FALSE(result);
+}
+
+/**
+ * @tc.name: DisplayPowerMgrSetForcedBrightness
+ * @tc.desc: Test SetForcedBrightness through DisplayPowerMgrClient
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetForcedBrightness, TestSize.Level0)
+{
+    DisplayPowerMgrClient::GetInstance().SetForcedBrightness(0.8, 0, 0, BrightnessValueType::RELATIVE_TO_MAX_RANGE);
+    DisplayPowerMgrClient::GetInstance().SetForcedBrightness(200.0, 0, 0, BrightnessValueType::ABSOLUTE_NIT);
+    auto result = DisplayPowerMgrClient::GetInstance().SetForcedBrightness(200.0, 0, 0, BrightnessValueType::MAX);
+    EXPECT_FALSE(result);
 }
 } // namespace

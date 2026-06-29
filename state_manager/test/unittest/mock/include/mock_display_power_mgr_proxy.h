@@ -30,6 +30,8 @@ public:
     int32_t GetDisplayState(uint32_t id, int32_t& displayState) override;
     int32_t GetDisplayIds(std::vector<uint32_t>& ids) override;
     int32_t GetMainDisplayId(uint32_t& id) override;
+    ErrCode SetForcedBrightness(double value, uint32_t displayId, uint32_t duration,
+        BrightnessValueType valueType, bool& result) override;
     int32_t SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& bResult,
         int32_t& retCode) override;
     int32_t SetMaxBrightness(double value, uint32_t enterTestMode, bool& bResult, int32_t& retCode) override;
@@ -49,6 +51,7 @@ public:
     int32_t CancelBoostBrightness(uint32_t displayId, bool& bResult) override;
     int32_t GetDeviceBrightness(uint32_t displayId, bool useHbm, uint32_t& deviceBrightness) override;
     int32_t SetCoordinated(bool coordinated, uint32_t displayId, bool& bResult) override;
+    ErrCode GetFeatureSupport(BrightnessFeatureType feature, bool& result) override;
     ErrCode WaitDimmingDone() override;
     ErrCode RunJsonCommand(const std::string& request, std::string& result) override;
     ErrCode RegisterDataChangeListener(const sptr<IDisplayBrightnessListener>& listener,

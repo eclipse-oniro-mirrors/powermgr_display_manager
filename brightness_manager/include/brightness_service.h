@@ -106,6 +106,7 @@ public:
 
     void Init(uint32_t defaultMax, uint32_t defaultMin);
     void DeInit();
+    bool GetFeatureSupport(BrightnessFeatureType feature);
     void SetDisplayState(uint32_t id, DisplayState state);
     DisplayState GetDisplayState();
     bool IsScreenOnState(DisplayState state);
@@ -125,6 +126,7 @@ public:
     uint32_t GetMappingBrightnessNit(uint32_t level);
     uint32_t GetBrightnessLevelFromNit(uint32_t nit);
     uint32_t GetMappingHighBrightnessLevel(uint32_t level);
+    bool SetForcedBrightness(double value, uint32_t duration, BrightnessValueType valueType);
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     void SetScreenOnBrightness();
     bool OverrideBrightness(uint32_t value, uint32_t gradualDuration = 0);

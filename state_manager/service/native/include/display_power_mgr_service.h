@@ -49,6 +49,8 @@ public:
     ErrCode GetDisplayState(uint32_t id, int32_t& displayState) override;
     ErrCode GetDisplayIds(std::vector<uint32_t>& ids) override;
     ErrCode GetMainDisplayId(uint32_t& id) override;
+    ErrCode SetForcedBrightness(double value, uint32_t displayId, uint32_t duration,
+        BrightnessValueType valueType, bool& result) override;
     ErrCode SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
         int32_t& displayError) override;
     ErrCode SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError) override;
@@ -83,6 +85,7 @@ public:
     ErrCode UpdateScreenPowerState(bool isScreenOn, bool& result) override;
     ErrCode NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& result) override;
     ErrCode WaitDimmingDone() override;
+    ErrCode GetFeatureSupport(BrightnessFeatureType feature, bool& result) override;
     ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
     ErrCode SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
         const sptr<IRemoteObject>& token, int32_t& result) override;
