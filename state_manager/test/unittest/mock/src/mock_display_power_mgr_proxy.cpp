@@ -173,9 +173,15 @@ int32_t MockDisplayPowerMgrProxy::SetScreenOnBrightness(bool& isResult)
     return ERR_FAIL;
 }
 
-int32_t MockDisplayPowerMgrProxy::IsScreenOnStrengthen(bool& isResult)
+int32_t MockDisplayPowerMgrProxy::UpdateScreenPowerState(bool isScreenOn, bool& isResult)
 {
-    return ERR_FAIL;
+    static std::vector<int32_t> vec{ERR_FAIL, ERR_OK};
+    static int32_t count = 0;
+    int32_t ret = vec[count++ % vec.size()];
+    if (ret == ERR_OK) {
+        isResult = true;
+    }
+    return ret;
 }
 
 int32_t MockDisplayPowerMgrProxy::NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus,

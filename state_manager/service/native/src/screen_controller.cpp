@@ -159,14 +159,12 @@ bool ScreenController::IsScreenOn()
     return (state_.load() == DisplayState::DISPLAY_ON || state_.load() == DisplayState::DISPLAY_DIM);
 }
 
-DisplayState ScreenController::UpdateCachedState()
+void ScreenController::UpdateCachedState(DisplayState state)
 {
-    DisplayState displayState = action_->GetDisplayState(true);
     lock_guard lock(mutexState_);
-    DISPLAY_HILOGI(FEAT_STATE, "UpdateCachedState, old=%{public}u, new=%{public}u",
-        static_cast<uint32_t>(state_.load()), static_cast<uint32_t>(displayState));
-    state_ = displayState;
-    return displayState;
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER] UpdateCachedState, old=%{public}u, new=%{public}u",
+        static_cast<uint32_t>(state_.load()), static_cast<uint32_t>(state));
+    state_ = state;
 }
 
 bool ScreenController::SetBrightness(uint32_t value, uint32_t gradualDuration, bool continuous)

@@ -508,15 +508,17 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient030, TestSize.Level
 
 /**
  * @tc.name: DisplayPowerMgrClient031
- * @tc.desc: test IsScreenOnStrengthen() when proxy return fail
+ * @tc.desc: test UpdateScreenPowerState() when proxy return fail
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient031, TestSize.Level0)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient031 function start!");
-    auto ret = mClient.IsScreenOnStrengthen();
+    auto ret = mClient.UpdateScreenPowerState(true);
     EXPECT_FALSE(ret);
+    ret = mClient.UpdateScreenPowerState(true);
+    EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient031 function end!");
 }
 } // namespace
