@@ -24,7 +24,7 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [out] boolean bResult);
     void GetDisplayState([in] unsigned int id, [out] int displayState);
     void GetDisplayIds([out] unsigned int[] ids);
-    void GetMainDisplayId([out] unsigned int id);
+    [customMsgOption flags=MessageOption::TF_IMAGE] void GetMainDisplayId([out] unsigned int id);
     void SetBrightness([in] unsigned int value, [in] unsigned int displayId, [in] boolean continuous,
         [out] boolean bResult, [out] int retCode);
     void DiscountBrightness([in] double value, [in] unsigned int displayId, [out] boolean bResult);
@@ -33,9 +33,9 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void OverrideDisplayOffDelay([in] unsigned int delayMs, [out] boolean bResult);
     void RestoreBrightness([in] unsigned int displayId, [in] unsigned int duration, [out] boolean bResult);
     void GetBrightness([in] unsigned int displayId, [out] unsigned int brightness);
-    void GetDefaultBrightness([out] unsigned int defaultBrightness);
-    void GetMaxBrightness([out] unsigned int maxBrightness);
-    void GetMinBrightness([out] unsigned int minBrightness);
+    [customMsgOption flags=MessageOption::TF_IMAGE] void GetDefaultBrightness([out] unsigned int defaultBrightness);
+    [customMsgOption flags=MessageOption::TF_IMAGE] void GetMaxBrightness([out] unsigned int maxBrightness);
+    [customMsgOption flags=MessageOption::TF_IMAGE] void GetMinBrightness([out] unsigned int minBrightness);
     void AdjustBrightness([in] unsigned int id, [in] int value, [in] unsigned int duration, [out] boolean bResult);
     void AutoAdjustBrightness([in] boolean enable, [out] boolean bResult);
     void IsAutoAdjustBrightness([out] boolean bResult);
