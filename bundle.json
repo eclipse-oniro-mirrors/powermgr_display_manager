@@ -47,7 +47,9 @@
         "hilog",
         "ipc",
         "image_framework",
+        "libuv",
         "napi",
+        "node",
         "power_manager",
         "runtime_core",
         "safwk",
@@ -87,7 +89,6 @@
         "//base/powermgr/display_manager/state_manager/test:displaymgr_fuzztest",
         "//base/powermgr/display_manager/state_manager/test:systemtest",
         "//base/powermgr/display_manager/brightness_manager/test:brightness_manager_test",
-        "//base/powermgr/display_manager/state_manager/frameworks/ets/taihe:display_manager_taihe_test",
         "//base/powermgr/display_manager/tools/ohos-displayManager:ohos-displayManager-cli-test"
       ]
     }
