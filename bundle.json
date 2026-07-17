@@ -56,8 +56,9 @@
         "samgr",
         "sensor",
         "skia",
-        "window_manager"
-      ]
+        "window_manager",
+        "taihe_ffi_gen"
+    ]
     },
     "build": {
       "group_type": {
