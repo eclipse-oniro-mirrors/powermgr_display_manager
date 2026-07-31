@@ -55,7 +55,7 @@
   "subcommands": {
     "set-brightness": {
       "description": "Set the brightness level of a display device. Used for adjusting screen brightness in system management. Does not support brightness scheduling or automatic adjustment configuration.",
-      "requirePermissions": [],
+      "requirePermissions": ["ohos.permission.cli.BRIGHTNESS_MANAGER"],
       "inputSchema": {
         "type": "object",
         "properties": {
