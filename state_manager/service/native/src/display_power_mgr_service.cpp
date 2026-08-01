@@ -1094,6 +1094,9 @@ ErrCode DisplayPowerMgrService::UpdateScreenPowerState(bool isScreenOn, bool& re
 {
     NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::UpdateScreenPowerState");
+    if (!Permission::IsSystem()) {
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
     result = UpdateScreenPowerStateInner(isScreenOn);
     return ERR_OK;
 }
