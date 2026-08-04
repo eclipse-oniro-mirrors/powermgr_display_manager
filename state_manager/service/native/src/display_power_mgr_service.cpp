@@ -302,7 +302,7 @@ void DisplayPowerMgrService::UndoSetDisplayStateInner(uint32_t id, DisplayState 
 {
     DISPLAY_HILOGI(COMP_SVC, "[UL_POWER]undo brightness SetDisplayState:%{public}u", curState);
     BrightnessManager::Get().SetDisplayState(id, curState, reason);
-    if (curState == DisplayState::DISPLAY_ON) {
+    if (curState == DisplayState::DISPLAY_ON || curState == DisplayState::DISPLAY_DIM) {
         BrightnessManager::Get().SetScreenOnBrightness();
     }
 }
