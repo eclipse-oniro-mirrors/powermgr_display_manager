@@ -16,6 +16,8 @@
 #ifndef DISPLAYMGR_DISPLAY_POWER_INFO_H
 #define DISPLAYMGR_DISPLAY_POWER_INFO_H
 
+#include <string>
+
 namespace OHOS {
 namespace DisplayPowerMgr {
 /**
@@ -40,6 +42,27 @@ enum class PowerOffStrategy : uint32_t {
     STRATEGY_SPECIFIC = 1,
     STRATEGY_UNKNOWN
 };
+
+/**
+ * Multi Screen State Change Reason
+ */
+enum class MultiScreenStateChangeReason : uint32_t {
+    STATE_CHANGE_REASON_DEFAULT = 0,
+    STATE_CHANGE_REASON_UNKNOWN = 1000,
+};
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+inline std::string GetReasonString(uint32_t reason)
+{
+    auto type = static_cast<MultiScreenStateChangeReason>(reason);
+    switch (type) {
+        case MultiScreenStateChangeReason::STATE_CHANGE_REASON_DEFAULT:
+            return std::string("DEFAULT");
+        default:
+            return std::string("UNKNOWN");
+    }
+}
+#endif
 } // namespace DisplayPowerMgr
 } // namespace OHOS
 #endif // DISPLAYMGR_DISPLAY_POWER_INFO_H

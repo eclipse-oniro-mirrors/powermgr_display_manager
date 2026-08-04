@@ -526,6 +526,15 @@ ohos_unittest("unittest_display_service_test") {
       "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
     ]
   }
+  if (display_manager_feature_multi_screen_state) {
+    defines += [ "DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE" ]
+    external_deps += [ "common_event_service:cesfwk_innerkits" ]
+    sources += [
+      "${displaymgr_root_path}/service/native/src/multi_screen_display_state_callback_manager.cpp",
+      "${displaymgr_root_path}/service/zidl/src/multi_screen_display_state_callback_proxy.cpp",
+      "${displaymgr_root_path}/service/zidl/src/multi_screen_display_state_callback_stub.cpp",
+    ]
+  }
 }
 
 group("unittest") {

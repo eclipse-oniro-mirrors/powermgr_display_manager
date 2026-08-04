@@ -28,6 +28,18 @@
 #include "display_power_mgr_service.h"
 #include "screen_manager_lite.h"
 #include "permission.h"
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+#include <chrono>
+#include <cinttypes>
+#include <thread>
+#include <common_event_data.h>
+#include <common_event_manager.h>
+#include <common_event_publish_info.h>
+#include <want.h>
+#include "imulti_screen_display_state_callback.h"
+#include "multi_screen_display_state_callback_manager.h"
+#include "screen_controller.h"
+#endif
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 #include "miscellaneous_display_power_strategy.h"
 #endif
@@ -72,6 +84,34 @@ bool g_isPermissionGranted = true;
 bool g_isMock = false;
 NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_brightnessServiceMock;
 NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_mock;
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+bool g_isNativePermissionGranted = true;
+constexpr uint64_t MAIN_SCREEN_ID = 0;
+constexpr uint64_t SECOND_SCREEN_ID = 1;
+constexpr uint64_t THIRD_SCREEN_ID = 2;
+constexpr uint64_t FOURTH_SCREEN_ID = 3;
+constexpr uint64_t FIFTH_SCREEN_ID = 4;
+constexpr uint64_t INVALID_SCREEN_ID = UINT64_MAX - 1;
+constexpr uint32_t DEFAULT_REASON = 0;
+constexpr const char* TEST_SCREEN_NAME = "testScreenName";
+constexpr uint32_t MAX_SCREEN_NAME_LENGTH = 100;
+constexpr int CONCURRENCY_DELAY_MS = 10;
+constexpr int MIN_CONCURRENCY_DEPTH = 3;
+bool g_mockSetDisplayStateRet = true;
+bool g_mockWakeUpBeginRet = true;
+bool g_mockSuspendBeginRet = true;
+bool g_mockWakeUpEndRet = true;
+bool g_mockSuspendEndRet = true;
+bool g_mockSetScreenPowerRet = true;
+int g_publishEventCount = 0;
+uint64_t g_lastPubScreenId = 0;
+std::string g_lastPubScreenName;
+std::string g_lastAction;
+std::string g_lastPermission;
+std::string g_lastPubReason;
+std::atomic<int> g_concurrencyCount{0};
+std::atomic<int> g_maxConcurrencyCount{0};
+#endif
 } // namespace
 
 namespace OHOS::PowerMgr {
@@ -80,6 +120,28 @@ bool Permission::IsSystem()
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest IsSystem, g_isPermissionGranted: %{public}d", g_isPermissionGranted);
     return g_isPermissionGranted;
 }
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+bool Permission::IsNativePermissionGranted(const std::string& perm)
+{
+    return g_isNativePermissionGranted;
+}
+
+void TestMultiScreenCallback::OnMultiScreenDisplayStateChanged(
+    uint64_t screenId, const std::string& screenName,
+    OHOS::DisplayPowerMgr::DisplayState state,
+    OHOS::DisplayPowerMgr::MultiScreenStateChangeReason reason)
+{
+    lastScreenId_ = screenId;
+    lastScreenName_ = screenName;
+    lastState_ = state;
+    lastReason_ = static_cast<uint32_t>(reason);
+    callCount_++;
+    DISPLAY_HILOGI(LABEL_TEST, "TestMultiScreenCallback: screenId=%{public}" PRIu64
+        " screenName=%{public}s state=%{public}u reason=%{public}u count=%{public}d",
+        screenId, screenName.c_str(), static_cast<uint32_t>(state), static_cast<uint32_t>(reason), callCount_);
+}
+#endif
 } // namespace OHOS::PowerMgr
 
 namespace OHOS::Rosen {
@@ -100,6 +162,58 @@ DisplayId DisplayManagerLite::GetDefaultDisplayId(int32_t userId)
     }
     return DISPLAY_MAIN_ID;
 }
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+bool DisplayManagerLite::SetDisplayState(DisplayId displayId, Rosen::DisplayState state, DisplayStateCallback callback)
+{
+    if (g_mockSetDisplayStateRet) {
+        int count = g_concurrencyCount.fetch_add(1, std::memory_order_relaxed) + 1;
+        int prev = g_maxConcurrencyCount.load(std::memory_order_relaxed);
+        while (count > prev &&
+               !g_maxConcurrencyCount.compare_exchange_weak(prev, count,
+                   std::memory_order_relaxed)) {}
+        // Small delay to widen concurrency window
+        std::this_thread::sleep_for(std::chrono::milliseconds(CONCURRENCY_DELAY_MS));
+        if (callback) {
+            callback(state);
+        }
+        g_concurrencyCount.fetch_sub(1, std::memory_order_relaxed);
+        return true;
+    }
+    return false;
+}
+
+bool DisplayManagerLite::WakeUpBegin(DisplayId displayId, PowerStateChangeReason reason)
+{
+    return g_mockWakeUpBeginRet;
+}
+
+bool DisplayManagerLite::SuspendBegin(DisplayId displayId, PowerStateChangeReason reason)
+{
+    return g_mockSuspendBeginRet;
+}
+
+bool DisplayManagerLite::WakeUpEnd(DisplayId displayId)
+{
+    return g_mockWakeUpEndRet;
+}
+
+bool DisplayManagerLite::SuspendEnd(DisplayId displayId)
+{
+    return g_mockSuspendEndRet;
+}
+
+bool ScreenManagerLite::SetScreenPowerForSpecifiedId(ScreenId screenId, ScreenPowerState state,
+    PowerStateChangeReason reason)
+{
+    return g_mockSetScreenPowerRet;
+}
+
+ScreenPowerState ScreenManagerLite::GetScreenPower(ScreenId screenId)
+{
+    return g_powerState;
+}
+#endif
 } // namespace OHOS::Rosen
 
 void DisplayServiceTest::SetUpTestCase()
@@ -142,6 +256,24 @@ ScreenPowerState ScreenManagerLite::GetScreenPower()
     return g_powerState;
 }
 } //namespace OHOS::Rosen
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+namespace OHOS::EventFwk {
+bool CommonEventManager::PublishCommonEvent(const CommonEventData& data,
+    const CommonEventPublishInfo& publishInfo)
+{
+    g_publishEventCount++;
+    auto want = data.GetWant();
+    g_lastPubScreenId = static_cast<uint64_t>(want.GetLongParam("screenId", -1L));
+    g_lastPubScreenName = want.GetStringParam("screenName");
+    g_lastAction = want.GetAction();
+    g_lastPubReason = want.GetStringParam("reason");
+    auto perms = publishInfo.GetSubscriberPermissions();
+    g_lastPermission = perms.empty() ? "" : perms[0];
+    return true;
+}
+} // namespace OHOS::EventFwk
+#endif
 
 namespace {
 /**
@@ -729,6 +861,7 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest042, TestSize.Level1)
     EXPECT_EQ(ret, ERR_OK);
     EXPECT_TRUE(result);
     g_isMock = false;
+    g_service->controllerMap_ = controllerMap;
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest042 function end!");
 }
 
@@ -974,4 +1107,728 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest054, TestSize.Level1)
     EXPECT_EQ(errCode, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function end!");
 }
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest001
+ * @tc.desc: Test SetMultiScreenDisplayStateInner without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest001 function start!");
+    g_isPermissionGranted = false;
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_SYSTEM_API_DENIED);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest001 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest002
+ * @tc.desc: Test SetMultiScreenDisplayStateInner without MULTI_SCREEN_MANAGER permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest002 function start!");
+    g_isPermissionGranted = true;
+    g_isNativePermissionGranted = false;
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    g_isNativePermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest002 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest003
+ * @tc.desc: Test SetMultiScreenDisplayStateInner with invalid state or screenName
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest003 function start!");
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_DIM, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_SUSPEND, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_DOZE, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_DOZE_SUSPEND, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+
+    std::string overlongScreenName(MAX_SCREEN_NAME_LENGTH + 1, 'a');
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, overlongScreenName, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest003 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest004
+ * @tc.desc: Test SetMultiScreenDisplayStateInner skip same state: no callback triggered
+ *           and no common event published for same-state Set.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest004, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest004 function start!");
+
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    ASSERT_EQ(DisplayErrors::ERR_OK,
+        g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID));
+    EXPECT_EQ(cb->callCount_, 0);
+
+    g_publishEventCount = 0;
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    EXPECT_EQ(cb->callCount_, 0);
+    EXPECT_EQ(g_publishEventCount, 0);
+
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest004 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest005
+ * @tc.desc: Test SetMultiScreenDisplayStateInner with UpdateMultiScreenState failure
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest005, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest005 function start!");
+    g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+
+    g_mockSetDisplayStateRet = false;
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_STATE_CHANGE_FAILED);
+    g_mockSetDisplayStateRet = true;
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest005 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest006
+ * @tc.desc: Test SetMultiScreenDisplayStateInner normal ON and OFF flow
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest006, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest006 function start!");
+
+    DisplayErrors ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN;
+    g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, state);
+    EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+
+    ret = g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, state);
+    EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest006 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest007
+ * @tc.desc: Test multi-screen independent state control: ON->OFF, OFF->ON, ON->ON, OFF->OFF, ON->OFF
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest007, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest007 function start!");
+
+    g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    g_service->SetMultiScreenDisplayStateInner(
+        SECOND_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    g_service->SetMultiScreenDisplayStateInner(
+        THIRD_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    g_service->SetMultiScreenDisplayStateInner(
+        FOURTH_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    g_service->SetMultiScreenDisplayStateInner(
+        FIFTH_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+
+    constexpr int SCREEN_COUNT = 5;
+    uint64_t screenIds[SCREEN_COUNT] = {
+        MAIN_SCREEN_ID, SECOND_SCREEN_ID, THIRD_SCREEN_ID, FOURTH_SCREEN_ID, FIFTH_SCREEN_ID};
+    DisplayPowerMgr::DisplayState targets[SCREEN_COUNT] = {
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF,
+    };
+
+    std::thread threads[SCREEN_COUNT];
+    DisplayErrors results[SCREEN_COUNT];
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i] = std::thread([&, i]() {
+            results[i] = g_service->SetMultiScreenDisplayStateInner(
+                screenIds[i], TEST_SCREEN_NAME, targets[i], DEFAULT_REASON);
+        });
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i].join();
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        EXPECT_EQ(results[i], DisplayErrors::ERR_OK);
+    }
+
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN;
+        g_service->GetMultiScreenDisplayStateInner(screenIds[i], state);
+        EXPECT_EQ(state, targets[i]);
+    }
+
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest007 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest008
+ * @tc.desc: Test concurrent SetMultiScreenDisplayState for 5 different screens.
+ *           Uses concurrency depth counter in SetDisplayState mock to verify
+ *           that different screens execute in parallel (different mutexes).
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest008, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest008 function start!");
+    constexpr int SCREEN_COUNT = 5;
+    for (uint64_t i = 0; i < SCREEN_COUNT; i++) {
+        g_service->SetMultiScreenDisplayStateInner(i, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON,
+            DEFAULT_REASON);
+    }
+    g_maxConcurrencyCount = 0;
+    std::thread threads[SCREEN_COUNT];
+    DisplayErrors results[SCREEN_COUNT];
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i] = std::thread([&, i]() {
+            results[i] = g_service->SetMultiScreenDisplayStateInner(
+                static_cast<uint64_t>(i), TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+        });
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i].join();
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        EXPECT_EQ(results[i], DisplayErrors::ERR_OK) << "screen " << i << " failed";
+    }
+    for (uint64_t i = 0; i < SCREEN_COUNT; i++) {
+        DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN;
+        g_service->GetMultiScreenDisplayStateInner(i, state);
+        EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    }
+    EXPECT_GE(g_maxConcurrencyCount.load(), MIN_CONCURRENCY_DEPTH);
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest008 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest009
+ * @tc.desc: Test concurrent SetMultiScreenDisplayState for the same screen is serialized by mutex.
+ *           Uses concurrency depth counter to verify that only 1 thread enters
+ *           SetDisplayState at a time for the same screen.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest009, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest009 function start!");
+
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+
+    constexpr int THREAD_COUNT = 4;
+    std::atomic<int> doneCount(0);
+    DisplayErrors results[THREAD_COUNT];
+    DisplayPowerMgr::DisplayState states[THREAD_COUNT] = {
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON,
+    };
+
+    g_maxConcurrencyCount = 0;
+
+    std::thread threads[THREAD_COUNT];
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads[i] = std::thread([&, i]() {
+            results[i] = g_service->SetMultiScreenDisplayStateInner(
+                MAIN_SCREEN_ID, TEST_SCREEN_NAME, states[i], static_cast<uint32_t>(i));
+            doneCount.fetch_add(1);
+        });
+    }
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        threads[i].join();
+    }
+    for (int i = 0; i < THREAD_COUNT; i++) {
+        EXPECT_EQ(results[i], DisplayErrors::ERR_OK) << "thread " << i << " failed";
+    }
+
+    EXPECT_EQ(doneCount.load(), THREAD_COUNT);
+    EXPECT_EQ(g_maxConcurrencyCount.load(), 1);
+
+    DisplayPowerMgr::DisplayState finalState = DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN;
+    g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, finalState);
+    EXPECT_TRUE(finalState == DisplayPowerMgr::DisplayState::DISPLAY_ON ||
+                finalState == DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest009 function end!");
+}
+
+/**
+ * @tc.name: SetMultiScreenDisplayStateInnerTest010
+ * @tc.desc: Test no callback or common event loss under concurrent Set: 3 callbacks each register
+ *           for 5 screens, concurrent Set triggers all callbacks and common events.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest010, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest010 function start!");
+
+    constexpr int SCREEN_COUNT = 5;
+    for (uint64_t i = 0; i < SCREEN_COUNT; i++) {
+        g_service->SetMultiScreenDisplayStateInner(i, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON,
+            DEFAULT_REASON);
+    }
+
+    sptr<TestMultiScreenCallback> cb0 = new TestMultiScreenCallback(true);
+    sptr<TestMultiScreenCallback> cb1 = new TestMultiScreenCallback(true);
+    sptr<TestMultiScreenCallback> cb2 = new TestMultiScreenCallback(true);
+    for (uint64_t i = 0; i < SCREEN_COUNT; i++) {
+        ASSERT_EQ(DisplayErrors::ERR_OK,
+            g_service->RegisterMultiScreenDisplayStateCallbackInner(cb0, i));
+        ASSERT_EQ(DisplayErrors::ERR_OK,
+            g_service->RegisterMultiScreenDisplayStateCallbackInner(cb1, i));
+        ASSERT_EQ(DisplayErrors::ERR_OK,
+            g_service->RegisterMultiScreenDisplayStateCallbackInner(cb2, i));
+    }
+
+    g_publishEventCount = 0;
+    std::thread threads[SCREEN_COUNT];
+    DisplayErrors results[SCREEN_COUNT];
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i] = std::thread([&, i]() {
+            results[i] = g_service->SetMultiScreenDisplayStateInner(
+                static_cast<uint64_t>(i), TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+        });
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        threads[i].join();
+    }
+    for (int i = 0; i < SCREEN_COUNT; i++) {
+        EXPECT_EQ(results[i], DisplayErrors::ERR_OK);
+    }
+
+    EXPECT_EQ(cb0->callCount_, SCREEN_COUNT);
+    EXPECT_EQ(cb1->callCount_, SCREEN_COUNT);
+    EXPECT_EQ(cb2->callCount_, SCREEN_COUNT);
+    EXPECT_EQ(g_publishEventCount, SCREEN_COUNT);
+
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb0, SCREEN_ID_ALL);
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb1, SCREEN_ID_ALL);
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb2, SCREEN_ID_ALL);
+
+    DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest010 function end!");
+}
+
+/**
+ * @tc.name: GetMultiScreenDisplayStateInnerTest001
+ * @tc.desc: Test GetMultiScreenDisplayStateInner without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetMultiScreenDisplayStateInnerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest001 function start!");
+    g_isPermissionGranted = false;
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_ON;
+    DisplayErrors ret = g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, state);
+    EXPECT_EQ(ret, DisplayErrors::ERR_SYSTEM_API_DENIED);
+    EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest001 function end!");
+}
+
+/**
+ * @tc.name: GetMultiScreenDisplayStateInnerTest002
+ * @tc.desc: Test GetMultiScreenDisplayStateInner without MULTI_SCREEN_MANAGER permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetMultiScreenDisplayStateInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest002 function start!");
+    g_isPermissionGranted = true;
+    g_isNativePermissionGranted = false;
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_ON;
+    DisplayErrors ret = g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, state);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN);
+    g_isNativePermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest002 function end!");
+}
+
+/**
+ * @tc.name: GetMultiScreenDisplayStateInnerTest003
+ * @tc.desc: Test GetMultiScreenDisplayStateInner successfully
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetMultiScreenDisplayStateInnerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest003 function start!");
+    g_service->SetMultiScreenDisplayStateInner(
+        MAIN_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    DisplayPowerMgr::DisplayState state = DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN;
+    DisplayErrors ret = g_service->GetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, state);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    EXPECT_EQ(state, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    DISPLAY_HILOGI(LABEL_TEST, "GetMultiScreenDisplayStateInnerTest003 function end!");
+}
+
+/**
+ * @tc.name: RegisterMultiScreenDisplayStateCallbackInnerTest001
+ * @tc.desc: Test RegisterMultiScreenDisplayStateCallbackInner without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest001 function start!");
+    g_isPermissionGranted = false;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    DisplayErrors ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_SYSTEM_API_DENIED);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest001 function end!");
+}
+
+/**
+ * @tc.name: RegisterMultiScreenDisplayStateCallbackInnerTest002
+ * @tc.desc: Test RegisterMultiScreenDisplayStateCallbackInner without MULTI_SCREEN_MANAGER permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest002 function start!");
+    g_isPermissionGranted = true;
+    g_isNativePermissionGranted = false;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    DisplayErrors ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    g_isNativePermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest002 function end!");
+}
+
+/**
+ * @tc.name: RegisterMultiScreenDisplayStateCallbackInnerTest003
+ * @tc.desc: Test RegisterMultiScreenDisplayStateCallbackInner with null callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest003 function start!");
+    DisplayErrors ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(nullptr, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest003 function end!");
+}
+
+/**
+ * @tc.name: RegisterMultiScreenDisplayStateCallbackInnerTest004
+ * @tc.desc: Test Register/Unregister with non-proxy, proxy, duplicate, and verify callback
+ *           triggered by Set with correct parameters; after unregister, Set does not trigger.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest004, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest004 function start!");
+    sptr<TestMultiScreenCallback> nonProxyCb = new TestMultiScreenCallback(false);
+    DisplayErrors ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(nonProxyCb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_REGISTRATION_FAILED);
+
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, 1);
+    EXPECT_EQ(cb->lastScreenId_, MAIN_SCREEN_ID);
+    EXPECT_EQ(cb->lastState_, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    EXPECT_EQ(cb->lastReason_, DEFAULT_REASON);
+
+    ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    int callCountAfterUnregister = cb->callCount_;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, callCountAfterUnregister);
+
+    ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest004 function end!");
+}
+
+/**
+ * @tc.name: UnregisterMultiScreenDisplayStateCallbackInnerTest001
+ * @tc.desc: Test UnregisterMultiScreenDisplayStateCallbackInner without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest001 function start!");
+    g_isPermissionGranted = false;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_SYSTEM_API_DENIED);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest001 function end!");
+}
+
+/**
+ * @tc.name: UnregisterMultiScreenDisplayStateCallbackInnerTest002
+ * @tc.desc: Test UnregisterMultiScreenDisplayStateCallbackInner without MULTI_SCREEN_MANAGER permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest002 function start!");
+    g_isPermissionGranted = true;
+    g_isNativePermissionGranted = false;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    g_isNativePermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest002 function end!");
+}
+
+/**
+ * @tc.name: UnregisterMultiScreenDisplayStateCallbackInnerTest003
+ * @tc.desc: Test UnregisterMultiScreenDisplayStateCallbackInner with null callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest003 function start!");
+    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(nullptr, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PARAM_INVALID);
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest003 function end!");
+}
+
+/**
+ * @tc.name: UnregisterMultiScreenDisplayStateCallbackInnerTest004
+ * @tc.desc: Test Unregister with SCREEN_ID_ALL and specific screen; after unregister, Set does not trigger callback.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest004, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest004 function start!");
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+
+    EXPECT_EQ(g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, SCREEN_ID_ALL),
+        DisplayErrors::ERR_OK);
+    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, SCREEN_ID_ALL);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    EXPECT_EQ(g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID),
+        DisplayErrors::ERR_OK);
+    ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, 0);
+    DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest004 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest001
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager Register with null callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest001 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    EXPECT_FALSE(mgr.Register(nullptr, MAIN_SCREEN_ID));
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest001 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest002
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager Unregister with null callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest002 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    EXPECT_FALSE(mgr.Unregister(nullptr, MAIN_SCREEN_ID));
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest002 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest003
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager Unregister with remaining and last entry
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest003 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    sptr<IRemoteObject> obj = cb->AsObject();
+
+    mgr.callbacks_.emplace(obj, MAIN_SCREEN_ID);
+    mgr.callbacks_.emplace(obj, SECOND_SCREEN_ID);
+    sptr<MultiScreenDisplayStateCallbackManager::CallbackDeathRecipient> dr(
+        new MultiScreenDisplayStateCallbackManager::CallbackDeathRecipient(mgr));
+    mgr.deathRecipients_[obj] = dr;
+
+    EXPECT_TRUE(mgr.Unregister(obj, MAIN_SCREEN_ID));
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(1));
+    EXPECT_EQ(mgr.deathRecipients_.count(obj), static_cast<size_t>(1));
+
+    EXPECT_TRUE(mgr.Unregister(obj, SECOND_SCREEN_ID));
+    auto range = mgr.callbacks_.equal_range(obj);
+    EXPECT_EQ(range.first, range.second);
+    EXPECT_EQ(mgr.deathRecipients_.count(obj), static_cast<size_t>(0));
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest003 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest004
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager UnregisterAll with null callback
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest004, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest004 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    EXPECT_FALSE(mgr.RemoveAll(nullptr));
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest004 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest005
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager RemoveAll with null and valid callback and OnRemoteDied
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest005, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest005 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    sptr<TestMultiScreenCallback> cb2 = new TestMultiScreenCallback(true);
+    sptr<IRemoteObject> obj = cb->AsObject();
+    sptr<IRemoteObject> obj2 = cb2->AsObject();
+
+    mgr.RemoveAll(nullptr);
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(0));
+
+    mgr.callbacks_.emplace(obj, MAIN_SCREEN_ID);
+    mgr.callbacks_.emplace(obj, SECOND_SCREEN_ID);
+    mgr.callbacks_.emplace(obj2, MAIN_SCREEN_ID);
+    mgr.deathRecipients_[obj] = nullptr;
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(3));
+
+    mgr.RemoveAll(obj);
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(1));
+    EXPECT_EQ(mgr.deathRecipients_.count(obj), static_cast<size_t>(0));
+    mgr.callbacks_.clear();
+
+    mgr.callbacks_.emplace(obj, MAIN_SCREEN_ID);
+    mgr.callbacks_.emplace(obj, SECOND_SCREEN_ID);
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(2));
+    sptr<MultiScreenDisplayStateCallbackManager::CallbackDeathRecipient> dr(
+        new MultiScreenDisplayStateCallbackManager::CallbackDeathRecipient(mgr));
+    mgr.deathRecipients_[obj] = dr;
+
+    dr->OnRemoteDied(wptr<IRemoteObject>(obj));
+    EXPECT_EQ(mgr.callbacks_.size(), static_cast<size_t>(0));
+    EXPECT_EQ(mgr.deathRecipients_.size(), static_cast<size_t>(0u));
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest005 function end!");
+}
+
+/**
+ * @tc.name: MultiScreenDisplayStateCallbackManagerTest006
+ * @tc.desc: Test MultiScreenDisplayStateCallbackManager Notify with mixed screen id matching
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest006, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest006 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
+    sptr<TestMultiScreenCallback> cbAll = new TestMultiScreenCallback(true);
+    sptr<IRemoteObject> obj = cb->AsObject();
+    sptr<IRemoteObject> objAll = cbAll->AsObject();
+
+    mgr.callbacks_.emplace(obj, SECOND_SCREEN_ID);
+    mgr.callbacks_.emplace(obj, FOURTH_SCREEN_ID);
+    mgr.callbacks_.emplace(objAll, SCREEN_ID_ALL);
+
+    mgr.Notify(SECOND_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, 1);
+    EXPECT_EQ(cbAll->callCount_, 1);
+
+    mgr.Notify(THIRD_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, 1);
+    EXPECT_EQ(cbAll->callCount_, 2);
+
+    mgr.Notify(FOURTH_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(cb->callCount_, 2);
+    EXPECT_EQ(cbAll->callCount_, 3);
+    mgr.callbacks_.clear();
+    DISPLAY_HILOGI(LABEL_TEST, "MultiScreenDisplayStateCallbackManagerTest006 function end!");
+}
+
+/**
+ * @tc.name: CommonEventTest001
+ * @tc.desc: Test common event published with correct parameters after SetMultiScreenDisplayState
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, CommonEventTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "CommonEventTest001 function start!");
+
+    g_publishEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+
+    EXPECT_EQ(g_publishEventCount, 1);
+    EXPECT_EQ(g_lastAction, "usual.event.display.MULTI_SCREEN_ON");
+    EXPECT_EQ(g_lastPubScreenId, MAIN_SCREEN_ID);
+    EXPECT_EQ(g_lastPubReason, "DEFAULT");
+    EXPECT_EQ(g_lastPermission, "ohos.permission.MULTI_SCREEN_MANAGER");
+
+    g_publishEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+
+    EXPECT_EQ(g_publishEventCount, 1);
+    EXPECT_EQ(g_lastAction, "usual.event.display.MULTI_SCREEN_OFF");
+    EXPECT_EQ(g_lastPubScreenId, MAIN_SCREEN_ID);
+    EXPECT_EQ(g_lastPubReason, "DEFAULT");
+    EXPECT_EQ(g_lastPermission, "ohos.permission.MULTI_SCREEN_MANAGER");
+
+    DISPLAY_HILOGI(LABEL_TEST, "CommonEventTest001 function end!");
+}
+#endif
 } // namespace

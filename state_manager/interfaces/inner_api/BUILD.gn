@@ -37,6 +37,12 @@ ohos_shared_library("displaymgr") {
     "${displaymgr_service_zidl}/src/display_power_callback_stub.cpp",
     "${displaymgr_service_zidl}/src/display_brightness_listener_stub.cpp",
   ]
+  if (display_manager_feature_multi_screen_state) {
+    defines += [ "DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE" ]
+    sources += [
+      "${displaymgr_service_zidl}/src/multi_screen_display_state_callback_stub.cpp",
+    ]
+  }
 
   configs = [
     ":displaymgr_private_config",
