@@ -902,6 +902,8 @@ ErrCode DisplayPowerMgrService::SetForcedBrightness(double value, uint32_t displ
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
         return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
     }
+    int MAX_NITS = 1000 * 1000;
+    CHECK_PARAM_WITH_RET(value, -1 * MAX_NITS, MAX_NITS, false);
     CHECK_PARAM_DURATION_WITH_RET(duration, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(COMP_SVC, "SetForcedBrightness value=%{public}.2f, duration=%{public}u, valueType=%{public}d",
         value, duration, static_cast<int>(valueType));

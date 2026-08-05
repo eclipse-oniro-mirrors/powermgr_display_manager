@@ -28,10 +28,13 @@ enum DisplayDataChangeListenerType {
     MAX
 };
 
+// Feature types used by GetFeatureSupport() to query
+// whether specific brightness features are supported or valid
 enum BrightnessFeatureType {
     DEFAULT = 1000,
-    CARE_MODE = 1001,
-    SCREEN_FLASH = 1002,
+    CARE_MODE = 1001,             // Query if care mode is supported
+    SCREEN_FLASH = 1002,          // Query if screen flash is supported
+    BRIGHTNESS_INFO = 1003,       // Query if DMS BrightnessInfo (including BrightnessInfo.brightnessPosition) is valid
     MAX
 };
 

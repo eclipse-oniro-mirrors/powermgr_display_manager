@@ -15,11 +15,13 @@
 #include "display_setting_helper.h"
 
 #include "display_log.h"
+#include "ffrt_inner.h"
 #include "setting_provider.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DisplayPowerMgr {
+using namespace std::chrono_literals;
 namespace {
 constexpr int32_t AUTO_BRIGHTNESS_DISABLE = 0;
 constexpr int32_t AUTO_BRIGHTNESS_ENABLE = 1;
@@ -105,6 +107,7 @@ void DisplaySettingHelper::RegisterSettingAutoBrightnessObserver(SettingObserver
     }
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Register setting auto brightness observer end");
 }
+
 void DisplaySettingHelper::UnregisterSettingAutoBrightnessObserver()
 {
     if (autoBrightnessObserver_ == nullptr) {
@@ -130,14 +133,21 @@ void DisplaySettingHelper::SetSettingAutoBrightness(bool enable)
             FEAT_BRIGHTNESS, "set setting auto brightness failed, enable=%{public}d, ret=%{public}d", enable, ret);
     }
 }
+
 bool DisplaySettingHelper::GetSettingAutoBrightness(const std::string& key)
 {
     SettingProvider& provider = SettingProvider::GetInstance(DISPLAY_MANAGER_SERVICE_ID);
-    int32_t value;
-    ErrCode ret = provider.GetIntValue(key, value);
-    if (ret != ERR_OK) {
-        DISPLAY_HILOGW(
-            FEAT_BRIGHTNESS, "get setting auto brightness failed key=%{public}s, ret=%{public}d", key.c_str(), ret);
+    int32_t value = AUTO_BRIGHTNESS_DISABLE;
+    for (int i = 0; i < 10; i++) { // 10 is max retry cnt
+        ErrCode ret = provider.GetIntValue(key, value);
+        if (ret != ERR_OK) {
+            DISPLAY_HILOGW(FEAT_BRIGHTNESS,
+                "get setting auto brightness failed key=%{public}s, ret=%{public}d, i=%{public}d", key.c_str(), ret, i);
+        }
+        if (ret != ERR_INVALID_OPERATION) {
+            break;
+        }
+        ffrt::this_task::sleep_for(100ms); // wait for other process/thread to finish accessing setting database
     }
     return (value == AUTO_BRIGHTNESS_ENABLE);
 }
