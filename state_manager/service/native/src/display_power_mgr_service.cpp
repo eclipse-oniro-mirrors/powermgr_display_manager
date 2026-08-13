@@ -1227,5 +1227,32 @@ ErrCode DisplayPowerMgrService::SetScreenPowerOffStrategy(uint32_t strategy, uin
 #endif
     return ERR_OK;
 }
+
+ErrCode DisplayPowerMgrService::SetSceneMode(uint32_t id, SceneModeType type, bool enable, bool& result)
+{
+    NoCoroutineSwitchGuard threadIdGuard;
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::SetSceneMode");
+    if (!Permission::IsSystem()) {
+        result = false;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+        return static_cast<ErrCode>(DisplayErrors::ERR_SYSTEM_API_DENIED);
+    }
+    if (type < SceneModeType::DEFAULT || type >= SceneModeType::MAX) {
+        DISPLAY_HILOGE(COMP_SVC, "SetSceneMode: invalid type=%{public}d", static_cast<int>(type));
+        result = false;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    DISPLAY_HILOGI(COMP_SVC, "SetSceneMode id=%{public}u type=%{public}d enable=%{public}d",
+        id, static_cast<int>(type), enable);
+    auto iterator = controllerMap_.find(id);
+    if (iterator == controllerMap_.end()) {
+        result = false;
+        lastError_ = static_cast<int32_t>(DisplayErrors::ERR_PARAM_INVALID);
+        return static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID);
+    }
+    result = BrightnessManager::Get().SetSceneMode(type, enable);
+    return ERR_OK;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

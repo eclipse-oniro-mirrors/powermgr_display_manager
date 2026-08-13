@@ -156,6 +156,7 @@ public:
     uint32_t GetCurrentSensorId();
     void SetCurrentSensorId(uint32_t sensorId);
     int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
+    bool SetSceneMode(SceneModeType type, bool enable);
 
     static uint32_t GetSafeBrightness(uint32_t value);
     bool SetMaxBrightness(double value);

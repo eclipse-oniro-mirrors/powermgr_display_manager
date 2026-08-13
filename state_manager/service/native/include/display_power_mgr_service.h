@@ -89,6 +89,7 @@ public:
     ErrCode SetScreenDisplayState(uint64_t screenId, uint32_t state, uint32_t reason) override;
     ErrCode SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
         const sptr<IRemoteObject>& token, int32_t& result) override;
+    ErrCode SetSceneMode(uint32_t id, SceneModeType type, bool enable, bool& result) override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);

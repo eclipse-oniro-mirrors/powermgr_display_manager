@@ -65,6 +65,7 @@ public:
     bool SetMaxBrightness(double value);
     bool SetMaxBrightnessNit(uint32_t nit);
     int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
+    bool SetSceneMode(SceneModeType type, bool enable);
 
 private:
     BrightnessManager() = default;

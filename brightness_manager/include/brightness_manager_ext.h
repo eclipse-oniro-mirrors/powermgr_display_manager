@@ -65,6 +65,7 @@ public:
     bool SetMaxBrightness(double value);
     bool SetMaxBrightnessNit(uint32_t maxNit);
     int NotifyScreenPowerStatus(uint32_t displayId, uint32_t status);
+    bool SetSceneMode(SceneModeType type, bool enable);
 
 private:
     bool LoadBrightnessExtLibrary();
@@ -109,6 +110,7 @@ private:
     void* mRunJsonCommandFunc = nullptr;
     void* mRegisterDataChangeListenerFunc = nullptr;
     void* mUnregisterDataChangeListenerFunc = nullptr;
+    void* mSetSceneModeFunc = nullptr;
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS

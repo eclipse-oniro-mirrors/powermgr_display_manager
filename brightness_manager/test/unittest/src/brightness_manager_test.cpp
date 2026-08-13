@@ -84,4 +84,15 @@ HWTEST_F(BrightnessManagerTest, BrightnessManagerSetForcedBrightness001, TestSiz
     EXPECT_FALSE(BrightnessManager::Get().SetForcedBrightness(0.5, 0, BrightnessValueType::MAX));
     DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerSetForcedBrightness001 function end!");
 }
+
+// ==================== SetSceneMode Tests ====================
+
+HWTEST_F(BrightnessManagerTest, BrightnessManagerSetSceneMode001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerSetSceneMode001 function start!");
+    BrightnessManager::Get().SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, true);
+    BrightnessManager::Get().SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, true);
+    EXPECT_FALSE(BrightnessManager::Get().SetSceneMode(SceneModeType::MAX, true));
+    DISPLAY_HILOGI(LABEL_TEST, "BrightnessManagerSetSceneMode001 function end!");
+}
 } // namespace

@@ -1122,4 +1122,16 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetForcedBrightness, Test
     auto result = DisplayPowerMgrClient::GetInstance().SetForcedBrightness(200.0, 0, 0, BrightnessValueType::MAX);
     EXPECT_FALSE(result);
 }
+
+/**
+ * @tc.name: DisplayPowerMgrSetSceneMode
+ * @tc.desc: Test SetSceneMode through DisplayPowerMgrClient
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetSceneMode, TestSize.Level0)
+{
+    DisplayPowerMgrClient::GetInstance().SetSceneMode(0, SceneModeType::SCENE_MODE_BUSINESS, true);
+    DisplayPowerMgrClient::GetInstance().SetSceneMode(0, SceneModeType::SCENE_MODE_CONSTANT, true);
+    EXPECT_FALSE(DisplayPowerMgrClient::GetInstance().SetSceneMode(0, SceneModeType::MAX, true));
+}
 } // namespace
