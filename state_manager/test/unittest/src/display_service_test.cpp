@@ -71,6 +71,7 @@ OHOS::Rosen::ScreenPowerState g_powerState = OHOS::Rosen::ScreenPowerState::POWE
 bool g_isPermissionGranted = true;
 bool g_isMock = false;
 NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_brightnessServiceMock;
+NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_mock;
 } // namespace
 
 namespace OHOS::PowerMgr {
@@ -113,6 +114,7 @@ void DisplayServiceTest::TearDownTestCase()
 {
     g_service->Deinit();
     g_service->Reset();
+    g_service->autoBrightnessQueue_.Clear(); // 2026.08.13: this newly added ffrtTimer is not cleared
 
     testing::Mock::AllowLeak(g_brightnessServiceMock);
     g_brightnessServiceMock = nullptr;
@@ -877,5 +879,42 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest050, TestSize.Level1)
     ret = g_service->UnregisterDataChangeListener(listenerType, "test", result);
     EXPECT_EQ(ret, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest050 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest051
+ * @tc.desc: Test UndoSetDisplayStateInner
+ * @tc.type: FUNC
+ */
+extern "C" {
+void __wrap__ZN4OHOS15DisplayPowerMgr17BrightnessManager21SetScreenOnBrightnessEv(BrightnessManager*)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "Mock SetScreenOnBrightness called");
+    // Use existing mock class but won't interfere with the existing (broken) tests:
+    // The leaked mock object is left leaking, sigh
+    if (!g_mock) {
+        // If mock is unavailable just do nothing. The side effect is non-relevant in this test suite.
+        // In case the original behaviour must be restored, use __real_<func>
+        DISPLAY_HILOGE(LABEL_TEST, "Mock object is nullptr, do nothing");
+        return;
+    }
+    g_mock->SetScreenOnBrightness();
+}
+}
+
+HWTEST_F(DisplayServiceTest, UndoSetDisplayStateInner, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UndoSetDisplayStateInner function start!");
+    // Reuse the existing mock class, although the redefined function is inside manager instead of service
+    NiceMock<DisplayServiceTest::BrightnessServiceMock> mockObj;
+    g_mock = &mockObj;
+    ASSERT_TRUE(g_service != nullptr);
+    EXPECT_CALL(mockObj, SetScreenOnBrightness).Times(2);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_ON, 0);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_DIM, 0);
+    EXPECT_CALL(mockObj, SetScreenOnBrightness).Times(0);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_OFF, 0);
+    g_mock = nullptr;
+    DISPLAY_HILOGI(LABEL_TEST, "UndoSetDisplayStateInner function end!");
 }
 } // namespace
