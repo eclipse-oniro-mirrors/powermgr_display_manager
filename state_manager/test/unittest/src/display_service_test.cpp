@@ -71,6 +71,7 @@ OHOS::Rosen::ScreenPowerState g_powerState = OHOS::Rosen::ScreenPowerState::POWE
 bool g_isPermissionGranted = true;
 bool g_isMock = false;
 NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_brightnessServiceMock;
+NiceMock<DisplayServiceTest::BrightnessServiceMock>* g_mock;
 } // namespace
 
 namespace OHOS::PowerMgr {
@@ -113,6 +114,7 @@ void DisplayServiceTest::TearDownTestCase()
 {
     g_service->Deinit();
     g_service->Reset();
+    g_service->autoBrightnessQueue_.Clear(); // 2026.08.13: this newly added ffrtTimer is not cleared
 
     testing::Mock::AllowLeak(g_brightnessServiceMock);
     g_brightnessServiceMock = nullptr;
@@ -881,45 +883,82 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest050, TestSize.Level1)
 
 /**
  * @tc.name: DisplayServiceTest051
- * @tc.desc: Test SetSceneMode via service with permission
+ * @tc.desc: Test UndoSetDisplayStateInner
  * @tc.type: FUNC
  */
-HWTEST_F(DisplayServiceTest, DisplayServiceTest051, TestSize.Level1)
+extern "C" {
+void __wrap__ZN4OHOS15DisplayPowerMgr17BrightnessManager21SetScreenOnBrightnessEv(BrightnessManager*)
 {
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest051 function start!");
-    EXPECT_TRUE(g_service != nullptr);
-    g_isPermissionGranted = true;
-    bool result = false;
-    auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, SceneModeType::SCENE_MODE_BUSINESS, true, result);
-    EXPECT_EQ(errCode, ERR_OK);
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest051 function end!");
+    DISPLAY_HILOGI(LABEL_TEST, "Mock SetScreenOnBrightness called");
+    // Use existing mock class but won't interfere with the existing (broken) tests:
+    // The leaked mock object is left leaking, sigh
+    if (!g_mock) {
+        // If mock is unavailable just do nothing. The side effect is non-relevant in this test suite.
+        // In case the original behaviour must be restored, use __real_<func>
+        DISPLAY_HILOGE(LABEL_TEST, "Mock object is nullptr, do nothing");
+        return;
+    }
+    g_mock->SetScreenOnBrightness();
+}
+}
+
+HWTEST_F(DisplayServiceTest, UndoSetDisplayStateInner, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "UndoSetDisplayStateInner function start!");
+    // Reuse the existing mock class, although the redefined function is inside manager instead of service
+    NiceMock<DisplayServiceTest::BrightnessServiceMock> mockObj;
+    g_mock = &mockObj;
+    ASSERT_TRUE(g_service != nullptr);
+    EXPECT_CALL(mockObj, SetScreenOnBrightness).Times(2);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_ON, 0);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_DIM, 0);
+    EXPECT_CALL(mockObj, SetScreenOnBrightness).Times(0);
+    g_service->UndoSetDisplayStateInner(0, DisplayPowerMgr::DisplayState::DISPLAY_OFF, 0);
+    g_mock = nullptr;
+    DISPLAY_HILOGI(LABEL_TEST, "UndoSetDisplayStateInner function end!");
 }
 
 /**
  * @tc.name: DisplayServiceTest052
- * @tc.desc: Test SetSceneMode via service without permission
+ * @tc.desc: Test SetSceneMode via service with permission
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceTest052, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest052 function start!");
     EXPECT_TRUE(g_service != nullptr);
-    g_isPermissionGranted = false;
+    g_isPermissionGranted = true;
     bool result = false;
     auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, SceneModeType::SCENE_MODE_BUSINESS, true, result);
-    EXPECT_NE(errCode, ERR_OK);
-    g_isPermissionGranted = true;
+    EXPECT_EQ(errCode, ERR_OK);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest052 function end!");
 }
 
 /**
  * @tc.name: DisplayServiceTest053
- * @tc.desc: Test SetSceneMode with invalid SceneModeType
+ * @tc.desc: Test SetSceneMode via service without permission
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayServiceTest, DisplayServiceTest053, TestSize.Level1)
 {
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest053 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    bool result = false;
+    auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, SceneModeType::SCENE_MODE_BUSINESS, true, result);
+    EXPECT_NE(errCode, ERR_OK);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest053 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest054
+ * @tc.desc: Test SetSceneMode with invalid SceneModeType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest054, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function start!");
     EXPECT_TRUE(g_service != nullptr);
     g_isPermissionGranted = true;
     bool result = false;
@@ -933,6 +972,5 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest053, TestSize.Level1)
     type = static_cast<SceneModeType>(typeNum);
     errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, type, true, result);
     EXPECT_EQ(errCode, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
-    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest053 function end!");
-}
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function end!");
 } // namespace

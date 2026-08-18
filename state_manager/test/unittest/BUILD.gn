@@ -443,6 +443,10 @@ ohos_unittest("unittest_display_service_test") {
     "-Dprotected=public",
   ]
 
+  # For testing, may be better off writing a script to exract the mangled name and to generate the __wrap function.
+  # The name must be changed if the function signature of BrightnessManager::SetScreenOnBrightness is changed
+  ldflags = [ "-Wl,--wrap=_ZN4OHOS15DisplayPowerMgr17BrightnessManager21SetScreenOnBrightnessEv" ]
+
   sanitize = {
     cfi = true
     cfi_cross_dso = true
