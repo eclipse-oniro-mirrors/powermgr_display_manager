@@ -57,14 +57,13 @@ ohos_shared_library("displaymgrservice") {
   ]
 
   deps = [
+    "${brightnessmgr_root_path}:brightness_manager",
     "${displaymgr_root_path}/service:displaymgr_stub",
   ]
   public_configs = [
     ":displaymgr_public_config",
     "${brightnessmgr_root_path}:brightness_manager_config",
   ]
-
-  public_deps = [ "${brightnessmgr_root_path}:brightness_manager" ]
 
   external_deps = [ "power_manager:power_permission" ]
   external_deps += [
