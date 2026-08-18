@@ -973,4 +973,5 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest054, TestSize.Level1)
     errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, type, true, result);
     EXPECT_EQ(errCode, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
     DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function end!");
+}
 } // namespace
