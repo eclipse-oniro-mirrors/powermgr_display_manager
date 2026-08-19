@@ -334,5 +334,14 @@ int BrightnessManager::NotifyScreenPowerStatus(uint32_t displayId, uint32_t stat
     return BrightnessService::Get().NotifyScreenPowerStatus(displayId, status);
 #endif
 }
+
+bool BrightnessManager::SetSceneMode(SceneModeType type, bool enable)
+{
+#ifdef OHOS_BUILD_ENABLE_BRIGHTNESS_WRAPPER
+    return mBrightnessManagerExt.SetSceneMode(type, enable);
+#else
+    return BrightnessService::Get().SetSceneMode(type, enable);
+#endif
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

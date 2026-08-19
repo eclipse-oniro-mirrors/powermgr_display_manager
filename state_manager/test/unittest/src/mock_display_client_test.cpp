@@ -476,6 +476,7 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient029, TestSize.Level
     EXPECT_GT(mClient.RunJsonCommand("").length(), 0);
     EXPECT_FALSE(mClient.GetFeatureSupport(BrightnessFeatureType::MAX));
     EXPECT_FALSE(mClient.SetForcedBrightness(0.5, 0, 0, BrightnessValueType::MAX));
+    EXPECT_FALSE(mClient.SetSceneMode(0, SceneModeType::MAX, true));
     mClient.WaitDimmingDone();
     EXPECT_NE(mClient.RegisterDataChangeListener(nullptr, ChangeType::STABLE_LUX), 0);
     EXPECT_NE(mClient.UnregisterDataChangeListener(ChangeType::STABLE_LUX), 0);

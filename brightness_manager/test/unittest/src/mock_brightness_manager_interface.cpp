@@ -203,6 +203,11 @@ bool SetMaxBrightnessNit(uint32_t maxNit)
     return MockReturnBool();
 }
 
+bool SetSceneMode(SceneModeType type, bool enable)
+{
+    return MockReturnBool();
+}
+
 void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& ext)
 {
     ext.CloseBrightnessExtLibrary();
@@ -237,6 +242,7 @@ void MockInitBrightnessManagerExt(OHOS::DisplayPowerMgr::BrightnessManagerExt& e
     ext.mRunJsonCommandFunc = reinterpret_cast<void*>(RunJsonCommand);
     ext.mGetFeatureSupportFunc = reinterpret_cast<void*>(GetFeatureSupport);
     ext.mSetForcedBrightnessFunc = reinterpret_cast<void*>(SetForcedBrightness);
+    ext.mSetSceneModeFunc = reinterpret_cast<void*>(SetSceneMode);
     ext.mRegisterDataChangeListenerFunc = reinterpret_cast<void*>(RegisterDataChangeListener);
     ext.mUnregisterDataChangeListenerFunc = reinterpret_cast<void*>(UnregisterDataChangeListener);
 }

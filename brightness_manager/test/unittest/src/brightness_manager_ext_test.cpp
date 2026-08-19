@@ -214,6 +214,8 @@ HWTEST_F(BrightnessManagerExtTest, MockInit003, TestSize.Level0)
     // Legal values after MockInit, ensure no crash
     g_BrightnessManagerExt.GetFeatureSupport(BrightnessFeatureType::DEFAULT);
     g_BrightnessManagerExt.SetForcedBrightness(0.5, 0, BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
+    g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, true);
+    g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, true);
     sptr<IDisplayBrightnessListener> listener = new DisplayBrightnessListenerStub();
     EXPECT_EQ(g_BrightnessManagerExt.RegisterDataChangeListener(listener, ChangeType::STABLE_LUX, "", ""), 0);
     EXPECT_EQ(g_BrightnessManagerExt.UnregisterDataChangeListener(ChangeType::STABLE_LUX, ""), 0);
@@ -231,6 +233,8 @@ HWTEST_F(BrightnessManagerExtTest, NoInit002, TestSize.Level0)
     // Library closed, expected to return false even with legal inputs
     EXPECT_FALSE(g_BrightnessManagerExt.GetFeatureSupport(BrightnessFeatureType::DEFAULT));
     EXPECT_FALSE(g_BrightnessManagerExt.SetForcedBrightness(0.5, 0, BrightnessValueType::RELATIVE_TO_CURRENT_RANGE));
+    EXPECT_FALSE(g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, true));
+    EXPECT_FALSE(g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, true));
     sptr<IDisplayBrightnessListener> listener = new DisplayBrightnessListenerStub();
     EXPECT_NE(g_BrightnessManagerExt.RegisterDataChangeListener(listener, ChangeType::STABLE_LUX, "", ""), 0);
     EXPECT_NE(g_BrightnessManagerExt.UnregisterDataChangeListener(ChangeType::STABLE_LUX, ""), 0);
@@ -252,6 +256,8 @@ HWTEST_F(BrightnessManagerExtTest, InitWithDlopen001, TestSize.Level1)
     // Legal values after re-init (dlopen), ensure no crash
     g_BrightnessManagerExt.GetFeatureSupport(BrightnessFeatureType::DEFAULT);
     g_BrightnessManagerExt.SetForcedBrightness(0.5, 0, BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
+    g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, true);
+    g_BrightnessManagerExt.SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, true);
     sptr<IDisplayBrightnessListener> listener = new DisplayBrightnessListenerStub();
     EXPECT_NE(g_BrightnessManagerExt.RegisterDataChangeListener(listener, ChangeType::STABLE_LUX, "", ""), 0);
     EXPECT_NE(g_BrightnessManagerExt.UnregisterDataChangeListener(ChangeType::STABLE_LUX, ""), 0);

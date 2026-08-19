@@ -917,4 +917,61 @@ HWTEST_F(DisplayServiceTest, UndoSetDisplayStateInner, TestSize.Level1)
     g_mock = nullptr;
     DISPLAY_HILOGI(LABEL_TEST, "UndoSetDisplayStateInner function end!");
 }
+
+/**
+ * @tc.name: DisplayServiceTest052
+ * @tc.desc: Test SetSceneMode via service with permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest052, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest052 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+    auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, SceneModeType::SCENE_MODE_BUSINESS, true, result);
+    EXPECT_EQ(errCode, ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest052 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest053
+ * @tc.desc: Test SetSceneMode via service without permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest053, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest053 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = false;
+    bool result = false;
+    auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, SceneModeType::SCENE_MODE_BUSINESS, true, result);
+    EXPECT_NE(errCode, ERR_OK);
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest053 function end!");
+}
+
+/**
+ * @tc.name: DisplayServiceTest054
+ * @tc.desc: Test SetSceneMode with invalid SceneModeType
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, DisplayServiceTest054, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function start!");
+    EXPECT_TRUE(g_service != nullptr);
+    g_isPermissionGranted = true;
+    bool result = false;
+
+    auto typeNum = static_cast<int>(SceneModeType::DEFAULT) - 1;
+    auto type = static_cast<SceneModeType>(typeNum);
+    auto errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, type, true, result);
+    EXPECT_EQ(errCode, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+
+    typeNum = static_cast<int>(SceneModeType::MAX) + 1;
+    type = static_cast<SceneModeType>(typeNum);
+    errCode = g_service->SetSceneMode(DISPLAY_MAIN_ID, type, true, result);
+    EXPECT_EQ(errCode, static_cast<ErrCode>(DisplayErrors::ERR_PARAM_INVALID));
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayServiceTest054 function end!");
+}
 } // namespace

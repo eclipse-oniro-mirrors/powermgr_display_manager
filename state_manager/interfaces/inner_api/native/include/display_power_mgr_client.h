@@ -80,6 +80,7 @@ public:
     int NotifyBrightnessManagerScreenPowerStatus(uint32_t displayId, uint32_t status);
     DisplayErrors SetScreenPowerOffStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason =
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
+    bool SetSceneMode(uint32_t id, SceneModeType type, bool enable);
 
 #ifndef DISPLAY_SERVICE_DEATH_UT
 private:

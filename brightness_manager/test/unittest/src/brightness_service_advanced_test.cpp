@@ -1766,4 +1766,22 @@ HWTEST_F(BrightnessServiceAdvancedTest, SetForcedBrightness_InvalidValueType_Ret
     brightnessService->SetForcedBrightness(-1, 0, BrightnessValueType::ABSOLUTE_NIT);
     DISPLAY_HILOGI(LABEL_TEST, "SetForcedBrightness_InvalidValueType_ReturnsFalse end!");
 }
+
+// ==================== SetSceneMode Tests ====================
+
+HWTEST_F(BrightnessServiceAdvancedTest, SetSceneMode_InvalidValueType_ReturnsFalse, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "SetSceneMode_InvalidValueType_ReturnsFalse start!");
+    brightnessService->SetDisplayState(0, DisplayState::DISPLAY_ON);
+    // Legal value types, call to ensure no crash
+    brightnessService->SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, true);
+    brightnessService->SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, true);
+    brightnessService->SetSceneMode(SceneModeType::SCENE_MODE_CONSTANT, false);
+    brightnessService->SetSceneMode(SceneModeType::SCENE_MODE_BUSINESS, false);
+
+    // Use an out-of-range valueType to trigger the default branch
+    bool result = brightnessService->SetSceneMode(SceneModeType::MAX, false);
+    EXPECT_FALSE(result);
+    DISPLAY_HILOGI(LABEL_TEST, "SetSceneMode_InvalidValueType_ReturnsFalse end!");
+}
 } // namespace

@@ -210,6 +210,11 @@ int32_t MockDisplayPowerMgrProxy::SetScreenDisplayState(uint64_t screenId, uint3
     return ERR_FAIL;
 }
 
+ErrCode MockDisplayPowerMgrProxy::SetSceneMode(uint32_t id, SceneModeType type, bool enable, bool& result)
+{
+    return ERR_FAIL;
+}
+
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 int32_t MockDisplayPowerMgrProxy::SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
     const sptr<IRemoteObject>& token, int32_t& result)

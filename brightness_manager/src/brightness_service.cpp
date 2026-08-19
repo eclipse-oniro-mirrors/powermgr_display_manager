@@ -1303,5 +1303,11 @@ uint32_t BrightnessService::GetSafeBrightness(uint32_t value)
     }
     return brightnessValue;
 }
+
+bool BrightnessService::SetSceneMode(SceneModeType type, bool enable)
+{
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetSceneMode type=%{public}d enable=%{public}d", static_cast<int>(type), enable);
+    return false;
+}
 } // namespace DisplayPowerMgr
 } // namespace OHOS

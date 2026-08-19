@@ -35,6 +35,7 @@ group("fuzztest") {
     "overridedisplayoffdelay_fuzzer:OverrideDisplayOffDelayFuzzTest",
     "registercallback_fuzzer:RegisterCallbackFuzzTest",
     "setbrightness_fuzzer:SetBrightnessFuzzTest",
+    "setscenemode_fuzzer:SetSceneModeFuzzTest",
     "setcoordinated_fuzzer:SetCoordinatedFuzzTest",
     "setforcedbrightness_fuzzer:SetForcedBrightnessFuzzTest",
     "setlightbrightnessthreshold_fuzzer:SetLightBrightnessThresholdFuzzTest",

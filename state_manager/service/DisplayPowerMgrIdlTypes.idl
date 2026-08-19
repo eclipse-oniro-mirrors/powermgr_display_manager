@@ -25,6 +25,7 @@ enum DisplayDataChangeListenerType {
     BRIGHTNESS_TARGET = 4,               // notify final target brightness changes only
     FACE_DETECTION_STATE = 5,            // notify face detection state changes (on/off)
     BRIGHTNESS_SLIDER = 6,               // notify brightness slider press/release events
+    FORCE_ENTER_CONSTANT_MODE = 7,       // notify force enter into constant mode
     MAX
 };
 
@@ -43,5 +44,12 @@ enum BrightnessValueType {
     RELATIVE_TO_CURRENT_RANGE = 0,  // Value range: (0, 1], 1 represents max brightness under current range
     RELATIVE_TO_MAX_RANGE,          // Value range: (0, 1], 1 represents max screen brightness
     ABSOLUTE_NIT,                   // Value in nits, range: (0, infinity), capped at screen max if exceeded
+    MAX
+};
+
+enum SceneModeType {
+    DEFAULT = 0,
+    SCENE_MODE_BUSINESS = 1,    // Business mode, long-time always-on display
+    SCENE_MODE_CONSTANT = 2,    // Constant mode, lower dimming curve
     MAX
 };

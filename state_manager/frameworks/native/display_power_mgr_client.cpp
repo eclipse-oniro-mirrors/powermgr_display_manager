@@ -576,5 +576,17 @@ DisplayErrors DisplayPowerMgrClient::SetScreenPowerOffStrategy(PowerOffStrategy 
 #endif
 }
 
+bool DisplayPowerMgrClient::SetSceneMode(uint32_t id, SceneModeType type, bool enable)
+{
+    auto proxy = GetProxy();
+    RETURN_IF_WITH_RET(proxy == nullptr, false);
+    bool result = false;
+    auto ret = proxy->SetSceneMode(id, type, enable, result);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "SetSceneMode, ret = %{public}d", ret);
+        return false;
+    }
+    return result;
+}
 }  // namespace DisplayPowerMgr
 }  // namespace OHOS

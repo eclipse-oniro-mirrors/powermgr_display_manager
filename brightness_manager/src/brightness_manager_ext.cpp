@@ -106,6 +106,11 @@ bool BrightnessManagerExt::LoadBrightnessOps()
         DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetMaxBrightnessNit func failed!");
         return false;
     }
+    mSetSceneModeFunc = dlsym(mBrightnessManagerExtHandle, "SetSceneMode");
+    if (!mSetSceneModeFunc) {
+        DISPLAY_HILOGE(FEAT_BRIGHTNESS, "dlsym SetSceneMode func failed!");
+        return false;
+    }
     return true;
 }
 
@@ -295,6 +300,7 @@ void BrightnessManagerExt::CloseBrightnessExtLibrary()
     mRunJsonCommandFunc = nullptr;
     mRegisterDataChangeListenerFunc = nullptr;
     mUnregisterDataChangeListenerFunc = nullptr;
+    mSetSceneModeFunc = nullptr;
 }
 
 bool BrightnessManagerExt::GetFeatureSupport(BrightnessFeatureType feature)
@@ -590,6 +596,15 @@ int BrightnessManagerExt::NotifyScreenPowerStatus(uint32_t displayId, uint32_t s
     auto NotifyScreenPowerStatusFunc =
         reinterpret_cast<int (*)(uint32_t, uint32_t)>(mNotifyScreenPowerStatusFunc);
     return NotifyScreenPowerStatusFunc(displayId, status);
+}
+
+bool BrightnessManagerExt::SetSceneMode(SceneModeType type, bool enable)
+{
+    if (!mBrightnessManagerExtEnable) {
+        return false;
+    }
+    auto setSceneModeFunc = reinterpret_cast<bool (*)(SceneModeType, bool)>(mSetSceneModeFunc);
+    return setSceneModeFunc(type, enable);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

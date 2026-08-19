@@ -67,4 +67,5 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     void SetScreenPowerOffStrategy([in] unsigned int strategy, [in] unsigned int reason,
         [in] IRemoteObject token, [out] int retCode);
     void UpdateScreenPowerState([in] boolean isScreenOn, [out] boolean bResult);
+    void SetSceneMode([in] unsigned int id, [in] SceneModeType type, [in] boolean enable, [out] boolean bResult);
 }
