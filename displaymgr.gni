@@ -25,6 +25,7 @@ declare_args() {
   display_manager_feature_brightnessext = ""
   display_manager_feature_poweroff_strategy = false
   display_manager_feature_support_display_cli = false
+  display_manager_feature_multi_screen_state = false
 
   if (!defined(global_parts_info) ||
       defined(global_parts_info.hiviewdfx_hisysevent)) {

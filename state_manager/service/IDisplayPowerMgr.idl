@@ -18,6 +18,7 @@ sequenceable OHOS.IRemoteObject;
 interface OHOS.DisplayPowerMgr.IDisplayBrightnessCallback;
 interface OHOS.DisplayPowerMgr.IDisplayBrightnessListener;
 interface OHOS.DisplayPowerMgr.IDisplayPowerCallback;
+interface OHOS.DisplayPowerMgr.IMultiScreenDisplayStateCallback;
 
 interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
     [ipccode 0] void SetDisplayState([in] unsigned int id, [in] unsigned int state, [in] unsigned int reason,
@@ -68,4 +69,12 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [in] IRemoteObject token, [out] int retCode);
     void UpdateScreenPowerState([in] boolean isScreenOn, [out] boolean bResult);
     void SetSceneMode([in] unsigned int id, [in] SceneModeType type, [in] boolean enable, [out] boolean bResult);
+    void SetMultiScreenDisplayState([in] unsigned long screenId, [in] String screenName,
+        [in] unsigned int state, [in] unsigned int reason, [out] int retCode);
+    void GetMultiScreenDisplayState([in] unsigned long screenId, [out] int displayState,
+        [out] int retCode);
+    void RegisterMultiScreenDisplayStateCallback([in] IMultiScreenDisplayStateCallback cb,
+        [in] unsigned long screenId, [out] int retCode);
+    void UnregisterMultiScreenDisplayStateCallback([in] IMultiScreenDisplayStateCallback cb,
+        [in] unsigned long screenId, [out] int retCode);
 }

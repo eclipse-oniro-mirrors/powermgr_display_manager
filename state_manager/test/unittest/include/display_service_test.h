@@ -20,6 +20,9 @@
 #include <gmock/gmock.h>
 #include "display_power_mgr_proxy.h"
 #include "display_power_callback_stub.h"
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+#include "multi_screen_display_state_callback_stub.h"
+#endif
 #include "brightness_service.h"
 
 namespace OHOS {
@@ -44,6 +47,28 @@ public:
         MOCK_METHOD0(SetScreenOnBrightness, void());
     };
 };
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    // When isProxy=true, Register accepts it as proxy for full IPC loopback
+    class TestMultiScreenCallback : public OHOS::DisplayPowerMgr::MultiScreenDisplayStateCallbackStub {
+    public:
+        explicit TestMultiScreenCallback(bool isProxy = false) : isProxy_(isProxy) {}
+        ~TestMultiScreenCallback() override = default;
+        bool IsProxyObject() const override { return isProxy_; }
+        void OnMultiScreenDisplayStateChanged(
+            uint64_t screenId, const std::string& screenName,
+            OHOS::DisplayPowerMgr::DisplayState state,
+            OHOS::DisplayPowerMgr::MultiScreenStateChangeReason reason) override;
+
+        uint64_t lastScreenId_ {0};
+        std::string lastScreenName_;
+        OHOS::DisplayPowerMgr::DisplayState lastState_ {OHOS::DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN};
+        uint32_t lastReason_ {0};
+        int callCount_ {0};
+    private:
+        bool isProxy_ {false};
+    };
+#endif
+
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 class MockRemoteObject : public IRemoteObject {
 public:

@@ -61,7 +61,11 @@ uint32_t ScreenAction::GetDisplayId()
 DisplayState ScreenAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
+#else
+    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower();
+#endif
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
@@ -301,5 +305,93 @@ void ScreenAction::SetCoordinated(bool coordinated)
 {
     coordinated_ = coordinated;
 }
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+bool ScreenAction::MultiScreenWakeUpBegin(uint32_t reason)
+{
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::DisplayManagerLite::GetInstance().WakeUpBegin(
+        static_cast<Rosen::DisplayId>(displayId_), ParseSpecialReason(reason));
+    IPCSkeleton::SetCallingIdentity(identity);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] WakeUpBegin screenId=%{public}u, reason=%{public}u, ret=%{public}d",
+        displayId_, reason, ret);
+    return ret;
+}
+
+bool ScreenAction::MultiScreenSuspendBegin(uint32_t reason)
+{
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::DisplayManagerLite::GetInstance().SuspendBegin(
+        static_cast<Rosen::DisplayId>(displayId_), ParseSpecialReason(reason));
+    IPCSkeleton::SetCallingIdentity(identity);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] SuspendBegin screenId=%{public}u, reason=%{public}u, ret=%{public}d",
+        displayId_, reason, ret);
+    return ret;
+}
+
+bool ScreenAction::MultiScreenSetDisplayState(DisplayState state)
+{
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] SetDisplayState screenId=%{public}u, state=%{public}u",
+        displayId_, static_cast<uint32_t>(state));
+
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::DisplayManagerLite::GetInstance().SetDisplayState(
+        static_cast<Rosen::DisplayId>(displayId_), ParseDisplayState(state), [](Rosen::DisplayState) {});
+    IPCSkeleton::SetCallingIdentity(identity);
+
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] SetDisplayState: screenId=%{public}u, state=%{public}u, ret=%{public}d",
+        displayId_, static_cast<uint32_t>(state), ret);
+    return ret;
+}
+
+bool ScreenAction::MultiScreenSetScreenPower(DisplayState state, uint32_t reason)
+{
+    Rosen::ScreenPowerState status = ParseScreenPowerState(state);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] SetScreenPower screenId=%{public}u, state=%{public}u, reason=%{public}u",
+        displayId_, static_cast<uint32_t>(state), reason);
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForSpecifiedId(
+        static_cast<Rosen::ScreenId>(displayId_), status, ParseSpecialReason(reason));
+    IPCSkeleton::SetCallingIdentity(identity);
+#ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
+    if (!ret) {
+        HiSysEventWrite(HiviewDFX::HiSysEvent::Domain::POWER, "ABNORMAL_FAULT",
+            HiviewDFX::HiSysEvent::EventType::FAULT, "TYPE", "SCREEN_ON_OFF", "REASON", "IVI SetDisplayPower failed");
+    }
+#endif
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] SetScreenPower screenId=%{public}u, state=%{public}u, ret=%{public}d",
+        displayId_, static_cast<uint32_t>(state), ret);
+    return ret;
+}
+
+bool ScreenAction::MultiScreenWakeUpEnd()
+{
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::DisplayManagerLite::GetInstance().WakeUpEnd(
+        static_cast<Rosen::DisplayId>(displayId_));
+    IPCSkeleton::SetCallingIdentity(identity);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] WakeUpEnd screenId=%{public}u, ret=%{public}d",
+        displayId_, ret);
+    return ret;
+}
+
+bool ScreenAction::MultiScreenSuspendEnd()
+{
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = Rosen::DisplayManagerLite::GetInstance().SuspendEnd(
+        static_cast<Rosen::DisplayId>(displayId_));
+    IPCSkeleton::SetCallingIdentity(identity);
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] SuspendEnd screenId=%{public}u, ret=%{public}d",
+        displayId_, ret);
+    return ret;
+}
+#endif
 } // namespace DisplayPowerMgr
 } // namespace OHOS

@@ -24,6 +24,9 @@
 #include "display_power_info.h"
 #include "idisplay_power_callback.h"
 #include "idisplay_power_mgr.h"
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+#include "imulti_screen_display_state_callback.h"
+#endif
 #include "power_state_machine_info.h"
 #include "display_mgr_errors.h"
 
@@ -81,6 +84,44 @@ public:
     DisplayErrors SetScreenPowerOffStrategy(PowerOffStrategy strategy, PowerMgr::StateChangeReason reason =
         PowerMgr::StateChangeReason::STATE_CHANGE_REASON_UNKNOWN);
     bool SetSceneMode(uint32_t id, SceneModeType type, bool enable);
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    /**
+     * @brief Set the display state of a specific screen.
+     * The caller must pass a valid screenId and the corresponding screenName.
+     *
+     * @param screenId Target screen ID. Fail when no corresponding physical screen exists.
+     * @param screenName Screen name. Max length 100.
+     * @param state Target state. Only DISPLAY_ON and DISPLAY_OFF are supported.
+     * @param reason Reason for the state change. Default STATE_CHANGE_REASON_DEFAULT.
+     */
+    DisplayErrors SetMultiScreenDisplayState(uint64_t screenId, const std::string& screenName, DisplayState state,
+        MultiScreenStateChangeReason reason = MultiScreenStateChangeReason::STATE_CHANGE_REASON_DEFAULT);
+    /**
+     * @brief Get the current display state of a specific screen.
+     *
+     * @param screenId Target screen ID.
+     * @param state [out] Current display state. DISPLAY_UNKNOWN if not found.
+     */
+    DisplayErrors GetMultiScreenDisplayState(uint64_t screenId, DisplayState& state);
+    /**
+     * @brief Register the callback for display state change of specific screen(s).
+     *
+     * @param callback Callback object implementing OnMultiScreenDisplayStateChanged. Must not be nullptr.
+     * @param screenId Target screen ID. SCREEN_ID_ALL (UINT64_MAX) means subscribing to all screens,
+     *                 a specific ID means subscribing to that screen only. Default SCREEN_ID_ALL.
+     */
+    DisplayErrors RegisterMultiScreenDisplayStateCallback(sptr<IMultiScreenDisplayStateCallback> callback,
+        uint64_t screenId = SCREEN_ID_ALL);
+    /**
+     * @brief Unregister the callback for display state change.
+     *
+     * @param callback Previously registered callback object. Must not be nullptr.
+     * @param screenId Target screen ID. SCREEN_ID_ALL (UINT64_MAX) means removing all screens registered by this
+     *                 callback, a specific ID means removing that screen only. Default SCREEN_ID_ALL.
+     */
+    DisplayErrors UnregisterMultiScreenDisplayStateCallback(sptr<IMultiScreenDisplayStateCallback> callback,
+        uint64_t screenId = SCREEN_ID_ALL);
+#endif
 
 #ifndef DISPLAY_SERVICE_DEATH_UT
 private:

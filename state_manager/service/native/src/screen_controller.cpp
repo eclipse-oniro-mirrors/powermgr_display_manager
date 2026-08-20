@@ -318,6 +318,57 @@ void ScreenController::OnStateChanged(DisplayState state, uint32_t reason)
     }
 }
 
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+ffrt::mutex& ScreenController::GetScreenLock()
+{
+    return screenLock_;
+}
+
+bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reason,
+    const std::string& screenName)
+{
+    DISPLAY_HILOGI(FEAT_STATE,
+        "[UL_POWER_IVI] UpdateMultiScreenState, screenId=%{public}u, state=%{public}u, current state=%{public}u,"
+        " reason=%{public}u",
+        action_->GetDisplayId(), static_cast<uint32_t>(state), static_cast<uint32_t>(state_.load()), reason);
+    auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    if (pms == nullptr) {
+        DISPLAY_HILOGW(FEAT_STATE, "pms is nullptr");
+        return false;
+    }
+    if (state == DisplayState::DISPLAY_ON) {
+        action_->MultiScreenWakeUpBegin(reason);
+    } else {
+        action_->MultiScreenSuspendBegin(reason);
+    }
+    bool setDisplayStateRet = action_->MultiScreenSetDisplayState(state);
+    bool setScreenPowerRet = action_->MultiScreenSetScreenPower(state, reason);
+    if (state == DisplayState::DISPLAY_ON) {
+        action_->MultiScreenWakeUpEnd();
+    } else {
+        action_->MultiScreenSuspendEnd();
+    }
+    if (!setDisplayStateRet || !setScreenPowerRet) {
+        DISPLAY_HILOGW(FEAT_STATE, "UpdateMultiScreenState failed, screenId=%{public}u, state=%{public}d",
+            action_->GetDisplayId(), state);
+        return false;
+    }
+    if (state == DisplayState::DISPLAY_ON) {
+        pms->SetScreenOnBrightness(action_->GetDisplayId());
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER_IVI] SetScreenOnBrightness screenId=%{public}u",
+            action_->GetDisplayId());
+    }
+
+    pms->NotifyMultiScreenStateChanged(static_cast<uint64_t>(action_->GetDisplayId()), screenName, state, reason);
+
+    state_ = state;
+    stateChangeReason_ = reason;
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] UpdateMultiScreenState to %{public}u, screenId=%{public}u",
+        static_cast<uint32_t>(state), action_->GetDisplayId());
+    return true;
+}
+#endif
+
 bool ScreenController::SkipNotify(DisplayState targetState)
 {
     bool isScreenOn = state_.load() == DisplayState::DISPLAY_ON || state_.load() == DisplayState::DISPLAY_DIM;

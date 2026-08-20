@@ -22,6 +22,7 @@
 #include <cstdint>
 
 #include "display_power_info.h"
+#include "ffrt_utils.h"
 #include "gradual_animator.h"
 #include "screen_action.h"
 
@@ -51,6 +52,10 @@ public:
     bool UpdateState(DisplayState state, uint32_t reason);
     void UpdateCachedState(DisplayState state);
     bool IsScreenOn();
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    bool UpdateMultiScreenState(DisplayState state, uint32_t reason, const std::string& screenName);
+    ffrt::mutex& GetScreenLock();
+#endif
 
     bool SetBrightness(uint32_t value, uint32_t gradualDuration = 0, bool continuous = false);
     uint32_t GetBrightness();
@@ -91,6 +96,9 @@ private:
     static const constexpr char* SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
     std::atomic<DisplayState> state_ {DisplayState::DISPLAY_UNKNOWN};
     std::mutex mutexState_;
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    ffrt::mutex screenLock_;  // Protects concurrent access to the same screen
+#endif
     uint32_t stateChangeReason_ {0};
     double discount_ {1.0};
 

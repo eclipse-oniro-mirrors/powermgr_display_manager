@@ -47,6 +47,15 @@ public:
     void SetCoordinated(bool coordinated);
     bool EnableSkipSetDisplayState(uint32_t reason);
 
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    bool MultiScreenWakeUpBegin(uint32_t reason);
+    bool MultiScreenSuspendBegin(uint32_t reason);
+    bool MultiScreenSetDisplayState(DisplayState state);
+    bool MultiScreenSetScreenPower(DisplayState state, uint32_t reason);
+    bool MultiScreenWakeUpEnd();
+    bool MultiScreenSuspendEnd();
+#endif
+
 private:
     static constexpr uint32_t DEFAULT_DISPLAY_ID = 0;
     std::mutex mutexBrightness_;
