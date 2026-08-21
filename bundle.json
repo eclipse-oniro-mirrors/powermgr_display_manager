@@ -22,7 +22,8 @@
     "features": [
       "display_manager_feature_brightnessext",
       "display_manager_feature_poweroff_strategy",
-      "display_manager_feature_support_display_cli"
+      "display_manager_feature_support_display_cli",
+      "display_manager_feature_multi_screen_state"
     ],
     "adapted_system_type": [ "standard" ],
     "rom": "1024KB",
