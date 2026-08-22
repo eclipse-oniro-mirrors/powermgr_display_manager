@@ -61,11 +61,7 @@ uint32_t ScreenAction::GetDisplayId()
 DisplayState ScreenAction::GetDisplayState()
 {
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower(displayId_);
-#else
-    Rosen::ScreenPowerState powerState = Rosen::ScreenManagerLite::GetInstance().GetScreenPower();
-#endif
     DISPLAY_HILOGI(FEAT_STATE, "ScreenPowerState=%{public}d", static_cast<uint32_t>(powerState));
     switch (powerState) {
         case Rosen::ScreenPowerState::POWER_ON:
