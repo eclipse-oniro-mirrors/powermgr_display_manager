@@ -22,7 +22,11 @@ namespace OHOS {
 namespace DisplayPowerMgr {
 class BrightnessManagerExt {
 public:
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    BrightnessManagerExt(uint32_t displayId);
+#else
     BrightnessManagerExt();
+#endif
     ~BrightnessManagerExt();
 
     BrightnessManagerExt(const BrightnessManagerExt&) = delete;
@@ -111,6 +115,11 @@ private:
     void* mRegisterDataChangeListenerFunc = nullptr;
     void* mUnregisterDataChangeListenerFunc = nullptr;
     void* mSetSceneModeFunc = nullptr;
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+private:
+    uint32_t mDisplayId {0};
+#endif
 };
 } // namespace DisplayPowerMgr
 } // namespace OHOS
