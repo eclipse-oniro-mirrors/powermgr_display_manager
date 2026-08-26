@@ -104,7 +104,7 @@ bool g_mockWakeUpEndRet = true;
 bool g_mockSuspendEndRet = true;
 bool g_mockSetScreenPowerRet = true;
 int g_publishEventCount = 0;
-uint64_t g_lastPubScreenId = 0;
+uint64_t g_lastPubDisplayId = 0;
 std::string g_lastPubScreenName;
 std::string g_lastAction;
 std::string g_lastPermission;
@@ -128,18 +128,18 @@ bool Permission::IsNativePermissionGranted(const std::string& perm)
 }
 
 void TestMultiScreenCallback::OnMultiScreenDisplayStateChanged(
-    uint64_t screenId, const std::string& screenName,
+    uint64_t displayId, const std::string& screenName,
     OHOS::DisplayPowerMgr::DisplayState state,
     OHOS::DisplayPowerMgr::MultiScreenStateChangeReason reason)
 {
-    lastScreenId_ = screenId;
+    lastDisplayId_ = displayId;
     lastScreenName_ = screenName;
     lastState_ = state;
     lastReason_ = static_cast<uint32_t>(reason);
     callCount_++;
-    DISPLAY_HILOGI(LABEL_TEST, "TestMultiScreenCallback: screenId=%{public}" PRIu64
+    DISPLAY_HILOGI(LABEL_TEST, "TestMultiScreenCallback: displayId=%{public}" PRIu64
         " screenName=%{public}s state=%{public}u reason=%{public}u count=%{public}d",
-        screenId, screenName.c_str(), static_cast<uint32_t>(state), static_cast<uint32_t>(reason), callCount_);
+        displayId, screenName.c_str(), static_cast<uint32_t>(state), static_cast<uint32_t>(reason), callCount_);
 }
 #endif
 } // namespace OHOS::PowerMgr
@@ -203,7 +203,7 @@ bool DisplayManagerLite::SuspendEnd(DisplayId displayId)
     return g_mockSuspendEndRet;
 }
 
-bool ScreenManagerLite::SetScreenPowerForSpecifiedId(ScreenId screenId, ScreenPowerState state,
+bool ScreenManagerLite::SetScreenPowerForSpecifiedId(DisplayId displayId, ScreenPowerState state,
     PowerStateChangeReason reason)
 {
     return g_mockSetScreenPowerRet;
@@ -264,7 +264,7 @@ bool CommonEventManager::PublishCommonEvent(const CommonEventData& data,
 {
     g_publishEventCount++;
     auto want = data.GetWant();
-    g_lastPubScreenId = static_cast<uint64_t>(want.GetLongParam("screenId", -1L));
+    g_lastPubDisplayId = static_cast<uint64_t>(want.GetLongParam("displayId", -1L));
     g_lastPubScreenName = want.GetStringParam("screenName");
     g_lastAction = want.GetAction();
     g_lastPubReason = want.GetStringParam("reason");
@@ -1440,9 +1440,9 @@ HWTEST_F(DisplayServiceTest, SetMultiScreenDisplayStateInnerTest010, TestSize.Le
     EXPECT_EQ(cb2->callCount_, SCREEN_COUNT);
     EXPECT_EQ(g_publishEventCount, SCREEN_COUNT);
 
-    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb0, SCREEN_ID_ALL);
-    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb1, SCREEN_ID_ALL);
-    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb2, SCREEN_ID_ALL);
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb0, DISPLAY_ID_ALL);
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb1, DISPLAY_ID_ALL);
+    g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb2, DISPLAY_ID_ALL);
 
     DISPLAY_HILOGI(LABEL_TEST, "SetMultiScreenDisplayStateInnerTest010 function end!");
 }
@@ -1565,7 +1565,7 @@ HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest004
     g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
         DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
     EXPECT_EQ(cb->callCount_, 1);
-    EXPECT_EQ(cb->lastScreenId_, MAIN_SCREEN_ID);
+    EXPECT_EQ(cb->lastDisplayId_, MAIN_SCREEN_ID);
     EXPECT_EQ(cb->lastState_, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
     EXPECT_EQ(cb->lastReason_, DEFAULT_REASON);
 
@@ -1633,7 +1633,7 @@ HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest0
 
 /**
  * @tc.name: UnregisterMultiScreenDisplayStateCallbackInnerTest004
- * @tc.desc: Test Unregister with SCREEN_ID_ALL and specific screen; after unregister, Set does not trigger callback.
+ * @tc.desc: Test Unregister with DISPLAY_ID_ALL and specific screen; after unregister, Set does not trigger callback.
  * @tc.type: FUNC
  */
 HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest004, TestSize.Level1)
@@ -1641,9 +1641,9 @@ HWTEST_F(DisplayServiceTest, UnregisterMultiScreenDisplayStateCallbackInnerTest0
     DISPLAY_HILOGI(LABEL_TEST, "UnregisterMultiScreenDisplayStateCallbackInnerTest004 function start!");
     sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
 
-    EXPECT_EQ(g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, SCREEN_ID_ALL),
+    EXPECT_EQ(g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, DISPLAY_ID_ALL),
         DisplayErrors::ERR_OK);
-    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, SCREEN_ID_ALL);
+    DisplayErrors ret = g_service->UnregisterMultiScreenDisplayStateCallbackInner(cb, DISPLAY_ID_ALL);
     EXPECT_EQ(ret, DisplayErrors::ERR_OK);
 
     EXPECT_EQ(g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID),
@@ -1782,7 +1782,7 @@ HWTEST_F(DisplayServiceTest, MultiScreenDisplayStateCallbackManagerTest006, Test
 
     mgr.callbacks_.emplace(obj, SECOND_SCREEN_ID);
     mgr.callbacks_.emplace(obj, FOURTH_SCREEN_ID);
-    mgr.callbacks_.emplace(objAll, SCREEN_ID_ALL);
+    mgr.callbacks_.emplace(objAll, DISPLAY_ID_ALL);
 
     mgr.Notify(SECOND_SCREEN_ID, TEST_SCREEN_NAME, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
     EXPECT_EQ(cb->callCount_, 1);
@@ -1814,7 +1814,7 @@ HWTEST_F(DisplayServiceTest, CommonEventTest001, TestSize.Level1)
 
     EXPECT_EQ(g_publishEventCount, 1);
     EXPECT_EQ(g_lastAction, "usual.event.display.MULTI_SCREEN_ON");
-    EXPECT_EQ(g_lastPubScreenId, MAIN_SCREEN_ID);
+    EXPECT_EQ(g_lastPubDisplayId, MAIN_SCREEN_ID);
     EXPECT_EQ(g_lastPubReason, "DEFAULT");
     EXPECT_EQ(g_lastPermission, "ohos.permission.MULTI_SCREEN_MANAGER");
 
@@ -1824,7 +1824,7 @@ HWTEST_F(DisplayServiceTest, CommonEventTest001, TestSize.Level1)
 
     EXPECT_EQ(g_publishEventCount, 1);
     EXPECT_EQ(g_lastAction, "usual.event.display.MULTI_SCREEN_OFF");
-    EXPECT_EQ(g_lastPubScreenId, MAIN_SCREEN_ID);
+    EXPECT_EQ(g_lastPubDisplayId, MAIN_SCREEN_ID);
     EXPECT_EQ(g_lastPubReason, "DEFAULT");
     EXPECT_EQ(g_lastPermission, "ohos.permission.MULTI_SCREEN_MANAGER");
 

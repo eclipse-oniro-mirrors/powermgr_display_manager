@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
-constexpr const char* PARAM_SCREEN_ID = "screenId";
+constexpr const char* PARAM_DISPLAY_ID = "displayId";
 constexpr const char* PARAM_SCREEN_NAME = "screenName";
 constexpr const char* PARAM_REASON = "reason";
 constexpr const char* MULTI_SCREEN_ON_ACTION = "usual.event.display.MULTI_SCREEN_ON";
@@ -38,7 +38,7 @@ constexpr const char* MULTI_SCREEN_OFF_ACTION = "usual.event.display.MULTI_SCREE
 constexpr const char* MULTI_SCREEN_PERMISSION = "ohos.permission.MULTI_SCREEN_MANAGER";
 }
 
-bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>& callback, uint64_t screenId)
+bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>& callback, uint64_t displayId)
 {
     if (callback == nullptr) {
         DISPLAY_HILOGE(COMP_SVC, "Register callback is nullptr");
@@ -47,8 +47,8 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
     std::lock_guard<ffrt::mutex> lock(mutex_);
     auto range = callbacks_.equal_range(callback);
     for (auto it = range.first; it != range.second; ++it) {
-        if (it->second == screenId) {
-            DISPLAY_HILOGI(COMP_SVC, "already registered for screenId=%{public}" PRIu64, screenId);
+        if (it->second == displayId) {
+            DISPLAY_HILOGI(COMP_SVC, "already registered for displayId=%{public}" PRIu64, displayId);
             return true;
         }
     }
@@ -63,25 +63,25 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
         callbackPidUidMap_.emplace(callback,
             std::make_pair(IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid()));
     }
-    callbacks_.emplace(callback, screenId);
-    DISPLAY_HILOGI(COMP_SVC, "callback for screenId=%{public}" PRIu64 ", total=%{public}zu",
-        screenId, callbacks_.size());
+    callbacks_.emplace(callback, displayId);
+    DISPLAY_HILOGI(COMP_SVC, "callback for displayId=%{public}" PRIu64 ", total=%{public}zu",
+        displayId, callbacks_.size());
     return true;
 }
 
-bool MultiScreenDisplayStateCallbackManager::Unregister(const sptr<IRemoteObject>& callback, uint64_t screenId)
+bool MultiScreenDisplayStateCallbackManager::Unregister(const sptr<IRemoteObject>& callback, uint64_t displayId)
 {
     if (callback == nullptr) {
         DISPLAY_HILOGE(COMP_SVC, "Unregister callback is nullptr");
         return false;
     }
-    if (screenId == SCREEN_ID_ALL) {
+    if (displayId == DISPLAY_ID_ALL) {
         return RemoveAll(callback);
     }
     std::lock_guard<ffrt::mutex> lock(mutex_);
     auto range = callbacks_.equal_range(callback);
     for (auto it = range.first; it != range.second; ++it) {
-        if (it->second != screenId) {
+        if (it->second != displayId) {
             continue;
         }
         callbacks_.erase(it);
@@ -96,7 +96,7 @@ bool MultiScreenDisplayStateCallbackManager::Unregister(const sptr<IRemoteObject
         }
         return true;
     }
-    DISPLAY_HILOGW(COMP_SVC, "callback not found for screenId=%{public}" PRIu64, screenId);
+    DISPLAY_HILOGW(COMP_SVC, "callback not found for displayId=%{public}" PRIu64, displayId);
     return true;
 }
 
@@ -121,12 +121,12 @@ bool MultiScreenDisplayStateCallbackManager::RemoveAll(const sptr<IRemoteObject>
     return true;
 }
 
-void MultiScreenDisplayStateCallbackManager::Notify(uint64_t screenId, const std::string& screenName,
+void MultiScreenDisplayStateCallbackManager::Notify(uint64_t displayId, const std::string& screenName,
     DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "Notify screenId=%{public}" PRIu64 ", screenName=%{public}s, state=%{public}u, reason=%{public}u",
-        screenId, screenName.c_str(), static_cast<uint32_t>(state), reason);
+        "Notify displayId=%{public}" PRIu64 ", screenName=%{public}s, state=%{public}u, reason=%{public}u",
+        displayId, screenName.c_str(), static_cast<uint32_t>(state), reason);
     std::vector<std::pair<sptr<IRemoteObject>, uint64_t>> callbacks;
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -134,16 +134,16 @@ void MultiScreenDisplayStateCallbackManager::Notify(uint64_t screenId, const std
     }
     for (const auto& entry : callbacks) {
         uint64_t registeredId = entry.second;
-        if (registeredId == screenId || registeredId == SCREEN_ID_ALL) {
+        if (registeredId == displayId || registeredId == DISPLAY_ID_ALL) {
             auto proxy = iface_cast<IMultiScreenDisplayStateCallback>(entry.first);
             if (proxy != nullptr) {
                 auto pidUidIt = callbackPidUidMap_.find(entry.first);
                 auto pidUid = (pidUidIt != callbackPidUidMap_.end()) ? pidUidIt->second : std::make_pair(0, 0);
                 DISPLAY_HILOGI(COMP_SVC,
-                    "MultiScreenCallback begin Pid=%{public}d Uid=%{public}d screenId=%{public}" PRIu64,
-                    pidUid.first, pidUid.second, screenId);
+                    "MultiScreenCallback begin Pid=%{public}d Uid=%{public}d displayId=%{public}" PRIu64,
+                    pidUid.first, pidUid.second, displayId);
                 int64_t start = GetTickCount();
-                proxy->OnMultiScreenDisplayStateChanged(screenId, screenName, state,
+                proxy->OnMultiScreenDisplayStateChanged(displayId, screenName, state,
                     static_cast<MultiScreenStateChangeReason>(reason));
                 int64_t cost = GetTickCount() - start;
                 DISPLAY_HILOGI(COMP_SVC,
@@ -154,13 +154,13 @@ void MultiScreenDisplayStateCallbackManager::Notify(uint64_t screenId, const std
     }
 }
 
-void MultiScreenDisplayStateCallbackManager::PublishCommonEvent(uint64_t screenId, const std::string& screenName,
+void MultiScreenDisplayStateCallbackManager::PublishCommonEvent(uint64_t displayId, const std::string& screenName,
     DisplayState state, uint32_t reason)
 {
     const char* action = (state == DisplayState::DISPLAY_ON) ? MULTI_SCREEN_ON_ACTION : MULTI_SCREEN_OFF_ACTION;
     AAFwk::Want want;
     want.SetAction(action);
-    want.SetParam(PARAM_SCREEN_ID, static_cast<long long>(screenId));
+    want.SetParam(PARAM_DISPLAY_ID, static_cast<long long>(displayId));
     want.SetParam(PARAM_SCREEN_NAME, screenName);
     want.SetParam(PARAM_REASON, GetReasonString(reason));
     EventFwk::CommonEventData data;
@@ -171,9 +171,9 @@ void MultiScreenDisplayStateCallbackManager::PublishCommonEvent(uint64_t screenI
     publishInfo.SetSubscriberPermissions(permissionVec);
     bool ret = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo);
     DISPLAY_HILOGI(COMP_SVC,
-        "PublishCommonEvent for %{public}s, screenId=%{public}" PRIu64 ", screenName=%{public}s,"
+        "PublishCommonEvent for %{public}s, displayId=%{public}" PRIu64 ", screenName=%{public}s,"
         " reason=%{public}u, ret=%{public}d",
-        action, screenId, screenName.c_str(), reason, ret);
+        action, displayId, screenName.c_str(), reason, ret);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

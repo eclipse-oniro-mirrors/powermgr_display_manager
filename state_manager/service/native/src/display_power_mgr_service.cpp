@@ -598,13 +598,13 @@ void DisplayPowerMgrService::NotifyStateChangeCallback(uint32_t displayId, Displ
 }
 
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t screenId,
+DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t displayId,
     const std::string& screenName, DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "[UL_POWER_IVI] SetMultiScreenDisplayStateInner screenId=%{public}" PRIu64 ", screenName=%{public}s,"
+        "[UL_POWER_IVI] SetMultiScreenDisplayStateInner displayId=%{public}" PRIu64 ", screenName=%{public}s,"
         " state=%{public}u, reason=%{public}u",
-        screenId, screenName.c_str(), static_cast<uint32_t>(state), reason);
+        displayId, screenName.c_str(), static_cast<uint32_t>(state), reason);
     if (!Permission::IsSystem()) {
         DISPLAY_HILOGI(COMP_SVC, "SetMultiScreenDisplayStateInner failed, System permission intercept");
         return DisplayErrors::ERR_SYSTEM_API_DENIED;
@@ -627,11 +627,11 @@ DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t s
     std::shared_ptr<ScreenController> controller;
     {
         std::lock_guard<ffrt::mutex> lock(controllerMapMutex_);
-        auto it = controllerMap_.find(screenId);
+        auto it = controllerMap_.find(displayId);
         if (it == controllerMap_.end()) {
-            DISPLAY_HILOGI(COMP_SVC, "screenId=%{public}" PRIu64 " not in map, creating dynamically", screenId);
-            it = controllerMap_.emplace(screenId,
-                std::make_shared<ScreenController>(static_cast<uint32_t>(screenId))).first;
+            DISPLAY_HILOGI(COMP_SVC, "displayId=%{public}" PRIu64 " not in map, creating dynamically", displayId);
+            it = controllerMap_.emplace(displayId,
+                std::make_shared<ScreenController>(static_cast<uint32_t>(displayId))).first;
         }
         controller = it->second;
     }
@@ -640,19 +640,19 @@ DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t s
         DISPLAY_HILOGI(COMP_SVC, "same state=%{public}u, skip", static_cast<uint32_t>(state));
         return DisplayErrors::ERR_OK;
     }
-    BrightnessManager::Get().SetDisplayState(static_cast<uint32_t>(screenId), state, reason);
+    BrightnessManager::Get().SetDisplayState(static_cast<uint32_t>(displayId), state, reason);
     bool ret = controller->UpdateMultiScreenState(state, reason, screenName);
     if (!ret) {
         DISPLAY_HILOGE(COMP_SVC, "[UL_POWER_IVI] undo brightness, UpdateMultiScreenState failed");
-        UndoSetDisplayStateInner(static_cast<uint32_t>(screenId), controller->GetState(), reason);
+        UndoSetDisplayStateInner(static_cast<uint32_t>(displayId), controller->GetState(), reason);
         return DisplayErrors::ERR_STATE_CHANGE_FAILED;
     }
     return DisplayErrors::ERR_OK;
 }
 
-DisplayErrors DisplayPowerMgrService::GetMultiScreenDisplayStateInner(uint64_t screenId, DisplayState& state)
+DisplayErrors DisplayPowerMgrService::GetMultiScreenDisplayStateInner(uint64_t displayId, DisplayState& state)
 {
-    DISPLAY_HILOGI(COMP_SVC, "GetMultiScreenDisplayStateInner screenId=%{public}" PRIu64, screenId);
+    DISPLAY_HILOGI(COMP_SVC, "GetMultiScreenDisplayStateInner displayId=%{public}" PRIu64, displayId);
     if (!Permission::IsSystem()) {
         DISPLAY_HILOGI(COMP_SVC, "GetMultiScreenDisplayStateInner failed, System permission intercept");
         state = DisplayState::DISPLAY_UNKNOWN;
@@ -667,11 +667,11 @@ DisplayErrors DisplayPowerMgrService::GetMultiScreenDisplayStateInner(uint64_t s
     std::shared_ptr<ScreenController> controller;
     {
         std::lock_guard<ffrt::mutex> lock(controllerMapMutex_);
-        auto it = controllerMap_.find(screenId);
+        auto it = controllerMap_.find(displayId);
         if (it == controllerMap_.end()) {
-            DISPLAY_HILOGI(COMP_SVC, "screenId=%{public}" PRIu64 " not in map, creating dynamically", screenId);
-            it = controllerMap_.emplace(screenId,
-                std::make_shared<ScreenController>(static_cast<uint32_t>(screenId))).first;
+            DISPLAY_HILOGI(COMP_SVC, "displayId=%{public}" PRIu64 " not in map, creating dynamically", displayId);
+            it = controllerMap_.emplace(displayId,
+                std::make_shared<ScreenController>(static_cast<uint32_t>(displayId))).first;
         }
         controller = it->second;
     }
@@ -681,9 +681,9 @@ DisplayErrors DisplayPowerMgrService::GetMultiScreenDisplayStateInner(uint64_t s
 }
 
 DisplayErrors DisplayPowerMgrService::RegisterMultiScreenDisplayStateCallbackInner(
-    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t screenId)
+    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t displayId)
 {
-    DISPLAY_HILOGI(COMP_SVC, "RegisterMultiScreenDisplayStateCallbackInner screenId=%{public}" PRIu64, screenId);
+    DISPLAY_HILOGI(COMP_SVC, "RegisterMultiScreenDisplayStateCallbackInner displayId=%{public}" PRIu64, displayId);
     if (!Permission::IsSystem()) {
         DISPLAY_HILOGI(COMP_SVC, "RegisterMultiScreenDisplayStateCallbackInner failed, System permission intercept");
         return DisplayErrors::ERR_SYSTEM_API_DENIED;
@@ -697,14 +697,14 @@ DisplayErrors DisplayPowerMgrService::RegisterMultiScreenDisplayStateCallbackInn
         DISPLAY_HILOGE(COMP_SVC, "callback is nullptr");
         return DisplayErrors::ERR_PARAM_INVALID;
     }
-    return multiScreenCallbackMgr_->Register(callback->AsObject(), screenId)
+    return multiScreenCallbackMgr_->Register(callback->AsObject(), displayId)
         ? DisplayErrors::ERR_OK : DisplayErrors::ERR_REGISTRATION_FAILED;
 }
 
 DisplayErrors DisplayPowerMgrService::UnregisterMultiScreenDisplayStateCallbackInner(
-    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t screenId)
+    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t displayId)
 {
-    DISPLAY_HILOGI(COMP_SVC, "UnregisterMultiScreenDisplayStateCallbackInner screenId=%{public}" PRIu64, screenId);
+    DISPLAY_HILOGI(COMP_SVC, "UnregisterMultiScreenDisplayStateCallbackInner displayId=%{public}" PRIu64, displayId);
     if (!Permission::IsSystem()) {
         DISPLAY_HILOGI(COMP_SVC, "UnregisterMultiScreenDisplayStateCallbackInner failed, System permission intercept");
         return DisplayErrors::ERR_SYSTEM_API_DENIED;
@@ -718,20 +718,20 @@ DisplayErrors DisplayPowerMgrService::UnregisterMultiScreenDisplayStateCallbackI
         DISPLAY_HILOGE(COMP_SVC, "callback is nullptr");
         return DisplayErrors::ERR_PARAM_INVALID;
     }
-    return multiScreenCallbackMgr_->Unregister(callback->AsObject(), screenId)
+    return multiScreenCallbackMgr_->Unregister(callback->AsObject(), displayId)
         ? DisplayErrors::ERR_OK : DisplayErrors::ERR_REGISTRATION_FAILED;
 }
 
-void DisplayPowerMgrService::NotifyMultiScreenStateChanged(uint64_t screenId, const std::string& screenName,
+void DisplayPowerMgrService::NotifyMultiScreenStateChanged(uint64_t displayId, const std::string& screenName,
     DisplayState state, uint32_t reason)
 {
     DISPLAY_HILOGI(COMP_SVC,
-        "NotifyMultiScreenStateChanged screenId=%{public}" PRIu64 ", screenName=%{public}s,"
+        "NotifyMultiScreenStateChanged displayId=%{public}" PRIu64 ", screenName=%{public}s,"
         " state=%{public}u, reason=%{public}u",
-        screenId, screenName.c_str(), static_cast<uint32_t>(state), reason);
+        displayId, screenName.c_str(), static_cast<uint32_t>(state), reason);
     if (multiScreenCallbackMgr_ != nullptr) {
-        multiScreenCallbackMgr_->Notify(screenId, screenName, state, reason);
-        multiScreenCallbackMgr_->PublishCommonEvent(screenId, screenName, state, reason);
+        multiScreenCallbackMgr_->Notify(displayId, screenName, state, reason);
+        multiScreenCallbackMgr_->PublishCommonEvent(displayId, screenName, state, reason);
     } else {
         DISPLAY_HILOGE(COMP_SVC, "multiScreenCallbackMgr_ is nullptr, skip notify");
     }
@@ -743,12 +743,12 @@ void DisplayPowerMgrService::SetScreenOnBrightness(uint32_t displayId)
 }
 #endif
 
-ErrCode DisplayPowerMgrService::SetMultiScreenDisplayState(uint64_t screenId, const std::string& screenName,
+ErrCode DisplayPowerMgrService::SetMultiScreenDisplayState(uint64_t displayId, const std::string& screenName,
     uint32_t state, uint32_t reason, int32_t& retCode)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMultiScreenDisplayState");
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-    DisplayErrors err = SetMultiScreenDisplayStateInner(screenId, screenName,
+    DisplayErrors err = SetMultiScreenDisplayStateInner(displayId, screenName,
         static_cast<DisplayState>(state), reason);
     retCode = static_cast<int32_t>(err);
 #else
@@ -757,14 +757,14 @@ ErrCode DisplayPowerMgrService::SetMultiScreenDisplayState(uint64_t screenId, co
     return ERR_OK;
 }
 
-ErrCode DisplayPowerMgrService::GetMultiScreenDisplayState(uint64_t screenId, int32_t& displayState,
+ErrCode DisplayPowerMgrService::GetMultiScreenDisplayState(uint64_t displayId, int32_t& displayState,
     int32_t& retCode)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::GetMultiScreenDisplayState");
     displayState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
-    DisplayErrors err = GetMultiScreenDisplayStateInner(screenId, state);
+    DisplayErrors err = GetMultiScreenDisplayStateInner(displayId, state);
     displayState = static_cast<int32_t>(state);
     retCode = static_cast<int32_t>(err);
 #else
@@ -774,11 +774,11 @@ ErrCode DisplayPowerMgrService::GetMultiScreenDisplayState(uint64_t screenId, in
 }
 
 ErrCode DisplayPowerMgrService::RegisterMultiScreenDisplayStateCallback(
-    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t screenId, int32_t& retCode)
+    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t displayId, int32_t& retCode)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::RegisterMultiScreenDisplayStateCallback");
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-    DisplayErrors err = RegisterMultiScreenDisplayStateCallbackInner(callback, screenId);
+    DisplayErrors err = RegisterMultiScreenDisplayStateCallbackInner(callback, displayId);
     retCode = static_cast<int32_t>(err);
 #else
     retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
@@ -787,11 +787,11 @@ ErrCode DisplayPowerMgrService::RegisterMultiScreenDisplayStateCallback(
 }
 
 ErrCode DisplayPowerMgrService::UnregisterMultiScreenDisplayStateCallback(
-    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t screenId, int32_t& retCode)
+    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t displayId, int32_t& retCode)
 {
     DisplayXCollie displayXCollie("DisplayPowerMgrService::UnregisterMultiScreenDisplayStateCallback");
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-    DisplayErrors err = UnregisterMultiScreenDisplayStateCallbackInner(callback, screenId);
+    DisplayErrors err = UnregisterMultiScreenDisplayStateCallbackInner(callback, displayId);
     retCode = static_cast<int32_t>(err);
 #else
     retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);

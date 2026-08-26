@@ -37,11 +37,11 @@ public:
     MultiScreenDisplayStateCallbackManager() = default;
     ~MultiScreenDisplayStateCallbackManager() = default;
 
-    bool Register(const sptr<IRemoteObject>& callback, uint64_t screenId);
-    bool Unregister(const sptr<IRemoteObject>& callback, uint64_t screenId);
+    bool Register(const sptr<IRemoteObject>& callback, uint64_t displayId);
+    bool Unregister(const sptr<IRemoteObject>& callback, uint64_t displayId);
     bool RemoveAll(const sptr<IRemoteObject>& callback);
-    void Notify(uint64_t screenId, const std::string& screenName, DisplayState state, uint32_t reason);
-    void PublishCommonEvent(uint64_t screenId, const std::string& screenName, DisplayState state, uint32_t reason);
+    void Notify(uint64_t displayId, const std::string& screenName, DisplayState state, uint32_t reason);
+    void PublishCommonEvent(uint64_t displayId, const std::string& screenName, DisplayState state, uint32_t reason);
 
 private:
     class CallbackDeathRecipient : public IRemoteObject::DeathRecipient {

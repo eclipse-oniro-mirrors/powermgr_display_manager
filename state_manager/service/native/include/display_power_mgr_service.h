@@ -94,26 +94,26 @@ public:
     ErrCode SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
         const sptr<IRemoteObject>& token, int32_t& result) override;
     ErrCode SetSceneMode(uint32_t id, SceneModeType type, bool enable, bool& result) override;
-    ErrCode SetMultiScreenDisplayState(uint64_t screenId, const std::string& screenName,
+    ErrCode SetMultiScreenDisplayState(uint64_t displayId, const std::string& screenName,
         uint32_t state, uint32_t reason, int32_t& retCode) override;
-    ErrCode GetMultiScreenDisplayState(uint64_t screenId, int32_t& displayState,
+    ErrCode GetMultiScreenDisplayState(uint64_t displayId, int32_t& displayState,
         int32_t& retCode) override;
     ErrCode RegisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
-        uint64_t screenId, int32_t& retCode) override;
+        uint64_t displayId, int32_t& retCode) override;
     ErrCode UnregisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
-        uint64_t screenId, int32_t& retCode) override;
+        uint64_t displayId, int32_t& retCode) override;
 private:
     bool SetDisplayStateInner(uint32_t id, DisplayState state, uint32_t reason);
     void UndoSetDisplayStateInner(uint32_t id, DisplayState curState, uint32_t reason);
     DisplayState GetDisplayStateInner(uint32_t id);
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-    DisplayErrors SetMultiScreenDisplayStateInner(uint64_t screenId, const std::string& screenName,
+    DisplayErrors SetMultiScreenDisplayStateInner(uint64_t displayId, const std::string& screenName,
         DisplayState state, uint32_t reason);
-    DisplayErrors GetMultiScreenDisplayStateInner(uint64_t screenId, DisplayState& state);
+    DisplayErrors GetMultiScreenDisplayStateInner(uint64_t displayId, DisplayState& state);
     DisplayErrors RegisterMultiScreenDisplayStateCallbackInner(sptr<IMultiScreenDisplayStateCallback> callback,
-        uint64_t screenId);
+        uint64_t displayId);
     DisplayErrors UnregisterMultiScreenDisplayStateCallbackInner(sptr<IMultiScreenDisplayStateCallback> callback,
-        uint64_t screenId);
+        uint64_t displayId);
 #endif
     void UnregisterCallbackInner();
     std::vector<uint32_t> GetDisplayIdsInner();
@@ -151,7 +151,7 @@ public:
     virtual int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-    void NotifyMultiScreenStateChanged(uint64_t screenId, const std::string& screenName, DisplayState state,
+    void NotifyMultiScreenStateChanged(uint64_t displayId, const std::string& screenName, DisplayState state,
         uint32_t reason);
     void SetScreenOnBrightness(uint32_t displayId);
 #endif

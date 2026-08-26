@@ -55,11 +55,11 @@ public:
         ~TestMultiScreenCallback() override = default;
         bool IsProxyObject() const override { return isProxy_; }
         void OnMultiScreenDisplayStateChanged(
-            uint64_t screenId, const std::string& screenName,
+            uint64_t displayId, const std::string& screenName,
             OHOS::DisplayPowerMgr::DisplayState state,
             OHOS::DisplayPowerMgr::MultiScreenStateChangeReason reason) override;
 
-        uint64_t lastScreenId_ {0};
+        uint64_t lastDisplayId_ {0};
         std::string lastScreenName_;
         OHOS::DisplayPowerMgr::DisplayState lastState_ {OHOS::DisplayPowerMgr::DisplayState::DISPLAY_UNKNOWN};
         uint32_t lastReason_ {0};
