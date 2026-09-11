@@ -310,7 +310,7 @@ bool ScreenAction::MultiScreenWakeUpBegin(uint32_t reason)
         static_cast<Rosen::DisplayId>(displayId_), ParseSpecialReason(reason));
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] WakeUpBegin screenId=%{public}u, reason=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] WakeUpBegin displayId=%{public}u, reason=%{public}u, ret=%{public}d",
         displayId_, reason, ret);
     return ret;
 }
@@ -322,14 +322,14 @@ bool ScreenAction::MultiScreenSuspendBegin(uint32_t reason)
         static_cast<Rosen::DisplayId>(displayId_), ParseSpecialReason(reason));
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] SuspendBegin screenId=%{public}u, reason=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] SuspendBegin displayId=%{public}u, reason=%{public}u, ret=%{public}d",
         displayId_, reason, ret);
     return ret;
 }
 
 bool ScreenAction::MultiScreenSetDisplayState(DisplayState state)
 {
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] SetDisplayState screenId=%{public}u, state=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] SetDisplayState displayId=%{public}u, state=%{public}u",
         displayId_, static_cast<uint32_t>(state));
 
     std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -338,7 +338,7 @@ bool ScreenAction::MultiScreenSetDisplayState(DisplayState state)
     IPCSkeleton::SetCallingIdentity(identity);
 
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] SetDisplayState: screenId=%{public}u, state=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] SetDisplayState: displayId=%{public}u, state=%{public}u, ret=%{public}d",
         displayId_, static_cast<uint32_t>(state), ret);
     return ret;
 }
@@ -347,11 +347,11 @@ bool ScreenAction::MultiScreenSetScreenPower(DisplayState state, uint32_t reason
 {
     Rosen::ScreenPowerState status = ParseScreenPowerState(state);
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] SetScreenPower screenId=%{public}u, state=%{public}u, reason=%{public}u",
+        "[UL_POWER_IVI] SetScreenPower displayId=%{public}u, state=%{public}u, reason=%{public}u",
         displayId_, static_cast<uint32_t>(state), reason);
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool ret = Rosen::ScreenManagerLite::GetInstance().SetScreenPowerForSpecifiedId(
-        static_cast<Rosen::ScreenId>(displayId_), status, ParseSpecialReason(reason));
+        static_cast<Rosen::DisplayId>(displayId_), status, ParseSpecialReason(reason));
     IPCSkeleton::SetCallingIdentity(identity);
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
     if (!ret) {
@@ -360,7 +360,7 @@ bool ScreenAction::MultiScreenSetScreenPower(DisplayState state, uint32_t reason
     }
 #endif
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] SetScreenPower screenId=%{public}u, state=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] SetScreenPower displayId=%{public}u, state=%{public}u, ret=%{public}d",
         displayId_, static_cast<uint32_t>(state), ret);
     return ret;
 }
@@ -372,7 +372,7 @@ bool ScreenAction::MultiScreenWakeUpEnd()
         static_cast<Rosen::DisplayId>(displayId_));
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] WakeUpEnd screenId=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] WakeUpEnd displayId=%{public}u, ret=%{public}d",
         displayId_, ret);
     return ret;
 }
@@ -384,7 +384,7 @@ bool ScreenAction::MultiScreenSuspendEnd()
         static_cast<Rosen::DisplayId>(displayId_));
     IPCSkeleton::SetCallingIdentity(identity);
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] SuspendEnd screenId=%{public}u, ret=%{public}d",
+        "[UL_POWER_IVI] SuspendEnd displayId=%{public}u, ret=%{public}d",
         displayId_, ret);
     return ret;
 }

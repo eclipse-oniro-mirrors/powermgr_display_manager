@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
-void MultiScreenDisplayStateCallbackProxy::OnMultiScreenDisplayStateChanged(uint64_t screenId,
+void MultiScreenDisplayStateCallbackProxy::OnMultiScreenDisplayStateChanged(uint64_t displayId,
     const std::string& screenName, DisplayState state, MultiScreenStateChangeReason reason)
 {
     sptr<IRemoteObject> remote = Remote();
@@ -39,7 +39,7 @@ void MultiScreenDisplayStateCallbackProxy::OnMultiScreenDisplayStateChanged(uint
         return;
     }
 
-    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint64, screenId);
+    RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint64, displayId);
     RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, String, screenName);
     RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, static_cast<uint32_t>(state));
     RETURN_IF_WRITE_PARCEL_FAILED_NO_RET(data, Uint32, static_cast<uint32_t>(reason));

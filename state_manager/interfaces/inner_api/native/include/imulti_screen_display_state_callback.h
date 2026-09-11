@@ -24,11 +24,11 @@
 namespace OHOS {
 namespace DisplayPowerMgr {
 
-static constexpr uint64_t SCREEN_ID_ALL = UINT64_MAX;
+static constexpr uint64_t DISPLAY_ID_ALL = UINT64_MAX;
 
 class IMultiScreenDisplayStateCallback : public IRemoteBroker {
 public:
-    virtual void OnMultiScreenDisplayStateChanged(uint64_t screenId, const std::string& screenName, DisplayState state,
+    virtual void OnMultiScreenDisplayStateChanged(uint64_t displayId, const std::string& screenName, DisplayState state,
         MultiScreenStateChangeReason reason) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.powermgr.IMultiScreenDisplayStateCallback");

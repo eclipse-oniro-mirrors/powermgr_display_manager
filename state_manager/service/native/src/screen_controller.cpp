@@ -324,11 +324,10 @@ ffrt::mutex& ScreenController::GetScreenLock()
     return screenLock_;
 }
 
-bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reason,
-    const std::string& screenName)
+bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reason, const std::string& screenName)
 {
     DISPLAY_HILOGI(FEAT_STATE,
-        "[UL_POWER_IVI] UpdateMultiScreenState, screenId=%{public}u, state=%{public}u, current state=%{public}u,"
+        "[UL_POWER_IVI] UpdateMultiScreenState, displayId=%{public}u, state=%{public}u, current state=%{public}u,"
         " reason=%{public}u",
         action_->GetDisplayId(), static_cast<uint32_t>(state), static_cast<uint32_t>(state_.load()), reason);
     auto pms = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
@@ -349,13 +348,13 @@ bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reaso
         action_->MultiScreenSuspendEnd();
     }
     if (!setDisplayStateRet || !setScreenPowerRet) {
-        DISPLAY_HILOGW(FEAT_STATE, "UpdateMultiScreenState failed, screenId=%{public}u, state=%{public}d",
+        DISPLAY_HILOGW(FEAT_STATE, "UpdateMultiScreenState failed, displayId=%{public}u, state=%{public}d",
             action_->GetDisplayId(), state);
         return false;
     }
     if (state == DisplayState::DISPLAY_ON) {
         pms->SetScreenOnBrightness(action_->GetDisplayId());
-        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER_IVI] SetScreenOnBrightness screenId=%{public}u",
+        DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER_IVI] SetScreenOnBrightness displayId=%{public}u",
             action_->GetDisplayId());
     }
 
@@ -363,7 +362,7 @@ bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reaso
 
     state_ = state;
     stateChangeReason_ = reason;
-    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] UpdateMultiScreenState to %{public}u, screenId=%{public}u",
+    DISPLAY_HILOGI(FEAT_STATE, "[UL_POWER_IVI] UpdateMultiScreenState to %{public}u, displayId=%{public}u",
         static_cast<uint32_t>(state), action_->GetDisplayId());
     return true;
 }

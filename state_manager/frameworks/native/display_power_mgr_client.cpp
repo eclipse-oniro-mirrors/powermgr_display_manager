@@ -589,13 +589,13 @@ bool DisplayPowerMgrClient::SetSceneMode(uint32_t id, SceneModeType type, bool e
     return result;
 }
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
-DisplayErrors DisplayPowerMgrClient::SetMultiScreenDisplayState(uint64_t screenId, const std::string& screenName,
+DisplayErrors DisplayPowerMgrClient::SetMultiScreenDisplayState(uint64_t displayId, const std::string& screenName,
     DisplayState state, MultiScreenStateChangeReason reason)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
     int32_t result = static_cast<int32_t>(DisplayErrors::ERR_OK);
-    auto ret = proxy->SetMultiScreenDisplayState(screenId, screenName,
+    auto ret = proxy->SetMultiScreenDisplayState(displayId, screenName,
         static_cast<uint32_t>(state), static_cast<uint32_t>(reason), result);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SetMultiScreenDisplayState, ret = %{public}d", ret);
@@ -604,7 +604,7 @@ DisplayErrors DisplayPowerMgrClient::SetMultiScreenDisplayState(uint64_t screenI
     return static_cast<DisplayErrors>(result);
 }
 
-DisplayErrors DisplayPowerMgrClient::GetMultiScreenDisplayState(uint64_t screenId, DisplayState& state)
+DisplayErrors DisplayPowerMgrClient::GetMultiScreenDisplayState(uint64_t displayId, DisplayState& state)
 {
     auto proxy = GetProxy();
     if (proxy == nullptr) {
@@ -613,7 +613,7 @@ DisplayErrors DisplayPowerMgrClient::GetMultiScreenDisplayState(uint64_t screenI
     }
     int32_t displayState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
     int32_t result = static_cast<int32_t>(DisplayErrors::ERR_OK);
-    auto ret = proxy->GetMultiScreenDisplayState(screenId, displayState, result);
+    auto ret = proxy->GetMultiScreenDisplayState(displayId, displayState, result);
     state = static_cast<DisplayState>(displayState);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "GetMultiScreenDisplayState, ret = %{public}d", ret);
@@ -623,7 +623,7 @@ DisplayErrors DisplayPowerMgrClient::GetMultiScreenDisplayState(uint64_t screenI
 }
 
 DisplayErrors DisplayPowerMgrClient::RegisterMultiScreenDisplayStateCallback(
-    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t screenId)
+    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t displayId)
 {
     if (callback == nullptr) {
         DISPLAY_HILOGE(COMP_FWK, "callback is nullptr");
@@ -632,7 +632,7 @@ DisplayErrors DisplayPowerMgrClient::RegisterMultiScreenDisplayStateCallback(
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
     int32_t result = static_cast<int32_t>(DisplayErrors::ERR_OK);
-    auto ret = proxy->RegisterMultiScreenDisplayStateCallback(callback, screenId, result);
+    auto ret = proxy->RegisterMultiScreenDisplayStateCallback(callback, displayId, result);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "RegisterMultiScreenDisplayStateCallback, ret = %{public}d", ret);
         return DisplayErrors::ERR_CONNECTION_FAIL;
@@ -641,7 +641,7 @@ DisplayErrors DisplayPowerMgrClient::RegisterMultiScreenDisplayStateCallback(
 }
 
 DisplayErrors DisplayPowerMgrClient::UnregisterMultiScreenDisplayStateCallback(
-    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t screenId)
+    sptr<IMultiScreenDisplayStateCallback> callback, uint64_t displayId)
 {
     if (callback == nullptr) {
         DISPLAY_HILOGE(COMP_FWK, "callback is nullptr");
@@ -650,7 +650,7 @@ DisplayErrors DisplayPowerMgrClient::UnregisterMultiScreenDisplayStateCallback(
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, DisplayErrors::ERR_CONNECTION_FAIL);
     int32_t result = static_cast<int32_t>(DisplayErrors::ERR_OK);
-    auto ret = proxy->UnregisterMultiScreenDisplayStateCallback(callback, screenId, result);
+    auto ret = proxy->UnregisterMultiScreenDisplayStateCallback(callback, displayId, result);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "UnregisterMultiScreenDisplayStateCallback, ret = %{public}d", ret);
         return DisplayErrors::ERR_CONNECTION_FAIL;

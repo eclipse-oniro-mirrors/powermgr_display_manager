@@ -32,7 +32,7 @@ public:
     explicit MultiScreenDisplayStateCallbackProxy(const sptr<IRemoteObject>& impl)
         : IRemoteProxy<IMultiScreenDisplayStateCallback>(impl) {}
     ~MultiScreenDisplayStateCallbackProxy() override = default;
-    void OnMultiScreenDisplayStateChanged(uint64_t screenId, const std::string& screenName, DisplayState state,
+    void OnMultiScreenDisplayStateChanged(uint64_t displayId, const std::string& screenName, DisplayState state,
         MultiScreenStateChangeReason reason) override;
 
 private:

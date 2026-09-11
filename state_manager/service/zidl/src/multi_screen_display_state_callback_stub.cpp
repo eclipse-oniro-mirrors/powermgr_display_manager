@@ -59,22 +59,22 @@ int32_t MultiScreenDisplayStateCallbackStub::OnRemoteRequest(uint32_t code, Mess
 int32_t MultiScreenDisplayStateCallbackStub::OnMultiScreenDisplayStateChangedStub(
     MessageParcel& data, MessageParcel& reply)
 {
-    uint64_t screenId = 0;
+    uint64_t displayId = 0;
     std::string screenName;
     uint32_t state = 0;
     uint32_t reason = 0;
 
-    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint64, screenId, E_READ_PARCEL_ERROR);
+    RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint64, displayId, E_READ_PARCEL_ERROR);
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, String, screenName, E_READ_PARCEL_ERROR);
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, state, E_READ_PARCEL_ERROR);
     RETURN_IF_READ_PARCEL_FAILED_WITH_RET(data, Uint32, reason, E_READ_PARCEL_ERROR);
 
-    OnMultiScreenDisplayStateChanged(screenId, screenName, static_cast<DisplayState>(state),
+    OnMultiScreenDisplayStateChanged(displayId, screenName, static_cast<DisplayState>(state),
         static_cast<MultiScreenStateChangeReason>(reason));
     return ERR_OK;
 }
 
-void MultiScreenDisplayStateCallbackStub::OnMultiScreenDisplayStateChanged(uint64_t screenId,
+void MultiScreenDisplayStateCallbackStub::OnMultiScreenDisplayStateChanged(uint64_t displayId,
     const std::string& screenName, DisplayState state, MultiScreenStateChangeReason reason) {}
 } // namespace DisplayPowerMgr
 } // namespace OHOS
