@@ -33,6 +33,7 @@
 #include "display_common.h"
 #include "display_power_info.h"
 #include "display_manager_lite.h"
+#include "screen_manager_lite.h"
 #include "dm_common.h"
 #include "iremote_object.h"
 #include "idisplay_brightness_callback.h"

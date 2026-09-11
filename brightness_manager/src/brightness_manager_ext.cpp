@@ -21,9 +21,16 @@
 
 namespace OHOS {
 namespace DisplayPowerMgr {
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+BrightnessManagerExt::BrightnessManagerExt(uint32_t displayId)
+{
+    mDisplayId = displayId;
+}
+#else
 BrightnessManagerExt::BrightnessManagerExt()
 {
 }
+#endif
 
 BrightnessManagerExt::~BrightnessManagerExt()
 {
@@ -51,7 +58,18 @@ void BrightnessManagerExt::DeInit()
 bool BrightnessManagerExt::LoadBrightnessExtLibrary()
 {
 #ifndef FUZZ_TEST
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    Dl_namespace brt;
+    Dl_namespace defaultNs;
+    std::string nsName = "bm_ns_" + std::to_string(mDisplayId);
+    dlns_init(&brt, nsName.c_str());
+    dlns_init(&defaultNs, "ndk");
+    dlns_create(&brt, "/system/lib64");
+    dlns_inherit(&brt, &defaultNs, "allow_all_shared_libs");
+    mBrightnessManagerExtHandle = dlopen_ns(&brt, "libbrightness_wrapper.z.so", RTLD_NOW);
+#else
     mBrightnessManagerExtHandle = dlopen("libbrightness_wrapper.z.so", RTLD_NOW);
+#endif
 #endif
     if (!mBrightnessManagerExtHandle) {
 #ifdef HAS_HIVIEWDFX_HISYSEVENT_PART
@@ -607,4 +625,5 @@ bool BrightnessManagerExt::SetSceneMode(SceneModeType type, bool enable)
     return setSceneModeFunc(type, enable);
 }
 } // namespace DisplayPowerMgr
-} // namespace OHOS
+} // namespace OHOS
+
