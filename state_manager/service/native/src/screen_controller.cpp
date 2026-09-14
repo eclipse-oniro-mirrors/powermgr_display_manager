@@ -41,7 +41,11 @@ ScreenController::ScreenController(uint32_t displayId)
 {
     DISPLAY_HILOGI(COMP_SVC, "ScreenController created for displayId=%{public}u", displayId);
     action_ = make_shared<ScreenAction>(displayId);
+    // multi-screen initialization, the display state of the specified screen is determined by the
+    // caller's explicit setup, rather than being obtained via the DMS interface.
+#ifndef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     state_ = action_->GetDisplayState();
+#endif
 
     string name = "BrightnessController_" + to_string(displayId);
     if (animateCallback_ == nullptr) {
@@ -357,8 +361,6 @@ bool ScreenController::UpdateMultiScreenState(DisplayState state, uint32_t reaso
         DISPLAY_HILOGI(FEAT_BRIGHTNESS, "[UL_POWER_IVI] SetScreenOnBrightness displayId=%{public}u",
             action_->GetDisplayId());
     }
-
-    pms->NotifyMultiScreenStateChanged(static_cast<uint64_t>(action_->GetDisplayId()), screenName, state, reason);
 
     state_ = state;
     stateChangeReason_ = reason;
