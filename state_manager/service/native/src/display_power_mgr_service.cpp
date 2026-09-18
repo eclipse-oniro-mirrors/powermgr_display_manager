@@ -647,6 +647,7 @@ DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t d
         UndoSetDisplayStateInner(static_cast<uint32_t>(displayId), controller->GetState(), reason);
         return DisplayErrors::ERR_STATE_CHANGE_FAILED;
     }
+    NotifyMultiScreenStateChanged(displayId, screenName, state, reason);
     return DisplayErrors::ERR_OK;
 }
 
