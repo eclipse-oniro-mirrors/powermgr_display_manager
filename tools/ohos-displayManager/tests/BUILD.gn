@@ -14,7 +14,7 @@
 import("//build/test.gni")
 import("../../../displaymgr.gni")
 
-module_output_path = "display_manager/ohos_display_manager_cli"
+module_output_path = "display_manager/display_manager"
 
 ohos_unittest("unittest_ohos_display_manager_cli") {
   module_out_path = module_output_path
