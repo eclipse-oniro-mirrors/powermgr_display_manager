@@ -80,7 +80,7 @@ private:
     class BrightnessInfo {
     public:
         uint32_t GetBrightness() const;
-        bool SetBrightness(int32_t value, bool continuous);
+        bool SetBrightness(int32_t value, bool continuous, uint32_t displayId = 0);
         int32_t GetAutoMode() const;
         bool SetAutoMode(bool mode);
         void ScreenOn(bool keep, std::shared_ptr<PowerMgr::RunningLock>& runningLock);

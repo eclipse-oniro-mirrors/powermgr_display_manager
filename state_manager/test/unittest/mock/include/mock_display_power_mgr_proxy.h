@@ -34,7 +34,8 @@ public:
         BrightnessValueType valueType, bool& result) override;
     int32_t SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& bResult,
         int32_t& retCode) override;
-    int32_t SetMaxBrightness(double value, uint32_t enterTestMode, bool& bResult, int32_t& retCode) override;
+    int32_t SetMaxBrightness(double value, uint32_t displayId, uint32_t enterTestMode, bool& bResult,
+        int32_t& retCode) override;
     int32_t SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode, bool& bResult, int32_t& retCode) override;
     int32_t DiscountBrightness(double value, uint32_t displayId, bool& bResult) override;
     int32_t OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration, bool& bResult) override;

@@ -41,7 +41,6 @@ void BrightnessManager::CreateExt(const uint32_t screenId)
     auto [it, inserted] = mMultiBrtMgrExt.emplace(screenId, std::make_shared<BrightnessManagerExt>(screenId));
     if (inserted) {
         it->second->Init(defaultMax_, defaultMin_);
-        it->second->SetDisplayId(screenId);
     } else {
         DISPLAY_HILOGD(FEAT_BRIGHTNESS, "BMExt for display id=%{public}u already exists",
             static_cast<uint32_t>(screenId));

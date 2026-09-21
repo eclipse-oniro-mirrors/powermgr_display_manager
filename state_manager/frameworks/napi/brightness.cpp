@@ -24,10 +24,11 @@ using namespace OHOS::PowerMgr;
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
-const uint32_t MAX_ARGC = 2;
+const uint32_t MAX_ARGC = 3;
 const uint32_t CALLBACK_ARGC = 1;
 const uint32_t ARGV_BRIGHTNESS_INDEX = 0;
 const uint32_t ARGV_CONTINUOUS_INDEX = 1;
+const uint32_t ARGV_DISPLAYID_INDEX = 2;
 const uint32_t ERR_DATA_INDEX = 0;
 const uint32_t ERR_CODE_INDEX = 1;
 const uint32_t MAX_FAIL_ARGC = 2;
@@ -104,7 +105,13 @@ void Brightness::SetValue(napi_callback_info& info)
         napi_get_value_bool(env_, napiContinuous, &continuous);
     }
 
-    if (!brightnessInfo_.SetBrightness(value, continuous)) {
+    uint32_t displayId = 0;
+    napi_value napiDisplayId = GetCallbackInfoWithThrow(info, ARGV_DISPLAYID_INDEX, napi_number);
+    if (napiDisplayId != nullptr) {
+        napi_get_value_uint32(env_, napiDisplayId, &displayId);
+    }
+
+    if (!brightnessInfo_.SetBrightness(value, continuous, displayId)) {
         DisplayErrors error = brightnessInfo_.GetServiceError();
         if (error != DisplayErrors::ERR_OK) {
             result_.ThrowError(env_, error);
@@ -319,12 +326,13 @@ uint32_t Brightness::BrightnessInfo::GetBrightness() const
     return brightness;
 }
 
-bool Brightness::BrightnessInfo::SetBrightness(int32_t value, bool continuous)
+bool Brightness::BrightnessInfo::SetBrightness(int32_t value, bool continuous, uint32_t displayId)
 {
-    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: %{public}d, %{public}d", value, continuous);
+    DISPLAY_HILOGI(FEAT_BRIGHTNESS, "Set brightness: id=%{public}u, %{public}d, %{public}d",
+        displayId, value, continuous);
     value = value > static_cast<int32_t>(MAX_BRIGHTNESS) ? static_cast<int32_t>(MAX_BRIGHTNESS) : value;
     value = value < static_cast<int32_t>(MIN_BRIGHTNESS) ? static_cast<int32_t>(MIN_BRIGHTNESS) : value;
-    bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value, 0, continuous);
+    bool isSucc = DisplayPowerMgrClient::GetInstance().SetBrightness(value, displayId, continuous);
     if (!isSucc) {
         DISPLAY_HILOGW(FEAT_BRIGHTNESS, "Failed to set brightness: %{public}d", value);
     }
