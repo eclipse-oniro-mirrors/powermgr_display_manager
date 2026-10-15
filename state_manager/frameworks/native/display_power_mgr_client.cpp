@@ -508,13 +508,13 @@ DisplayErrors DisplayPowerMgrClient::GetError()
     return lastError_.exchange(DisplayErrors::ERR_OK);
 }
 
-bool DisplayPowerMgrClient::SetMaxBrightness(double value, uint32_t enterTestMode)
+bool DisplayPowerMgrClient::SetMaxBrightness(double value, uint32_t displayId, uint32_t enterTestMode)
 {
     auto proxy = GetProxy();
     RETURN_IF_WITH_RET(proxy == nullptr, false);
     bool result = false;
     int32_t displayError = ERR_OK;
-    auto ret = proxy->SetMaxBrightness(value, enterTestMode, result, displayError);
+    auto ret = proxy->SetMaxBrightness(value, displayId, enterTestMode, result, displayError);
     if (ret != ERR_OK) {
         DISPLAY_HILOGE(COMP_FWK, "SetMaxBrightness, ret = %{public}d", ret);
         return false;

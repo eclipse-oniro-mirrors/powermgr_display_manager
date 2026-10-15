@@ -57,7 +57,8 @@ public:
         BrightnessValueType valueType, bool& result) override;
     ErrCode SetBrightness(uint32_t value, uint32_t displayId, bool continuous, bool& result,
         int32_t& displayError) override;
-    ErrCode SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError) override;
+    ErrCode SetMaxBrightness(double value, uint32_t displayId, uint32_t mode,
+        bool& result, int32_t& displayError) override;
     ErrCode SetMaxBrightnessNit(uint32_t maxNit, uint32_t mode, bool& result, int32_t& displayError) override;
     ErrCode DiscountBrightness(double discount, uint32_t displayId, bool& result) override;
     ErrCode OverrideBrightness(uint32_t value, uint32_t displayId, uint32_t duration, bool& result) override;
@@ -119,7 +120,7 @@ private:
     std::vector<uint32_t> GetDisplayIdsInner();
     uint32_t GetMainDisplayIdInner();
     bool SetBrightnessInner(uint32_t value, uint32_t displayId, bool continuous = false);
-    bool SetMaxBrightnessInner(double value, uint32_t mode);
+    bool SetMaxBrightnessInner(double value, uint32_t displayId, uint32_t mode);
     bool SetMaxBrightnessNitInner(uint32_t maxNit, uint32_t mode);
     bool DiscountBrightnessInner(double discount, uint32_t displayId);
     bool OverrideBrightnessInner(uint32_t value, uint32_t displayId, uint32_t duration = 500);

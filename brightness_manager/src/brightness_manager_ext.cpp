@@ -42,6 +42,11 @@ void BrightnessManagerExt::Init(uint32_t defaultMax, uint32_t defaultMin)
     if (!LoadBrightnessExtLibrary()) {
         return;
     }
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    SetDisplayId(mDisplayId);
+#else
+    SetDisplayId(0);
+#endif
     auto init = reinterpret_cast<void (*)(uint32_t, uint32_t)>(mBrightnessManagerInitFunc);
     init(defaultMax, defaultMin);
 }

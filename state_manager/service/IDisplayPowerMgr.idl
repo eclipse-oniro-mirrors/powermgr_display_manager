@@ -53,8 +53,8 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [in] String params, [out] int retCode);
     void UnregisterDataChangeListener(
         [in] DisplayDataChangeListenerType listenerType, [in] String callerId, [out] int retCode);
-    void SetMaxBrightness([in] double value, [in] unsigned int enterTestMode, [out] boolean bResult,
-        [out] int retCode);
+    void SetMaxBrightness([in] double value, [in] unsigned int displayId, [in] unsigned int enterTestMode,
+        [out] boolean bResult, [out] int retCode);
     void SetMaxBrightnessNit([in] unsigned int maxNit, [in] unsigned int enterTestMode, [out] boolean bResult,
         [out] int retCode);
     void NotifyScreenPowerStatus([in] unsigned int displayId, [in] unsigned int displayPowerStatus,

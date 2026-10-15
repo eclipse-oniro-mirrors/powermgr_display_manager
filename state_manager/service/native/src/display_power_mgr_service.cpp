@@ -361,7 +361,7 @@ bool DisplayPowerMgrService::SetBrightnessInner(uint32_t value, uint32_t display
     auto brightness = GetSafeBrightness(value);
     DISPLAY_HILOGI(FEAT_BRIGHTNESS, "SetBrightness displayId=%{public}u, value=%{public}u, continuous=%{public}d",
         displayId, brightness, continuous);
-    return BrightnessManager::Get().SetBrightness(brightness, 0, continuous);
+    return BrightnessManager::Get().SetBrightness(brightness, 0, continuous, displayId);
 }
 
 bool DisplayPowerMgrService::DiscountBrightnessInner(double discount, uint32_t displayId)
@@ -937,12 +937,13 @@ void DisplayPowerMgrService::InvokerDeathRecipient::OnRemoteDied(const wptr<IRem
 /**
 * @brief Function to limit maximum screen brightness
 * @param value  The max brightness level that needs to be restricted
+* @param displayId  The id of the display to set max brightness
 * @param mode  0 = default mode, set param value as maxBrightness;
 *               1 = enter testMode, when running unittest set maxBrightness to default value;
 *               2 = exit testMode
 * @return false = set failed; true = set Sucess
 */
-bool DisplayPowerMgrService::SetMaxBrightnessInner(double value, uint32_t mode)
+bool DisplayPowerMgrService::SetMaxBrightnessInner(double value, uint32_t displayId, uint32_t mode)
 {
     if (!Permission::IsSystem()) {
         lastError_ = static_cast<int32_t>(DisplayErrors::ERR_SYSTEM_API_DENIED);
@@ -961,9 +962,9 @@ bool DisplayPowerMgrService::SetMaxBrightnessInner(double value, uint32_t mode)
     if (isInTestMode_) {
         DISPLAY_HILOGI(COMP_SVC, "in the TestMode SetMaxBrightness to Default Value!");
         double maxBrightness = 1.0;
-        return BrightnessManager::Get().SetMaxBrightness(maxBrightness);
+        return BrightnessManager::Get().SetMaxBrightness(maxBrightness, displayId);
     }
-    return BrightnessManager::Get().SetMaxBrightness(value);
+    return BrightnessManager::Get().SetMaxBrightness(value, displayId);
 }
 
 /**
@@ -1279,11 +1280,12 @@ ErrCode DisplayPowerMgrService::SetLightBrightnessThreshold(const std::vector<in
     return ERR_OK;
 }
 
-ErrCode DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t mode, bool& result, int32_t& displayError)
+ErrCode DisplayPowerMgrService::SetMaxBrightness(double value, uint32_t displayId, uint32_t mode, bool& result,
+    int32_t& displayError)
 {
     NoCoroutineSwitchGuard threadIdGuard;
     DisplayXCollie displayXCollie("DisplayPowerMgrService::SetMaxBrightness");
-    result = SetMaxBrightnessInner(value, mode);
+    result = SetMaxBrightnessInner(value, displayId, mode);
     displayError = static_cast<int32_t>(GetError());
     return ERR_OK;
 }

@@ -51,8 +51,8 @@ int32_t MockDisplayPowerMgrProxy::SetBrightness(uint32_t value, uint32_t display
     return ERR_FAIL;
 }
 
-int32_t MockDisplayPowerMgrProxy::SetMaxBrightness(double value, uint32_t enterTestMode, bool& isResult,
-    int32_t& retCode)
+int32_t MockDisplayPowerMgrProxy::SetMaxBrightness(double value, uint32_t displayId, uint32_t enterTestMode,
+    bool& isResult, int32_t& retCode)
 {
     return ERR_FAIL;
 }

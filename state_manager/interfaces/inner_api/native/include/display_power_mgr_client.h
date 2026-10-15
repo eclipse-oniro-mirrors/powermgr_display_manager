@@ -49,7 +49,7 @@ public:
     bool SetForcedBrightness(double value, uint32_t displayId = 0, uint32_t duration = 500,
         BrightnessValueType valueType = BrightnessValueType::RELATIVE_TO_CURRENT_RANGE);
     bool SetBrightness(uint32_t value, uint32_t displayId = 0, bool continuous = false);
-    bool SetMaxBrightness(double value, uint32_t enterTestMode = 0);
+    bool SetMaxBrightness(double value, uint32_t displayId = 0, uint32_t enterTestMode = 0);
     bool SetMaxBrightnessNit(uint32_t maxNit, uint32_t enterTestMode = 0);
     bool DiscountBrightness(double discount, uint32_t displayId = 0);
     bool OverrideBrightness(uint32_t value, uint32_t displayId = 0, uint32_t duration = 500);

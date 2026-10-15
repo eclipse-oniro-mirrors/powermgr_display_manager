@@ -48,7 +48,7 @@ public:
         DisplayPowerMgrClient::GetInstance().DiscountBrightness(NO_DISCOUNT);
         uint32_t maxBrightness = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
         double value = (double)maxBrightness / MAX_DEFAULT_BRIGHTNESS_LEVEL;
-        DisplayPowerMgrClient::GetInstance().SetMaxBrightness(value, TEST_MODE);
+        DisplayPowerMgrClient::GetInstance().SetMaxBrightness(value, 0, TEST_MODE);
 
         auto& powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
         PowerMgr::PowerMode mode = powerMgrClient.GetDeviceMode();
@@ -68,7 +68,7 @@ public:
         DisplayPowerMgrClient::GetInstance().CancelBoostBrightness();
         uint32_t maxBrightness = DisplayPowerMgrClient::GetInstance().GetMaxBrightness();
         double value = (double)maxBrightness / MAX_DEFAULT_BRIGHTNESS_LEVEL;
-        DisplayPowerMgrClient::GetInstance().SetMaxBrightness(value, NORMAL_MODE);
+        DisplayPowerMgrClient::GetInstance().SetMaxBrightness(value, 0, NORMAL_MODE);
     }
 
     void WaitDimmingDone()
@@ -1014,7 +1014,7 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness001, Test
     usleep(CMD_EXECUTION_DELAY);
 
     const uint32_t SET_MAX_BRIGHTNESS = 98;
-    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 2);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 0, NORMAL_MODE);
     EXPECT_TRUE(ret);
     WaitDimmingDone();
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
@@ -1034,12 +1034,12 @@ HWTEST_F(DisplayPowerMgrBrightnessTest, DisplayPowerMgrSetMaxBrightness002, Test
     usleep(CMD_EXECUTION_DELAY);
 
     const uint32_t SET_MAX_BRIGHTNESS = 200;
-    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 2);
+    bool ret = DisplayPowerMgrClient::GetInstance().SetMaxBrightness((double)SET_MAX_BRIGHTNESS / 255, 0, NORMAL_MODE);
     EXPECT_TRUE(ret);
     WaitDimmingDone();
     uint32_t brightness = DisplayPowerMgrClient::GetInstance().GetBrightness();
     EXPECT_EQ(SET_BRIGHTNESS, brightness);
-    DisplayPowerMgrClient::GetInstance().SetMaxBrightness(SET_BRIGHTNESS, 1);
+    DisplayPowerMgrClient::GetInstance().SetMaxBrightness(SET_BRIGHTNESS, 0, TEST_MODE);
 }
 
 /**
