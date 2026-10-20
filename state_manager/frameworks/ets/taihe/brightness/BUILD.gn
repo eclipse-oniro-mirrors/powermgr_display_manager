@@ -58,6 +58,9 @@ taihe_shared_library("display_manager_brightness_taihe_native") {
     "power_manager:powermgr_client",
   ]
 
+  # SO symbol visibility optimization - white list mode
+  version_script = "libdisplay_manager_brightness_taihe_native.map"
+
   subsystem_name = "powermgr"
   part_name = "${displaymgr_part_name}"
 }
