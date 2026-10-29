@@ -1020,7 +1020,7 @@ HWTEST_F(DisplayServiceTest, DisplayServiceTest050, TestSize.Level1)
  * @tc.type: FUNC
  */
 extern "C" {
-void __wrap__ZN4OHOS15DisplayPowerMgr17BrightnessManager21SetScreenOnBrightnessEv(BrightnessManager*)
+void __wrap__ZN4OHOS15DisplayPowerMgr17BrightnessManager21SetScreenOnBrightnessEj(BrightnessManager*)
 {
     DISPLAY_HILOGI(LABEL_TEST, "Mock SetScreenOnBrightness called");
     // Use existing mock class but won't interfere with the existing (broken) tests:
