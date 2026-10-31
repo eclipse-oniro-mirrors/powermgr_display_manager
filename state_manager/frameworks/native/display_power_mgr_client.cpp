@@ -622,6 +622,27 @@ DisplayErrors DisplayPowerMgrClient::GetMultiScreenDisplayState(uint64_t display
     return static_cast<DisplayErrors>(result);
 }
 
+std::vector<std::pair<uint64_t, DisplayState>> DisplayPowerMgrClient::GetAllMultiScreenDisplayState()
+{
+    std::vector<std::pair<uint64_t, DisplayState>> result;
+    auto proxy = GetProxy();
+    if (proxy == nullptr) {
+        return result;
+    }
+    std::map<uint64_t, int32_t> states;
+    int32_t retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    auto ret = proxy->GetAllMultiScreenDisplayState(states, retCode);
+    lastError_ = static_cast<DisplayErrors>(retCode);
+    if (ret != ERR_OK) {
+        DISPLAY_HILOGE(COMP_FWK, "GetAllMultiScreenDisplayState, ret = %{public}d", ret);
+        return result;
+    }
+    for (const auto& [id, state] : states) {
+        result.emplace_back(id, static_cast<DisplayState>(state));
+    }
+    return result;
+}
+
 DisplayErrors DisplayPowerMgrClient::RegisterMultiScreenDisplayStateCallback(
     sptr<IMultiScreenDisplayStateCallback> callback, uint64_t displayId)
 {

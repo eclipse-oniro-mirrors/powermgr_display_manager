@@ -184,6 +184,13 @@ ohos_unittest("unittest_display_cilent_mock") {
     "src/mock_display_client_test.cpp",
   ]
 
+  if (display_manager_feature_multi_screen_state) {
+    defines += [ "DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE" ]
+    sources += [
+      "${displaymgr_service_zidl}/src/multi_screen_display_state_callback_stub.cpp",
+    ]
+  }
+
   configs = [
     "${displaymgr_utils_path}:utils_config",
     ":module_private_config",
@@ -528,7 +535,10 @@ ohos_unittest("unittest_display_service_test") {
   }
   if (display_manager_feature_multi_screen_state) {
     defines += [ "DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE" ]
-    external_deps += [ "common_event_service:cesfwk_innerkits" ]
+    external_deps += [
+      "common_event_service:cesfwk_innerkits",
+      "os_account:os_account_innerkits",
+    ]
     sources += [
       "${displaymgr_root_path}/service/native/src/multi_screen_display_state_callback_manager.cpp",
       "${displaymgr_root_path}/service/zidl/src/multi_screen_display_state_callback_proxy.cpp",

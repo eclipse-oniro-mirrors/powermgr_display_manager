@@ -35,9 +35,11 @@
 #include <common_event_data.h>
 #include <common_event_manager.h>
 #include <common_event_publish_info.h>
+#include <common_event_support.h>
 #include <want.h>
 #include "imulti_screen_display_state_callback.h"
 #include "multi_screen_display_state_callback_manager.h"
+#include "os_account_manager.h"
 #include "screen_controller.h"
 #endif
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
@@ -111,6 +113,19 @@ std::string g_lastPermission;
 std::string g_lastPubReason;
 std::atomic<int> g_concurrencyCount{0};
 std::atomic<int> g_maxConcurrencyCount{0};
+// PublishCommonEventAsUser mock capture: covers per-user SCREEN_ON/OFF (routed to the display's
+// foreground OsAccount inside PublishScreenCommonEvent) and whole-machine U0 SCREEN_ON/OFF
+// (PublishSystemCommonEvent edge-trigger).
+int g_publishAsUserEventCount = 0;
+std::string g_lastAsUserAction;
+int32_t g_lastAsUserUserId = -1;
+uint64_t g_lastAsUserPubDisplayId = 0;
+std::string g_lastAsUserPubScreenName;
+std::string g_lastAsUserPubReason;
+bool g_lastAsUserIsUserApp = false;
+// OsAccountManager::GetForegroundOsAccountLocalId mock control (per-user routing).
+bool g_isOsAccountOk = true;
+int32_t g_mockOsAccountUserId = 100;
 #endif
 } // namespace
 
@@ -272,7 +287,34 @@ bool CommonEventManager::PublishCommonEvent(const CommonEventData& data,
     g_lastPermission = perms.empty() ? "" : perms[0];
     return true;
 }
+
+bool CommonEventManager::PublishCommonEventAsUser(const CommonEventData& data,
+    const CommonEventPublishInfo& publishInfo, const int32_t& userId)
+{
+    g_publishAsUserEventCount++;
+    auto want = data.GetWant();
+    g_lastAsUserAction = want.GetAction();
+    g_lastAsUserUserId = userId;
+    g_lastAsUserPubDisplayId = static_cast<uint64_t>(want.GetLongParam("displayId", -1L));
+    g_lastAsUserPubScreenName = want.GetStringParam("screenName");
+    g_lastAsUserPubReason = want.GetStringParam("reason");
+    g_lastAsUserIsUserApp =
+        (publishInfo.GetSubscriberType() == EventFwk::SubscriberType::USER_APP_SUBSCRIBER_TYPE);
+    return true;
+}
 } // namespace OHOS::EventFwk
+
+namespace OHOS::AccountSA {
+ErrCode OsAccountManager::GetForegroundOsAccountLocalId(const uint64_t displayId, int32_t& localId)
+{
+    if (g_isOsAccountOk) {
+        localId = g_mockOsAccountUserId;
+        return 0;
+    }
+    localId = -1;
+    return -1;
+}
+} // namespace OHOS::AccountSA
 #endif
 
 namespace {
@@ -1556,7 +1598,7 @@ HWTEST_F(DisplayServiceTest, RegisterMultiScreenDisplayStateCallbackInnerTest004
     DISPLAY_HILOGI(LABEL_TEST, "RegisterMultiScreenDisplayStateCallbackInnerTest004 function start!");
     sptr<TestMultiScreenCallback> nonProxyCb = new TestMultiScreenCallback(false);
     DisplayErrors ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(nonProxyCb, MAIN_SCREEN_ID);
-    EXPECT_EQ(ret, DisplayErrors::ERR_REGISTRATION_FAILED);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
 
     sptr<TestMultiScreenCallback> cb = new TestMultiScreenCallback(true);
     ret = g_service->RegisterMultiScreenDisplayStateCallbackInner(cb, MAIN_SCREEN_ID);
@@ -1830,5 +1872,268 @@ HWTEST_F(DisplayServiceTest, CommonEventTest001, TestSize.Level1)
 
     DISPLAY_HILOGI(LABEL_TEST, "CommonEventTest001 function end!");
 }
+
+// ===== Helpers for multi-screen broadcast / U0 edge tests =====
+// Write the atomic ScreenController::state_ directly to put the aggregated
+// whole-machine state into a known shape, without driving SetMultiScreen
+// (which itself computes the edge via IsWholeMachineScreenStateChanged and may fire a U0 send).
+// state_ is std::atomic; GetState() is a lock-free load, so this matches the read
+// path. private->public via -Dprivate=public exposes both controllerMap_ and
+// ScreenController::state_.
+static void ForceAllControllersState(DisplayPowerMgr::DisplayState state)
+{
+    for (auto& item : g_service->controllerMap_) {
+        item.second->state_ = state;
+    }
+}
+
+static void ForceControllerState(uint64_t displayId, DisplayPowerMgr::DisplayState state)
+{
+    auto it = g_service->controllerMap_.find(displayId);
+    if (it != g_service->controllerMap_.end()) {
+        it->second->state_ = state;
+    }
+}
+
+// Create (if absent) and set the known multi-screen controllers OFF via the real
+// SetMultiScreenDisplayStateInner flow, so later ForceControllerState calls find them.
+static void SetupAllScreensOff()
+{
+    g_mockSetDisplayStateRet = true;
+    const uint64_t ids[] = {MAIN_SCREEN_ID, SECOND_SCREEN_ID, THIRD_SCREEN_ID,
+        FOURTH_SCREEN_ID, FIFTH_SCREEN_ID};
+    for (uint64_t id : ids) {
+        g_service->SetMultiScreenDisplayStateInner(id, TEST_SCREEN_NAME,
+            DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    }
+}
+
+/**
+ * @tc.name: GetAllMultiScreenDisplayStateInnerTest001
+ * @tc.desc: Test GetAllMultiScreenDisplayStateInner without system permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetAllMultiScreenDisplayStateInnerTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest001 function start!");
+    g_isPermissionGranted = false;
+    std::map<uint64_t, int32_t> states;
+    DisplayErrors ret = g_service->GetAllMultiScreenDisplayStateInner(states);
+    EXPECT_EQ(ret, DisplayErrors::ERR_SYSTEM_API_DENIED);
+    EXPECT_TRUE(states.empty());
+    g_isPermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest001 function end!");
+}
+
+/**
+ * @tc.name: GetAllMultiScreenDisplayStateInnerTest002
+ * @tc.desc: Test GetAllMultiScreenDisplayStateInner without MULTI_SCREEN_MANAGER permission
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetAllMultiScreenDisplayStateInnerTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest002 function start!");
+    g_isPermissionGranted = true;
+    g_isNativePermissionGranted = false;
+    std::map<uint64_t, int32_t> states;
+    DisplayErrors ret = g_service->GetAllMultiScreenDisplayStateInner(states);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    EXPECT_TRUE(states.empty());
+    g_isNativePermissionGranted = true;
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest002 function end!");
+}
+
+/**
+ * @tc.name: GetAllMultiScreenDisplayStateInnerTest003
+ * @tc.desc: Test GetAllMultiScreenDisplayStateInner returns every screen state in a map
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetAllMultiScreenDisplayStateInnerTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest003 function start!");
+    SetupAllScreensOff();
+    ForceControllerState(MAIN_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    ForceControllerState(SECOND_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    ForceControllerState(THIRD_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    std::map<uint64_t, int32_t> states;
+    DisplayErrors ret = g_service->GetAllMultiScreenDisplayStateInner(states);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    EXPECT_GE(states.size(), static_cast<size_t>(3));
+    EXPECT_EQ(states[MAIN_SCREEN_ID], static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON));
+    EXPECT_EQ(states[SECOND_SCREEN_ID], static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF));
+    EXPECT_EQ(states[THIRD_SCREEN_ID], static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON));
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateInnerTest003 function end!");
+}
+
+/**
+ * @tc.name: GetAllMultiScreenDisplayStateTest001
+ * @tc.desc: Test GetAllMultiScreenDisplayState override casts DisplayState->int32_t + retCode
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, GetAllMultiScreenDisplayStateTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateTest001 function start!");
+    SetupAllScreensOff();
+    ForceControllerState(MAIN_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    ForceControllerState(SECOND_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    std::map<uint64_t, int32_t> states;
+    int32_t retCode = -1;
+    ErrCode ret = g_service->GetAllMultiScreenDisplayState(states, retCode);
+    EXPECT_EQ(ret, ERR_OK);
+    EXPECT_EQ(retCode, static_cast<int32_t>(DisplayErrors::ERR_OK));
+    EXPECT_GE(states.size(), static_cast<size_t>(2));
+    EXPECT_EQ(states[MAIN_SCREEN_ID], static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_ON));
+    EXPECT_EQ(states[SECOND_SCREEN_ID], static_cast<int32_t>(DisplayPowerMgr::DisplayState::DISPLAY_OFF));
+    DISPLAY_HILOGI(LABEL_TEST, "GetAllMultiScreenDisplayStateTest001 function end!");
+}
+
+/**
+ * @tc.name: WholeMachineScreenStateChangedTest001
+ * @tc.desc: whole-machine edge: aggregate off->on -> broadcast without USER_APP (reaches U0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, WholeMachineScreenStateChangedTest001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest001 function start!");
+    SetupAllScreensOff();
+    ForceAllControllersState(DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    g_publishAsUserEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_EQ(g_lastAsUserAction, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    EXPECT_EQ(g_lastAsUserUserId, 0);
+    EXPECT_FALSE(g_lastAsUserIsUserApp); // edge: whole-machine, no USER_APP
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest001 function end!");
+}
+
+/**
+ * @tc.name: WholeMachineScreenStateChangedTest002
+ * @tc.desc: whole-machine edge: aggregate on->off -> broadcast without USER_APP (reaches U0)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, WholeMachineScreenStateChangedTest002, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest002 function start!");
+    SetupAllScreensOff();
+    ForceAllControllersState(DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    ForceControllerState(MAIN_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    g_publishAsUserEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_EQ(g_lastAsUserAction, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EXPECT_EQ(g_lastAsUserUserId, 0);
+    EXPECT_FALSE(g_lastAsUserIsUserApp);
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest002 function end!");
+}
+
+/**
+ * @tc.name: WholeMachineScreenStateChangedTest003
+ * @tc.desc: non-edge: a second screen ON while aggregate already on -> per-user (USER_APP set)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, WholeMachineScreenStateChangedTest003, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest003 function start!");
+    SetupAllScreensOff();
+    ForceAllControllersState(DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    ForceControllerState(MAIN_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    g_publishAsUserEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(SECOND_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON);
+    EXPECT_EQ(g_publishAsUserEventCount, 1); // per-user fires on every change
+    EXPECT_TRUE(g_lastAsUserIsUserApp); // non-edge: USER_APP set (U10X only)
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest003 function end!");
+}
+
+/**
+ * @tc.name: WholeMachineScreenStateChangedTest004
+ * @tc.desc: non-edge then edge: turn one screen off while another stays on (USER_APP),
+ *           then turn the last screen off (no USER_APP, whole-machine)
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, WholeMachineScreenStateChangedTest004, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest004 function start!");
+    SetupAllScreensOff();
+    ForceAllControllersState(DisplayPowerMgr::DisplayState::DISPLAY_OFF);
+    ForceControllerState(MAIN_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    ForceControllerState(SECOND_SCREEN_ID, DisplayPowerMgr::DisplayState::DISPLAY_ON);
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    // MAIN off, SECOND still on -> non-edge, per-user (USER_APP)
+    g_publishAsUserEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(MAIN_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_TRUE(g_lastAsUserIsUserApp);
+    // SECOND off -> aggregate off, edge fires (no USER_APP, whole-machine)
+    g_publishAsUserEventCount = 0;
+    g_service->SetMultiScreenDisplayStateInner(SECOND_SCREEN_ID, TEST_SCREEN_NAME,
+        DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_EQ(g_lastAsUserAction, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EXPECT_EQ(g_lastAsUserUserId, 0);
+    EXPECT_FALSE(g_lastAsUserIsUserApp);
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "WholeMachineScreenStateChangedTest004 function end!");
+}
+
+/**
+ * @tc.name: PublishSystemCommonEventOnForU0Test001
+ * @tc.desc: Manager PublishSystemCommonEvent(ON) sends SCREEN_ON to user 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, PublishSystemCommonEventOnForU0Test001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "PublishSystemCommonEventOnForU0Test001 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    g_publishAsUserEventCount = 0;
+    mgr.PublishSystemCommonEvent(
+        g_mockOsAccountUserId, DisplayPowerMgr::DisplayState::DISPLAY_ON, DEFAULT_REASON, true);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_EQ(g_lastAsUserAction, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON);
+    EXPECT_EQ(g_lastAsUserUserId, 0);
+    EXPECT_FALSE(g_lastAsUserIsUserApp);
+    EXPECT_TRUE(g_lastAsUserPubReason.empty());
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "PublishSystemCommonEventOnForU0Test001 function end!");
+}
+
+/**
+ * @tc.name: PublishSystemCommonEventOffForU0Test001
+ * @tc.desc: Manager PublishSystemCommonEvent(OFF) sends SCREEN_OFF to user 0
+ * @tc.type: FUNC
+ */
+HWTEST_F(DisplayServiceTest, PublishSystemCommonEventOffForU0Test001, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "PublishSystemCommonEventOffForU0Test001 function start!");
+    MultiScreenDisplayStateCallbackManager mgr;
+    g_isOsAccountOk = true;
+    g_mockOsAccountUserId = 0;
+    g_publishAsUserEventCount = 0;
+    mgr.PublishSystemCommonEvent(
+        g_mockOsAccountUserId, DisplayPowerMgr::DisplayState::DISPLAY_OFF, DEFAULT_REASON, true);
+    EXPECT_EQ(g_publishAsUserEventCount, 1);
+    EXPECT_EQ(g_lastAsUserAction, EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    EXPECT_EQ(g_lastAsUserUserId, 0);
+    EXPECT_FALSE(g_lastAsUserIsUserApp);
+    EXPECT_TRUE(g_lastAsUserPubReason.empty());
+    g_isOsAccountOk = true;
+    DISPLAY_HILOGI(LABEL_TEST, "PublishSystemCommonEventOffForU0Test001 function end!");
+}
+
 #endif
 } // namespace

@@ -67,9 +67,26 @@ public:
     int32_t NotifyScreenPowerStatus(uint32_t displayId, uint32_t displayPowerStatus, int32_t& retCode) override;
     int32_t SetScreenDisplayState(uint64_t screenId, uint32_t status, uint32_t reason) override;
     ErrCode SetSceneMode(uint32_t id, SceneModeType type, bool enable, bool& result) override;
+    ErrCode GetAllMultiScreenDisplayState(std::map<uint64_t, int32_t>& states,
+        int32_t& retCode) override;
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
     int32_t SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
         const sptr<IRemoteObject>& token, int32_t& result) override;
+#endif
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    int32_t SetMultiScreenDisplayState(uint64_t displayId, const std::string& screenName, uint32_t state,
+        uint32_t reason, int32_t& retCode) override;
+    int32_t GetMultiScreenDisplayState(uint64_t displayId, int32_t& displayState, int32_t& retCode) override;
+    int32_t RegisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
+        uint64_t displayId, int32_t& retCode) override;
+    int32_t UnregisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
+        uint64_t displayId, int32_t& retCode) override;
+
+    static int32_t mockMultiScreenRet;
+    static int32_t mockMultiScreenRetCode;
+    static int32_t mockMultiScreenState;
+
+    static void ResetMultiScreenMock();
 #endif
 };
 } // namespace DisplayPowerMgr

@@ -22,6 +22,9 @@ config("displaymgr_public_config") {
     "native/include",
     "${displaymgr_utils_path}/native/include",
   ]
+  if (display_manager_feature_multi_screen_state) {
+    defines += [ "DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE" ]
+  }
 }
 
 ohos_shared_library("displaymgr") {

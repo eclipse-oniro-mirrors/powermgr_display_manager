@@ -73,6 +73,8 @@ interface OHOS.DisplayPowerMgr.IDisplayPowerMgr {
         [in] unsigned int state, [in] unsigned int reason, [out] int retCode);
     void GetMultiScreenDisplayState([in] unsigned long displayId, [out] int displayState,
         [out] int retCode);
+    void GetAllMultiScreenDisplayState([out] OrderedMap<unsigned long, int> states,
+        [out] int retCode);
     void RegisterMultiScreenDisplayStateCallback([in] IMultiScreenDisplayStateCallback cb,
         [in] unsigned long displayId, [out] int retCode);
     void UnregisterMultiScreenDisplayStateCallback([in] IMultiScreenDisplayStateCallback cb,

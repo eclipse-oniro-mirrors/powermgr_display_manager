@@ -13,6 +13,7 @@
 
 import("//build/test.gni")
 import("../../../../displaymgr.gni")
+import("../displaymgr_fuzztest.gni")
 
 module_output_path = "display_manager/display_state_manager"
 
@@ -100,4 +101,7 @@ ohos_fuzztest("SetScreenPowerOffStrategyFuzzTest") {
   if (use_clang_coverage) {
     defines += [ "FUZZ_COV_TEST" ]
   }
+  defines += displaymgr_fuzz_defines
+  external_deps += displaymgr_fuzz_external_deps
+  sources += displaymgr_fuzz_sources
 }

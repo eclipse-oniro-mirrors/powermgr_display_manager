@@ -47,6 +47,9 @@ void DisplayPowerMgrClientMockTest::TearDown()
     DisplayPowerMgrClient::GetInstance().SetDisplayState(DisplayState::DISPLAY_OFF);
     g_testRemoteObj = nullptr;
     mClient.proxy_ = mProxyBack;
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    MockDisplayPowerMgrProxy::ResetMultiScreenMock();
+#endif
 }
 
 void DisplayPowerMgrClientMockTest::DisplayPowerMgrTestCallback::OnDisplayStateChanged(
@@ -524,4 +527,138 @@ HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient031, TestSize.Level
     EXPECT_TRUE(ret);
     DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient031 function end!");
 }
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+constexpr uint64_t TEST_MULTI_DISPLAY_ID = 1;
+const std::string TEST_MULTI_SCREEN_NAME = "test_screen";
+
+/**
+ * @tc.name: DisplayPowerMgrClient032
+ * @tc.desc: test SetMultiScreenDisplayState() when proxy return fail / success / error code passthrough
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient032, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient032 function start!");
+    auto ret = mClient.SetMultiScreenDisplayState(
+        TEST_MULTI_DISPLAY_ID, TEST_MULTI_SCREEN_NAME, DisplayState::DISPLAY_ON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_CONNECTION_FAIL);
+
+    MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_OK;
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    ret = mClient.SetMultiScreenDisplayState(TEST_MULTI_DISPLAY_ID, TEST_MULTI_SCREEN_NAME,
+        DisplayState::DISPLAY_OFF, MultiScreenStateChangeReason::STATE_CHANGE_REASON_DEFAULT);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_PERMISSION_DENIED);
+    ret = mClient.SetMultiScreenDisplayState(
+        TEST_MULTI_DISPLAY_ID, TEST_MULTI_SCREEN_NAME, DisplayState::DISPLAY_ON);
+    EXPECT_EQ(ret, DisplayErrors::ERR_PERMISSION_DENIED);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient032 function end!");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrClient033
+ * @tc.desc: test GetMultiScreenDisplayState() when proxy return fail and success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient033, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient033 function start!");
+    DisplayState state = DisplayState::DISPLAY_UNKNOWN;
+    auto ret = mClient.GetMultiScreenDisplayState(TEST_MULTI_DISPLAY_ID, state);
+    EXPECT_EQ(ret, DisplayErrors::ERR_CONNECTION_FAIL);
+
+    MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_OK;
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    MockDisplayPowerMgrProxy::mockMultiScreenState = static_cast<int32_t>(DisplayState::DISPLAY_ON);
+    state = DisplayState::DISPLAY_UNKNOWN;
+    ret = mClient.GetMultiScreenDisplayState(TEST_MULTI_DISPLAY_ID, state);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    EXPECT_EQ(state, DisplayState::DISPLAY_ON);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient033 function end!");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrClient034
+ * @tc.desc: test RegisterMultiScreenDisplayStateCallback() nullptr callback / proxy return fail / success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient034, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient034 function start!");
+    EXPECT_EQ(mClient.RegisterMultiScreenDisplayStateCallback(nullptr), DisplayErrors::ERR_PARAM_INVALID);
+
+    sptr<IMultiScreenDisplayStateCallback> callback =
+        new DisplayPowerMgrClientMockTest::TestMultiScreenCallback();
+    auto ret = mClient.RegisterMultiScreenDisplayStateCallback(callback);
+    EXPECT_EQ(ret, DisplayErrors::ERR_CONNECTION_FAIL);
+
+    MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_OK;
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    ret = mClient.RegisterMultiScreenDisplayStateCallback(callback, TEST_MULTI_DISPLAY_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient034 function end!");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrClient035
+ * @tc.desc: test UnregisterMultiScreenDisplayStateCallback() nullptr callback / proxy return fail / success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient035, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient035 function start!");
+    EXPECT_EQ(mClient.UnregisterMultiScreenDisplayStateCallback(nullptr), DisplayErrors::ERR_PARAM_INVALID);
+
+    sptr<IMultiScreenDisplayStateCallback> callback =
+        new DisplayPowerMgrClientMockTest::TestMultiScreenCallback();
+    auto ret = mClient.UnregisterMultiScreenDisplayStateCallback(callback);
+    EXPECT_EQ(ret, DisplayErrors::ERR_CONNECTION_FAIL);
+
+    MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_OK;
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    ret = mClient.UnregisterMultiScreenDisplayStateCallback(callback, TEST_MULTI_DISPLAY_ID);
+    EXPECT_EQ(ret, DisplayErrors::ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient035 function end!");
+}
+
+/**
+ * @tc.name: DisplayPowerMgrClient036
+ * @tc.desc: test GetAllMultiScreenDisplayState() (all screens) when proxy return fail and success
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DisplayPowerMgrClientMockTest, DisplayPowerMgrClient036, TestSize.Level1)
+{
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient036 function start!");
+    // proxy fail -> empty vector
+    auto result = mClient.GetAllMultiScreenDisplayState();
+    EXPECT_TRUE(result.empty());
+
+    // proxy success -> vector populated + last error OK
+    MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_OK;
+    MockDisplayPowerMgrProxy::mockMultiScreenRetCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+    MockDisplayPowerMgrProxy::mockMultiScreenState = static_cast<int32_t>(DisplayState::DISPLAY_ON);
+    result = mClient.GetAllMultiScreenDisplayState();
+    EXPECT_FALSE(result.empty());
+    bool found = false;
+    DisplayState foundState = DisplayState::DISPLAY_UNKNOWN;
+    for (const auto& [id, st] : result) {
+        if (id == TEST_MULTI_DISPLAY_ID) {
+            found = true;
+            foundState = st;
+            break;
+        }
+    }
+    EXPECT_TRUE(found);
+    EXPECT_EQ(foundState, DisplayState::DISPLAY_ON);
+    EXPECT_EQ(mClient.GetError(), DisplayErrors::ERR_OK);
+    DISPLAY_HILOGI(LABEL_TEST, "DisplayPowerMgrClient036 function end!");
+}
+#endif
 } // namespace
