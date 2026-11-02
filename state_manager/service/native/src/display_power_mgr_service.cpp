@@ -27,6 +27,9 @@
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
 #include <cinttypes>
 #include <mutex>
+#include <algorithm>
+#include <iterator>
+#include <os_account_manager.h>
 #endif
 #ifdef ENABLE_SENSOR_PART
 #include "sensor_agent.h"
@@ -62,6 +65,7 @@ const int32_t ERR_OK = 0;
 
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
 constexpr uint32_t MAX_SCREEN_NAME_LENGTH = 100;
+constexpr int32_t INVALID_USER_ID = -1;
 #endif
 
 #define CHECK_PARAM_WITH_RET(value, lower, upper, ret) \
@@ -635,11 +639,13 @@ DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t d
         }
         controller = it->second;
     }
+
     std::lock_guard<ffrt::mutex> lock(controller->GetScreenLock());
     if (controller->GetState() == state) {
         DISPLAY_HILOGI(COMP_SVC, "same state=%{public}u, skip", static_cast<uint32_t>(state));
         return DisplayErrors::ERR_OK;
     }
+
     BrightnessManager::Get().SetDisplayState(static_cast<uint32_t>(displayId), state, reason);
     bool ret = controller->UpdateMultiScreenState(state, reason, screenName);
     if (!ret) {
@@ -647,7 +653,7 @@ DisplayErrors DisplayPowerMgrService::SetMultiScreenDisplayStateInner(uint64_t d
         UndoSetDisplayStateInner(static_cast<uint32_t>(displayId), controller->GetState(), reason);
         return DisplayErrors::ERR_STATE_CHANGE_FAILED;
     }
-    NotifyMultiScreenStateChanged(displayId, screenName, state, reason);
+    NotifyMultiScreenStateChanged(displayId, screenName, state, reason, controller);
     return DisplayErrors::ERR_OK;
 }
 
@@ -678,6 +684,25 @@ DisplayErrors DisplayPowerMgrService::GetMultiScreenDisplayStateInner(uint64_t d
     }
     std::lock_guard<ffrt::mutex> lock(controller->GetScreenLock());
     state = controller->GetState();
+    return DisplayErrors::ERR_OK;
+}
+
+DisplayErrors DisplayPowerMgrService::GetAllMultiScreenDisplayStateInner(
+    std::map<uint64_t, int32_t>& states)
+{
+    if (!Permission::IsSystem()) {
+        DISPLAY_HILOGI(COMP_SVC, "GetAllMultiScreenDisplayStateInner failed, System permission intercept");
+        return DisplayErrors::ERR_SYSTEM_API_DENIED;
+    }
+    if (!Permission::IsNativePermissionGranted("ohos.permission.MULTI_SCREEN_MANAGER")) {
+        DISPLAY_HILOGI(COMP_SVC,
+            "GetAllMultiScreenDisplayStateInner failed, The caller does not have the permission");
+        return DisplayErrors::ERR_PERMISSION_DENIED;
+    }
+    std::lock_guard<ffrt::mutex> lock(controllerMapMutex_);
+    for (auto& iter : controllerMap_) {
+        states[iter.first] = static_cast<int32_t>(iter.second->GetState());
+    }
     return DisplayErrors::ERR_OK;
 }
 
@@ -724,18 +749,124 @@ DisplayErrors DisplayPowerMgrService::UnregisterMultiScreenDisplayStateCallbackI
 }
 
 void DisplayPowerMgrService::NotifyMultiScreenStateChanged(uint64_t displayId, const std::string& screenName,
-    DisplayState state, uint32_t reason)
+    DisplayState state, uint32_t reason, const std::shared_ptr<ScreenController>& controller)
 {
     DISPLAY_HILOGI(COMP_SVC,
         "NotifyMultiScreenStateChanged displayId=%{public}" PRIu64 ", screenName=%{public}s,"
         " state=%{public}u, reason=%{public}u",
         displayId, screenName.c_str(), static_cast<uint32_t>(state), reason);
-    if (multiScreenCallbackMgr_ != nullptr) {
-        multiScreenCallbackMgr_->Notify(displayId, screenName, state, reason);
-        multiScreenCallbackMgr_->PublishCommonEvent(displayId, screenName, state, reason);
-    } else {
+    if (multiScreenCallbackMgr_ == nullptr) {
         DISPLAY_HILOGE(COMP_SVC, "multiScreenCallbackMgr_ is nullptr, skip notify");
+        return;
     }
+
+    multiScreenCallbackMgr_->Notify(displayId, screenName, state, reason);
+    auto [userId, isMainScreen] = GetUserMainScreenInfo(displayId, controller);
+    if (!isMainScreen) {
+        DISPLAY_HILOGI(COMP_SVC, "displayId %{public}" PRIu64 " Not user %{public}d main screen", displayId, userId);
+        return;
+    }
+    multiScreenCallbackMgr_->PublishSystemCommonEvent(userId, state, reason,
+        IsWholeMachineScreenStateChanged(displayId, state));
+}
+
+void DisplayPowerMgrService::OnUserSwitched(int32_t userId, uint64_t displayId)
+{
+    if (multiScreenCallbackMgr_ == nullptr) {
+        DISPLAY_HILOGW(COMP_SVC, "OnUserSwitched multiScreenCallbackMgr_ is nullptr, skip");
+        return;
+    }
+    std::shared_ptr<ScreenController> controller;
+    {
+        std::lock_guard<ffrt::mutex> lock(controllerMapMutex_);
+        auto iter = controllerMap_.find(displayId);
+        if (iter != controllerMap_.end()) {
+            controller = iter->second;
+        }
+    }
+    if (controller == nullptr) {
+        DISPLAY_HILOGI(COMP_SVC,
+            "OnUserSwitched no controller for displayId=%{public}" PRIu64 ", skip", displayId);
+        return;
+    }
+    std::lock_guard<ffrt::mutex> lock(controller->GetScreenLock());
+    DisplayState state = controller->GetState();
+    constexpr uint32_t reason = 0;
+    DISPLAY_HILOGI(COMP_SVC,
+        "OnUserSwitched userId=%{public}d, displayId=%{public}" PRIu64 ", state=%{public}u",
+        userId, displayId, static_cast<uint32_t>(state));
+    multiScreenCallbackMgr_->PublishSystemCommonEvent(userId, state, reason,
+        IsWholeMachineScreenStateChanged(displayId, state));
+}
+
+void DisplayPowerMgrService::PostUserSwitched(int32_t userId, uint64_t displayId)
+{
+    if (queue_ == nullptr) {
+        DISPLAY_HILOGW(COMP_SVC, "PostUserSwitched queue_ is null, skip userId=%{public}d", userId);
+        return;
+    }
+    auto self = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+    queue_->submit([self, userId, displayId]() {
+        if (self != nullptr) {
+            self->OnUserSwitched(userId, displayId);
+        }
+    });
+}
+
+std::pair<int32_t, bool> DisplayPowerMgrService::GetUserMainScreenInfo(
+    uint64_t displayId, const std::shared_ptr<ScreenController>& controller)
+{
+    int32_t userId = INVALID_USER_ID;
+    ErrCode err = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(
+        static_cast<uint32_t>(displayId), userId);
+    if (err != ERR_OK) {
+        DISPLAY_HILOGI(COMP_SVC,
+            "GetUserMainScreenInfo query failed displayId=%{public}" PRIu64 ", err=%{public}d, skip",
+            displayId, err);
+        return {INVALID_USER_ID, false};
+    }
+
+    uint64_t mainDisplayId = 0;
+    ErrCode errMain = AccountSA::OsAccountManager::GetForegroundOsAccountDisplayId(userId, mainDisplayId);
+    if (errMain != ERR_OK) {
+        DISPLAY_HILOGI(COMP_SVC,
+            "GetUserMainScreenInfo query main display failed userId=%{public}d, err=%{public}d, skip",
+            userId, errMain);
+        return {INVALID_USER_ID, false};
+    }
+    bool isMainScreen = (mainDisplayId == displayId);
+    DISPLAY_HILOGD(COMP_SVC,
+        "GetUserMainScreenInfo displayId=%{public}" PRIu64 ", userId=%{public}d, mainDisplayId=%{public}" PRIu64
+        ", isMainScreen=%{public}d",
+        displayId, userId, mainDisplayId, isMainScreen);
+    return {userId, isMainScreen};
+}
+
+bool DisplayPowerMgrService::IsWholeMachineScreenStateChanged(uint64_t displayId, DisplayState state)
+{
+    std::lock_guard<ffrt::mutex> lock(controllerMapMutex_);
+    bool isNowAnyOn = (state == DisplayState::DISPLAY_ON || state == DisplayState::DISPLAY_DIM);
+
+    for (const auto& iter : controllerMap_) {
+        if (iter.first == displayId) {
+            continue;
+        }
+        auto [userId, isMainScreen] = GetUserMainScreenInfo(iter.first, iter.second);
+        if (!isMainScreen) {
+            continue;
+        }
+        DisplayState s = iter.second->GetState();
+        if (s == DisplayState::DISPLAY_ON || s == DisplayState::DISPLAY_DIM) {
+            isNowAnyOn = true;
+            break;
+        }
+    }
+    bool changed = (isPrevAnyOn_ != isNowAnyOn);
+    DISPLAY_HILOGI(COMP_SVC, "IsWholeMachineScreenStateChanged displayId=%{public}" PRIu64 ", state=%{public}u,"
+        " nowAnyOn=%{public}d, prevAnyOn=%{public}d, changed=%{public}d",
+        displayId, static_cast<uint32_t>(state), isNowAnyOn, isPrevAnyOn_, changed);
+    isPrevAnyOn_ = isNowAnyOn;
+    return changed;
 }
 
 void DisplayPowerMgrService::SetScreenOnBrightness(uint32_t displayId)
@@ -767,6 +898,19 @@ ErrCode DisplayPowerMgrService::GetMultiScreenDisplayState(uint64_t displayId, i
     DisplayState state = DisplayState::DISPLAY_UNKNOWN;
     DisplayErrors err = GetMultiScreenDisplayStateInner(displayId, state);
     displayState = static_cast<int32_t>(state);
+    retCode = static_cast<int32_t>(err);
+#else
+    retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);
+#endif
+    return ERR_OK;
+}
+
+ErrCode DisplayPowerMgrService::GetAllMultiScreenDisplayState(std::map<uint64_t, int32_t>& states,
+    int32_t& retCode)
+{
+    DisplayXCollie displayXCollie("DisplayPowerMgrService::GetAllMultiScreenDisplayState");
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    DisplayErrors err = GetAllMultiScreenDisplayStateInner(states);
     retCode = static_cast<int32_t>(err);
 #else
     retCode = static_cast<int32_t>(DisplayErrors::ERR_OK);

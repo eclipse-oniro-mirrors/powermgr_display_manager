@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <utility>
 #include <memory>
 #include <functional>
 #include <sys/types.h>
@@ -99,6 +100,8 @@ public:
         uint32_t state, uint32_t reason, int32_t& retCode) override;
     ErrCode GetMultiScreenDisplayState(uint64_t displayId, int32_t& displayState,
         int32_t& retCode) override;
+    ErrCode GetAllMultiScreenDisplayState(std::map<uint64_t, int32_t>& states,
+        int32_t& retCode) override;
     ErrCode RegisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
         uint64_t displayId, int32_t& retCode) override;
     ErrCode UnregisterMultiScreenDisplayStateCallback(const sptr<IMultiScreenDisplayStateCallback>& callback,
@@ -111,6 +114,7 @@ private:
     DisplayErrors SetMultiScreenDisplayStateInner(uint64_t displayId, const std::string& screenName,
         DisplayState state, uint32_t reason);
     DisplayErrors GetMultiScreenDisplayStateInner(uint64_t displayId, DisplayState& state);
+    DisplayErrors GetAllMultiScreenDisplayStateInner(std::map<uint64_t, int32_t>& states);
     DisplayErrors RegisterMultiScreenDisplayStateCallbackInner(sptr<IMultiScreenDisplayStateCallback> callback,
         uint64_t displayId);
     DisplayErrors UnregisterMultiScreenDisplayStateCallbackInner(sptr<IMultiScreenDisplayStateCallback> callback,
@@ -153,8 +157,14 @@ public:
     void NotifyStateChangeCallback(uint32_t displayId, DisplayState state, uint32_t reason);
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     void NotifyMultiScreenStateChanged(uint64_t displayId, const std::string& screenName, DisplayState state,
-        uint32_t reason);
+        uint32_t reason, const std::shared_ptr<ScreenController>& controller);
+    bool IsWholeMachineScreenStateChanged(uint64_t displayId, DisplayState state);
+
+    std::pair<int32_t, bool> GetUserMainScreenInfo(uint64_t displayId,
+        const std::shared_ptr<ScreenController>& controller);
     void SetScreenOnBrightness(uint32_t displayId);
+    void OnUserSwitched(int32_t userId, uint64_t displayId);
+    void PostUserSwitched(int32_t userId, uint64_t displayId);
 #endif
     void Init();
     void Deinit();
@@ -220,6 +230,7 @@ private:
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
     ffrt::mutex controllerMapMutex_;  // Protects concurrent find/emplace access to controllerMap_
     std::shared_ptr<MultiScreenDisplayStateCallbackManager> multiScreenCallbackMgr_;
+    bool isPrevAnyOn_ {false};
 #endif
 
     std::atomic_int32_t lastError_ {static_cast<int32_t>(DisplayErrors::ERR_OK)};

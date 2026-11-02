@@ -18,7 +18,9 @@
 
 #include <atomic>
 #include <iremote_object.h>
+#include <map>
 #include <singleton.h>
+#include <utility>
 #include <vector>
 
 #include "display_power_info.h"
@@ -103,6 +105,13 @@ public:
      * @param state [out] Current display state. DISPLAY_UNKNOWN if not found.
      */
     DisplayErrors GetMultiScreenDisplayState(uint64_t displayId, DisplayState& state);
+    /**
+     * @brief Get the display state of all screens in one call.
+     *
+     * @return A vector of {displayId, DisplayState} pairs for all known screens. Empty on failure
+     *         (e.g. proxy unavailable); call GetError() for the last error code.
+     */
+    std::vector<std::pair<uint64_t, DisplayState>> GetAllMultiScreenDisplayState();
     /**
      * @brief Register the callback for display state change of specific screen(s).
      *

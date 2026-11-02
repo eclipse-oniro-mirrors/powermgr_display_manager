@@ -23,6 +23,7 @@
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_publish_info.h"
+#include "common_event_support.h"
 #include "display_common.h"
 #include "display_log.h"
 #include "want.h"
@@ -30,6 +31,7 @@
 namespace OHOS {
 namespace DisplayPowerMgr {
 namespace {
+constexpr int32_t SYSTEM_USER_ID = 0;
 constexpr const char* PARAM_DISPLAY_ID = "displayId";
 constexpr const char* PARAM_SCREEN_NAME = "screenName";
 constexpr const char* PARAM_REASON = "reason";
@@ -53,15 +55,15 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
         }
     }
     if (range.first == range.second) {
-        if (!callback->IsProxyObject()) {
-            DISPLAY_HILOGE(COMP_SVC, "callback is not proxy");
-            return false;
+        if (callback->IsProxyObject()) {
+            sptr<CallbackDeathRecipient> deathRecipient(new CallbackDeathRecipient(*this));
+            callback->AddDeathRecipient(deathRecipient);
+            deathRecipients_[callback] = deathRecipient;
+            callbackPidUidMap_.emplace(callback, std::make_pair(IPCSkeleton::GetCallingPid(),
+                IPCSkeleton::GetCallingUid()));
+        } else {
+            DISPLAY_HILOGI(COMP_SVC, "Callback is not proxy, treating as in-process stub");
         }
-        sptr<CallbackDeathRecipient> deathRecipient(new CallbackDeathRecipient(*this));
-        callback->AddDeathRecipient(deathRecipient);
-        deathRecipients_[callback] = deathRecipient;
-        callbackPidUidMap_.emplace(callback,
-            std::make_pair(IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid()));
     }
     callbacks_.emplace(callback, displayId);
     DISPLAY_HILOGI(COMP_SVC, "callback for displayId=%{public}" PRIu64 ", total=%{public}zu",
@@ -174,6 +176,28 @@ void MultiScreenDisplayStateCallbackManager::PublishCommonEvent(uint64_t display
         "PublishCommonEvent for %{public}s, displayId=%{public}" PRIu64 ", screenName=%{public}s,"
         " reason=%{public}u, ret=%{public}d",
         action, displayId, screenName.c_str(), reason, ret);
+}
+
+void MultiScreenDisplayStateCallbackManager::PublishSystemCommonEvent(int32_t userId,
+    DisplayState state, uint32_t reason, bool isWholeMachineScreenStateChanged)
+{
+    const std::string& action =
+        (state == DisplayState::DISPLAY_ON) ? EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON
+                                            : EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF;
+    AAFwk::Want want;
+    want.SetAction(action);
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(false);
+    // no USER_APP_SUBSCRIBER_TYPE flag means for U0 and U10X
+    if (!isWholeMachineScreenStateChanged) {
+        publishInfo.SetSubscriberType(EventFwk::SubscriberType::USER_APP_SUBSCRIBER_TYPE);
+    }
+    bool ret = EventFwk::CommonEventManager::PublishCommonEventAsUser(data, publishInfo, userId);
+    DISPLAY_HILOGI(COMP_SVC,
+        "PublishSystemCommonEvent %{public}s to userId=%{public}d, reason=%{public}u, ret=%{public}d, T=%{public}d",
+        action.c_str(), userId, reason, ret, isWholeMachineScreenStateChanged);
 }
 } // namespace DisplayPowerMgr
 } // namespace OHOS

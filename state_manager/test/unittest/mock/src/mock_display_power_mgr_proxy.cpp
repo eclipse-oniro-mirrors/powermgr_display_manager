@@ -215,6 +215,21 @@ ErrCode MockDisplayPowerMgrProxy::SetSceneMode(uint32_t id, SceneModeType type, 
     return ERR_FAIL;
 }
 
+ErrCode MockDisplayPowerMgrProxy::GetAllMultiScreenDisplayState(std::map<uint64_t, int32_t>& states,
+    int32_t& retCode)
+{
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    // Key matches TEST_MULTI_DISPLAY_ID (= 1) in mock_display_client_test.cpp.
+    retCode = mockMultiScreenRetCode;
+    if (mockMultiScreenRet == ERR_OK) {
+        states[static_cast<uint64_t>(1)] = mockMultiScreenState;
+    }
+    return mockMultiScreenRet;
+#else
+    return ERR_FAIL;
+#endif
+}
+
 #ifdef ENABLE_SCREEN_POWER_OFF_STRATEGY
 int32_t MockDisplayPowerMgrProxy::SetScreenPowerOffStrategy(uint32_t strategy, uint32_t reason,
     const sptr<IRemoteObject>& token, int32_t& result)
@@ -224,6 +239,48 @@ int32_t MockDisplayPowerMgrProxy::SetScreenPowerOffStrategy(uint32_t strategy, u
         return ERR_OK;
     }
     return ERR_FAIL;
+}
+#endif
+
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+int32_t MockDisplayPowerMgrProxy::mockMultiScreenRet = ERR_FAIL;
+int32_t MockDisplayPowerMgrProxy::mockMultiScreenRetCode = ERR_OK;
+int32_t MockDisplayPowerMgrProxy::mockMultiScreenState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
+
+void MockDisplayPowerMgrProxy::ResetMultiScreenMock()
+{
+    mockMultiScreenRet = ERR_FAIL;
+    mockMultiScreenRetCode = ERR_OK;
+    mockMultiScreenState = static_cast<int32_t>(DisplayState::DISPLAY_UNKNOWN);
+}
+
+int32_t MockDisplayPowerMgrProxy::SetMultiScreenDisplayState(uint64_t displayId, const std::string& screenName,
+    uint32_t state, uint32_t reason, int32_t& retCode)
+{
+    retCode = mockMultiScreenRetCode;
+    return mockMultiScreenRet;
+}
+
+int32_t MockDisplayPowerMgrProxy::GetMultiScreenDisplayState(uint64_t displayId, int32_t& displayState,
+    int32_t& retCode)
+{
+    displayState = mockMultiScreenState;
+    retCode = mockMultiScreenRetCode;
+    return mockMultiScreenRet;
+}
+
+int32_t MockDisplayPowerMgrProxy::RegisterMultiScreenDisplayStateCallback(
+    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t displayId, int32_t& retCode)
+{
+    retCode = mockMultiScreenRetCode;
+    return mockMultiScreenRet;
+}
+
+int32_t MockDisplayPowerMgrProxy::UnregisterMultiScreenDisplayStateCallback(
+    const sptr<IMultiScreenDisplayStateCallback>& callback, uint64_t displayId, int32_t& retCode)
+{
+    retCode = mockMultiScreenRetCode;
+    return mockMultiScreenRet;
 }
 #endif
 } // namespace DisplayPowerMgr
