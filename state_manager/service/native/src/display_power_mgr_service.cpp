@@ -1040,7 +1040,7 @@ int32_t DisplayPowerMgrService::SetScreenPowerOffStrategyInner(PowerOffStrategy 
     }
     localMutex_.unlock();
     DISPLAY_HILOGI(COMP_SVC, "strategy =%{public}d, reason = %{public}u, CallingPid = %{public}d, uid = %{public}d",
-        strategy, reason, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+        strategy, reason, IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingAppUid());
     MiscellaneousDisplayPowerStrategy::GetInstance().SetStrategy(strategy, reason);
     return static_cast<int32_t>(DisplayErrors::ERR_OK);
 }

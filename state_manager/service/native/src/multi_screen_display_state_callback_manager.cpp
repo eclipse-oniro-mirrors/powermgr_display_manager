@@ -61,7 +61,7 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
         callback->AddDeathRecipient(deathRecipient);
         deathRecipients_[callback] = deathRecipient;
         callbackPidUidMap_.emplace(callback,
-            std::make_pair(IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid()));
+            std::make_pair(IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingAppUid()));
     }
     callbacks_.emplace(callback, displayId);
     DISPLAY_HILOGI(COMP_SVC, "callback for displayId=%{public}" PRIu64 ", total=%{public}zu",
