@@ -55,15 +55,15 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
         }
     }
     if (range.first == range.second) {
-        if (!callback->IsProxyObject()) {
-            DISPLAY_HILOGE(COMP_SVC, "callback is not proxy");
-            return false;
+        if (callback->IsProxyObject()) {
+            sptr<CallbackDeathRecipient> deathRecipient(new CallbackDeathRecipient(*this));
+            callback->AddDeathRecipient(deathRecipient);
+            deathRecipients_[callback] = deathRecipient;
+            callbackPidUidMap_.emplace(callback, std::make_pair(IPCSkeleton::GetCallingPid(),
+                IPCSkeleton::GetCallingAppUid()));
+        } else {
+            DISPLAY_HILOGI(COMP_SVC, "Callback is not proxy, treating as in-process stub");
         }
-        sptr<CallbackDeathRecipient> deathRecipient(new CallbackDeathRecipient(*this));
-        callback->AddDeathRecipient(deathRecipient);
-        deathRecipients_[callback] = deathRecipient;
-        callbackPidUidMap_.emplace(callback,
-            std::make_pair(IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingAppUid()));
     }
     callbacks_.emplace(callback, displayId);
     DISPLAY_HILOGI(COMP_SVC, "callback for displayId=%{public}" PRIu64 ", total=%{public}zu",
