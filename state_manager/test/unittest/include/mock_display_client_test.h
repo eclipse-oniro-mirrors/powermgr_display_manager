@@ -19,6 +19,9 @@
 #include <gtest/gtest.h>
 #include "display_power_mgr_client.h"
 #include "display_power_callback_stub.h"
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+#include "multi_screen_display_state_callback_stub.h"
+#endif
 
 class DisplayPowerMgrClientMockTest : public testing::Test {
 public:
@@ -33,6 +36,16 @@ public:
         virtual void OnDisplayStateChanged(
             uint32_t displayId, OHOS::DisplayPowerMgr::DisplayState state, uint32_t reason) override;
     };
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    class TestMultiScreenCallback : public OHOS::DisplayPowerMgr::MultiScreenDisplayStateCallbackStub {
+    public:
+        TestMultiScreenCallback() = default;
+        ~TestMultiScreenCallback() override = default;
+        void OnMultiScreenDisplayStateChanged(uint64_t displayId, const std::string& screenName,
+            OHOS::DisplayPowerMgr::DisplayState state,
+            OHOS::DisplayPowerMgr::MultiScreenStateChangeReason reason) override {};
+    };
+#endif
 
     OHOS::DisplayPowerMgr::DisplayPowerMgrClient& mClient = OHOS::DisplayPowerMgr::DisplayPowerMgrClient::GetInstance();
     OHOS::sptr<OHOS::DisplayPowerMgr::IDisplayPowerMgr> mProxyBack{nullptr};

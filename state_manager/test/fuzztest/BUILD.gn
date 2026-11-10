@@ -51,4 +51,13 @@ group("fuzztest") {
       "setscreenpoweroffstrategy_fuzzer:SetScreenPowerOffStrategyFuzzTest",
     ]
   }
+  if (display_manager_feature_multi_screen_state) {
+    deps += [
+      "setmultiscreendisplaystate_fuzzer:SetMultiScreenDisplayStateFuzzTest",
+      "getmultiscreendisplaystate_fuzzer:GetMultiScreenDisplayStateFuzzTest",
+      "getallmultiscreendisplaystate_fuzzer:GetAllMultiScreenDisplayStateFuzzTest",
+      "registermultiscreendisplaystatecallback_fuzzer:RegisterMultiScreenDisplayStateCallbackFuzzTest",
+      "unregistermultiscreendisplaystatecallback_fuzzer:UnregisterMultiScreenDisplayStateCallbackFuzzTest",
+    ]
+  }
 }

@@ -57,6 +57,9 @@ void DisplaySystemAbility::OnAddSystemAbility(int32_t systemAbilityId, const std
         DISPLAY_HILOGI(COMP_SVC, "COMMON_EVENT_SERVICE_ID loaded");
         OHOS::EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+#endif
         OHOS::EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         if (commonEventManager_ == nullptr) {
             commonEventManager_ = std::make_shared<DisplayCommonEventManager>(subscribeInfo);

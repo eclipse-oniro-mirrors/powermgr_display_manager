@@ -34,7 +34,11 @@ namespace {
     const uint32_t INIT_WAITING = 50 * 1000; // 50ms
 }
 
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+BrightnessManagerExt g_BrightnessManagerExt(0);
+#else
 BrightnessManagerExt g_BrightnessManagerExt;
+#endif
 
 class BrightnessManagerExtTest : public Test {};
 

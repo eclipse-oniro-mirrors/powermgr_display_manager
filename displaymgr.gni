@@ -46,6 +46,7 @@ declare_args() {
 if (display_manager_feature_poweroff_strategy) {
     defines += [ "ENABLE_SCREEN_POWER_OFF_STRATEGY" ]
 }
+
 displaymgr_part_name = "display_manager"
 
 displaymgr_root_path = "//base/powermgr/display_manager/state_manager"

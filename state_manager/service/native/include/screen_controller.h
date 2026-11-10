@@ -49,6 +49,7 @@ public:
     DisplayState GetState();
     DisplayState SetDelayOffState();
     DisplayState SetOnState();
+
     bool UpdateState(DisplayState state, uint32_t reason);
     void UpdateCachedState(DisplayState state);
     bool IsScreenOn();
@@ -94,6 +95,7 @@ private:
     bool SkipNotify(DisplayState targetState);
 
     static const constexpr char* SETTING_BRIGHTNESS_KEY {"settings.display.screen_brightness_status"};
+
     std::atomic<DisplayState> state_ {DisplayState::DISPLAY_UNKNOWN};
     std::mutex mutexState_;
 #ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE

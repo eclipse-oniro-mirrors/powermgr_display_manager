@@ -16,6 +16,8 @@
 #ifndef BRIGHTNESS_MANAGER_H
 #define BRIGHTNESS_MANAGER_H
 
+#include <shared_mutex>
+
 #include "brightness_service.h"
 #include "brightness_manager_ext.h"
 

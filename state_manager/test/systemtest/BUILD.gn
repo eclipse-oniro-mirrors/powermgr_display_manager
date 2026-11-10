@@ -130,6 +130,16 @@ ohos_systemtest("systemtest_display_mgr_service") {
       "${displaymgr_root_path}/service/native/src/miscellaneous_display_power_strategy.cpp",
     ]
   }
+
+  if (display_manager_feature_multi_screen_state) {
+    sources += [
+      "${displaymgr_root_path}/service/native/src/multi_screen_display_state_callback_manager.cpp",
+    ]
+    external_deps += [
+      "common_event_service:cesfwk_innerkits",
+      "os_account:os_account_innerkits",
+    ]
+  }
 }
 
 group("systemtest") {

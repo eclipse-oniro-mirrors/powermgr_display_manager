@@ -41,6 +41,8 @@ public:
     bool Unregister(const sptr<IRemoteObject>& callback, uint64_t displayId);
     bool RemoveAll(const sptr<IRemoteObject>& callback);
     void Notify(uint64_t displayId, const std::string& screenName, DisplayState state, uint32_t reason);
+    void PublishSystemCommonEvent(
+        int32_t userId, DisplayState state, uint32_t reason, bool isWholeMachineScreenStateChanged);
     void PublishCommonEvent(uint64_t displayId, const std::string& screenName, DisplayState state, uint32_t reason);
 
 private:

@@ -15,6 +15,9 @@
 
 #include "display_common_event_mgr.h"
 
+#include <cerrno>
+#include <cinttypes>
+#include <cstdlib>
 #include <string>
 
 #include "display_system_ability.h"
@@ -48,6 +51,27 @@ void DisplayCommonEventManager::OnReceiveEvent(const CommonEventData &data)
             HandleBootBrightness();
         }
     }
+#ifdef DISPLAY_MANAGER_ENABLE_MULTI_SCREEN_STATE
+    else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = data.GetCode();
+        std::string displayIdStr = data.GetWant().GetStringParam("displayId");
+        uint64_t displayId = 0;
+        errno = 0;
+        char* endPtr = nullptr;
+        unsigned long long parsed = std::strtoull(displayIdStr.c_str(), &endPtr, 10);
+        if (errno == 0 && endPtr != displayIdStr.c_str() && *endPtr == '\0') {
+            displayId = static_cast<uint64_t>(parsed);
+        } else {
+            DISPLAY_HILOGW(COMP_SVC, "user switched event invalid displayId=%{public}s", displayIdStr.c_str());
+        }
+        DISPLAY_HILOGI(COMP_SVC,
+            "on receive user switched, userId=%{public}d, displayId=%{public}" PRIu64, userId, displayId);
+        auto service = DelayedSpSingleton<DisplayPowerMgrService>::GetInstance();
+        if (service != nullptr) {
+            service->PostUserSwitched(userId, displayId);
+        }
+    }
+#endif
 }
 
 bool DisplayCommonEventManager::CheckIfSettingsDataReady()
