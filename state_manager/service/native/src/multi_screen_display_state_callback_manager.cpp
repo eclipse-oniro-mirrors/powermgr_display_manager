@@ -60,7 +60,7 @@ bool MultiScreenDisplayStateCallbackManager::Register(const sptr<IRemoteObject>&
             callback->AddDeathRecipient(deathRecipient);
             deathRecipients_[callback] = deathRecipient;
             callbackPidUidMap_.emplace(callback, std::make_pair(IPCSkeleton::GetCallingPid(),
-                IPCSkeleton::GetCallingUid()));
+                IPCSkeleton::GetCallingAppUid()));
         } else {
             DISPLAY_HILOGI(COMP_SVC, "Callback is not proxy, treating as in-process stub");
         }
